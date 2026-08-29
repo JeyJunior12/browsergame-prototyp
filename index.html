@@ -1,18 +1,46 @@
 <!doctype html>
 <html lang="de">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Browsergame – Entwicklung</title>
-  <style>
-    :root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;font-family:system-ui,sans-serif;background:linear-gradient(135deg,#111827,#1f2937);color:#f9fafb}.card{max-width:680px;margin:24px;padding:40px;border:1px solid #374151;border-radius:22px;background:#111827cc;box-shadow:0 24px 70px #0008}h1{margin:0 0 12px;font-size:clamp(2rem,7vw,4rem)}p{font-size:1.1rem;line-height:1.65;color:#d1d5db}.status{display:inline-flex;gap:10px;align-items:center;margin-top:14px;padding:10px 14px;border-radius:999px;background:#052e16;color:#86efac}.dot{width:10px;height:10px;border-radius:50%;background:#22c55e;box-shadow:0 0 16px #22c55e}
-  </style>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KiezKönig – Von null nach ganz unten</title>
+<style>
+:root{--ink:#191713;--paper:#e8dcc0;--rust:#9d3e1d;--acid:#d4d92b;--night:#211f1b;--line:#5d5545}*{box-sizing:border-box}body{margin:0;background:#332f29;color:var(--ink);font-family:Verdana,Arial,sans-serif;background-image:linear-gradient(#0003,#0003),repeating-linear-gradient(25deg,#35312b 0 2px,#302c27 2px 5px)}button,input{font:inherit}.wrap{max-width:1120px;margin:auto;min-height:100vh;background:var(--paper);box-shadow:0 0 80px #000}.mast{padding:16px 22px;background:var(--night);color:#fff;border-bottom:6px solid var(--rust);display:flex;justify-content:space-between;align-items:center;gap:16px}.logo{font:900 clamp(25px,6vw,48px) Impact,sans-serif;letter-spacing:2px;transform:rotate(-1deg);text-shadow:3px 3px #9d3e1d}.tag{color:#cfc3a4;font-size:12px}.layout{display:grid;grid-template-columns:210px 1fr;min-height:700px}.side{background:#cabc9a;border-right:3px solid var(--line);padding:12px}.side button{width:100%;text-align:left;margin:4px 0;padding:11px;border:1px solid #726955;background:#e7dcc0;font-weight:bold;cursor:pointer}.side button:hover{background:var(--acid)}.side button:disabled{opacity:.55}.main{padding:18px}.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:14px}.stat{padding:10px;background:#211f1b;color:#fff;border-bottom:4px solid var(--rust)}.stat small{display:block;color:#bdb195}.stat b{font-size:18px}.panel{background:#f7efd9;border:2px solid var(--line);box-shadow:5px 5px #0002;margin-bottom:16px}.panel h2{margin:0;padding:10px 14px;background:#5e5749;color:#fff;font-size:18px}.inside{padding:16px}.hero{display:grid;grid-template-columns:1.3fr .7fr;gap:16px}.action{border:2px dashed var(--rust);padding:16px;background:#fff7db}.big{border:0;background:var(--rust);color:white;font-weight:900;padding:14px 20px;cursor:pointer;box-shadow:4px 4px #4a1b0c}.big:hover{transform:translate(2px,2px);box-shadow:2px 2px #4a1b0c}.big:disabled{filter:grayscale(1);cursor:not-allowed}.notice{padding:10px;margin:12px 0;background:#fff0a6;border-left:5px solid #b58e00}.good{background:#dbe99d}.bad{background:#f0b2a1}.auth{max-width:520px;margin:35px auto}.auth input{width:100%;padding:12px;margin:6px 0;border:2px solid #777;background:#fffdf4}.auth .row{display:flex;gap:10px;flex-wrap:wrap}.ghost{padding:11px 16px;border:2px solid #5d5545;background:#ded2b5;cursor:pointer}.progress{height:13px;background:#897f6b;margin-top:5px}.progress span{display:block;height:100%;background:var(--acid)}.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.card{padding:12px;border:1px solid #827762;background:#e9ddbf}.locked{filter:grayscale(1);opacity:.7}.quote{font-style:italic;color:#5d5545}.topline{display:flex;justify-content:space-between;gap:12px;align-items:center}.hide{display:none!important}@media(max-width:760px){.layout{grid-template-columns:1fr}.side{display:flex;overflow:auto;border-right:0;border-bottom:3px solid var(--line)}.side button{min-width:145px}.stats{grid-template-columns:repeat(2,1fr)}.hero,.cards{grid-template-columns:1fr}.mast{align-items:flex-start}.main{padding:10px}}
+</style>
 </head>
-<body>
-  <main class="card">
-    <h1>Browsergame</h1>
-    <p>Die Online-Entwicklungsumgebung läuft. Ab jetzt werden neue Versionen automatisch über GitHub und Vercel veröffentlicht.</p>
-    <div class="status"><span class="dot"></span>Testserver online</div>
-  </main>
-</body>
-</html>
+<body><div class="wrap">
+<header class="mast"><div><div class="logo">KIEZKÖNIG</div><div class="tag">Von null nach ganz unten – und dann wieder hoch.</div></div><button id="logout" class="ghost hide">Abmelden</button></header>
+<div id="auth" class="auth panel"><h2>Rein in den Kiez</h2><div class="inside">
+<p>Kein Download. Kein Glanz. Nur du, eine knisternde Tüte und große Träume.</p>
+<input id="username" placeholder="Straßenname (bei Registrierung)" maxlength="24">
+<input id="email" type="email" placeholder="E-Mail">
+<input id="password" type="password" placeholder="Passwort (mindestens 6 Zeichen)">
+<div class="row"><button id="login" class="big">Einloggen</button><button id="signup" class="ghost">Neu registrieren</button></div>
+<div id="authmsg"></div></div></div>
+<div id="game" class="layout hide">
+<nav class="side"><button data-page="home">🛒 Pfandtour</button><button disabled>🎓 Weiterbildung</button><button disabled>🧥 Schwarzmarkt</button><button disabled>🛏 Unterkunft</button><button disabled>👊 Prügelei</button><button disabled>🐕 Begleiter</button><button disabled>👥 Bande</button><button disabled>🏆 Rangliste</button></nav>
+<main class="main">
+<div class="stats"><div class="stat"><small>Kohle</small><b id="money">0,00 €</b></div><div class="stat"><small>Energie</small><b id="energy">100 / 100</b></div><div class="stat"><small>Pfand</small><b id="bottles">0</b></div><div class="stat"><small>Level</small><b id="level">1</b></div><div class="stat"><small>Rang</small><b id="rank">Tüten-Neuling</b></div></div>
+<section class="panel"><h2>Dein Elend auf einen Blick</h2><div class="inside topline"><div><b id="playername">Kiezkind</b><div class="quote">„Andere haben einen Lebenslauf. Du hast einen Einkaufswagen.“</div></div><div>XP<div class="progress"><span id="xpbar" style="width:0%"></span></div><small id="xptext">0 / 100</small></div></div></section>
+<div class="hero"><section class="panel"><h2>Pfandtour: Hinterhof am Bahnhof</h2><div class="inside"><div class="action"><h3>Wühl dich zum Wohlstand</h3><p>Zwischen fragwürdigen Pfützen und noch fragwürdigeren Tauben wartet bares Geld. Eine Tour kostet <b>10 Energie</b>.</p><button id="collect" class="big">🛒 Pfand sammeln</button><div id="result"></div></div></div></section>
+<section class="panel"><h2>Gerüchteküche</h2><div class="inside"><p>🗞️ Der Pfandpreis liegt heute sensationell stabil bei <b>0,25 €</b>.</p><p>🐦 Eine Taube behauptet, du schuldest ihr noch ein Brötchen.</p><p>🚧 Weitere Stadtteile öffnen bald.</p></div></section></div>
+<section class="panel"><h2>Dein Aufstieg</h2><div class="inside cards"><div class="card"><b>1. Tüten-Neuling</b><p>Plastiktüte, Parkbank, null Ruf.</p></div><div class="card locked"><b>2. Pfand-Profi</b><p>Ab Level 2. Größerer Sack, größere Klappe.</p></div><div class="card locked"><b>3. Kiezgestalt</b><p>Später. Man kennt dich. Leider.</p></div></div></section>
+</main></div></div>
+<script type="module">
+import {createClient} from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+const supabase=createClient('https://qazpwdyyzfdektlbtxae.supabase.co','sb_publishable_MItYmVu-D7OqRcAYHkLGOQ_TDpsjf0P');
+const q=s=>document.querySelector(s), auth=q('#auth'), game=q('#game'), msg=q('#authmsg');
+function say(el,text,type='notice'){el.innerHTML='<div class="'+type+'">'+text+'</div>'}
+async function load(){
+ const {data:{session}}=await supabase.auth.getSession();
+ if(!session){auth.classList.remove('hide');game.classList.add('hide');q('#logout').classList.add('hide');return}
+ auth.classList.add('hide');game.classList.remove('hide');q('#logout').classList.remove('hide');
+ const {data,error}=await supabase.from('profiles').select('*').eq('id',session.user.id).single();
+ if(error){say(q('#result'),'Profil klemmt: '+error.message,'notice bad');return} render(data)
+}
+function render(p){q('#playername').textContent=p.username;q('#money').textContent=Number(p.money).toFixed(2).replace('.',',')+' €';q('#energy').textContent=p.energy+' / 100';q('#bottles').textContent=p.bottles;q('#level').textContent=p.level;const part=p.xp%100;q('#xpbar').style.width=part+'%';q('#xptext').textContent=part+' / 100';q('#rank').textContent=p.level>=3?'Kiezgestalt':p.level>=2?'Pfand-Profi':'Tüten-Neuling';q('#collect').disabled=p.energy<10}
+q('#login').onclick=async()=>{msg.innerHTML='';const {error}=await supabase.auth.signInWithPassword({email:q('#email').value,password:q('#password').value});if(error)say(msg,error.message,'notice bad');else load()}
+q('#signup').onclick=async()=>{const u=q('#username').value.trim();if(u.length<3)return say(msg,'Dein Straßenname braucht mindestens 3 Zeichen.','notice bad');const {error}=await supabase.auth.signUp({email:q('#email').value,password:q('#password').value,options:{data:{username:u}}});if(error)say(msg,error.message,'notice bad');else say(msg,'Account angelegt. Falls eine Mail kommt: bestätigen, dann einloggen.','notice good')}
+q('#logout').onclick=async()=>{await supabase.auth.signOut();load()}
+q('#collect').onclick=async()=>{q('#collect').disabled=true;const {data,error}=await supabase.rpc('collect_bottles');if(error)say(q('#result'),error.message,'notice bad');else{render(data.profile);say(q('#result'),'Du hast <b>'+data.found+' Flaschen</b> aus dem Dreck gezogen und <b>'+Number(data.earned).toFixed(2).replace('.',',')+' €</b> verdient. Deine Würde bleibt verschollen.','notice good')}setTimeout(()=>{q('#collect').disabled=false},8000)}
+supabase.auth.onAuthStateChange(()=>load());load();
+</script></body></html>
