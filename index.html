@@ -249,4 +249,5 @@ document.querySelectorAll('.panel>.section-tools span').forEach((s,i)=>{s.setAtt
 <script id="profile-slip-script-v27">
 (()=>{const slip=document.querySelector('.player-slip');if(!slip||slip.dataset.v27)return;slip.dataset.v27='1';const rows=slip.querySelectorAll(':scope>span');if(rows[0])rows[0].innerHTML='<b>AUS:</b><i>Bahnhof</i>';if(rows[1])rows[1].innerHTML='<b>PLATZ:</b><i>Level <em id="sliplevel">'+(document.querySelector('#level')?.textContent||'1')+'</em></i>';if(rows[2]){rows[2].className='slip-messages';rows[2].innerHTML='<b>NEUE NACHRICHTEN</b><i>Postfach</i>'}const sync=()=>{const n=document.querySelector('#playername')?.textContent,l=document.querySelector('#level')?.textContent;if(n)slip.querySelector('#slipname').textContent=n;const level=slip.querySelector('#sliplevel');if(level&&l)level.textContent=l};sync();setInterval(sync,1000)})();
 </script>
+<style id="profile-overlap-fix-v27b">.player-slip{top:142px!important}@media(max-width:700px){.player-slip{top:222px!important}}</style>
 </body></html>
