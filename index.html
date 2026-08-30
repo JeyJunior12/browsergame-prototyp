@@ -296,7 +296,7 @@ html{min-height:100%;background:#111}body{min-height:100%;background-color:#1717
 @media(max-width:800px){.kiez-quickbar{height:auto;min-height:27px;margin-left:5px;margin-right:5px;grid-template-columns:repeat(6,1fr);align-items:stretch}.kiez-quickbar button{height:23px!important;white-space:normal;font-size:6px}}
 </style>
 <script id="kiez-quickbar-script-v31">
-(()=>{const main=document.querySelector('.main'),stats=document.querySelector('.stats'),hidden=document.querySelector('.side');if(!main||!stats||!hidden||document.querySelector('.kiez-quickbar'))return;const places=[['Stadtkarte','income'],['Zubehör','store'],['Supermarkt','store'],['Tierhandlung','pets'],['Waffenladen','store'],['Apotheke','begging'],['Waschhaus','begging'],['Schnorrplätze','begging'],['Musikladen','income'],['Eigenheime','gear'],['Glücksspiel','missions']];const bar=document.createElement('nav');bar.className='kiez-quickbar';bar.setAttribute('aria-label','Orte im Kiez');places.forEach(([name,id])=>{const b=document.createElement('button');b.textContent=name;b.dataset.view=id;b.onclick=()=>{hidden.querySelector('[data-view="'+id+'"]')?.click();bar.querySelectorAll('button').forEach(x=>x.classList.toggle('active',x===b))};bar.append(b)});stats.after(bar)})();
+(()=>{const main=document.querySelector('.main'),stats=document.querySelector('.stats'),hidden=document.querySelector('.side');if(!main||!stats||!hidden||document.querySelector('.kiez-quickbar'))return;const places=[['Stadtkarte','income'],['Zubehör','store'],['Supermarkt','store'],['Tierhandlung','pets'],['Waffenladen','store'],['Apotheke','begging'],['Waschhaus','begging'],['Schnorrplätze','begging'],['Musikladen','income'],['Eigenheime','gear'],['Glücksspiel','missions'],['Plunderkiste','plunder']];const bar=document.createElement('nav');bar.className='kiez-quickbar';bar.setAttribute('aria-label','Orte im Kiez');places.forEach(([name,id])=>{const b=document.createElement('button');b.textContent=name;b.dataset.view=id;b.onclick=()=>{hidden.querySelector('[data-view="'+id+'"]')?.click();bar.querySelectorAll('button').forEach(x=>x.classList.toggle('active',x===b))};bar.append(b)});stats.after(bar)})();
 </script>
 <style id="classic-profile-page-v32">
 #overview.active-view{display:grid!important;grid-template-columns:minmax(0,1fr) 180px!important;grid-template-areas:"profile tabs"!important;min-height:540px!important;background:#30302ef2!important}#overview>.classic-profile-content{grid-area:profile;padding:14px 12px 22px!important}#overview>.profile-paper-tabs{grid-area:tabs;padding:14px 10px;background:#2d2d2b;border-left:1px solid #494742}#overview>.profile-paper-tabs button{display:block;width:100%;min-height:38px;margin:4px 0;padding:8px 13px;border:0;text-align:left;background:#d8c594;color:#382f22;font:700 9px Georgia,serif;cursor:pointer;clip-path:polygon(2% 3%,96% 0,100% 34%,97% 70%,100% 95%,4% 100%,0 72%,3% 38%)}#overview>.profile-paper-tabs button:hover{background:#edd9a5;transform:translateX(-3px)}.classic-profile-title{display:flex;justify-content:space-between;align-items:center;margin:0 0 6px;padding:2px 4px 8px;border-bottom:1px solid #44423e}.classic-profile-title h2{margin:0;background:none!important;border:0!important;padding:0!important;color:#eee6d4!important;font:34px/1 Georgia,serif!important;text-shadow:2px 2px #000}.classic-profile-title span{color:#cfc6af;font:20px Georgia,serif}.profile-label{margin:0 0 8px;padding:4px 6px;background:#393936;color:#d6d0c0;font:700 10px Arial}.classic-profile-core{display:grid;grid-template-columns:115px minmax(0,1fr);gap:10px;width:min(560px,100%);padding:8px;background:#2a2a28;border:1px solid #3f3e3a}.profile-main-avatar{width:105px;height:128px;background:#171715 center/cover no-repeat;border:5px solid #4a4740;box-shadow:inset 0 0 14px #000}.profile-main-avatar:after{content:'Profilbild ändern';display:block;position:relative;top:103px;padding:3px;background:#171715d9;color:#ddd2b8;text-align:center;font:7px Arial;cursor:pointer}.profile-mood{height:8px;margin:5px 0 8px;border:1px solid #111;background:#151515}.profile-mood span{display:block;width:18%;height:100%;background:#7d2421}.profile-warning{color:#a43e35;text-align:center;font-size:8px}.profile-table{width:100%;border-collapse:collapse;font-size:9px}.profile-table td{padding:3px 6px;border-bottom:1px solid #44423e}.profile-table td:first-child{width:95px;color:#b8b2a6}.profile-table td:last-child{color:#e0d8c4}.profile-wide-row{width:min(560px,100%);margin-top:9px;padding:8px;background:#292927;border:1px solid #3f3e39}.profile-wide-row h3{margin:0 0 7px;padding:4px 5px;background:#393936;color:#d5cebd;font:700 10px Arial}.profile-invite{display:grid;grid-template-columns:1fr 130px;gap:4px}.profile-invite input{height:25px;padding:4px;background:#222;border:1px solid #555;color:#ddd;font-size:9px}.profile-invite button{font-size:8px;padding:4px}.profile-progress-row{display:grid;grid-template-columns:74px 1fr;gap:8px;align-items:center}.profile-bug{height:60px;background:linear-gradient(135deg,#6d5a34,#2c2a24);display:grid;place-items:center;font-size:32px;border:3px solid #7f6f4d}.classic-profile-page-bg{background-image:linear-gradient(#10101066,#101010aa),url('/scene-city-v1.png')!important}
@@ -352,3 +352,174 @@ body{background-image:linear-gradient(#09090966,#09090999),var(--body-scene,url(
 <style id="pennergame-player-card-v46">.player-slip{clip-path:none!important;border-radius:4px!important;border:1px solid #4a3f2e!important;background-color:#8f7c60!important;background-image:radial-gradient(ellipse 34px 18px at 12% 20%,rgba(35,26,15,.35) 0%,transparent 70%),radial-gradient(ellipse 26px 30px at 85% 65%,rgba(35,26,15,.32) 0%,transparent 70%),radial-gradient(ellipse 20px 14px at 45% 90%,rgba(35,26,15,.26) 0%,transparent 70%),radial-gradient(ellipse 30px 10px at 30% 50%,rgba(255,245,220,.1) 0%,transparent 70%),linear-gradient(160deg,#a08a68,#7a6a4f)!important;box-shadow:2px 3px 6px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.15)!important}.player-slip strong{color:#2b2015!important;text-shadow:0 1px rgba(255,255,255,.3)!important;border-bottom-color:rgba(50,40,25,.25)!important}.player-slip span b{color:#4a3d2a!important}.player-slip span i{color:#2b2015!important}.player-slip .slip-messages b{color:#8a2f22!important}.player-slip .slip-messages i{color:#3a2d1c!important}.profile-avatar{border-color:#4a3f2e!important;filter:sepia(.35) contrast(1.05)}.player-slip>#logout{background:#7d6c52!important;border:1px solid #4a3f2e!important;color:#2b2015!important}</style>
 <style id="pennergame-crumpled-paper-v55">.mast{background-color:#cbb98f!important;background-image:url('/altes-papier-crop-v2.jpg')!important;background-repeat:repeat!important;background-size:260px auto!important}.logo{color:#2b2015!important;-webkit-text-fill-color:#2b2015!important;text-shadow:2px 2px rgba(255,255,255,.25),-1px -1px rgba(0,0,0,.15)!important}.tag{color:#5c4c34!important}.classic-mainnav>button{color:#2b2015!important;border-left-color:rgba(60,40,20,.3)!important;text-shadow:0 1px rgba(255,255,255,.2)!important}.classic-mainnav>button:last-child{border-right-color:rgba(60,40,20,.3)!important}.classic-mainnav>button:hover,.classic-mainnav>button.active{color:#000!important}.stats{background-color:#b7a37a!important;background-image:linear-gradient(rgba(30,20,10,.12),rgba(30,20,10,.12)),url('/altes-papier-crop-v2.jpg')!important;background-repeat:repeat!important;background-size:100% 100%,220px auto!important;border-top:1px solid rgba(255,255,255,.1)!important;border-bottom:2px solid #6b5a40!important}.stat{background:transparent!important;border-right:1px solid rgba(0,0,0,.2)!important}.stat small{color:#2b2015!important;font-weight:700!important;letter-spacing:.3px!important;text-shadow:0 1px rgba(255,255,255,.4)!important}.stat b{color:#000!important;font-weight:800!important;font-size:13px!important;text-shadow:0 1px rgba(255,255,255,.35)!important}</style>
 <style id="pennergame-paper-all-buttons-v57">button.big,button.ghost,.kiez-quickbar button,.kiez-quickbar button:nth-child(even),.panel.active-view>.section-tools span,.panel.active-view>.section-tools span:first-child,.panel.active-view>.section-tools span:nth-child(even),.classic-menu button,.player-slip>#logout,.duration-grid button,.trainbtn,.buyitem,.buypet{background-color:#cbb98f!important;background-image:url('/altes-papier-crop-v2.jpg')!important;background-repeat:repeat!important;background-size:140px auto!important;color:#1a1208!important;font-weight:700!important;text-shadow:none!important;border-color:#6b5a40!important}button.big:hover,button.ghost:hover,.kiez-quickbar button:hover,.kiez-quickbar button.active,.panel.active-view>.section-tools span:hover,.panel.active-view>.section-tools span.subtab-active,.classic-menu button:hover{background-image:url('/altes-papier-crop-v2.jpg')!important;filter:brightness(1.1);color:#000!important}button.big:disabled,button.ghost:disabled{filter:grayscale(1) brightness(.85);color:#3a3226!important}</style>
+<style id="pennergame-new-features-v58">
+.kiez-bio-row table.profile-table td:last-child{word-break:break-word}
+.kiez-bio-edit{margin-top:8px;display:grid;gap:6px;max-width:340px}
+.kiez-bio-edit input{padding:7px 9px}
+.haeuser-gallery{margin-top:14px}
+.haeuser-card{position:relative;min-height:130px;display:flex;flex-direction:column;justify-content:flex-end;border-radius:6px;overflow:hidden}
+.haeuser-card b,.haeuser-card p,.haeuser-card em{color:#f0e6d2!important;text-shadow:0 1px 3px #000}
+.haeuser-card em{font-style:normal;font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:#c8b78f!important}
+#plunder .cards .card small{display:block;margin-top:5px;color:#9a8f78}
+.kiez-weather-badge{display:inline-block}
+.guestbook-entry{padding:8px 10px;margin:0 0 6px;background:#00000022;border-radius:5px}
+.guestbook-entry b{color:#e8dcc0}
+</style>
+<script id="pennergame-new-features-script-v58">
+(()=>{
+const kiezLS={get:(k,d)=>{try{return localStorage.getItem(k)||d}catch(e){return d}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}}};
+function addBioAndGuestbook(){
+ const prof=document.querySelector('#overview .classic-profile-content');
+ if(!prof||prof.querySelector('.kiez-bio-row'))return;
+ const bio=JSON.parse(kiezLS.get('kiez_bio','{}'));
+ const row=document.createElement('div');
+ row.className='profile-wide-row kiez-bio-row';
+ row.innerHTML='<h3>Profil ansehen</h3><table class="profile-table"><tr><td>Vorname:</td><td class="bv-vor">'+(bio.vorname||'–')+'</td></tr><tr><td>Nachname:</td><td class="bv-nach">'+(bio.nachname||'–')+'</td></tr><tr><td>Wohnort:</td><td class="bv-wohn">'+(bio.wohnort||'–')+'</td></tr><tr><td>Trinkt gerne:</td><td class="bv-trinkt">'+(bio.trinkt||'–')+'</td></tr><tr><td>Homepage:</td><td class="bv-home">'+(bio.homepage||'–')+'</td></tr><tr><td>Lebensmotto:</td><td class="bv-motto">'+(bio.motto||'–')+'</td></tr></table><button class="ghost" id="bioEditBtn">Profil bearbeiten</button><div class="kiez-bio-edit hide" id="bioEditForm"><input id="bioVorname" placeholder="Vorname" value="'+(bio.vorname||'')+'"><input id="bioNachname" placeholder="Nachname" value="'+(bio.nachname||'')+'"><input id="bioWohnort" placeholder="Wohnort" value="'+(bio.wohnort||'')+'"><input id="bioTrinkt" placeholder="Trinkt gerne" value="'+(bio.trinkt||'')+'"><input id="bioHomepage" placeholder="Homepage" value="'+(bio.homepage||'')+'"><input id="bioMotto" placeholder="Lebensmotto" value="'+(bio.motto||'')+'"><button class="big" id="bioSaveBtn">Speichern</button></div>';
+ prof.appendChild(row);
+ const gb=document.createElement('div');
+ gb.className='profile-wide-row kiez-guestbook-row';
+ const entries=JSON.parse(kiezLS.get('kiez_guestbook','[]'));
+ const renderGb=()=>entries.length?entries.map(e=>'<div class="guestbook-entry"><b>'+e.name+':</b> '+e.text+'</div>').join(''):'Noch keine Einträge im Gästebuch.';
+ gb.innerHTML='<h3>Gästebuch</h3><div id="guestbookList">'+renderGb()+'</div><div class="profile-invite" style="margin-top:8px"><input id="guestName" placeholder="Dein Name"><input id="guestText" placeholder="Nachricht hinterlassen"></div><button class="ghost" id="guestSendBtn" style="margin-top:6px">Eintragen</button>';
+ prof.appendChild(gb);
+ document.getElementById('bioEditBtn').onclick=()=>document.getElementById('bioEditForm').classList.toggle('hide');
+ document.getElementById('bioSaveBtn').onclick=()=>{
+  const data={vorname:document.getElementById('bioVorname').value.trim(),nachname:document.getElementById('bioNachname').value.trim(),wohnort:document.getElementById('bioWohnort').value.trim(),trinkt:document.getElementById('bioTrinkt').value.trim(),homepage:document.getElementById('bioHomepage').value.trim(),motto:document.getElementById('bioMotto').value.trim()};
+  kiezLS.set('kiez_bio',JSON.stringify(data));
+  row.querySelector('.bv-vor').textContent=data.vorname||'–';
+  row.querySelector('.bv-nach').textContent=data.nachname||'–';
+  row.querySelector('.bv-wohn').textContent=data.wohnort||'–';
+  row.querySelector('.bv-trinkt').textContent=data.trinkt||'–';
+  row.querySelector('.bv-home').textContent=data.homepage||'–';
+  row.querySelector('.bv-motto').textContent=data.motto||'–';
+  document.getElementById('bioEditForm').classList.add('hide');
+ };
+ document.getElementById('guestSendBtn').onclick=()=>{
+  const name=document.getElementById('guestName').value.trim()||'Anonym';
+  const text=document.getElementById('guestText').value.trim();
+  if(!text)return;
+  entries.unshift({name,text});
+  kiezLS.set('kiez_guestbook',JSON.stringify(entries.slice(0,50)));
+  document.getElementById('guestbookList').innerHTML=renderGb();
+  document.getElementById('guestText').value='';
+ };
+}
+function addHaeuserGalerie(){
+ const cards=document.querySelector('#gear .cards');
+ if(!cards||document.querySelector('.haeuser-gallery'))return;
+ const houses=[
+  {min:1,name:'Parkbank',desc:'Kalt, hart, aber wenigstens gratis. Die Polizei stört gelegentlich.',img:'/scene-city-v1.png'},
+  {min:2,name:'Notunterkunft-Zelt',desc:'Regen bleibt meistens draußen. Meistens.',img:'/scene-shelter-v1.png'},
+  {min:3,name:'Verlassener Wohnwagen',desc:'Riecht nach Vorbesitzer, aber die Tür schließt ab.',img:'/scene-training-v1.png'},
+  {min:4,name:'Kellerloch mit Heizung',desc:'Feucht, aber warm. Luxus pur im Vergleich.',img:'/scene-store-v1.png'},
+  {min:5,name:'Altbauwohnung im Kiez',desc:'Eigene vier Wände. Die Nachbarn beschweren sich trotzdem.',img:'/scene-pets-v1.png'}
+ ];
+ const wrap=document.createElement('div');
+ wrap.className='haeuser-gallery cards';
+ wrap.innerHTML='<h3 class="shop-category" style="grid-column:1/-1">Häuser im Kiez</h3>'+houses.map(h=>'<div class="card haeuser-card" data-min="'+h.min+'" style="background-image:linear-gradient(rgba(10,10,10,.5),rgba(10,10,10,.78)),url(\''+h.img+'\');background-size:cover;background-position:center"><b>'+h.name+'</b><p>'+h.desc+'</p><em class="haeuser-status"></em></div>').join('');
+ cards.after(wrap);
+ const update=()=>{
+  const lvl=Number(document.querySelector('#shelterlvl')?.textContent||1);
+  wrap.querySelectorAll('.haeuser-card').forEach(c=>{
+   const min=Number(c.dataset.min),status=c.querySelector('.haeuser-status');
+   if(min===lvl)status.textContent='✅ Aktuell bewohnt';
+   else if(min<lvl)status.textContent='Bereits durchlaufen';
+   else if(min===lvl+1)status.textContent='Nächster Ausbau';
+   else status.textContent='Noch gesperrt';
+   c.style.opacity=min>lvl+1?'.45':'1';
+  });
+ };
+ update();setInterval(update,1500);
+}
+const PLUNDER_POOL=[
+ {name:'Kaputte Brille',att:0,def:1,desc:'Man sieht damit nichts, aber stylisch ist anders.'},
+ {name:'Rostiger Angelhaken',att:1,def:0,desc:'Fängt eher Ärger als Fische.'},
+ {name:'Goldenes Kleeblatt',att:0,def:2,desc:'Bringt angeblich Glück. Bisher nicht bestätigt.'},
+ {name:'Alter Motormotor',att:2,def:1,desc:'Zu schwer zum Tragen, zu schade zum Wegwerfen.'},
+ {name:'Dose "Dr. Penner"',att:1,def:1,desc:'Ein Energy-Drink, der niemanden je energetisiert hat.'},
+ {name:'Boxhandschuhe',att:3,def:0,desc:'Einer fehlt, aber der andere sitzt gut.'},
+ {name:'Tarnumhang',att:0,def:3,desc:'Funktioniert nur, wenn niemand hinschaut.'},
+ {name:'Verbeulter Kürbis',att:1,def:1,desc:'Fund vom letzten Herbst. Riecht komisch.'},
+ {name:'Zerbrochener Regenschirm',att:0,def:2,desc:'Hält weder Wind noch Regen ab, sieht aber wehrhaft aus.'},
+ {name:'Krone aus Alufolie',att:2,def:2,desc:'Für den König des Kiez.'}
+];
+function renderPlunder(){
+ const el=document.getElementById('plunderlist');
+ if(!el)return;
+ const list=JSON.parse(kiezLS.get('kiez_plunder','[]'));
+ el.innerHTML=list.length?list.map(p=>'<div class="card"><b>'+p.name+'</b><p>'+p.desc+'</p><p>ATT +'+p.att+' · DEF +'+p.def+'</p><small>Gefunden am '+p.found+'</small></div>').join(''):'Noch nichts gefunden. Geh auf Pfandtour!';
+}
+window.kiezMaybeFindPlunder=()=>{
+ if(Math.random()>0.35)return null;
+ const item=PLUNDER_POOL[Math.floor(Math.random()*PLUNDER_POOL.length)];
+ const list=JSON.parse(kiezLS.get('kiez_plunder','[]'));
+ list.unshift(Object.assign({},item,{found:new Date().toLocaleDateString('de-DE')}));
+ kiezLS.set('kiez_plunder',JSON.stringify(list.slice(0,100)));
+ renderPlunder();
+ return item;
+};
+function addPlunderSection(){
+ if(document.querySelector('#plunder'))return;
+ const main=document.querySelector('.main');
+ if(!main)return;
+ const section=document.createElement('section');
+ section.id='plunder';
+ section.className='panel';
+ section.innerHTML='<h2>Plunderkiste</h2><div class="section-tools"><span>Deine Funde</span><span>Sammlung</span></div><div class="inside"><p>Auf deinen Pfandtouren findest du gelegentlich kuriosen Plunder. Sammle alles - manches ist wertlos, manches eine Legende.</p><div id="plunderlist" class="cards">Noch nichts gefunden. Geh auf Pfandtour!</div></div>';
+ main.appendChild(section);
+ renderPlunder();
+ const sideNav=document.querySelector('.side');
+ if(sideNav&&!sideNav.querySelector('[data-view="plunder"]')){
+  const btn=document.createElement('button');
+  btn.dataset.view='plunder';
+  btn.textContent='🎒 Plunder';
+  btn.onclick=()=>{
+   document.querySelectorAll('section.panel').forEach(s=>s.classList.toggle('active-view',s.id==='plunder'));
+   document.querySelectorAll('.side [data-view]').forEach(b=>b.classList.toggle('active',b===btn));
+   document.querySelectorAll('.kiez-quickbar button').forEach(b=>b.classList.toggle('active',b.dataset.view==='plunder'));
+   window.scrollTo({top:0,behavior:'smooth'});
+  };
+  const adminNav=document.getElementById('adminnav');
+  sideNav.insertBefore(btn,adminNav||null);
+ }
+ const finishBtn=document.getElementById('finishcollect');
+ if(finishBtn&&!finishBtn.dataset.plunderHooked){
+  finishBtn.dataset.plunderHooked='1';
+  finishBtn.addEventListener('click',()=>{
+   setTimeout(()=>{
+    const found=window.kiezMaybeFindPlunder();
+    if(found){
+     const resultEl=document.querySelector('#result');
+     if(resultEl)resultEl.insertAdjacentHTML('beforeend','<div class="notice good">🎒 Plunder gefunden: <b>'+found.name+'</b> (ATT +'+found.att+' · DEF +'+found.def+')!</div>');
+    }
+   },900);
+  });
+ }
+}
+function addWeatherBadge(){
+ const title=document.querySelector('#overview .classic-profile-title');
+ if(!title||document.querySelector('.kiez-weather-badge'))return;
+ const weathers=[{n:'☀️ Sonnig',bonus:25},{n:'⛅ Bewölkt',bonus:10},{n:'🌧️ Regnerisch',bonus:-5},{n:'❄️ Kalt',bonus:0}];
+ const w=weathers[new Date().getDate()%weathers.length];
+ const badge=document.createElement('span');
+ badge.className='kiez-weather-badge';
+ badge.style.cssText='margin-left:10px;padding:3px 10px;background:#00000055;border-radius:10px;font-size:11px;color:#e8dcc0;vertical-align:middle';
+ badge.textContent=w.n+' · Pfandbonus '+(w.bonus>=0?'+':'')+w.bonus+'%';
+ title.appendChild(badge);
+}
+function addKronkorken(){
+ const statsRow=document.querySelector('.stats');
+ if(!statsRow||statsRow.querySelector('.kronkorken-stat'))return;
+ const kk=Number(kiezLS.get('kiez_kronkorken',0));
+ const k=document.createElement('div');
+ k.className='stat kronkorken-stat';
+ k.style.cursor='pointer';
+ k.innerHTML='<small>Kronkorken</small><b>'+kk+'</b><em>Premium-Währung</em>';
+ k.onclick=()=>alert('Kronkorken-Shop kommt bald! Aktuell gesammelt: '+kk);
+ statsRow.appendChild(k);
+}
+function initAll(){addBioAndGuestbook();addHaeuserGalerie();addPlunderSection();addWeatherBadge();addKronkorken();}
+initAll();
+setInterval(initAll,1000);
+})();
+</script>
