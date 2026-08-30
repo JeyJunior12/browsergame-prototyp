@@ -973,3 +973,127 @@ setInterval(initAll,1000);
 <style id="flow-purchase-buttons-v46b">section.panel .purchase-card{display:flex!important;flex-direction:column!important;align-items:stretch!important;padding-bottom:12px!important;overflow:visible!important}section.panel .purchase-card>.asset-thumb,section.panel .purchase-card>.generated-item-thumb{float:none!important;flex:0 0 auto!important}section.panel .purchase-card .buyitem,section.panel .purchase-card .buypet,section.panel .purchase-card .buyinstrument,section.panel .purchase-card .buywashitem,section.panel .purchase-card .uniform-purchase-button{position:static!important;left:auto!important;right:auto!important;bottom:auto!important;width:100%!important;height:30px!important;min-height:30px!important;margin:10px 0 0!important;flex:0 0 auto!important;clear:both!important}</style>
 
 <style id="flow-purchase-buttons-v46c">section.panel .purchase-card{display:flex!important;flex-direction:column!important;align-items:stretch!important;padding-bottom:12px!important;overflow:visible!important}section.panel .purchase-card>.asset-thumb,section.panel .purchase-card>.generated-item-thumb{float:none!important;flex:0 0 auto!important}section.panel .purchase-card .buyitem,section.panel .purchase-card .buypet,section.panel .purchase-card .buyinstrument,section.panel .purchase-card .buywashitem,section.panel .purchase-card .uniform-purchase-button{position:static!important;left:auto!important;right:auto!important;bottom:auto!important;width:100%!important;height:30px!important;min-height:30px!important;margin:10px 0 0!important;flex:0 0 auto!important;clear:both!important}</style>
+
+
+<style id="readable-purchase-layout-v47">
+section.panel .purchase-card{
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:stretch!important;
+  min-width:0!important;
+  padding-bottom:12px!important;
+  overflow:visible!important
+}
+section.panel .purchase-card>.asset-thumb,
+section.panel .purchase-card>.generated-item-thumb{
+  float:none!important;
+  flex:0 0 auto!important
+}
+section.panel .purchase-card .buyitem,
+section.panel .purchase-card .buypet,
+section.panel .purchase-card .buyinstrument,
+section.panel .purchase-card .buywashitem,
+section.panel .purchase-card .uniform-purchase-button{
+  position:static!important;
+  inset:auto!important;
+  width:auto!important;
+  max-width:100%!important;
+  min-width:128px!important;
+  height:29px!important;
+  min-height:29px!important;
+  margin:10px 0 0!important;
+  padding:5px 10px!important;
+  align-self:flex-start!important;
+  flex:0 0 auto!important;
+  clear:both!important;
+  font-size:9px!important;
+  line-height:1.1!important
+}
+#store .kiez-zubehoer-head,
+#store .kiez-zubehoer-extra,
+#shoplist .temporary-hidden-store-item{display:none!important}
+.supermarket-inline{display:none;margin:0 0 10px;padding:8px;background:#292927;border:1px solid #46433d}
+.supermarket-inline.active{display:block}
+.supermarket-inline>h3{margin:0 0 7px;padding:5px 7px;background:#383631;color:#ddd3bc;font-size:12px}
+.supermarket-inline .drink-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:6px}
+.supermarket-inline .drink{display:flex;flex-direction:column;min-width:0;padding:9px;background:#232321;border:1px solid #48453e}
+.supermarket-inline .drink p{flex:1;margin:6px 0;font-size:9px;line-height:1.35}
+.supermarket-inline .drink button{position:static!important;width:auto!important;min-width:128px!important;height:29px!important;min-height:29px!important;align-self:flex-start!important;margin-top:7px!important;padding:5px 10px!important;font-size:9px!important}
+@media(max-width:620px){
+ section.panel .purchase-card .uniform-purchase-button,
+ .supermarket-inline .drink button{width:100%!important;align-self:stretch!important}
+}
+</style>
+<script id="store-and-purchase-cleanup-v47">
+(()=>{
+ const store=document.querySelector('#store'),shoplist=document.querySelector('#shoplist');
+ if(!store||!shoplist||document.documentElement.dataset.storeV47)return;
+ document.documentElement.dataset.storeV47='1';
+ const modal=document.querySelector('#kiezmodal');
+ const hideBasicSection=()=>{
+  const heads=[...shoplist.querySelectorAll('.shop-category')];
+  heads.forEach(head=>{
+   if(!/Fundstückes*&s*Grundausrüstung/i.test(head.textContent))return;
+   head.classList.add('temporary-hidden-store-item');
+   let node=head.nextElementSibling;
+   while(node&&!node.classList.contains('shop-category')){
+    node.classList.add('temporary-hidden-store-item');
+    node=node.nextElementSibling;
+   }
+  });
+  store.querySelector('.kiez-zubehoer-head')?.classList.add('temporary-hidden-store-item');
+  store.querySelector('.kiez-zubehoer-extra')?.classList.add('temporary-hidden-store-item');
+ };
+ const inline=document.createElement('section');
+ inline.className='supermarket-inline';
+ inline.innerHTML='<h3>Getränke & Pfandbonus</h3><div class="supermarket-inline-body"><p>Getränke werden geladen …</p></div>';
+ shoplist.before(inline);
+ const renderDrinks=async()=>{
+  const body=inline.querySelector('.supermarket-inline-body');
+  try{
+   const p=window.kiezRefreshProfile?await window.kiezRefreshProfile():null;
+   body.innerHTML=window.kiezDrinkShopHTML?window.kiezDrinkShopHTML(p):'<div id="drinkmsg">Getränke sind gerade nicht verfügbar.</div>';
+  }catch(err){body.innerHTML='<div class="notice bad">'+err.message+'</div>'}
+ };
+ const closeModal=()=>{if(modal){modal.classList.add('hide');modal.setAttribute('aria-hidden','true')}};
+ const setView=async label=>{
+  const title=store.querySelector(':scope>h2');
+  const supermarket=label==='Supermarkt';
+  inline.classList.toggle('active',supermarket);
+  shoplist.style.display=supermarket?'none':'';
+  store.querySelector('#inventorylist')?.closest('.inside');
+  if(supermarket){if(title)title.textContent='Supermarkt';await renderDrinks();closeModal()}
+  else if(label==='Waffenladen'){if(title)title.textContent='Waffenladen'}
+  else if(label==='Zubehör'){if(title)title.textContent='Zubehör'}
+ };
+ const wire=()=>{
+  hideBasicSection();
+  const bar=document.querySelector('.kiez-quickbar');
+  if(!bar||bar.dataset.storeV47)return;
+  bar.dataset.storeV47='1';
+  bar.addEventListener('click',e=>{
+   const btn=e.target.closest('button');if(!btn)return;
+   const label=btn.textContent.trim();
+   if(!['Supermarkt','Waffenladen','Zubehör'].includes(label))return;
+   setTimeout(()=>setView(label),0);
+  });
+ };
+ inline.addEventListener('click',async e=>{
+  const drink=e.target.closest('.buy-drink');
+  if(drink){
+   e.preventDefault();e.stopPropagation();drink.disabled=true;
+   try{await window.kiezBuyAlcohol(drink.dataset.drink);await renderDrinks()}
+   catch(err){const msg=inline.querySelector('#drinkmsg');if(msg)msg.innerHTML='<div class="notice bad">'+err.message+'</div>'}
+   return;
+  }
+  const pump=e.target.closest('#pumpstomach');
+  if(pump){e.preventDefault();e.stopPropagation();pump.disabled=true;try{await window.kiezPumpStomach();await renderDrinks()}catch(err){pump.disabled=false}return}
+  const buy=e.target.closest('#buyinsurance');
+  if(buy){e.preventDefault();e.stopPropagation();buy.disabled=true;try{await window.kiezBuyInsurance();await renderDrinks()}catch(err){buy.disabled=false}return}
+  const cancel=e.target.closest('#cancelinsurance');
+  if(cancel){e.preventDefault();e.stopPropagation();cancel.disabled=true;try{await window.kiezCancelInsurance();await renderDrinks()}catch(err){cancel.disabled=false}}
+ });
+ wire();
+ new MutationObserver(()=>{hideBasicSection();wire()}).observe(store,{childList:true,subtree:true});
+})();
+</script>
