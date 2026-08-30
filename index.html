@@ -409,15 +409,18 @@ function addHaeuserGalerie(){
  const cards=document.querySelector('#gear .cards');
  if(!cards||document.querySelector('.haeuser-gallery'))return;
  const houses=[
-  {min:1,name:'Parkbank',desc:'Kalt, hart, aber wenigstens gratis. Die Polizei stört gelegentlich.',img:'/scene-city-v1.png'},
-  {min:2,name:'Notunterkunft-Zelt',desc:'Regen bleibt meistens draußen. Meistens.',img:'/scene-shelter-v1.png'},
-  {min:3,name:'Verlassener Wohnwagen',desc:'Riecht nach Vorbesitzer, aber die Tür schließt ab.',img:'/scene-training-v1.png'},
-  {min:4,name:'Kellerloch mit Heizung',desc:'Feucht, aber warm. Luxus pur im Vergleich.',img:'/scene-store-v1.png'},
-  {min:5,name:'Altbauwohnung im Kiez',desc:'Eigene vier Wände. Die Nachbarn beschweren sich trotzdem.',img:'/scene-pets-v1.png'}
+  {min:1,name:'Parkbank',bezirk:'Bahnhofsviertel',desc:'Kalt, hart, aber wenigstens gratis. Die Polizei stört gelegentlich.',img:'/scene-city-v1.png'},
+  {min:2,name:'Einkaufswagen-Unterschlupf',bezirk:'Supermarkt-Parkplatz',desc:'Vier Räder, ein Dach aus Pappe. Mobil bist du damit allemal.',img:'/schnorren-scene-v1.png'},
+  {min:3,name:'Zelt am Elbstrand',bezirk:'Elbstrand',desc:'Meerblick für Arme. Bei Flut wird es allerdings ungemütlich.',img:'/scene-fairground-v1.png'},
+  {min:4,name:'Verlassener Bauwagen',bezirk:'Gleisdreieck',desc:'Riecht nach Vorbesitzer, aber die Tür schließt ab.',img:'/scene-training-v1.png'},
+  {min:5,name:'Kellerloch mit Heizung',bezirk:'Altbauviertel',desc:'Feucht, aber warm. Luxus pur im Vergleich.',img:'/scene-store-v1.png'},
+  {min:6,name:'Leuchtturm',bezirk:'Neuland',desc:'Endlich, dein erstes richtiges Gebäude! Zwar nerven die ewig rotierenden Scheinwerfer, aber wenigstens hast du es schön warm.',img:'/scene-gang-v1.png'},
+  {min:7,name:'Alte Kirche',bezirk:'Basel',desc:'Dass Gott dich im Stich gelassen hat, wissen wir beide. Vielleicht drückt er ja ein Auge zu, wenn du bei ihm wohnst.',img:'/scene-messages-v1.png'},
+  {min:8,name:'Burg',bezirk:'Kirchwerder',desc:'Nur ein Wunderling wie du zieht heutzutage noch in diese alten Gemäuer ein. Aber diese Burg bietet dir sagenhaften Schutz.',img:'/scene-pets-v1.png'}
  ];
  const wrap=document.createElement('div');
  wrap.className='haeuser-gallery cards';
- wrap.innerHTML='<h3 class="shop-category" style="grid-column:1/-1">Häuser im Kiez</h3>'+houses.map(h=>'<div class="card haeuser-card" data-min="'+h.min+'" style="--h-img:url(\''+h.img+'\')"><b>'+h.name+'</b><p>'+h.desc+'</p><em class="haeuser-status"></em></div>').join('');
+ wrap.innerHTML='<h3 class="shop-category" style="grid-column:1/-1">Häuser im Kiez</h3>'+houses.map(h=>'<div class="card haeuser-card" data-min="'+h.min+'" style="--h-img:url(\''+h.img+'\')"><b>'+h.name+'</b><small style="display:block;color:#c8b78f!important;margin:2px 0 5px">Stadtteil: '+h.bezirk+'</small><p>'+h.desc+'</p><em class="haeuser-status"></em></div>').join('');
  cards.after(wrap);
  const update=()=>{
   const lvl=Number(document.querySelector('#shelterlvl')?.textContent||1);
