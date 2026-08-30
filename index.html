@@ -415,14 +415,17 @@ function addHaeuserGalerie(){
  const cards=document.querySelector('#gear .cards');
  if(!cards||document.querySelector('.haeuser-gallery'))return;
  const houses=[
-  {min:1,name:'Parkbank',bezirk:'Bahnhofsviertel',desc:'Kalt, hart, aber wenigstens gratis. Die Polizei stört gelegentlich.',img:'/scene-city-v1.png'},
-  {min:2,name:'Einkaufswagen-Unterschlupf',bezirk:'Supermarkt-Parkplatz',desc:'Vier Räder, ein Dach aus Pappe. Mobil bist du damit allemal.',img:'/schnorren-scene-v1.png'},
-  {min:3,name:'Zelt am Elbstrand',bezirk:'Elbstrand',desc:'Meerblick für Arme. Bei Flut wird es allerdings ungemütlich.',img:'/scene-fairground-v1.png'},
-  {min:4,name:'Verlassener Bauwagen',bezirk:'Gleisdreieck',desc:'Riecht nach Vorbesitzer, aber die Tür schließt ab.',img:'/scene-training-v1.png'},
-  {min:5,name:'Kellerloch mit Heizung',bezirk:'Altbauviertel',desc:'Feucht, aber warm. Luxus pur im Vergleich.',img:'/scene-store-v1.png'},
-  {min:6,name:'Leuchtturm',bezirk:'Neuland',desc:'Endlich, dein erstes richtiges Gebäude! Zwar nerven die ewig rotierenden Scheinwerfer, aber wenigstens hast du es schön warm.',img:'/scene-gang-v1.png'},
-  {min:7,name:'Alte Kirche',bezirk:'Basel',desc:'Dass Gott dich im Stich gelassen hat, wissen wir beide. Vielleicht drückt er ja ein Auge zu, wenn du bei ihm wohnst.',img:'/scene-messages-v1.png'},
-  {min:8,name:'Burg',bezirk:'Kirchwerder',desc:'Nur ein Wunderling wie du zieht heutzutage noch in diese alten Gemäuer ein. Aber diese Burg bietet dir sagenhaften Schutz.',img:'/scene-pets-v1.png'}
+  {min:1,name:'Bürgersteig',bezirk:'überall verfügbar',desc:'Hier fangen alle mal an: Mitten auf dem Bürgersteig. Es ist kalt, unsicher und laut.',img:'/scene-city-v1.png'},
+  {min:2,name:'Park',bezirk:'überall verfügbar',desc:'Weiche Wiesen, frische Luft und Vogelgezwitscher. Eine gute Alternative zum beliebten und dreckigen Bürgersteig.',img:'/kiez-background-v1.png'},
+  {min:3,name:'Parkbank',bezirk:'überall verfügbar',desc:'Im Pennerjargon auch Mittelklasse-Hotel genannt. Ein etwas unbequemes Bett, aber dafür die wunderschöne Natur um dich herum.',img:'/schnorren-scene-v1.png'},
+  {min:4,name:'Pennerbox',bezirk:'überall verfügbar',desc:'Die bekannte Firma Schluckspecht bietet neuerdings eine Pennerbox für die Unterschichtspenner an.',img:'/scene-training-v1.png'},
+  {min:5,name:'Grabkammer',bezirk:'Allermöhe',desc:'Auf dem Friedhof stent eine alte Grabkammer. Der Friedhofsgärtner würde sie dir gerne verkaufen. Er kann aber keine Garantie dafür übernehmen, dass du darin völlig allein bist.',img:'/scene-store-v1.png'},
+  {min:6,name:'Tiefgarage',bezirk:'überall verfügbar',desc:'Nicht nur für Autos eine Möglichkeit nach einem Vollrausch mal abzuschalten. Die Gase sind nicht sehr gesund, aber das bekommst du sowieso nicht mit.',img:'/scene-training-v1.png'},
+  {min:7,name:'Kakaofabrik',bezirk:'Stellingen',desc:'Als Kenner des Industriegebiets bist du natürlich bestens mit den umliegenden Fabriken vertraut. Die Kakaofabrik sticht sofort ins Auge.',img:'/scene-fairground-v1.png'},
+  {min:8,name:'Kran',bezirk:'überall verfügbar',desc:'Ganz schön hoch kann man in dieser kleinen engen Kabine über den Dingen stehen. Der Nebensache, wenn man die schöne Aussicht und die Sicherheit in Betracht zieht.',img:'/scene-shelter-v1.png'},
+  {min:9,name:'Leuchtturm',bezirk:'Neuland',desc:'Endlich, dein erstes richtiges Gebäude! Zwar nerven die ewig rotierenden Scheinwerfer, aber wenigstens hast du es schön warm.',img:'/scene-gang-v1.png'},
+  {min:10,name:'Alte Kirche',bezirk:'Basel',desc:'Dass Gott dich im Stich gelassen hat, wissen wir beide. Vielleicht drückt er ja ein Auge zu, wenn du bei ihm wohnst.',img:'/scene-messages-v1.png'},
+  {min:11,name:'Burg',bezirk:'Kirchwerder',desc:'Nur ein Wunderling wie du zieht heutzutage noch in diese alten Gemäuer ein. Aber diese Burg bietet dir sagenhaften Schutz.',img:'/scene-pets-v1.png'}
  ];
  const wrap=document.createElement('div');
  wrap.className='haeuser-gallery cards';
@@ -528,13 +531,13 @@ function addOverviewSlots(){
  if(!prof||prof.querySelector('.kiez-slots-row'))return;
  const row=document.createElement('div');
  row.className='profile-wide-row kiez-slots-row';
- row.innerHTML='<h3>📦 Container: Spendenbehälter</h3><p style="margin:0 0 10px;color:#bdb4a0;font-size:9px">Fassungsvermögen: 1.000.000,00 € · Gefüllt zu <b>0 %</b><br>Du hast bisher noch niemanden zum Spenden bewegt. Teile deinen Kiez-Link, sobald du einen hast.</p><div class="kiez-slot-grid"><div class="kiez-slot"><b>Deine Waffe</b><div class="kiez-slot-name" id="slotWeapon">Blanke Fäuste</div><a class="kiez-slot-link" data-go="store">Zum Waffenladen</a></div><div class="kiez-slot"><b>Dein Eigenheim</b><div class="kiez-slot-name" id="slotHome">Parkbank</div><a class="kiez-slot-link" data-go="gear">Eigenheim suchen</a></div><div class="kiez-slot"><b>Dein Instrument</b><div class="kiez-slot-name" id="slotInstrument">Keins</div><a class="kiez-slot-link" data-go="income">Instrument kaufen</a></div><div class="kiez-slot"><b>Dein Schnorrplatz</b><div class="kiez-slot-name" id="slotSpot">Bahnhofs-Hinterhof</div><a class="kiez-slot-link" data-go="income">Schnorrplatz erforschen</a></div></div>';
+ row.innerHTML='<h3>📦 Container: Spendenbehälter</h3><p style="margin:0 0 10px;color:#bdb4a0;font-size:9px">Fassungsvermögen: 1.000.000,00 € · Gefüllt zu <b>0 %</b><br>Du hast bisher noch niemanden zum Spenden bewegt. Teile deinen Kiez-Link, sobald du einen hast.</p><div class="kiez-slot-grid"><div class="kiez-slot"><b>Deine Waffe</b><div class="kiez-slot-name" id="slotWeapon">Blanke Fäuste</div><a class="kiez-slot-link" data-go="store">Zum Waffenladen</a></div><div class="kiez-slot"><b>Dein Eigenheim</b><div class="kiez-slot-name" id="slotHome">Bürgersteig</div><a class="kiez-slot-link" data-go="gear">Eigenheim suchen</a></div><div class="kiez-slot"><b>Dein Instrument</b><div class="kiez-slot-name" id="slotInstrument">Keins</div><a class="kiez-slot-link" data-go="income">Instrument kaufen</a></div><div class="kiez-slot"><b>Dein Schnorrplatz</b><div class="kiez-slot-name" id="slotSpot">Bahnhofs-Hinterhof</div><a class="kiez-slot-link" data-go="income">Schnorrplatz erforschen</a></div></div>';
  const invite=prof.querySelector('.profile-wide-row');
  if(invite)invite.after(row);else prof.appendChild(row);
  row.querySelectorAll('.kiez-slot-link').forEach(a=>{a.onclick=()=>document.querySelector('.side [data-view="'+a.dataset.go+'"]')?.click()});
  const sync=()=>{
   const home=document.querySelector('.haeuser-card .haeuser-status');
-  let homeName='Parkbank';
+  let homeName='Bürgersteig';
   document.querySelectorAll('.haeuser-card').forEach(c=>{if(c.querySelector('.haeuser-status')?.textContent.includes('Aktuell'))homeName=c.querySelector('b')?.textContent||homeName});
   document.getElementById('slotHome').textContent=homeName;
   const instr=document.getElementById('musicname')?.textContent;
