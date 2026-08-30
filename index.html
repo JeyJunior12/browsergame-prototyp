@@ -1129,3 +1129,55 @@ section.panel .purchase-card .uniform-purchase-button{
  new MutationObserver(clean).observe(document.querySelector('#pets')||document.body,{childList:true,subtree:true});
 })();
 </script>
+
+
+<style id="supermarket-final-cleanup-v49">
+#shoplist .hide-basic-category-v49{display:none!important}
+</style>
+<script id="supermarket-final-cleanup-script-v49">
+(()=>{
+ const store=document.querySelector('#store'),bar=document.querySelector('.kiez-quickbar');
+ if(!store||!bar||document.documentElement.dataset.storeV49)return;
+ document.documentElement.dataset.storeV49='1';
+ const modal=document.querySelector('#kiezmodal');
+ const closeModal=()=>{if(modal){modal.classList.add('hide');modal.setAttribute('aria-hidden','true')}};
+ const hideBasics=()=>{
+  const list=document.querySelector('#shoplist');if(!list)return;
+  [...list.querySelectorAll('.shop-category')].forEach(head=>{
+   if(!head.textContent.includes('Fundstücke'))return;
+   head.classList.add('hide-basic-category-v49');
+   let el=head.nextElementSibling;
+   while(el&&!el.classList.contains('shop-category')){
+    el.classList.add('hide-basic-category-v49');
+    el=el.nextElementSibling;
+   }
+  });
+ };
+ const supermarket=[...bar.querySelectorAll('button')].find(b=>b.textContent.trim()==='Supermarkt');
+ if(supermarket&&!supermarket.dataset.finalV49){
+  supermarket.dataset.finalV49='1';
+  supermarket.addEventListener('click',e=>{
+   e.preventDefault();
+   e.stopImmediatePropagation();
+   document.querySelector('.side [data-view="store"]')?.click();
+   bar.querySelectorAll('button').forEach(x=>x.classList.toggle('active',x===supermarket));
+   const inline=store.querySelector('.supermarket-inline');
+   if(inline)inline.classList.add('active');
+   const shoplist=document.querySelector('#shoplist');if(shoplist)shoplist.style.display='none';
+   const title=store.querySelector(':scope>h2');if(title)title.textContent='Supermarkt';
+   closeModal();
+   setTimeout(closeModal,100);
+   setTimeout(closeModal,500);
+   if(window.kiezRefreshProfile&&window.kiezDrinkShopHTML&&inline){
+    window.kiezRefreshProfile().then(p=>{
+     const body=inline.querySelector('.supermarket-inline-body');
+     if(body)body.innerHTML=window.kiezDrinkShopHTML(p);
+     closeModal();
+    }).catch(()=>closeModal());
+   }
+  },true);
+ }
+ hideBasics();
+ new MutationObserver(hideBasics).observe(store,{childList:true,subtree:true});
+})();
+</script>
