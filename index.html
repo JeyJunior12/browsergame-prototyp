@@ -1097,3 +1097,35 @@ section.panel .purchase-card .uniform-purchase-button{
  new MutationObserver(()=>{hideBasicSection();wire()}).observe(store,{childList:true,subtree:true});
 })();
 </script>
+
+
+<style id="single-clean-pet-image-v48">
+#petshop .single-pet-image>.asset-thumb,
+#mypets .single-pet-image>.asset-thumb{display:none!important}
+#petshop .single-pet-image>.generated-item-thumb,
+#mypets .single-pet-image>.generated-item-thumb{
+  display:block!important;
+  float:none!important;
+  flex:0 0 auto!important;
+  width:112px!important;
+  height:112px!important;
+  min-height:112px!important;
+  margin:0 auto 10px!important;
+  border:4px solid #655642!important;
+  box-sizing:border-box!important
+}
+#petshop .single-pet-image,
+#mypets .single-pet-image{overflow:visible!important}
+</style>
+<script id="single-clean-pet-image-script-v48">
+(()=>{
+ const clean=()=>document.querySelectorAll('#petshop .card,#mypets .card').forEach(card=>{
+  const generated=card.querySelector(':scope>.generated-item-thumb');
+  if(!generated)return;
+  card.classList.add('single-pet-image');
+  card.querySelectorAll(':scope>.asset-thumb').forEach(old=>old.remove());
+ });
+ clean();
+ new MutationObserver(clean).observe(document.querySelector('#pets')||document.body,{childList:true,subtree:true});
+})();
+</script>
