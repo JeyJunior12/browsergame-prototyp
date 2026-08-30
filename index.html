@@ -521,7 +521,7 @@ function fixProfileSubTabs(){
  const aside=document.querySelector('#overview .profile-paper-tabs');
  if(!aside||aside.dataset.kiezFixed)return;
  aside.dataset.kiezFixed='1';
- aside.innerHTML='<button data-act="profil">Profil ansehen</button><button data-act="uebersicht" class="active">Übersicht</button><button data-go="gear">Häuser</button><button data-go="missions">Aktionen</button><button data-act="inventar">Inventar</button><button data-act="kronkorken">Kronkorken</button>';
+ aside.innerHTML='<button data-act="profil">Profil ansehen</button><button data-act="uebersicht" class="active">Übersicht</button><button data-go="pets">Haustier</button><button data-go="missions">Aktionen</button><button data-act="inventar">Inventar</button><button data-act="kronkorken">Kronkorken</button>';
  aside.querySelectorAll('button').forEach(b=>{
   b.onclick=()=>{
    aside.querySelectorAll('button').forEach(x=>x.classList.remove('active'));
