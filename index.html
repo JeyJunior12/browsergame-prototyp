@@ -327,4 +327,5 @@ body{background-image:linear-gradient(#09090966,#09090999),var(--body-scene,url(
 <script id="seamless-background-script-v35">
 (()=>{const main=document.querySelector('.main');if(!main)return;const sync=()=>{const image=main.style.getPropertyValue('--page-hero')||'url("/kiez-header-street-v2.png")',position=main.style.getPropertyValue('--page-hero-position')||'center top';document.body.style.setProperty('--body-scene',image);document.body.style.setProperty('--body-scene-position',position)};document.querySelectorAll('.side [data-view]').forEach(b=>b.addEventListener('click',()=>setTimeout(sync,0)));document.querySelectorAll('.kiez-quickbar button').forEach(b=>b.addEventListener('click',()=>setTimeout(sync,0)));sync()})();
 </script>
+<style id="profile-background-seam-fix-v35b">body.classic-profile-page-bg{background-image:linear-gradient(#09090966,#09090999),var(--body-scene,url('/kiez-header-street-v2.png'))!important;background-position:var(--body-scene-position,center top)!important;background-size:cover!important}</style>
 </body></html>
