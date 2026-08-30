@@ -1181,3 +1181,67 @@ section.panel .purchase-card .uniform-purchase-button{
  new MutationObserver(hideBasics).observe(store,{childList:true,subtree:true});
 })();
 </script>
+
+
+<style id="store-routing-cleanup-v50">
+#store>.section-tools span.store-tab-removed-v50{display:none!important}
+#shoplist .supermarket-hidden-v50{display:none!important}
+.supermarket-inline.active{display:block!important}
+</style>
+<script id="store-routing-cleanup-script-v50">
+(()=>{
+ const bar=document.querySelector('.kiez-quickbar'),store=document.querySelector('#store');
+ if(!bar||!store||document.documentElement.dataset.storeV50)return;
+ document.documentElement.dataset.storeV50='1';
+ const modal=document.querySelector('#kiezmodal');
+ const closeModal=()=>{if(modal){modal.classList.add('hide');modal.setAttribute('aria-hidden','true')}};
+ const showOnlyCategory=word=>{
+  const list=document.querySelector('#shoplist');if(!list)return;
+  list.style.display='';
+  [...list.querySelectorAll('.shop-category')].forEach(head=>{
+   const keep=head.textContent.includes(word)&&!head.textContent.includes('Grundausrüstung');
+   head.classList.toggle('supermarket-hidden-v50',!keep);
+   let el=head.nextElementSibling;
+   while(el&&!el.classList.contains('shop-category')){
+    el.classList.toggle('supermarket-hidden-v50',!keep);
+    el=el.nextElementSibling;
+   }
+  });
+ };
+ const oldAccessory=[...bar.querySelectorAll('button')].find(b=>b.textContent.trim()==='Zubehör');
+ if(oldAccessory)oldAccessory.remove();
+ const oldMarket=[...bar.querySelectorAll('button')].find(b=>b.textContent.trim()==='Supermarkt');
+ if(oldMarket){
+  const market=oldMarket.cloneNode(true);
+  oldMarket.replaceWith(market);
+  market.addEventListener('click',async e=>{
+   e.preventDefault();e.stopImmediatePropagation();
+   document.querySelector('.side [data-view="store"]')?.click();
+   bar.querySelectorAll('button').forEach(x=>x.classList.toggle('active',x===market));
+   const title=store.querySelector(':scope>h2');if(title)title.textContent='Supermarkt';
+   const inline=store.querySelector('.supermarket-inline');
+   if(inline)inline.classList.add('active');
+   showOnlyCategory('Zubehör');
+   closeModal();
+   if(window.kiezRefreshProfile&&window.kiezDrinkShopHTML&&inline){
+    try{
+     const p=await window.kiezRefreshProfile();
+     const body=inline.querySelector('.supermarket-inline-body');
+     if(body)body.innerHTML=window.kiezDrinkShopHTML(p);
+    }catch(_){}
+   }
+   closeModal();
+  },true);
+ }
+ const tools=store.querySelectorAll(':scope>.section-tools span');
+ tools.forEach(tab=>{
+  const label=tab.textContent.trim();
+  if(label==='Zubehör'||label==='Verbrauchbares')tab.classList.add('store-tab-removed-v50');
+ });
+ const weapon=[...bar.querySelectorAll('button')].find(b=>b.textContent.trim()==='Waffenladen');
+ if(weapon)weapon.addEventListener('click',()=>{
+  const inline=store.querySelector('.supermarket-inline');if(inline)inline.classList.remove('active');
+  setTimeout(()=>showOnlyCategory('Waffen'),0);
+ },true);
+})();
+</script>
