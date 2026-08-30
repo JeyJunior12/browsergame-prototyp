@@ -638,7 +638,23 @@ function reorganizeStorePages(){
  });
  storePanel.kiezApplyFilter=applyFilter;
 }
+function splitIncomeView(view){
+ const inc=document.getElementById('income');
+ if(!inc)return;
+ if(view)inc.dataset.kiezView=view;
+ else if(!inc.dataset.kiezView)inc.dataset.kiezView='schnorr';
+ const v=inc.dataset.kiezView;
+ const areaCard=document.getElementById('areaname')?.closest('.card');
+ const musicCard=document.getElementById('musicname')?.closest('.card');
+ const musicCollectCard=document.getElementById('musiccollect')?.closest('.card');
+ const roadmap=inc.querySelector('.feature-roadmap');
+ if(areaCard)areaCard.style.display=v==='music'?'none':'';
+ if(musicCard)musicCard.style.display=v==='schnorr'?'none':'';
+ if(musicCollectCard)musicCollectCard.style.display=v==='schnorr'?'none':'';
+ if(roadmap)roadmap.style.display=v==='music'?'none':'';
+}
 function routeQuickbarSpecials(){
+ splitIncomeView();
  const bar=document.querySelector('.kiez-quickbar');
  if(!bar||bar.dataset.kiezSpecials)return;
  bar.dataset.kiezSpecials='1';
@@ -650,8 +666,8 @@ function routeQuickbarSpecials(){
   if(label==='Waffenladen'){setTimeout(()=>document.querySelector('#store')?.kiezApplyFilter?.('waffen'),150)}
   if(label==='Zubehör'){setTimeout(()=>document.querySelector('#store')?.kiezApplyFilter?.('zubehoer'),150)}
   if(label==='Waschhaus'){setTimeout(()=>document.getElementById('wash')?.closest('.action-block')?.scrollIntoView({behavior:'smooth',block:'center'}),150)}
-  if(label==='Schnorrplätze'){setTimeout(()=>document.getElementById('areaname')?.closest('.card')?.scrollIntoView({behavior:'smooth',block:'center'}),150)}
-  if(label==='Musikladen'){setTimeout(()=>document.getElementById('musicname')?.closest('.card')?.scrollIntoView({behavior:'smooth',block:'center'}),150)}
+  if(label==='Schnorrplätze'){splitIncomeView('schnorr');setTimeout(()=>document.getElementById('areaname')?.closest('.card')?.scrollIntoView({behavior:'smooth',block:'center'}),150)}
+  if(label==='Musikladen'){splitIncomeView('music');setTimeout(()=>document.getElementById('musicname')?.closest('.card')?.scrollIntoView({behavior:'smooth',block:'center'}),150)}
  });
 }
 function initAll(){addBioAndGuestbook();addHaeuserGalerie();addOverviewSlots();addPlunderSection();addWeatherBadge();addKronkorken();reorganizeStorePages();routeQuickbarSpecials();fixProfileSubTabs();}
