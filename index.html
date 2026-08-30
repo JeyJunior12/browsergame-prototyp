@@ -420,19 +420,25 @@ function addHaeuserGalerie(){
  ];
  const wrap=document.createElement('div');
  wrap.className='haeuser-gallery cards';
- wrap.innerHTML='<h3 class="shop-category" style="grid-column:1/-1">Häuser im Kiez</h3>'+houses.map(h=>'<div class="card haeuser-card" data-min="'+h.min+'" style="--h-img:url(\''+h.img+'\')"><b>'+h.name+'</b><small style="display:block;color:#c8b78f!important;margin:2px 0 5px">Stadtteil: '+h.bezirk+'</small><p>'+h.desc+'</p><em class="haeuser-status"></em></div>').join('');
+ wrap.innerHTML='<h3 class="shop-category" style="grid-column:1/-1">Häuser im Kiez</h3>'+houses.map(h=>'<div class="card haeuser-card" data-min="'+h.min+'" style="--h-img:url(\''+h.img+'\')"><b>'+h.name+'</b><small style="display:block;color:#c8b78f!important;margin:2px 0 5px">Stadtteil: '+h.bezirk+'</small><p>'+h.desc+'</p><em class="haeuser-status"></em><button class="ghost haeuser-move-btn hide">Einziehen</button></div>').join('');
  cards.after(wrap);
+ const oldCard=document.getElementById('shelter');
+ if(oldCard)oldCard.style.display='none';
  const update=()=>{
   const lvl=Number(document.querySelector('#shelterlvl')?.textContent||1);
+  const price=document.querySelector('#shelterprice')?.textContent||'';
   wrap.querySelectorAll('.haeuser-card').forEach(c=>{
-   const min=Number(c.dataset.min),status=c.querySelector('.haeuser-status');
-   if(min===lvl)status.textContent='✅ Aktuell bewohnt';
-   else if(min<lvl)status.textContent='Bereits durchlaufen';
-   else if(min===lvl+1)status.textContent='Nächster Ausbau';
-   else status.textContent='Noch gesperrt';
+   const min=Number(c.dataset.min),status=c.querySelector('.haeuser-status'),btn=c.querySelector('.haeuser-move-btn');
+   if(min===lvl){status.textContent='✅ Aktuell bewohnt';btn.classList.add('hide')}
+   else if(min<lvl){status.textContent='Bereits durchlaufen';btn.classList.add('hide')}
+   else if(min===lvl+1){status.textContent='Nächster Ausbau';btn.textContent='Einziehen – '+price;btn.classList.remove('hide')}
+   else{status.textContent='Noch gesperrt';btn.classList.add('hide')}
    c.style.opacity=min>lvl+1?'.45':'1';
   });
  };
+ wrap.addEventListener('click',e=>{
+  if(e.target.classList.contains('haeuser-move-btn'))document.getElementById('buyshelter')?.click();
+ });
  update();setInterval(update,1500);
 }
 const PLUNDER_POOL=[
@@ -522,7 +528,84 @@ function addKronkorken(){
  k.onclick=()=>alert('Kronkorken-Shop kommt bald! Aktuell gesammelt: '+kk);
  statsRow.appendChild(k);
 }
-function initAll(){addBioAndGuestbook();addHaeuserGalerie();addPlunderSection();addWeatherBadge();addKronkorken();}
+function openDrinkShopFromQuickbar(){
+ const modal=document.querySelector('#kiezmodal'),title=document.querySelector('#kiezmodaltitle'),body=document.querySelector('#kiezmodalbody');
+ if(!modal||!title||!body)return;
+ title.textContent='Supermarkt: Getränke';
+ body.innerHTML='<p>Solange der Bonus läuft, findest du auf Pfandtouren mehr Flaschen. Mit höherem Pegel steigt der Bonus bis auf 35 %.</p><div class="drink-list"><div class="drink"><b>🍺 Dosenbier</b><p>+0,25 ‰ · 10 % mehr Pfand für 30 Minuten.</p><button class="big buy-drink" data-drink="beer">Kaufen – 1,00 €</button></div><div class="drink"><b>🍷 Kartonwein</b><p>+0,55 ‰ · bis 20 % mehr Pfand für 60 Minuten.</p><button class="big buy-drink" data-drink="wine">Kaufen – 2,50 €</button></div><div class="drink"><b>🥃 Kiosk-Mische</b><p>+0,90 ‰ · bis 35 % mehr Pfand für 90 Minuten.</p><button class="big buy-drink" data-drink="mix">Kaufen – 5,00 €</button></div></div><div id="drinkmsg"></div>';
+ modal.classList.remove('hide');modal.setAttribute('aria-hidden','false');
+}
+function reorganizeStorePages(){
+ const storePanel=document.querySelector('#store');
+ if(!storePanel||storePanel.dataset.kiezReorg)return;
+ const bagCard=document.getElementById('baglvl')?.closest('.card'),containerCard=document.getElementById('containerlvl')?.closest('.card');
+ const inside=storePanel.querySelector(':scope>.inside'),shoplist=document.getElementById('shoplist');
+ if(!bagCard||!containerCard||!inside||!shoplist)return;
+ storePanel.dataset.kiezReorg='1';
+ const h=document.createElement('h3');
+ h.className='shop-category kiez-zubehoer-head';
+ h.textContent='Ausrüstungs-Ausbau';
+ const extra=document.createElement('div');
+ extra.className='cards kiez-zubehoer-extra';
+ inside.insertBefore(h,shoplist);
+ inside.insertBefore(extra,shoplist);
+ extra.append(bagCard,containerCard);
+ const tabs=storePanel.querySelectorAll(':scope>.section-tools span');
+ const applyFilter=cat=>{
+  document.querySelectorAll('#shoplist .shop-category').forEach(head=>{
+   const t=head.textContent;
+   let show=true;
+   if(cat==='waffen')show=t.includes('Waffen');
+   else if(cat==='kleidung')show=t.includes('Kleidung');
+   else if(cat==='zubehoer')show=t.includes('Zubehör')||t.includes('Grundausrüstung');
+   head.style.display=show?'':'none';
+   let el=head.nextElementSibling;
+   while(el&&!el.classList.contains('shop-category')){el.style.display=show?'':'none';el=el.nextElementSibling}
+  });
+  h.style.display=cat==='zubehoer'||!cat?'':'none';
+  extra.style.display=cat==='zubehoer'||!cat?'':'none';
+ };
+ tabs.forEach(tab=>{
+  const label=tab.textContent.trim();
+  tab.onclick=()=>{
+   tabs.forEach(t=>t.classList.remove('subtab-active'));
+   tab.classList.add('subtab-active');
+   if(label==='Verbrauchbares'){openDrinkShopFromQuickbar();return}
+   if(label==='Verkaufen'){document.getElementById('inventorylist')?.scrollIntoView({behavior:'smooth',block:'start'});return}
+   const map={'Waffen':'waffen','Kleidung':'kleidung','Zubehör':'zubehoer'};
+   applyFilter(map[label]||null);
+  };
+ });
+ storePanel.kiezApplyFilter=applyFilter;
+}
+function reorganizeBeggingPage(){
+ const panel=document.querySelector('#begging');
+ if(!panel||panel.dataset.kiezReorg)return;
+ const washBlock=document.getElementById('wash')?.closest('.action-block');
+ if(!washBlock)return;
+ panel.dataset.kiezReorg='1';
+ const apo=document.createElement('div');
+ apo.className='action-block kiez-apotheke-block';
+ apo.innerHTML='<h3>💊 Apotheke: Erste Hilfe</h3><p>Verbandszeug und Desinfektion gegen die gröbsten Blessuren vom Kiezalltag. Wirkt wie eine gründliche Wäsche, nur medizinischer verpackt.</p><button class="ghost" id="kiezApoWash">Behandeln lassen – 0,50 €</button>';
+ washBlock.after(apo);
+ apo.querySelector('#kiezApoWash').onclick=()=>document.getElementById('wash')?.click();
+}
+function routeQuickbarSpecials(){
+ const bar=document.querySelector('.kiez-quickbar');
+ if(!bar||bar.dataset.kiezSpecials)return;
+ bar.dataset.kiezSpecials='1';
+ bar.addEventListener('click',e=>{
+  const btn=e.target.closest('button');
+  if(!btn)return;
+  const label=btn.textContent.trim();
+  if(label==='Supermarkt'){openDrinkShopFromQuickbar();return}
+  if(label==='Waffenladen'){setTimeout(()=>document.querySelector('#store')?.kiezApplyFilter?.('waffen'),150)}
+  if(label==='Zubehör'){setTimeout(()=>document.querySelector('#store')?.kiezApplyFilter?.('zubehoer'),150)}
+  if(label==='Waschhaus'){setTimeout(()=>document.getElementById('wash')?.closest('.action-block')?.scrollIntoView({behavior:'smooth',block:'center'}),150)}
+  if(label==='Apotheke'){setTimeout(()=>document.querySelector('.kiez-apotheke-block')?.scrollIntoView({behavior:'smooth',block:'center'}),150)}
+ });
+}
+function initAll(){addBioAndGuestbook();addHaeuserGalerie();addPlunderSection();addWeatherBadge();addKronkorken();reorganizeStorePages();reorganizeBeggingPage();routeQuickbarSpecials();}
 initAll();
 setInterval(initAll,1000);
 })();
