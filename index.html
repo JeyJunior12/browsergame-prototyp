@@ -211,10 +211,12 @@ document.querySelectorAll('.panel>.section-tools span').forEach((s,i)=>{s.setAtt
 @media(max-width:900px){.mast{grid-template-columns:170px minmax(400px,1fr) 170px!important}.classic-mainnav>button{font-size:8px!important}.player-slip{width:170px!important;padding-left:54px!important}.classic-menu{left:170px}.logo{font-size:27px!important}}
 @media(max-width:720px){.mast{display:grid!important;grid-template-columns:1fr 150px!important;height:auto!important;padding:7px 7px 0!important}.mast>div:first-child{grid-column:1}.player-slip{grid-column:2;grid-row:1;width:150px!important}.classic-mainnav{grid-column:1/-1;grid-row:2;height:48px}.classic-mainnav>button{height:48px;padding-top:23px!important;font-size:7px!important}.classic-mainnav>button:before{font-size:16px}.classic-menu{position:fixed;top:128px;left:8px;right:8px;width:auto}.main{padding-left:5px!important;padding-right:5px!important}.stats{display:grid!important;grid-template-columns:repeat(4,1fr)!important;overflow:visible!important}.stat{min-width:0!important;flex:auto!important}.mast>#logout{right:9px!important;bottom:-159px!important}}
 </style>
+<style>.player-slip>#logout{position:absolute!important;right:7px!important;bottom:5px!important;padding:2px 7px!important;font-size:7px!important;line-height:1.1!important;z-index:2!important}</style>
 <script id="classic-header-script-v25">
 (()=>{
  const mast=document.querySelector('.mast'), hiddenNav=document.querySelector('.side'), slip=document.querySelector('.player-slip');
  if(!mast||!hiddenNav||!slip||mast.querySelector('.classic-mainnav'))return;
+ const logout=document.querySelector('#logout');if(logout)slip.append(logout);
  const groups=[
   ['Mein Kiez',[['Übersicht','overview'],['Pfandtour','pfand'],['Schnorren','begging'],['Unterkunft','gear'],['Weiterbildung','training'],['Kiezladen','store'],['Begleiter','pets'],['Profil & Laufbahn','career']]],
   ['Kommunikation',[['Kiezpost','messages'],['Rangliste','leaderboard'],['Erfolge','achievements']]],
