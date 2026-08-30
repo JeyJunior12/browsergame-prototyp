@@ -638,6 +638,58 @@ function reorganizeStorePages(){
  });
  storePanel.kiezApplyFilter=applyFilter;
 }
+function addInstrumentShop(){
+ const musicCard=document.getElementById('musicname')?.closest('.card');
+ if(!musicCard||document.querySelector('.instrument-list'))return;
+ musicCard.style.display='none';
+ const names=['Grashalmflöte','Flaschenflöte','Glocke','Trommel','Akkordion','Radio','Gitarre','Saxophon','Chor'];
+ const prices=[1,5,20,60,180,450,900,1800,3500];
+ const rates=[.02,.05,.12,.30,.70,1.50,2.80,5.00,9.00];
+ const wrap=document.createElement('div');
+ wrap.className='instrument-list cards';
+ wrap.style.gridColumn='1/-1';
+ names.forEach((name,i)=>{
+  const lvl=i+1;
+  const priceTxt=prices[i].toFixed(2).replace('.',',')+' €';
+  const card=document.createElement('div');
+  card.className='card instrument-card';
+  card.dataset.level=lvl;
+  card.innerHTML='<b>'+name+'</b><p>Einnahmen: <b>'+rates[i].toFixed(2).replace('.',',')+' €/Min</b></p><p class="instrument-status"></p><button class="ghost buyinstrument" data-label="Kaufen – '+priceTxt+'">Kaufen – '+priceTxt+'</button>';
+  wrap.appendChild(card);
+ });
+ musicCard.insertAdjacentElement('afterend',wrap);
+ wrap.addEventListener('click',e=>{
+  const btn=e.target.closest('.buyinstrument');
+  if(!btn||btn.disabled)return;
+  document.getElementById('buymusic')?.click();
+ });
+}
+function updateInstrumentShop(){
+ const list=document.querySelector('.instrument-list');
+ if(!list)return;
+ const names=['Keins','Grashalmflöte','Flaschenflöte','Glocke','Trommel','Akkordion','Radio','Gitarre','Saxophon','Chor'];
+ const curName=document.getElementById('musicname')?.textContent.trim();
+ const idx=names.indexOf(curName);
+ const curLevel=idx<0?0:idx;
+ list.querySelectorAll('.instrument-card').forEach(card=>{
+  const lvl=Number(card.dataset.level);
+  const status=card.querySelector('.instrument-status');
+  const btn=card.querySelector('.buyinstrument');
+  if(lvl<=curLevel){
+   card.classList.add('locked');
+   if(status)status.textContent=lvl===curLevel?'✅ Aktuelles Instrument':'Bereits besessen';
+   if(btn){btn.disabled=true;btn.textContent=lvl===curLevel?'Im Einsatz':'Bereits gekauft';}
+  }else if(lvl===curLevel+1){
+   card.classList.remove('locked');
+   if(status)status.textContent='Nächste Stufe';
+   if(btn){btn.disabled=false;btn.textContent=btn.dataset.label;}
+  }else{
+   card.classList.add('locked');
+   if(status)status.textContent='🔒 Erst vorherige Stufe kaufen';
+   if(btn){btn.disabled=true;btn.textContent='Gesperrt';}
+  }
+ });
+}
 function splitIncomeView(view){
  const inc=document.getElementById('income');
  if(!inc)return;
@@ -645,12 +697,12 @@ function splitIncomeView(view){
  else if(!inc.dataset.kiezView)inc.dataset.kiezView='schnorr';
  const v=inc.dataset.kiezView;
  const areaCard=document.getElementById('areaname')?.closest('.card');
- const musicCard=document.getElementById('musicname')?.closest('.card');
  const musicCollectCard=document.getElementById('musiccollect')?.closest('.card');
+ const instrumentList=inc.querySelector('.instrument-list');
  const roadmap=inc.querySelector('.feature-roadmap');
  if(areaCard)areaCard.style.display=v==='music'?'none':'';
- if(musicCard)musicCard.style.display=v==='schnorr'?'none':'';
  if(musicCollectCard)musicCollectCard.style.display=v==='schnorr'?'none':'';
+ if(instrumentList)instrumentList.style.display=v==='schnorr'?'none':'';
  if(roadmap)roadmap.style.display=v==='music'?'none':'';
 }
 function routeQuickbarSpecials(){
@@ -670,7 +722,7 @@ function routeQuickbarSpecials(){
   if(label==='Musikladen'){splitIncomeView('music');setTimeout(()=>document.getElementById('musicname')?.closest('.card')?.scrollIntoView({behavior:'smooth',block:'center'}),150)}
  });
 }
-function initAll(){addBioAndGuestbook();addHaeuserGalerie();addOverviewSlots();addPlunderSection();addWeatherBadge();addKronkorken();reorganizeStorePages();routeQuickbarSpecials();fixProfileSubTabs();}
+function initAll(){addBioAndGuestbook();addHaeuserGalerie();addOverviewSlots();addPlunderSection();addWeatherBadge();addKronkorken();reorganizeStorePages();addInstrumentShop();updateInstrumentShop();routeQuickbarSpecials();fixProfileSubTabs();}
 initAll();
 setInterval(initAll,1000);
 })();
