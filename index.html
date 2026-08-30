@@ -517,6 +517,24 @@ function addWeatherBadge(){
  badge.textContent=w.n+' · Pfandbonus '+(w.bonus>=0?'+':'')+w.bonus+'%';
  title.appendChild(badge);
 }
+function fixProfileSubTabs(){
+ const aside=document.querySelector('#overview .profile-paper-tabs');
+ if(!aside||aside.dataset.kiezFixed)return;
+ aside.dataset.kiezFixed='1';
+ aside.innerHTML='<button data-act="profil">Profil ansehen</button><button data-act="uebersicht" class="active">Übersicht</button><button data-go="gear">Häuser</button><button data-go="missions">Aktionen</button><button data-act="inventar">Inventar</button><button data-act="kronkorken">Kronkorken</button>';
+ aside.querySelectorAll('button').forEach(b=>{
+  b.onclick=()=>{
+   aside.querySelectorAll('button').forEach(x=>x.classList.remove('active'));
+   b.classList.add('active');
+   const act=b.dataset.act,go=b.dataset.go;
+   if(go){document.querySelector('.side [data-view="'+go+'"]')?.click();return}
+   if(act==='profil'){document.querySelector('.kiez-bio-row')?.scrollIntoView({behavior:'smooth',block:'start'});return}
+   if(act==='uebersicht'){document.querySelector('#overview')?.scrollIntoView({behavior:'smooth',block:'start'});return}
+   if(act==='inventar'){document.querySelector('.side [data-view="store"]')?.click();setTimeout(()=>document.getElementById('inventorylist')?.scrollIntoView({behavior:'smooth',block:'start'}),150);return}
+   if(act==='kronkorken'){document.querySelector('.kronkorken-stat')?.click();return}
+  };
+ });
+}
 function addKronkorken(){
  const statsRow=document.querySelector('.stats');
  if(!statsRow||statsRow.querySelector('.kronkorken-stat'))return;
@@ -594,7 +612,7 @@ function routeQuickbarSpecials(){
   if(label==='Musikladen'){setTimeout(()=>document.getElementById('musicname')?.closest('.card')?.scrollIntoView({behavior:'smooth',block:'center'}),150)}
  });
 }
-function initAll(){addBioAndGuestbook();addHaeuserGalerie();addPlunderSection();addWeatherBadge();addKronkorken();reorganizeStorePages();routeQuickbarSpecials();}
+function initAll(){addBioAndGuestbook();addHaeuserGalerie();addPlunderSection();addWeatherBadge();addKronkorken();reorganizeStorePages();routeQuickbarSpecials();fixProfileSubTabs();}
 initAll();
 setInterval(initAll,1000);
 })();
