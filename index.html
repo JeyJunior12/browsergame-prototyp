@@ -415,21 +415,30 @@ function addHaeuserGalerie(){
  const cards=document.querySelector('#gear .cards');
  if(!cards||document.querySelector('.haeuser-gallery'))return;
  const houses=[
-  {min:1,name:'Bürgersteig',bezirk:'überall verfügbar',desc:'Hier fangen alle mal an: Mitten auf dem Bürgersteig. Es ist kalt, unsicher und laut.',img:'/scene-city-v1.png'},
-  {min:2,name:'Park',bezirk:'überall verfügbar',desc:'Weiche Wiesen, frische Luft und Vogelgezwitscher. Eine gute Alternative zum beliebten und dreckigen Bürgersteig.',img:'/kiez-background-v1.png'},
-  {min:3,name:'Parkbank',bezirk:'überall verfügbar',desc:'Im Pennerjargon auch Mittelklasse-Hotel genannt. Ein etwas unbequemes Bett, aber dafür die wunderschöne Natur um dich herum.',img:'/schnorren-scene-v1.png'},
-  {min:4,name:'Pennerbox',bezirk:'überall verfügbar',desc:'Die bekannte Firma Schluckspecht bietet neuerdings eine Pennerbox für die Unterschichtspenner an.',img:'/scene-training-v1.png'},
-  {min:5,name:'Grabkammer',bezirk:'Allermöhe',desc:'Auf dem Friedhof stent eine alte Grabkammer. Der Friedhofsgärtner würde sie dir gerne verkaufen. Er kann aber keine Garantie dafür übernehmen, dass du darin völlig allein bist.',img:'/scene-store-v1.png'},
-  {min:6,name:'Tiefgarage',bezirk:'überall verfügbar',desc:'Nicht nur für Autos eine Möglichkeit nach einem Vollrausch mal abzuschalten. Die Gase sind nicht sehr gesund, aber das bekommst du sowieso nicht mit.',img:'/scene-training-v1.png'},
-  {min:7,name:'Kakaofabrik',bezirk:'Stellingen',desc:'Als Kenner des Industriegebiets bist du natürlich bestens mit den umliegenden Fabriken vertraut. Die Kakaofabrik sticht sofort ins Auge.',img:'/scene-fairground-v1.png'},
-  {min:8,name:'Kran',bezirk:'überall verfügbar',desc:'Ganz schön hoch kann man in dieser kleinen engen Kabine über den Dingen stehen. Der Nebensache, wenn man die schöne Aussicht und die Sicherheit in Betracht zieht.',img:'/scene-shelter-v1.png'},
-  {min:9,name:'Leuchtturm',bezirk:'Neuland',desc:'Endlich, dein erstes richtiges Gebäude! Zwar nerven die ewig rotierenden Scheinwerfer, aber wenigstens hast du es schön warm.',img:'/scene-gang-v1.png'},
-  {min:10,name:'Alte Kirche',bezirk:'Basel',desc:'Dass Gott dich im Stich gelassen hat, wissen wir beide. Vielleicht drückt er ja ein Auge zu, wenn du bei ihm wohnst.',img:'/scene-messages-v1.png'},
-  {min:11,name:'Burg',bezirk:'Kirchwerder',desc:'Nur ein Wunderling wie du zieht heutzutage noch in diese alten Gemäuer ein. Aber diese Burg bietet dir sagenhaften Schutz.',img:'/scene-pets-v1.png'}
+  {min:1,def:1,name:'Bürgersteig',bezirk:'überall verfügbar',desc:'Hier fangen alle mal an: Mitten auf dem Bürgersteig. Es ist kalt, unsicher und laut.',img:'/scene-city-v1.png'},
+  {min:2,def:4,name:'Park',bezirk:'überall verfügbar',desc:'Weiche Wiesen, frische Luft und Vogelgezwitscher. Eine gute Alternative zum beliebten und dreckigen Bürgersteig.',img:'/kiez-background-v1.png'},
+  {min:3,def:8,name:'Parkbank',bezirk:'überall verfügbar',desc:'Im Pennerjargon auch Mittelklasse-Hotel genannt. Ein etwas unbequemes Bett, aber dafür die wunderschöne Natur um dich herum.',img:'/kiez-header-street-v2.png'},
+  {min:4,def:17,name:'Pennerbox',bezirk:'überall verfügbar',desc:'Die bekannte Firma Schluckspecht bietet neuerdings eine Pennerbox für die Unterschichtspenner an.',img:'/scene-store-v1.png'},
+  {min:5,def:21,name:'Brunnen',bezirk:'überall verfügbar',desc:'Trockener als man denkt, solange es nicht regnet. Das Wasser holst du dir gleich nebenan.',img:'/scene-fairground-v1.png'},
+  {min:6,def:24,name:'Brücke',bezirk:'überall verfügbar',desc:'Ein Klassiker unter Kennern. Trocken, zugig und mit Blick auf den Verkehr.',img:'/scene-city-v1.png'},
+  {min:7,def:28,name:'Katakomben',bezirk:'überall verfügbar',desc:'Etwas gruselig, dafür aber angenehm ruhig. Niemand stört dich hier unten.',img:'/scene-messages-v1.png'},
+  {min:8,def:31,name:'Elbstrand',bezirk:'Elbstrand',desc:'Meerblick für Arme. Bei Flut wird es allerdings ungemütlich.',img:'/kiez-background-v1.png'},
+  {min:9,def:34,name:'Baumhaus',bezirk:'überall verfügbar',desc:'Kindheitstraum trifft Obdachlosigkeit. Mit etwas Glück fällt wenigstens niemand raus.',img:'/scene-gang-v1.png'},
+  {min:10,def:42,name:'Zelt',bezirk:'überall verfügbar',desc:'Regen bleibt meistens draußen. Meistens.',img:'/scene-shelter-v1.png'},
+  {min:11,def:51,name:'Wolfsrudel',bezirk:'überall verfügbar',desc:'Wärme durch Gesellschaft, auch wenn die Mitbewohner gelegentlich knurren.',img:'/scene-pets-v1.png'},
+  {min:12,def:58,name:'Wohnwagen',bezirk:'überall verfügbar',desc:'Riecht nach Vorbesitzer, aber die Tür schließt immerhin ab.',img:'/scene-training-v1.png'},
+  {min:13,def:64,name:'Boot',bezirk:'überall verfügbar',desc:'Schaukelt bei jedem Windstoß, aber wenigstens hast du einen Ausblick, um den dich viele beneiden.',img:'/schnorren-scene-v1.png'},
+  {min:14,def:73,name:'Grabkammer',bezirk:'Allermöhe',desc:'Auf dem Friedhof steht eine alte Grabkammer. Der Friedhofsgärtner würde sie dir gerne verkaufen. Er kann aber keine Garantie dafür übernehmen, dass du darin völlig allein bist.',img:'/scene-messages-v1.png'},
+  {min:15,def:82,name:'Tiefgarage',bezirk:'überall verfügbar',desc:'Nicht nur für Autos eine Möglichkeit, nach einem Vollrausch mal abzuschalten. Die Abgase sind nicht sehr gesund, aber das bekommst du sowieso nicht mehr mit.',img:'/scene-training-v1.png'},
+  {min:16,def:89,name:'Kakaofabrik',bezirk:'Stellingen',desc:'Als Kenner des Industriegebiets bist du natürlich bestens mit den umliegenden Fabriken vertraut. Die Kakaofabrik sticht sofort ins Auge.',img:'/scene-fairground-v1.png'},
+  {min:17,def:102,name:'Kran',bezirk:'überall verfügbar',desc:'Ganz schön hoch kann man in dieser kleinen engen Kabine über den Dingen stehen, wenn man die schöne Aussicht und die Sicherheit in Betracht zieht.',img:'/scene-shelter-v1.png'},
+  {min:18,def:125,name:'Leuchtturm',bezirk:'Neuland',desc:'Endlich, dein erstes richtiges Gebäude! Zwar nerven die ewig rotierenden Scheinwerfer, aber wenigstens hast du es schön warm.',img:'/scene-gang-v1.png'},
+  {min:19,def:147,name:'Alte Kirche',bezirk:'Basel',desc:'Dass Gott dich im Stich gelassen hat, wissen wir beide. Vielleicht drückt er ja ein Auge zu, wenn du bei ihm wohnst.',img:'/scene-messages-v1.png'},
+  {min:20,def:158,name:'Burg',bezirk:'Kirchwerder',desc:'Nur ein Wunderling wie du zieht heutzutage noch in diese alten Gemäuer ein. Aber diese Burg bietet dir sagenhaften Schutz.',img:'/scene-pets-v1.png'}
  ];
  const wrap=document.createElement('div');
  wrap.className='haeuser-gallery cards';
- wrap.innerHTML='<h3 class="shop-category" style="grid-column:1/-1">Häuser im Kiez</h3>'+houses.map(h=>'<div class="card haeuser-card" data-min="'+h.min+'" style="--h-img:url(\''+h.img+'\')"><b>'+h.name+'</b><small style="display:block;color:#c8b78f!important;margin:2px 0 5px">Stadtteil: '+h.bezirk+'</small><p>'+h.desc+'</p><em class="haeuser-status"></em><button class="ghost haeuser-move-btn hide">Einziehen</button></div>').join('');
+ wrap.innerHTML='<h3 class="shop-category" style="grid-column:1/-1">Häuser im Kiez</h3>'+houses.map(h=>'<div class="card haeuser-card" data-min="'+h.min+'" style="--h-img:url(\''+h.img+'\')"><b>'+h.name+'</b><small style="display:block;color:#c8b78f!important;margin:2px 0 5px">Stadtteil: '+h.bezirk+' · 🛡 +'+h.def+'</small><p>'+h.desc+'</p><em class="haeuser-status"></em><button class="ghost haeuser-move-btn hide">Einziehen</button></div>').join('');
  cards.after(wrap);
  const oldCard=document.getElementById('shelter');
  if(oldCard)oldCard.style.display='none';
