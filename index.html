@@ -1333,7 +1333,8 @@ section.panel .purchase-card .uniform-purchase-button{
   const supermarket=label==='Supermarkt';
   inline.classList.toggle('active',supermarket);
   shoplist.style.display=supermarket?'none':'';
-  store.querySelector('#inventorylist')?.closest('.inside');
+  const invlist=store.querySelector('#inventorylist');
+  if(invlist)invlist.style.display=label==='Verkaufen'?'':'none';
   document.getElementById('defenseshop')?.classList.add('hide');
   if(supermarket){if(title)title.textContent='Supermarkt';if(angebot)angebot.classList.add('kiez-force-hide');await renderDrinks();closeModal()}
   else if(label==='Waffenladen'){if(title)title.textContent='Waffenladen';inline.classList.remove('active');shoplist.style.display='';if(angebot)angebot.classList.remove('kiez-force-hide')}
