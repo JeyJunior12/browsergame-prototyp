@@ -1261,6 +1261,48 @@ function updateCraftingSection(){
  });
 }
 (()=>{if(document.getElementById('schnorr-result-style'))return;const st=document.createElement('style');st.id='schnorr-result-style';st.textContent='.schnorr-result:not(:empty){margin-top:8px}.schnorr-result .notice{margin:0}';document.head.appendChild(st)})();
+function addAreaProgression(){
+ const roadmap=document.querySelector('#income .feature-roadmap');
+ if(!roadmap||document.querySelector('.area-list'))return;
+ const areas=['Bahnhofs-Hinterhof','Altglas-Gasse','Ranziger Stadtpark','Touristenmeile','Luxusviertel-Hintereingang'];
+ const factors=['1,00×','1,25×','1,55×','1,95×','2,50×'];
+ const prices=['25,00 €','100,00 €','350,00 €','1200,00 €'];
+ const wrap=document.createElement('div');
+ wrap.className='area-list cards';
+ wrap.style.gridColumn='1/-1';
+ wrap.innerHTML='<h3 class="shop-category" style="grid-column:1/-1">Schnorrgebiete</h3>'+areas.map((name,i)=>'<div class="card area-card" data-idx="'+i+'"><b>'+name+'</b><p>Flaschenfaktor: '+factors[i]+'</p><p class="area-status"></p>'+(i<4?'<button class="ghost area-unlock" data-idx="'+i+'">Freischalten – '+prices[i]+'</button>':'')+'</div>').join('');
+ roadmap.insertAdjacentElement('beforebegin',wrap);
+ wrap.addEventListener('click',e=>{
+  const btn=e.target.closest('.area-unlock');
+  if(!btn||btn.disabled)return;
+  document.getElementById('buyarea')?.click();
+ });
+}
+function updateAreaProgression(){
+ const wrap=document.querySelector('.area-list');
+ if(!wrap)return;
+ const areas=['Bahnhofs-Hinterhof','Altglas-Gasse','Ranziger Stadtpark','Touristenmeile','Luxusviertel-Hintereingang'];
+ const curName=document.getElementById('areaname')?.textContent;
+ const curLevel=Math.max(0,areas.indexOf(curName));
+ wrap.querySelectorAll('.area-card').forEach(card=>{
+  const idx=Number(card.dataset.idx);
+  const status=card.querySelector('.area-status');
+  const btn=card.querySelector('.area-unlock');
+  if(idx<=curLevel){
+   card.classList.add('locked');
+   if(status)status.textContent=idx===curLevel?'✅ Aktuelles Gebiet':'✅ Freigeschaltet';
+   if(btn){btn.disabled=true;btn.classList.add('hide')}
+  }else if(idx===curLevel+1){
+   card.classList.remove('locked');
+   if(status)status.textContent='Nächstes Gebiet';
+   if(btn){btn.disabled=false;btn.classList.remove('hide')}
+  }else{
+   card.classList.add('locked');
+   if(status)status.textContent='🔒 Erst vorheriges Gebiet freischalten';
+   if(btn){btn.disabled=true;btn.classList.remove('hide')}
+  }
+ });
+}
 function addSchnorrplaetze(){
  const areaCard=document.getElementById('areaname')?.closest('.card');
  if(!areaCard||document.querySelector('.schnorr-spots'))return;
@@ -1332,7 +1374,7 @@ function routeQuickbarSpecials(){
   if(label==='Musikladen'){splitIncomeView('music');setTimeout(()=>document.getElementById('musicname')?.closest('.card')?.scrollIntoView({behavior:'smooth',block:'center'}),150)}
  });
 }
-function initAll(){addBioAndGuestbook();addHaeuserGalerie();addOverviewSlots();addPlunderSection();addWeatherBadge();addKronkorken();reorganizeStorePages();addInstrumentShop();updateInstrumentShop();addWashUpgrades();updateWashUpgrades();addConcentration();updateConcentration();addCrimeSystem();updateCrimeSystem();addSchnorrplaetze();addCraftingSection();updateCraftingSection();updatePfandExtras();updatePriceHistory();updateBeerGlass();wireCityHub();updateQuickbar();addScratchTickets();addOverviewInventoryCard();updateOverviewInventoryCard();movePetsToOverview();moveActionsToOverview();routeQuickbarSpecials();fixProfileSubTabs();}
+function initAll(){addBioAndGuestbook();addHaeuserGalerie();addOverviewSlots();addPlunderSection();addWeatherBadge();addKronkorken();reorganizeStorePages();addInstrumentShop();updateInstrumentShop();addWashUpgrades();updateWashUpgrades();addConcentration();updateConcentration();addCrimeSystem();updateCrimeSystem();addSchnorrplaetze();addAreaProgression();updateAreaProgression();addCraftingSection();updateCraftingSection();updatePfandExtras();updatePriceHistory();updateBeerGlass();wireCityHub();updateQuickbar();addScratchTickets();addOverviewInventoryCard();updateOverviewInventoryCard();movePetsToOverview();moveActionsToOverview();routeQuickbarSpecials();fixProfileSubTabs();}
 initAll();
 setInterval(initAll,1000);
 })();
