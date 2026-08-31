@@ -335,7 +335,7 @@ setTimeout(initSubtabDefaults,300);
 @media(max-width:700px){.player-slip{top:187px!important;right:8px!important;width:190px!important;height:128px!important;padding-left:70px!important}}
 </style>
 <script id="profile-slip-script-v27">
-(()=>{const slip=document.querySelector('.player-slip');if(!slip||slip.dataset.v27)return;slip.dataset.v27='1';const rows=slip.querySelectorAll(':scope>span');if(rows[0])rows[0].innerHTML='<b>AUS:</b><i>Bahnhof</i>';if(rows[1])rows[1].innerHTML='<b>PLATZ:</b><i>Level <em id="sliplevel">'+(document.querySelector('#level')?.textContent||'1')+'</em></i>';if(rows[2]){rows[2].className='slip-messages';rows[2].innerHTML='<b>NEUE NACHRICHTEN</b><i>Postfach</i>'}const sync=()=>{const n=document.querySelector('#playername')?.textContent,l=document.querySelector('#level')?.textContent;if(n)slip.querySelector('#slipname').textContent=n;const level=slip.querySelector('#sliplevel');if(level&&l)level.textContent=l};sync();setInterval(sync,1000)})();
+(()=>{const slip=document.querySelector('.player-slip');if(!slip||slip.dataset.v27)return;slip.dataset.v27='1';const rows=slip.querySelectorAll(':scope>span');if(rows[0])rows[0].innerHTML='<b>AUS:</b><i id="slipdistrict">Bahnhof</i>';if(rows[1])rows[1].innerHTML='<b>PLATZ:</b><i>Level <em id="sliplevel">'+(document.querySelector('#level')?.textContent||'1')+'</em></i>';if(rows[2]){rows[2].className='slip-messages';rows[2].innerHTML='<b>NACHRICHTEN</b><i>Postfach</i>'}const sync=()=>{const n=document.querySelector('#playername')?.textContent,l=document.querySelector('#level')?.textContent,d=document.querySelector('#areaname')?.textContent;if(n)slip.querySelector('#slipname').textContent=n;const level=slip.querySelector('#sliplevel');if(level&&l)level.textContent=l;const district=slip.querySelector('#slipdistrict');if(district&&d)district.textContent=d};sync();setInterval(sync,1000)})();
 </script>
 <style id="profile-overlap-fix-v27b">.player-slip{top:142px!important}@media(max-width:700px){.player-slip{top:222px!important}}</style>
 <style id="continuous-street-layout-v28">
@@ -1395,6 +1395,15 @@ section.panel .purchase-card.kiez-force-hide,section.panel .kiez-force-hide{disp
 .kiez-quickbar.kiez-quickbar-hide{display:none!important}
 .kiez-quickbar{display:flex!important;justify-content:flex-start!important;width:auto!important;margin-left:14px!important;flex-wrap:wrap!important;height:auto!important;min-height:27px!important}
 .kiez-quickbar button{flex:0 0 auto!important;padding-left:10px!important;padding-right:10px!important}
+.player-slip{background-color:#211f1c!important;background-image:none!important;border:1px solid #5d4b32!important;box-shadow:0 8px 20px #000c!important;color:#d8cba6!important}
+.player-slip strong{color:#f0d998!important;text-shadow:none!important;border-bottom-color:#4a4030!important}
+.player-slip span{color:#c9bd9d!important}
+.player-slip span b{color:#8f8265!important}
+.player-slip span i{color:#e8dcc0!important}
+.player-slip .slip-messages{border-top-color:#4a4030!important;border-bottom-color:#4a4030!important}
+.player-slip .slip-messages i{color:#d98a6a!important}
+.player-slip .profile-avatar{background-color:#1c1a17!important;border-color:#5d4b32!important}
+.player-slip>#logout{background:#3a352b!important;color:#d8cba6!important;border:1px solid #5d4b32!important}
 #begging .scene-visual{background-size:cover;background-position:center 35%;min-height:150px}
 </style>
 <script id="store-routing-cleanup-script-v50">
