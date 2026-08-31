@@ -113,6 +113,7 @@ async function load(){
  const {data,error}=await supabase.rpc('refresh_my_profile');
  if(error){say(q('#result'),'Profil klemmt: '+error.message,'notice bad');return} render(data);if(q('#alcohol'))q('#alcohol').textContent=Number(data.alcohol_level||0).toFixed(2).replace('.',',')+' ‰';showView(currentView);loadLeaderboard();loadItems();loadPvp();loadPetsAndMission();loadSocial();loadAchievementsAndFights()
 }
+window.kiezRenderProfile=p=>render(p);
 function render(p){currentProfile=p;document.body.dataset.washLevel=p.wash_level;document.body.dataset.concentrationEndsAt=p.concentration_ends_at||'';document.body.dataset.jailUntil=p.jail_until||'';document.body.dataset.jailBail=p.jail_bail||0;document.body.dataset.bottlesLifetime=p.bottles_lifetime_earned||0;document.body.dataset.bottlesNow=p.bottles;document.body.dataset.collectionStartedAt=p.collection_started_at||'';document.body.dataset.collectionEndsAt=p.collection_ends_at||'';document.body.dataset.collectionMinutes=p.collection_minutes||'';document.body.dataset.streetwise=p.streetwise;document.body.dataset.cleanliness=p.cleanliness;document.body.dataset.matNails=p.mat_nails;document.body.dataset.matWood=p.mat_wood;document.body.dataset.matShards=p.mat_shards;document.body.dataset.matTextile=p.mat_textile;q('#playername').textContent=p.username;q('#money').textContent=Number(p.money).toFixed(2).replace('.',',')+' €';q('#energy').textContent=p.energy+' / 100';q('#bottles').textContent=p.bottles;q('#level').textContent=p.level;const part=p.xp%250;q('#xpbar').style.width=(part/2.5)+'%';q('#xptext').textContent=part+' / 250';q('#rank').textContent=p.cleanliness+' %';if(q('#begclean'))q('#begclean').textContent=p.cleanliness+' %';if(q('#streakcount'))q('#streakcount').textContent=p.login_streak+' Tage';if(q('#begfactor'))q('#begfactor').textContent=(0.35+p.cleanliness/100*0.65+p.streetwise*0.03).toFixed(2).replace('.',',')+'×';q('#baglvl').textContent=p.bag_level;q('#shelterlvl').textContent=p.shelter_level;q('#containerlvl').textContent=p.container_level;q('#cashcap').textContent=Number(p.cash_capacity).toFixed(2).replace('.',',')+' €';q('#attacklvl').textContent=p.attack_skill;q('#defenselvl').textContent=p.defense_skill;q('#streetlvl').textContent=p.streetwise;q('#staminalvl').textContent=p.stamina;q('#speechlvl').textContent=p.speech_skill;q('#musiclvl').textContent=p.music_skill;q('#sociallvl').textContent=p.social_skill;q('#pickpocketlvl').textContent=p.pickpocket_skill;const bp=[3,12,45,180,700],sp=[1,10,50,200,700],cp=[20,150,3000,75000],containerNames=['Tasche','Große Tüte','Beutel','Einkaufswagen','Container'];q('#bagprice').textContent=Number(bp[Math.min(p.bag_level-1,4)]).toFixed(2).replace('.',',')+' €';q('#shelterprice').textContent=Number(sp[Math.min(p.shelter_level-1,4)]).toFixed(2).replace('.',',')+' €';q('#containerprice').textContent=p.container_level>=5?'MAX':Number(cp[Math.min(p.container_level-1,3)]).toFixed(2).replace('.',',')+' €';q('#buycontainer').disabled=p.container_level>=5;if(q('#containername'))q('#containername').textContent=containerNames[Math.min(p.container_level-1,4)];const areas=['Bahnhofs-Hinterhof','Altglas-Gasse','Ranziger Stadtpark','Touristenmeile','Luxusviertel-Hintereingang'],af=[1,1.25,1.55,1.95,2.5],ap=[25,100,350,1200],music=['Keins','Grashalmflöte','Flaschenflöte','Glocke','Trommel','Akkordion','Radio','Gitarre','Saxophon','Chor'],mr=[0,.02,.05,.12,.30,.70,1.50,2.80,5.00,9.00],mp=[1,5,20,60,180,450,900,1800,3500];q('#areaname').textContent=areas[p.area_level-1];q('#areafactor').textContent=af[p.area_level-1].toFixed(2).replace('.',',')+'×';q('#areaprice').textContent=p.area_level>=5?'MAX':ap[p.area_level-1].toFixed(2).replace('.',',')+' €';q('#buyarea').disabled=p.area_level>=5;q('#musicname').textContent=music[p.music_level];q('#musicrate').textContent=mr[p.music_level].toFixed(2).replace('.',',')+' €';q('#musicprice').textContent=p.music_level>=9?'MAX':mp[p.music_level].toFixed(2).replace('.',',')+' €';q('#buymusic').disabled=p.music_level>=9;q('#musiccollect').disabled=p.music_level<1;q('#fightrecord').textContent=p.wins+' Siege · '+p.losses+' Niederlagen';const titles=['Tüten-Neuling','Pfand-Schnüffler','Parkbank-Profi','Kiosk-Bekannter','Kiezgestalt','Gassen-Kapitän','Hinterhof-Boss','Viertel-Schreck','Straßen-Veteran','Asphalt-Baron','Unterwelt-Promi','Pfand-Magnat','Stadtteil-Legende','Beton-Kaiser','KiezKönig'];const ti=Math.min(14,Math.floor((p.level-1)/10));q('#ranktitle').textContent='Karriererang '+(ti+1)+': '+titles[ti]+' · Gesamtlevel '+p.level;q('#rankgoal').textContent=ti<14?'Nächster Rang ab Gesamtlevel '+((ti+1)*10+1)+'. Steigere Weiterbildungen, XP und Ausrüstung.':'Höchster Karriererang erreicht – Rangliste und Banden bleiben das Endspiel.';q('#rankladder').innerHTML=titles.map((t,i)=>'<div class="card '+(i>ti?'locked':'')+'"><b>'+(i+1)+'. '+t+'</b><p>'+(i<=ti?'Freigeschaltet':'Ab Gesamtlevel '+(i*10+1))+'</p></div>').join('');q('#admin').classList.toggle('hide',!p.is_admin);q('#adminnav')?.classList.toggle('hide',!p.is_admin);document.querySelector('.adminnav-top')?.classList.toggle('hide',!p.is_admin);if(p.is_admin)loadAdmin();const skillNames={attack:'Angriff',defense:'Verteidigung',streetwise:'Geschick',stamina:'Ausdauer',speech:'Sprechen',music:'Musik',social:'Sozialkontakte',pickpocket:'Taschentricks'};if(p.training_type&&p.training_ends_at&&new Date(p.training_ends_at)<=new Date()&&!window.kiezAutoFinishing){window.kiezAutoFinishing=true;supabase.rpc('finish_training').then(({data,error})=>{window.kiezAutoFinishing=false;if(!error)render(data.profile)}).catch(()=>{window.kiezAutoFinishing=false})}
 q('#trainingstatus').textContent=p.training_type?'Aktiv: '+skillNames[p.training_type]+' · Ende '+new Date(p.training_ends_at).toLocaleString('de-DE'):'Keine Weiterbildung aktiv.';q('#finishtraining').classList.toggle('hide',!p.training_type);document.querySelectorAll('.trainbtn').forEach(b=>{const capCheck={social:45,music:9}[b.dataset.skill]||150,lvCheck={attack:p.attack_skill,defense:p.defense_skill,streetwise:p.streetwise,stamina:p.stamina,speech:p.speech_skill,music:p.music_skill,social:p.social_skill,pickpocket:p.pickpocket_skill}[b.dataset.skill];b.disabled=!!p.training_type||lvCheck>=capCheck});document.querySelectorAll('.trainbtn').forEach(b=>{const levels={attack:p.attack_skill,defense:p.defense_skill,streetwise:p.streetwise,stamina:p.stamina,speech:p.speech_skill,music:p.music_skill,social:p.social_skill,pickpocket:p.pickpocket_skill},bases={attack:4,defense:4,streetwise:5,stamina:6,speech:7,social:10,pickpocket:12},flat={attack:{base:9.80,dur:24,durstep:3},defense:{base:3.20,dur:8,durstep:1},streetwise:{base:20.00,dur:50,durstep:5}},maxLevel={social:45,music:9},skill=b.dataset.skill,lv=levels[skill],cap=maxLevel[skill]||150;let price,mins;if(flat[skill]){const f=flat[skill];price=f.base+(lv-1)*5;mins=f.dur+(lv-1)*f.durstep}else if(skill==='music'){price=25*Math.pow(lv,1.9);mins=Math.pow(lv,1.5)*3}else{price=bases[skill]*Math.pow(lv,1.65);mins=Math.round(Math.pow(lv,1.28)*2)}mins=Math.min(10080,Math.max(1,Math.round(mins)));b.textContent=lv>=cap?'Maximalstufe '+cap+' erreicht':'Nächste Stufe · '+price.toFixed(2).replace('.',',')+' € · '+humanMinutes(mins)});updateActionTimers()}
 let kiezSkipPush=false;
@@ -252,13 +253,15 @@ const CONTENT_ZONES={
  leaderboard:{sel:':scope > .inside',tabs:{'Spieler':[0,1]}},
  career:{sel:':scope > .inside',tabs:{'Statistik':[0],'Ränge':[1]}},
  plunder:{sel:':scope > .inside',tabs:{'Deine Funde':[0,1,2],'Sammlung':[3,4]}},
- begging:{sel:'.scene-actions',tabs:{'Schnorrplatz':[0],'Körperpflege':[1,2]}}
+ begging:{sel:'.scene-actions',tabs:{'Schnorrplatz':[0],'Körperpflege':[2]}}
 };
 const crossPage={gear:{'Lager':'plunder'},messages:{'Bandenpost':'gangs'},leaderboard:{'Banden':'gangs'},pfand:{'Fundstücke':'plunder'}};
-const beggingCopy={'Schnorrplatz':'Such dir einen guten Platz, halte den Becher hin und wirke wenigstens halbwegs vertrauenswürdig. Geschick und Sauberkeit entscheiden über den Ertrag.','Körperpflege':'Sauberkeit kostet ein paar Cent, bringt aber bessere Schnorrerlöse. Pfandtouren machen dich schmutziger – hier wäschst du das wieder ab.'};
+const beggingCopy={'Schnorrplatz':{h2:'Schnorren',text:'Such dir einen guten Platz, halte den Becher hin und wirke wenigstens halbwegs vertrauenswürdig. Geschick und Sauberkeit entscheiden über den Ertrag.'},'Körperpflege':{h2:'Körperpflege',text:'Sauberkeit kostet ein paar Cent, bringt aber bessere Schnorrerlöse. Pfandtouren machen dich schmutziger – hier wäschst du das wieder ab.'}};
 const updateBeggingCopy=label=>{
- const p=document.querySelector('#begging .scene-copy p');
- if(p&&beggingCopy[label])p.textContent=beggingCopy[label];
+ const p=document.querySelector('#begging .scene-copy p'),h2=document.querySelector('#begging .scene-copy h2'),info=beggingCopy[label];
+ if(!info)return;
+ if(p)p.textContent=info.text;
+ if(h2)h2.textContent=info.h2;
 };
 const storeTabs={'Waffen':['Waffenladen','waffen'],'Kleidung':['Kleidung','kleidung'],'Zubehör':['Zubehör','zubehoer'],'Verbrauchbares':['Supermarkt',null],'Verkaufen':['Verkaufen',null],'Verteidigung':['Verteidigung',null]};
 const runSubtab=s=>{
@@ -835,14 +838,7 @@ function cleanupKatzenwaesche(){
  const block=washBtn.closest('.action-block');
  if(!block)return;
  document.body.dataset.kiezWashCleanup='1';
- block.querySelector('h3')?.remove();
- block.querySelector(':scope>p')?.remove();
- block.querySelector('.tip-list')?.remove();
- const h3=document.createElement('h3');
- h3.textContent='🚿 Waschen';
- h3.style.marginTop='14px';
- block.prepend(h3);
- list.insertAdjacentElement('afterend',block);
+ block.style.display='none';
 }
 function updateWashUpgrades(){
  const list=document.querySelector('.wash-list');
@@ -1184,24 +1180,41 @@ function updateCraftingSection(){
   card.classList.toggle('locked',!enough);
  });
 }
+(()=>{if(document.getElementById('schnorr-result-style'))return;const st=document.createElement('style');st.id='schnorr-result-style';st.textContent='.schnorr-result:not(:empty){margin-top:8px}.schnorr-result .notice{margin:0}';document.head.appendChild(st)})();
 function addSchnorrplaetze(){
  const areaCard=document.getElementById('areaname')?.closest('.card');
  if(!areaCard||document.querySelector('.schnorr-spots'))return;
  const spots=[
-  {id:'englischer_garten',name:'Englischer Garten',rate:0.10,desc:'Hier gibt es nur endlose Wiesen und verliebte Paare. Nur ein Idiot geht hier schnorren.'},
-  {id:'jahrmarkt',name:'Jahrmarkt',rate:0.50,desc:'Zuckerwatte, Blinklichter und pralle Geldbeutel – hier lohnt sich Betteln richtig.'}
+  {id:'englischer_garten',name:'Englischer Garten',rate:0.10,seconds:20,desc:'Hier gibt es nur endlose Wiesen und verliebte Paare. Nur ein Idiot geht hier schnorren.'},
+  {id:'jahrmarkt',name:'Jahrmarkt',rate:0.50,seconds:30,desc:'Zuckerwatte, Blinklichter und pralle Geldbeutel – hier lohnt sich Betteln richtig.'}
  ];
  const wrap=document.createElement('div');
  wrap.className='schnorr-spots cards';
  wrap.style.gridColumn='1/-1';
- wrap.innerHTML='<h3 class="shop-category" style="grid-column:1/-1">Schnorrplätze</h3>'+spots.map(s=>'<div class="card"><b>'+s.name+'</b><p>'+s.desc+'</p><p>💰 +'+s.rate.toFixed(2).replace('.',',')+' € pro Spende (bis zu 10×, Mitleid deines Begleiters erhöht die Ausbeute)</p><button class="ghost schnorr-go" data-spot="'+s.id+'">Hingehen</button></div>').join('');
+ wrap.innerHTML='<h3 class="shop-category" style="grid-column:1/-1">Schnorrplätze</h3>'+spots.map(s=>'<div class="card" data-spot="'+s.id+'" data-seconds="'+s.seconds+'"><b>'+s.name+'</b><p>'+s.desc+'</p><p>💰 +'+s.rate.toFixed(2).replace('.',',')+' € pro Spende (bis zu 10×, Mitleid deines Begleiters erhöht die Ausbeute)</p><button class="ghost schnorr-go" data-spot="'+s.id+'">Hingehen</button><div class="schnorr-result"></div></div>').join('');
  areaCard.insertAdjacentElement('afterend',wrap);
- wrap.addEventListener('click',e=>{
+ wrap.addEventListener('click',async e=>{
   const btn=e.target.closest('.schnorr-go');
   if(!btn||btn.disabled)return;
-  const hidden=document.getElementById('begspotid');
-  if(hidden)hidden.value=btn.dataset.spot;
-  document.getElementById('begatspot')?.click();
+  const card=btn.closest('.card'),spotId=btn.dataset.spot,seconds=Number(card.dataset.seconds)||20,resultBox=card.querySelector('.schnorr-result');
+  btn.disabled=true;
+  let remaining=seconds;
+  btn.textContent='Unterwegs … '+remaining+'s';
+  resultBox.innerHTML='';
+  const tick=setInterval(()=>{
+   remaining--;
+   if(remaining>0)btn.textContent='Unterwegs … '+remaining+'s';
+  },1000);
+  await new Promise(r=>setTimeout(r,seconds*1000));
+  clearInterval(tick);
+  const {data,error}=await window.kiezSupabase.rpc('beg_at_spot',{spot_id:spotId});
+  if(error){resultBox.innerHTML='<div class="notice bad">'+error.message+'</div>';}
+  else{
+   window.kiezRenderProfile(data.profile);
+   resultBox.innerHTML='<div class="notice good">+'+Number(data.total).toFixed(2).replace('.',',')+' € von '+data.count+' Spenden kassiert.</div>';
+  }
+  btn.disabled=false;
+  btn.textContent='Hingehen';
  });
 }
 window.splitIncomeView=(...a)=>splitIncomeView(...a);
