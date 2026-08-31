@@ -833,61 +833,35 @@ function updateInstrumentShop(){
   }
  });
 }
+(()=>{if(document.getElementById('wash-status-style'))return;const st=document.createElement('style');st.id='wash-status-style';st.textContent='.wash-status-good{color:#9bd17a}.wash-status-bad{color:#e08a7d}';document.head.appendChild(st)})();
 function addWashUpgrades(){
  const washCard=document.getElementById('wash')?.closest('.action-block');
  if(!washCard||document.querySelector('.wash-list'))return;
- const names=['Schwamm','Waschanlage'];
- const prices=[6,25];
- const descs=['Statt nasser Hand gibt es jetzt echte Seife: mehr Sauberkeit pro Wäsche.','Eine richtige Waschanlage im Hinterhof: volle Sauberkeit, und zwar kostenlos.'];
+ const tiers=[['schwamm','Schwamm',6,10,'Statt nasser Hand gibt es jetzt echte Seife: +10 % Sauberkeit. Kannst du so oft kaufen, wie du willst.'],['waschanlage','Waschanlage',25,50,'Eine richtige Waschanlage im Hinterhof: +50 % Sauberkeit. Kannst du so oft kaufen, wie du willst.']];
  const wrap=document.createElement('div');
  wrap.className='wash-list cards';
  wrap.style.marginTop='14px';
- names.forEach((name,i)=>{
-  const lvl=i+1;
-  const priceTxt=prices[i].toFixed(2).replace('.',',')+' €';
-  const card=document.createElement('div');
-  card.className='card wash-card';
-  card.dataset.level=lvl;
-  card.innerHTML='<b>'+name+'</b><p>'+descs[i]+'</p><p class="wash-status"></p><button class="ghost buywashitem" data-label="Kaufen – '+priceTxt+'">Kaufen – '+priceTxt+'</button>';
-  wrap.appendChild(card);
- });
+ wrap.innerHTML=tiers.map(([id,name,price,gain,desc])=>'<div class="card wash-card" data-tier="'+id+'"><b>'+name+'</b><p>'+desc+'</p><p class="wash-status"></p><button class="ghost buywashitem" data-tier="'+id+'">Kaufen – '+price.toFixed(2).replace('.',',')+' €</button></div>').join('');
  washCard.insertAdjacentElement('afterend',wrap);
- wrap.addEventListener('click',e=>{
+ washCard.style.display='none';
+ wrap.addEventListener('click',async e=>{
   const btn=e.target.closest('.buywashitem');
   if(!btn||btn.disabled)return;
-  document.getElementById('buywash')?.click();
+  btn.disabled=true;
+  const status=btn.closest('.wash-card').querySelector('.wash-status');
+  const {data,error}=await window.kiezSupabase.rpc('wash_up',{tier:btn.dataset.tier});
+  if(error){status.innerHTML='<span class="wash-status-bad">'+error.message+'</span>'}
+  else{window.kiezRenderProfile(data.profile);status.innerHTML='<span class="wash-status-good">+'+data.gain+' % Sauberkeit für '+Number(data.price).toFixed(2).replace('.',',')+' €.</span>';updateWashUpgrades()}
+  btn.disabled=false;
  });
-}
-function cleanupKatzenwaesche(){
- const washBtn=document.getElementById('wash');
- const list=document.querySelector('.wash-list');
- if(!washBtn||!list||document.body.dataset.kiezWashCleanup)return;
- const block=washBtn.closest('.action-block');
- if(!block)return;
- document.body.dataset.kiezWashCleanup='1';
- block.style.display='none';
 }
 function updateWashUpgrades(){
  const list=document.querySelector('.wash-list');
  if(!list)return;
- const curLevel=Number(document.body.dataset.washLevel||0);
+ const clean=Number(document.body.dataset.cleanliness||0);
  list.querySelectorAll('.wash-card').forEach(card=>{
-  const lvl=Number(card.dataset.level);
-  const status=card.querySelector('.wash-status');
   const btn=card.querySelector('.buywashitem');
-  if(lvl<=curLevel){
-   card.classList.add('locked');
-   if(status)status.textContent='✅ Vorhanden';
-   if(btn){btn.disabled=true;btn.textContent='Bereits gekauft';}
-  }else if(lvl===curLevel+1){
-   card.classList.remove('locked');
-   if(status)status.textContent='Nächster Ausbau';
-   if(btn){btn.disabled=false;btn.textContent=btn.dataset.label;}
-  }else{
-   card.classList.add('locked');
-   if(status)status.textContent='🔒 Erst vorherige Stufe kaufen';
-   if(btn){btn.disabled=true;btn.textContent='Gesperrt';}
-  }
+  if(btn)btn.disabled=clean>=100;
  });
 }
 function addConcentration(){
@@ -1358,7 +1332,7 @@ function routeQuickbarSpecials(){
   if(label==='Musikladen'){splitIncomeView('music');setTimeout(()=>document.getElementById('musicname')?.closest('.card')?.scrollIntoView({behavior:'smooth',block:'center'}),150)}
  });
 }
-function initAll(){addBioAndGuestbook();addHaeuserGalerie();addOverviewSlots();addPlunderSection();addWeatherBadge();addKronkorken();reorganizeStorePages();addInstrumentShop();updateInstrumentShop();addWashUpgrades();updateWashUpgrades();cleanupKatzenwaesche();addConcentration();updateConcentration();addCrimeSystem();updateCrimeSystem();addSchnorrplaetze();addCraftingSection();updateCraftingSection();updatePfandExtras();updatePriceHistory();updateBeerGlass();wireCityHub();updateQuickbar();addScratchTickets();addOverviewInventoryCard();updateOverviewInventoryCard();movePetsToOverview();moveActionsToOverview();routeQuickbarSpecials();fixProfileSubTabs();}
+function initAll(){addBioAndGuestbook();addHaeuserGalerie();addOverviewSlots();addPlunderSection();addWeatherBadge();addKronkorken();reorganizeStorePages();addInstrumentShop();updateInstrumentShop();addWashUpgrades();updateWashUpgrades();addConcentration();updateConcentration();addCrimeSystem();updateCrimeSystem();addSchnorrplaetze();addCraftingSection();updateCraftingSection();updatePfandExtras();updatePriceHistory();updateBeerGlass();wireCityHub();updateQuickbar();addScratchTickets();addOverviewInventoryCard();updateOverviewInventoryCard();movePetsToOverview();moveActionsToOverview();routeQuickbarSpecials();fixProfileSubTabs();}
 initAll();
 setInterval(initAll,1000);
 })();
