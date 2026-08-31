@@ -969,9 +969,9 @@ function addScratchTickets(){
   fields.forEach(f=>{f.textContent='❓';f.classList.remove('scratch-win','scratch-lose')});
   const msg=document.getElementById('scratchmsg');
   msg.innerHTML='';
-  const {data,error}=await supabase.rpc('buy_scratch_ticket');
+  const {data,error}=await window.kiezSupabase.rpc('buy_scratch_ticket');
   if(error){msg.innerHTML='<div class="notice bad">'+error.message+'</div>';btn.disabled=false;return}
-  render(data.profile);
+  window.kiezRenderProfile(data.profile);
   const prize=Number(data.prize);
   const won=prize>0;
   let symbols;
@@ -1212,10 +1212,10 @@ function addCraftingSection(){
  invCard.innerHTML='<b>Dein Inventar</b><p>🍾 Pfandflaschen: <b class="inv-bottles">0</b> · 🔩 Nägel: <b class="mat-nails">0</b> · 🪵 Holz: <b class="mat-wood">0</b> · 🔺 Scherben: <b class="mat-shards">0</b> · 🧵 Textil: <b class="mat-textile">0</b></p><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px"><label style="display:flex;flex-direction:column;font-size:12px;gap:3px">Menge<input type="number" id="sellqty" min="1" step="1" placeholder="Anzahl" style="width:100px;padding:8px"></label><button class="ghost" id="sellbottlesbtn">Verkaufen</button><button class="ghost" id="sellallbtn">Alle verkaufen</button></div><div id="sellmsg"></div>';
  anchor.insertAdjacentElement('beforebegin',invCard);
  const sellHandler=qty=>async()=>{
-  const {data,error}=await supabase.rpc('sell_bottles',qty?{qty}:{});
+  const {data,error}=await window.kiezSupabase.rpc('sell_bottles',qty?{qty}:{});
   const msg=document.getElementById('sellmsg');
   if(error){msg.innerHTML='<div class="notice bad">'+error.message+'</div>';return}
-  render(data.profile);
+  window.kiezRenderProfile(data.profile);
   let t='Verkauft: '+data.sold+' Flaschen zu '+Number(data.price).toFixed(2).replace('.',',')+' € pro Flasche. Du bekommst '+Number(data.paid).toFixed(2).replace('.',',')+' €.';
   if(Number(data.lost)>0)t+=' <b>'+Number(data.lost).toFixed(2).replace('.',',')+' € gingen verloren, weil dein Behälter voll war!</b>';
   msg.innerHTML='<div class="notice good">'+t+'</div>';
