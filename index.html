@@ -951,22 +951,44 @@ function kiezPfandPrice(){
 function addScratchTickets(){
  const inside=document.querySelector('#missions > .inside');
  if(!inside||document.querySelector('.scratch-card'))return;
+ if(!document.getElementById('scratch-card-style')){
+  const st=document.createElement('style');
+  st.id='scratch-card-style';
+  st.textContent='.scratch-fields{display:flex;gap:8px;margin:10px 0}.scratch-field{flex:1;display:flex;align-items:center;justify-content:center;min-height:56px;border:2px dashed #6a5f4a;border-radius:8px;background:#20201d;font-size:13px;font-weight:700;color:#9a927e;transition:background .2s,border-color .2s}.scratch-field.scratch-win{border-color:#7ea34a;background:#233421;color:#c7e6a0}.scratch-field.scratch-lose{border-color:#8a4a42;background:#332320;color:#e0b1a8}';
+  document.head.appendChild(st);
+ }
  const card=document.createElement('div');
  card.className='card scratch-card';
  card.style.gridColumn='1/-1';
- card.innerHTML='<b>🎫 Rubbellose</b><p>Ein Rubbellos kostet 10,00 € und bringt zwischen 0 € und 100 € zurück – je höher der Gewinn, desto seltener.</p><button class="ghost" id="buyscratch">Rubbellos kaufen – 10,00 €</button><div id="scratchmsg"></div>';
+ card.innerHTML='<b>🎫 Rubbellose</b><p>Ein Rubbellos kostet 10,00 € und bringt zwischen 0 € und 100 € zurück. Nur wenn alle drei Felder WIN zeigen, gewinnst du – je höher der Gewinn, desto seltener.</p><div class="scratch-fields"><div class="scratch-field" data-i="0">❓</div><div class="scratch-field" data-i="1">❓</div><div class="scratch-field" data-i="2">❓</div></div><button class="ghost" id="buyscratch">Rubbellos kaufen – 10,00 €</button><div id="scratchmsg"></div>';
  inside.append(card);
  document.getElementById('buyscratch').onclick=async()=>{
   const btn=document.getElementById('buyscratch');
   btn.disabled=true;
-  const {data,error}=await supabase.rpc('buy_scratch_ticket');
+  const fields=[...card.querySelectorAll('.scratch-field')];
+  fields.forEach(f=>{f.textContent='❓';f.classList.remove('scratch-win','scratch-lose')});
   const msg=document.getElementById('scratchmsg');
-  if(error){msg.innerHTML='<div class="notice bad">'+error.message+'</div>'}
+  msg.innerHTML='';
+  const {data,error}=await supabase.rpc('buy_scratch_ticket');
+  if(error){msg.innerHTML='<div class="notice bad">'+error.message+'</div>';btn.disabled=false;return}
+  render(data.profile);
+  const prize=Number(data.prize);
+  const won=prize>0;
+  let symbols;
+  if(won)symbols=[true,true,true];
   else{
-   render(data.profile);
-   const prize=Number(data.prize);
-   msg.innerHTML=prize>0?'<div class="notice good">🎉 Gewonnen: '+prize.toFixed(2).replace('.',',')+' €!</div>':'<div class="notice bad">Niete. Nächstes Mal.</div>';
+   const winCount=Math.floor(Math.random()*3);
+   symbols=[0,1,2].map(i=>i<winCount);
+   for(let i=symbols.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[symbols[i],symbols[j]]=[symbols[j],symbols[i]]}
   }
+  for(let i=0;i<3;i++){
+   await new Promise(r=>setTimeout(r,350));
+   const f=fields[i];
+   f.textContent=symbols[i]?'🏆 WIN':'❌ NIETE';
+   f.classList.add(symbols[i]?'scratch-win':'scratch-lose');
+  }
+  await new Promise(r=>setTimeout(r,200));
+  msg.innerHTML=won?'<div class="notice good">🎉 Gewonnen: '+prize.toFixed(2).replace('.',',')+' €!</div>':'<div class="notice bad">Niete. Nächstes Mal.</div>';
   btn.disabled=false;
  };
 }
