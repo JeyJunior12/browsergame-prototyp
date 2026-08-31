@@ -954,7 +954,25 @@ function wireCityHub(){
 }
 const profileTabItems=[['Profil ansehen','profil'],['Übersicht','uebersicht'],['Haustier','pets-go'],['Aktionen','missions-go'],['Inventar','inventar'],['Kronkorken','kronkorken']];
 const cityTabItems=[['Zubehör','store','Zubehör'],['Supermarkt','store','Verbrauchbares'],['Tierhandlung','pets',null],['Waffenladen','store','Waffen'],['Apotheke','apotheke',null],['Waschhaus','begging','Körperpflege'],['Schnorrplätze','income','Schnorrplätze'],['Musikladen','income','Instrumente'],['Eigenheime','gear',null],['Glücksspiel','missions',null]];
-const profileZones={profil:[0,1,6,7],uebersicht:[0,1,2,3,4,5]};
+const profileZones={profil:[0,1,6,7],uebersicht:[0,1,2,3,4,5],inventar:[8]};
+function addOverviewInventoryCard(){
+ const content=document.querySelector('#overview .classic-profile-content');
+ if(!content||content.querySelector('.overview-inventory-card'))return;
+ const card=document.createElement('div');
+ card.className='profile-wide-row overview-inventory-card';
+ card.style.display='none';
+ card.innerHTML='<b>Dein Inventar</b><p>🍾 Pfandflaschen: <b class="ov-inv-bottles">0</b> · 🔩 Nägel: <b class="ov-inv-nails">0</b> · 🪵 Holz: <b class="ov-inv-wood">0</b> · 🔺 Scherben: <b class="ov-inv-shards">0</b> · 🧵 Textil: <b class="ov-inv-textile">0</b></p>';
+ content.append(card);
+}
+function updateOverviewInventoryCard(){
+ const card=document.querySelector('.overview-inventory-card');
+ if(!card)return;
+ card.querySelector('.ov-inv-bottles').textContent=document.body.dataset.bottlesNow||0;
+ card.querySelector('.ov-inv-nails').textContent=document.body.dataset.matNails||0;
+ card.querySelector('.ov-inv-wood').textContent=document.body.dataset.matWood||0;
+ card.querySelector('.ov-inv-shards').textContent=document.body.dataset.matShards||0;
+ card.querySelector('.ov-inv-textile').textContent=document.body.dataset.matTextile||0;
+}
 function showProfileZone(key){
  const content=document.querySelector('#overview .classic-profile-content');
  if(!content)return;
@@ -966,9 +984,9 @@ function showProfileZone(key){
 function profileTabAction(key){
  if(key==='profil'){showProfileZone('profil');document.querySelector('#overview')?.scrollIntoView({behavior:'smooth',block:'start'});return}
  if(key==='uebersicht'){showProfileZone('uebersicht');document.querySelector('#overview')?.scrollIntoView({behavior:'smooth',block:'start'});return}
- if(key==='pets-go'){document.querySelector('.side [data-view="pets"]')?.click();return}
- if(key==='missions-go'){document.querySelector('.side [data-view="missions"]')?.click();return}
- if(key==='inventar'){document.querySelector('.side [data-view="store"]')?.click();setTimeout(()=>document.getElementById('inventorylist')?.scrollIntoView({behavior:'smooth',block:'start'}),150);return}
+ if(key==='pets-go'){document.querySelector('.side [data-view="pets"]')?.click();setTimeout(()=>{const t=[...document.querySelectorAll('#pets .section-tools span')].find(s=>s.textContent.trim()==='Deine Begleiter');t?.click()},80);return}
+ if(key==='missions-go'){document.querySelector('.side [data-view="missions"]')?.click();setTimeout(()=>{const t=[...document.querySelectorAll('#missions .section-tools span')].find(s=>s.textContent.trim()==='Kiezaktionen');t?.click()},80);return}
+ if(key==='inventar'){showProfileZone('inventar');document.querySelector('#overview')?.scrollIntoView({behavior:'smooth',block:'start'});return}
  if(key==='kronkorken'){document.querySelector('.kronkorken-stat')?.click();return}
 }
 function updateQuickbar(){
@@ -1191,7 +1209,7 @@ function routeQuickbarSpecials(){
   if(label==='Musikladen'){splitIncomeView('music');setTimeout(()=>document.getElementById('musicname')?.closest('.card')?.scrollIntoView({behavior:'smooth',block:'center'}),150)}
  });
 }
-function initAll(){addBioAndGuestbook();addHaeuserGalerie();addOverviewSlots();addPlunderSection();addWeatherBadge();addKronkorken();reorganizeStorePages();addInstrumentShop();updateInstrumentShop();addWashUpgrades();updateWashUpgrades();addConcentration();updateConcentration();addCrimeSystem();updateCrimeSystem();addSchnorrplaetze();addCraftingSection();updateCraftingSection();updatePfandExtras();updatePriceHistory();updateBeerGlass();wireCityHub();updateQuickbar();addScratchTickets();routeQuickbarSpecials();fixProfileSubTabs();}
+function initAll(){addBioAndGuestbook();addHaeuserGalerie();addOverviewSlots();addPlunderSection();addWeatherBadge();addKronkorken();reorganizeStorePages();addInstrumentShop();updateInstrumentShop();addWashUpgrades();updateWashUpgrades();addConcentration();updateConcentration();addCrimeSystem();updateCrimeSystem();addSchnorrplaetze();addCraftingSection();updateCraftingSection();updatePfandExtras();updatePriceHistory();updateBeerGlass();wireCityHub();updateQuickbar();addScratchTickets();addOverviewInventoryCard();updateOverviewInventoryCard();routeQuickbarSpecials();fixProfileSubTabs();}
 initAll();
 setInterval(initAll,1000);
 })();
