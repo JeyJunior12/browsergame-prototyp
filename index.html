@@ -235,7 +235,7 @@ const priceHistory=()=>{
 const alcohol=async()=>{const p=await window.kiezRefreshProfile();show('Kiosk: Alkohol & Pfandspürbonus',window.kiezDrinkShopHTML(p))};
 const training=()=>show('Aktuelle Weiterbildung','<div class="status-detail"><small>Status</small><strong>'+value('#toptraining')+'</strong><span>'+value('#trainingstatus')+'</span></div><p><button class="big modal-go" data-go="training">Weiterbildungszentrum öffnen</button></p>');
 const simple=(name,html,go,label)=>show(name,'<div class="status-detail-grid">'+html+'</div><p><button class="big modal-go" data-go="'+go+'">'+label+'</button></p>');
-const actions={money:finance,alcohol:alcohol,toptraining:training,topprice:priceHistory,bottles:bottles,energy:()=>simple('Energie','<div class="status-detail"><small>Verfügbar</small><strong>'+value('#energy')+'</strong><span>Regeneriert automatisch um 1 pro Minute.</span></div>','missions','Aktionen öffnen'),level:()=>simple('Level & Fortschritt','<div class="status-detail"><small>Gesamtlevel</small><strong>'+value('#level')+'</strong><span>'+value('#xptext')+' XP bis zum nächsten Abschnitt.</span></div>','career','Laufbahn öffnen')};
+const actions={money:finance,alcohol:alcohol,toptraining:training,topprice:priceHistory,bottles:()=>goto('plunder'),energy:()=>simple('Energie','<div class="status-detail"><small>Verfügbar</small><strong>'+value('#energy')+'</strong><span>Regeneriert automatisch um 1 pro Minute.</span></div>','missions','Aktionen öffnen'),level:()=>simple('Level & Fortschritt','<div class="status-detail"><small>Gesamtlevel</small><strong>'+value('#level')+'</strong><span>'+value('#xptext')+' XP bis zum nächsten Abschnitt.</span></div>','career','Laufbahn öffnen')};
 document.querySelectorAll('.stats .stat:not(.clean-stat)').forEach(card=>{card.setAttribute('role','button');card.tabIndex=0;const id=card.querySelector('b')?.id;const run=()=>actions[id]?.();card.onclick=run;card.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();run()}}});
 document.addEventListener('click',async e=>{const go=e.target.closest('.modal-go');if(go)return goto(go.dataset.go);const drink=e.target.closest('.buy-drink');if(drink){drink.disabled=true;const msg=document.querySelector('#drinkmsg');try{const d=await window.kiezBuyAlcohol(drink.dataset.drink);msg.innerHTML='<div class="notice good">'+d.label+' gekauft. Pegel: '+Number(d.promille).toFixed(2).replace('.',',')+' ‰ · Pfandbonus aktiv.</div>';const p=await window.kiezRefreshProfile();body.innerHTML=window.kiezDrinkShopHTML(p)}catch(err){msg.innerHTML='<div class="notice bad">'+err.message+'</div>'}drink.disabled=false;return}const pump=e.target.closest('#pumpstomach');if(pump){pump.disabled=true;try{await window.kiezPumpStomach();const p=await window.kiezRefreshProfile();body.innerHTML=window.kiezDrinkShopHTML(p);document.querySelector('#drinkmsg').innerHTML='<div class="notice good">Magen ausgepumpt. Du bist wieder nüchtern.</div>'}catch(err){document.querySelector('#drinkmsg').innerHTML='<div class="notice bad">'+err.message+'</div>'}return}const buyIns=e.target.closest('#buyinsurance');if(buyIns){buyIns.disabled=true;try{await window.kiezBuyInsurance();const p=await window.kiezRefreshProfile();body.innerHTML=window.kiezDrinkShopHTML(p);document.querySelector('#drinkmsg').innerHTML='<div class="notice good">Krankenversicherung abgeschlossen.</div>'}catch(err){document.querySelector('#drinkmsg').innerHTML='<div class="notice bad">'+err.message+'</div>'}return}const cancelIns=e.target.closest('#cancelinsurance');if(cancelIns){cancelIns.disabled=true;try{await window.kiezCancelInsurance();const p=await window.kiezRefreshProfile();body.innerHTML=window.kiezDrinkShopHTML(p);document.querySelector('#drinkmsg').innerHTML='<div class="notice good">Versicherung gekündigt.</div>'}catch(err){document.querySelector('#drinkmsg').innerHTML='<div class="notice bad">'+err.message+'</div>'}}});
 document.querySelectorAll('.panel>.section-tools span').forEach((s,i)=>{s.setAttribute('role','button');s.tabIndex=0;s.onclick=()=>{s.parentElement.querySelectorAll('span').forEach(x=>x.classList.remove('subtab-active'));s.classList.add('subtab-active');show(s.textContent,'Dieser Unterbereich gehört zu „'+s.closest('.panel').querySelector('h2')?.textContent+'“. Die Detailansicht wird innerhalb dieses Fensters geöffnet und in den nächsten Ausbauschritten weiter gefüllt.')};s.onkeydown=e=>{if(e.key==='Enter')s.click()}});
@@ -894,9 +894,11 @@ const CRAFT_RECIPES=[
 function addCraftingSection(){
  const anchor=document.getElementById('plunderlist');
  if(!anchor||document.querySelector('.craft-list'))return;
- const matbar=document.createElement('p');
- matbar.className='craft-materials';
- matbar.innerHTML='🔩 Nägel: <b class="mat-nails">0</b> · 🪵 Holz: <b class="mat-wood">0</b> · 🔺 Scherben: <b class="mat-shards">0</b> · 🧵 Textil: <b class="mat-textile">0</b>';
+ const invCard=document.createElement('div');
+ invCard.className='card kiez-inventory-card';
+ invCard.style.gridColumn='1/-1';
+ invCard.innerHTML='<b>Dein Inventar</b><p>🍾 Pfandflaschen: <b class="inv-bottles">0</b> · 🔩 Nägel: <b class="mat-nails">0</b> · 🪵 Holz: <b class="mat-wood">0</b> · 🔺 Scherben: <b class="mat-shards">0</b> · 🧵 Textil: <b class="mat-textile">0</b></p>';
+ anchor.insertAdjacentElement('beforebegin',invCard);
  const h=document.createElement('h3');
  h.className='shop-category';
  h.style.gridColumn='1/-1';
@@ -904,8 +906,7 @@ function addCraftingSection(){
  const wrap=document.createElement('div');
  wrap.className='craft-list cards';
  wrap.innerHTML=CRAFT_RECIPES.map(r=>'<div class="card craft-card" data-id="'+r.id+'"><b>'+r.name+'</b><p>🔩 '+r.nails+' · 🪵 '+r.wood+' · 🔺 '+r.shards+' · 🧵 '+r.textile+'</p><button class="ghost craft-go">Herstellen – '+r.price.toFixed(2).replace('.',',')+' €</button></div>').join('')+'<div id="craftmsg"></div>';
- anchor.insertAdjacentElement('afterend',matbar);
- matbar.insertAdjacentElement('afterend',h);
+ anchor.insertAdjacentElement('afterend',h);
  h.insertAdjacentElement('afterend',wrap);
  wrap.addEventListener('click',e=>{
   const btn=e.target.closest('.craft-go');
@@ -919,6 +920,7 @@ function updateCraftingSection(){
  const wrap=document.querySelector('.craft-list');
  if(!wrap)return;
  const have={nails:Number(document.body.dataset.matNails||0),wood:Number(document.body.dataset.matWood||0),shards:Number(document.body.dataset.matShards||0),textile:Number(document.body.dataset.matTextile||0)};
+ document.querySelector('.inv-bottles')?.replaceChildren(document.createTextNode(document.body.dataset.bottlesNow||0));
  document.querySelector('.mat-nails')?.replaceChildren(document.createTextNode(have.nails));
  document.querySelector('.mat-wood')?.replaceChildren(document.createTextNode(have.wood));
  document.querySelector('.mat-shards')?.replaceChildren(document.createTextNode(have.shards));
