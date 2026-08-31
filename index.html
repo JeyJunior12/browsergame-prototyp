@@ -812,6 +812,7 @@ function updateInstrumentShop(){
  const curName=document.getElementById('musicname')?.textContent.trim();
  const idx=names.indexOf(curName);
  const curLevel=idx<0?0:idx;
+ const musicSkill=Number(document.getElementById('musiclvl')?.textContent||1);
  list.querySelectorAll('.instrument-card').forEach(card=>{
   const lvl=Number(card.dataset.level);
   const status=card.querySelector('.instrument-status');
@@ -820,6 +821,10 @@ function updateInstrumentShop(){
    card.classList.add('locked');
    if(status)status.textContent=lvl===curLevel?'✅ Aktuelles Instrument':'Bereits besessen';
    if(btn){btn.disabled=true;btn.textContent=lvl===curLevel?'Im Einsatz':'Bereits gekauft';}
+  }else if(lvl===curLevel+1&&musicSkill<lvl){
+   card.classList.add('locked');
+   if(status)status.textContent='🎓 Musik-Weiterbildung auf Stufe '+lvl+' nötig';
+   if(btn){btn.disabled=true;btn.textContent='Erst weiterbilden';}
   }else if(lvl===curLevel+1){
    card.classList.remove('locked');
    if(status)status.textContent='Nächste Stufe';
