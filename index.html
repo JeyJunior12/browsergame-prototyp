@@ -237,42 +237,40 @@ const simple=(name,html,go,label)=>show(name,'<div class="status-detail-grid">'+
 const actions={money:finance,alcohol:alcohol,toptraining:training,topprice:priceHistory,bottles:()=>goto('plunder'),energy:()=>simple('Energie','<div class="status-detail"><small>Verfügbar</small><strong>'+value('#energy')+'</strong><span>Regeneriert automatisch um 1 pro Minute.</span></div>','missions','Aktionen öffnen'),level:()=>simple('Level & Fortschritt','<div class="status-detail"><small>Gesamtlevel</small><strong>'+value('#level')+'</strong><span>'+value('#xptext')+' XP bis zum nächsten Abschnitt.</span></div>','career','Laufbahn öffnen')};
 document.querySelectorAll('.stats .stat:not(.clean-stat)').forEach(card=>{card.setAttribute('role','button');card.tabIndex=0;const id=card.querySelector('b')?.id;const run=()=>actions[id]?.();card.onclick=run;card.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();run()}}});
 document.addEventListener('click',async e=>{const go=e.target.closest('.modal-go');if(go)return goto(go.dataset.go);const drink=e.target.closest('.buy-drink');if(drink){drink.disabled=true;const msg=document.querySelector('#drinkmsg');try{const d=await window.kiezBuyAlcohol(drink.dataset.drink);msg.innerHTML='<div class="notice good">'+d.label+' gekauft. Pegel: '+Number(d.promille).toFixed(2).replace('.',',')+' ‰ · Pfandbonus aktiv.</div>';const p=await window.kiezRefreshProfile();body.innerHTML=window.kiezDrinkShopHTML(p)}catch(err){msg.innerHTML='<div class="notice bad">'+err.message+'</div>'}drink.disabled=false;return}const pump=e.target.closest('#pumpstomach');if(pump){pump.disabled=true;try{await window.kiezPumpStomach();const p=await window.kiezRefreshProfile();body.innerHTML=window.kiezDrinkShopHTML(p);document.querySelector('#drinkmsg').innerHTML='<div class="notice good">Magen ausgepumpt. Du bist wieder nüchtern.</div>'}catch(err){document.querySelector('#drinkmsg').innerHTML='<div class="notice bad">'+err.message+'</div>'}return}const buyIns=e.target.closest('#buyinsurance');if(buyIns){buyIns.disabled=true;try{await window.kiezBuyInsurance();const p=await window.kiezRefreshProfile();body.innerHTML=window.kiezDrinkShopHTML(p);document.querySelector('#drinkmsg').innerHTML='<div class="notice good">Krankenversicherung abgeschlossen.</div>'}catch(err){document.querySelector('#drinkmsg').innerHTML='<div class="notice bad">'+err.message+'</div>'}return}const cancelIns=e.target.closest('#cancelinsurance');if(cancelIns){cancelIns.disabled=true;try{await window.kiezCancelInsurance();const p=await window.kiezRefreshProfile();body.innerHTML=window.kiezDrinkShopHTML(p);document.querySelector('#drinkmsg').innerHTML='<div class="notice good">Versicherung gekündigt.</div>'}catch(err){document.querySelector('#drinkmsg').innerHTML='<div class="notice bad">'+err.message+'</div>'}}});
-const subtabTargets={
- overview:[['Übersicht','.classic-profile-core'],['Status','.kiez-slots-row'],['Aktive Vorgänge','.profile-progress-row']],
- pfand:[['Sammeln','.action'],['Pfandkurs','#durationselect'],['Tourenprotokoll','.timerbox'],['Fundstücke','@goto:plunder']],
- begging:[['Schnorrplatz','#beg'],['Körperpflege','#wash'],['Ertragsfaktoren','.metric-row']],
- income:[['Stadtteile','@view:schnorr:#areaname'],['Schnorrplätze','@view:schnorr:.schnorr-spots'],['Instrumente','@view:music:.instrument-list'],['Waschhaus','@goto:begging']],
- gear:[['Unterkünfte','.haeuser-gallery'],['Lager','@goto:plunder']],
- training:[['Fähigkeiten','.skill-grid'],['Lernwarteschlange','.timerbox']],
- messages:[['Posteingang','#inbox'],['Bandenpost','@goto:gangs'],['System','.section-lead']],
- missions:[['Tagesauftrag','#missiontext'],['Kiezaktionen','.activity-grid'],['Belohnungsserie','#claimdaily']],
- pets:[['Begleiter','#petshop'],['Deine Begleiter','#mypets']],
- achievements:[['Erfolge','#achievementlist'],['Kommende Meilensteine','.feature-roadmap']],
- store:[['Waffen','@filter:waffen'],['Kleidung','@filter:kleidung'],['Zubehör','@filter:zubehoer'],['Verbrauchbares','@drink'],['Verkaufen','#inventorylist']],
- leaderboard:[['Spieler','#leaders'],['Banden','@goto:gangs']],
- career:[['Ränge','#rankladder'],['Statistik','#ranktitle']],
- plunder:[['Deine Funde','#plunderlist'],['Sammlung','.craft-list']]
+const CONTENT_ZONES={
+ pets:{sel:':scope > .inside',tabs:{'Begleiter':[0],'Deine Begleiter':[1,2,3,4]}},
+ income:{sel:':scope > .inside',tabs:{'Stadtteile':[0],'Schnorrplätze':[1],'Instrumente':[3,4]},view:{'Stadtteile':'schnorr','Schnorrplätze':'schnorr','Instrumente':'music'}},
+ training:{sel:':scope > .inside',tabs:{'Fähigkeiten':[0,1],'Lernwarteschlange':[2,3,4]}},
+ messages:{sel:':scope > .inside',tabs:{'Posteingang':[0,1],'System':[2]}},
+ missions:{sel:':scope > .inside',tabs:{'Belohnungsserie':[0],'Kiezaktionen':[1],'Tagesauftrag':[2,3,4,5,6,7]}},
+ achievements:{sel:':scope > .inside',tabs:{'Erfolge':[0,1,2,3],'Kommende Meilensteine':[4]}},
+ leaderboard:{sel:':scope > .inside',tabs:{'Spieler':[0,1]}},
+ career:{sel:':scope > .inside',tabs:{'Statistik':[0],'Ränge':[1]}},
+ plunder:{sel:':scope > .inside',tabs:{'Deine Funde':[0,1,2],'Sammlung':[3,4]}},
+ begging:{sel:'.scene-actions',tabs:{'Schnorrplatz':[0],'Körperpflege':[1,2],'Ertragsfaktoren':[0]}}
 };
+const crossPage={income:{'Waschhaus':'begging'},gear:{'Lager':'plunder'},messages:{'Bandenpost':'gangs'},leaderboard:{'Banden':'gangs'},pfand:{'Fundstücke':'plunder'}};
+const storeTabs={'Waffen':['Waffenladen','waffen'],'Kleidung':['Kleidung','kleidung'],'Zubehör':['Zubehör','zubehoer'],'Verbrauchbares':['Supermarkt',null],'Verkaufen':['Verkaufen',null]};
 const runSubtab=s=>{
  s.parentElement.querySelectorAll('span').forEach(x=>x.classList.remove('subtab-active'));
  s.classList.add('subtab-active');
  const panel=s.closest('.panel');
- const list=subtabTargets[panel?.id]||[];
+ const pid=panel?.id;
  const label=s.textContent.trim();
- const entry=list.find(([l])=>l===label);
- const sel=entry?entry[1]:null;
- if(!sel)return;
- if(sel.startsWith('@goto:')){goto(sel.slice(6));return}
- if(sel.startsWith('@filter:')){setTimeout(()=>document.querySelector('#store')?.kiezApplyFilter?.(sel.slice(8)),50);return}
- if(sel==='@drink'){window.openDrinkShopFromQuickbar?.();return}
- if(sel.startsWith('@view:')){
-  const parts=sel.split(':');
-  window.splitIncomeView?.(parts[1]);
-  setTimeout(()=>{const t=panel.querySelector(parts[2]);if(t)t.scrollIntoView({behavior:'smooth',block:'center'})},60);
+ if(crossPage[pid]?.[label]){goto(crossPage[pid][label]);return}
+ if(pid==='store'){
+  const [viewLabel,filter]=storeTabs[label]||[null,null];
+  if(viewLabel)window.kiezSetStoreView?.(viewLabel);
+  if(filter)setTimeout(()=>document.querySelector('#store')?.kiezApplyFilter?.(filter),50);
   return;
  }
- const target=panel.querySelector(sel);
- if(target)target.scrollIntoView({behavior:'smooth',block:'center'});
+ const zone=CONTENT_ZONES[pid];
+ if(!zone)return;
+ if(zone.view?.[label])window.splitIncomeView?.(zone.view[label]);
+ const container=panel.querySelector(zone.sel);
+ if(!container)return;
+ const showIdx=new Set(zone.tabs[label]||[]);
+ [...container.children].forEach((child,i)=>{child.style.display=showIdx.has(i)?'':'none'});
 };
 document.addEventListener('click',e=>{
  const s=e.target.closest('.panel .section-tools span');
@@ -283,14 +281,26 @@ document.addEventListener('keydown',e=>{
  const s=e.target.closest?.('.panel .section-tools span');
  if(s)runSubtab(s);
 });
+const initSubtabDefaults=()=>{
+ document.querySelectorAll('.panel .section-tools').forEach(bar=>{
+  if(bar.dataset.kiezInit)return;
+  const first=bar.querySelector('span');
+  if(!first)return;
+  bar.dataset.kiezInit='1';
+  first.classList.add('subtab-active');
+  runSubtab(first);
+ });
+};
 new MutationObserver(muts=>{
  for(const m of muts)for(const n of m.addedNodes){
   if(n.nodeType!==1)continue;
   const spans=n.matches?.('.panel .section-tools span')?[n]:[...(n.querySelectorAll?.('.panel .section-tools span')||[])];
   spans.forEach(s=>{s.setAttribute('role','button');s.tabIndex=0});
  }
+ initSubtabDefaults();
 }).observe(document.body,{childList:true,subtree:true});
 document.querySelectorAll('.panel .section-tools span').forEach(s=>{s.setAttribute('role','button');s.tabIndex=0});
+setTimeout(initSubtabDefaults,300);
 })();
 </script>
 <style id="training-layout-v24">
@@ -719,24 +729,14 @@ function reorganizeStorePages(){
    if(cat==='waffen')show=t.includes('Waffen');
    else if(cat==='kleidung')show=t.includes('Kleidung');
    else if(cat==='zubehoer')show=t.includes('Zubehör')||t.includes('Grundausrüstung');
-   head.style.display=show?'':'none';
+   head.classList.toggle('kiez-force-hide',!show);
    let el=head.nextElementSibling;
-   while(el&&!el.classList.contains('shop-category')){el.style.display=show?'':'none';el=el.nextElementSibling}
+   while(el&&!el.classList.contains('shop-category')){el.classList.toggle('kiez-force-hide',!show);el=el.nextElementSibling}
   });
-  h.style.display=cat==='zubehoer'||!cat?'':'none';
-  extra.style.display=cat==='zubehoer'||!cat?'':'none';
+  const zShow=cat==='zubehoer'||!cat;
+  h.classList.toggle('kiez-force-hide',!zShow);
+  extra.classList.toggle('kiez-force-hide',!zShow);
  };
- tabs.forEach(tab=>{
-  const label=tab.textContent.trim();
-  tab.onclick=()=>{
-   tabs.forEach(t=>t.classList.remove('subtab-active'));
-   tab.classList.add('subtab-active');
-   if(label==='Verbrauchbares'){openDrinkShopFromQuickbar();return}
-   if(label==='Verkaufen'){document.getElementById('inventorylist')?.scrollIntoView({behavior:'smooth',block:'start'});return}
-   const map={'Waffen':'waffen','Kleidung':'kleidung','Zubehör':'zubehoer'};
-   applyFilter(map[label]||null);
-  };
- });
  storePanel.kiezApplyFilter=applyFilter;
 }
 function addInstrumentShop(){
@@ -1159,14 +1159,18 @@ section.panel .purchase-card .uniform-purchase-button{
  const closeModal=()=>{if(modal){modal.classList.add('hide');modal.setAttribute('aria-hidden','true')}};
  const setView=async label=>{
   const title=store.querySelector(':scope>h2');
+  const angebot=[...store.querySelectorAll(':scope>.inside>h3')].find(h=>h.textContent.trim()==='Angebot');
   const supermarket=label==='Supermarkt';
   inline.classList.toggle('active',supermarket);
   shoplist.style.display=supermarket?'none':'';
   store.querySelector('#inventorylist')?.closest('.inside');
-  if(supermarket){if(title)title.textContent='Supermarkt';await renderDrinks();closeModal()}
-  else if(label==='Waffenladen'){if(title)title.textContent='Waffenladen'}
-  else if(label==='Zubehör'){if(title)title.textContent='Zubehör'}
+  if(supermarket){if(title)title.textContent='Supermarkt';if(angebot)angebot.classList.add('kiez-force-hide');await renderDrinks();closeModal()}
+  else if(label==='Waffenladen'){if(title)title.textContent='Waffenladen';inline.classList.remove('active');shoplist.style.display='';if(angebot)angebot.classList.remove('kiez-force-hide')}
+  else if(label==='Kleidung'){if(title)title.textContent='Kleidung';inline.classList.remove('active');shoplist.style.display='';if(angebot)angebot.classList.remove('kiez-force-hide')}
+  else if(label==='Zubehör'){if(title)title.textContent='Zubehör';inline.classList.remove('active');shoplist.style.display='';if(angebot)angebot.classList.remove('kiez-force-hide')}
+  else if(label==='Verkaufen'){if(title)title.textContent='Verkaufen';inline.classList.remove('active');shoplist.style.display='none';if(angebot)angebot.classList.add('kiez-force-hide')}
  };
+ window.kiezSetStoreView=setView;
  const wire=()=>{
   hideBasicSection();
   const bar=document.querySelector('.kiez-quickbar');
@@ -1286,6 +1290,7 @@ section.panel .purchase-card .uniform-purchase-button{
 
 <style id="store-routing-cleanup-v50">
 #store>.section-tools span.store-tab-removed-v50{display:none!important}
+section.panel .purchase-card.kiez-force-hide,section.panel .kiez-force-hide{display:none!important}
 #shoplist .supermarket-hidden-v50{display:none!important}
 .supermarket-inline.active{display:block!important}
 </style>
