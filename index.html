@@ -272,7 +272,7 @@ document.querySelectorAll('.stats .stat:not(.clean-stat)').forEach(card=>{card.s
 document.addEventListener('click',async e=>{const go=e.target.closest('.modal-go');if(go)return goto(go.dataset.go,go.dataset.tab);const drink=e.target.closest('.buy-drink');if(drink){drink.disabled=true;const msg=document.querySelector('#drinkmsg');try{const d=await window.kiezBuyAlcohol(drink.dataset.drink);msg.innerHTML='<div class="notice good">'+d.label+' gekauft. Pegel: '+Number(d.promille).toFixed(2).replace('.',',')+' ‰ · Pfandbonus aktiv.</div>';const p=await window.kiezRefreshProfile();rerender(p)}catch(err){msg.innerHTML='<div class="notice bad">'+err.message+'</div>'}drink.disabled=false;return}const pump=e.target.closest('#pumpstomach');if(pump){pump.disabled=true;try{await window.kiezPumpStomach();const p=await window.kiezRefreshProfile();rerender(p);document.querySelector('#drinkmsg').innerHTML='<div class="notice good">Magen ausgepumpt. Du bist wieder nüchtern.</div>'}catch(err){document.querySelector('#drinkmsg').innerHTML='<div class="notice bad">'+err.message+'</div>'}return}const buyIns=e.target.closest('#buyinsurance');if(buyIns){buyIns.disabled=true;try{await window.kiezBuyInsurance();const p=await window.kiezRefreshProfile();rerender(p);document.querySelector('#drinkmsg').innerHTML='<div class="notice good">Krankenversicherung abgeschlossen.</div>'}catch(err){document.querySelector('#drinkmsg').innerHTML='<div class="notice bad">'+err.message+'</div>'}return}const cancelIns=e.target.closest('#cancelinsurance');if(cancelIns){cancelIns.disabled=true;try{await window.kiezCancelInsurance();const p=await window.kiezRefreshProfile();rerender(p);document.querySelector('#drinkmsg').innerHTML='<div class="notice good">Versicherung gekündigt.</div>'}catch(err){document.querySelector('#drinkmsg').innerHTML='<div class="notice bad">'+err.message+'</div>'}}});
 const CONTENT_ZONES={
  pets:{sel:':scope > .inside',tabs:{'Begleiter':[0],'Deine Begleiter':[1,2,3,4]}},
- income:{sel:':scope > .inside',tabs:{'Schnorrplätze':[1],'Instrumente':[2,3,4]},view:{'Schnorrplätze':'schnorr','Instrumente':'music'}},
+ income:{sel:':scope > .inside',tabs:{'Schnorrplätze':[1,5],'Instrumente':[2,3,4]},view:{'Schnorrplätze':'schnorr','Instrumente':'music'}},
  training:{sel:':scope > .inside',tabs:{'Fähigkeiten':[0,1],'Lernwarteschlange':[2,3,4]}},
  messages:{sel:':scope > .inside',tabs:{'Posteingang':[0,1],'System':[2]}},
  missions:{sel:':scope > .inside',tabs:{'Belohnungsserie':[0],'Kiezaktionen':[1],'Tagesauftrag':[2,3,4,5,6,7],'Glücksspiel':[9]}},
@@ -1262,20 +1262,27 @@ function updateCraftingSection(){
 }
 (()=>{if(document.getElementById('schnorr-result-style'))return;const st=document.createElement('style');st.id='schnorr-result-style';st.textContent='.schnorr-result:not(:empty){margin-top:8px}.schnorr-result .notice{margin:0}';document.head.appendChild(st)})();
 function addAreaProgression(){
- const roadmap=document.querySelector('#income .feature-roadmap');
- if(!roadmap||document.querySelector('.area-list'))return;
+ const inside=document.querySelector('#income > .inside');
+ if(!inside||document.querySelector('.area-list'))return;
  const areas=['Bahnhofs-Hinterhof','Altglas-Gasse','Ranziger Stadtpark','Touristenmeile','Luxusviertel-Hintereingang'];
  const factors=['1,00×','1,25×','1,55×','1,95×','2,50×'];
  const prices=['25,00 €','100,00 €','350,00 €','1200,00 €'];
  const wrap=document.createElement('div');
  wrap.className='area-list cards';
  wrap.style.gridColumn='1/-1';
- wrap.innerHTML='<h3 class="shop-category" style="grid-column:1/-1">Schnorrgebiete</h3>'+areas.map((name,i)=>'<div class="card area-card" data-idx="'+i+'"><b>'+name+'</b><p>Flaschenfaktor: '+factors[i]+'</p><p class="area-status"></p>'+(i<4?'<button class="ghost area-unlock" data-idx="'+i+'">Freischalten – '+prices[i]+'</button>':'')+'</div>').join('');
- roadmap.insertAdjacentElement('beforebegin',wrap);
- wrap.addEventListener('click',e=>{
+ wrap.innerHTML='<h3 class="shop-category" style="grid-column:1/-1">Schnorrgebiete</h3>'+areas.map((name,i)=>'<div class="card area-card" data-idx="'+i+'"><b>'+name+'</b><p>Flaschenfaktor: '+factors[i]+'</p><p class="area-status"></p>'+(i<4?'<button class="ghost area-unlock" data-idx="'+i+'">Freischalten – '+prices[i]+'</button>':'')+'<div class="area-msg"></div></div>').join('');
+ inside.appendChild(wrap);
+ wrap.addEventListener('click',async e=>{
   const btn=e.target.closest('.area-unlock');
   if(!btn||btn.disabled)return;
-  document.getElementById('buyarea')?.click();
+  btn.disabled=true;
+  const msg=btn.closest('.area-card').querySelector('.area-msg');
+  try{
+   const {data,error}=await window.kiezSupabase.rpc('buy_progress',{progress_type:'area'});
+   if(error){msg.innerHTML='<span class="wash-status-bad">'+error.message+'</span>'}
+   else{window.kiezRenderProfile(data.profile);msg.innerHTML='<span class="wash-status-good">'+data.label+' freigeschaltet.</span>'}
+  }catch(err){msg.innerHTML='<span class="wash-status-bad">'+err.message+'</span>'}
+  finally{updateAreaProgression()}
  });
 }
 function updateAreaProgression(){
