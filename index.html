@@ -749,9 +749,9 @@ function reorganizeStorePages(){
   document.querySelectorAll('#shoplist .shop-category').forEach(head=>{
    const t=head.textContent;
    let show=true;
-   if(cat==='waffen')show=t.includes('Waffen');
+   if(cat==='waffen')show=t.includes('Waffen')||t.includes('Grundausrüstung');
    else if(cat==='kleidung')show=t.includes('Kleidung');
-   else if(cat==='zubehoer')show=t.includes('Zubehör')||t.includes('Grundausrüstung');
+   else if(cat==='zubehoer')show=t.includes('Zubehör');
    head.classList.toggle('kiez-force-hide',!show);
    let el=head.nextElementSibling;
    while(el&&!el.classList.contains('shop-category')){el.classList.toggle('kiez-force-hide',!show);el=el.nextElementSibling}
@@ -1454,6 +1454,8 @@ section.panel .purchase-card .uniform-purchase-button{
   const invlist=store.querySelector('#inventorylist');
   if(invlist)invlist.style.display=label==='Verkaufen'?'':'none';
   document.getElementById('defenseshop')?.classList.add('hide');
+  const tools=store.querySelector(':scope>.section-tools');
+  if(tools){if(label==='Zubehör')tools.style.setProperty('display','none','important');else tools.style.removeProperty('display')}
   if(supermarket){if(title)title.textContent='Supermarkt';if(angebot)angebot.classList.add('kiez-force-hide');await renderDrinks();closeModal()}
   else if(label==='Waffenladen'){if(title)title.textContent='Waffenladen';inline.classList.remove('active');shoplist.style.display='';if(angebot)angebot.classList.remove('kiez-force-hide')}
   else if(label==='Kleidung'){if(title)title.textContent='Kleidung';inline.classList.remove('active');shoplist.style.display='';if(angebot)angebot.classList.remove('kiez-force-hide')}
@@ -1574,8 +1576,6 @@ section.panel .purchase-card .uniform-purchase-button{
    }
   },true);
  }
- hideBasics();
- new MutationObserver(hideBasics).observe(store,{childList:true,subtree:true});
 })();
 </script>
 
@@ -1615,6 +1615,7 @@ section.panel .purchase-card.kiez-force-hide,section.panel .kiez-force-hide{disp
 #petshop .pet-shop-card .buypet{margin-top:auto!important;align-self:center!important;position:static!important;width:auto!important;min-width:140px}
 #petshop .pet-shop-card .pet-lock-status{margin-top:auto!important;color:#a99a78;font-size:12px}
 #shoplist .card{display:flex!important;flex-direction:column!important;align-items:center!important;text-align:center!important}
+#shoplist .card.kiez-force-hide,#shoplist .card.hide-basic-category-v49,#shoplist .card.supermarket-hidden-v50,#shoplist .card.temporary-hidden-store-item{display:none!important}
 #shoplist .card .buyitem{margin-top:auto!important;align-self:center!important;position:static!important;width:auto!important;min-width:140px;padding-top:8px!important;padding-bottom:8px!important}
 #shoplist .card.purchase-card{padding-bottom:13px!important}
 .pet-stat-row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #3a352b;font-size:13px;flex-wrap:wrap}
