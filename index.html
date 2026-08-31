@@ -90,7 +90,7 @@ body{background-image:linear-gradient(rgba(12,14,15,.78),rgba(12,14,15,.92)),url
 <section id="overview" class="panel scene-page"><div class="overview-hero"><div class="overview-content"><span class="eyebrow">Dein Revier · Bahnhofs-Hinterhof</span><h2>Willkommen zurück, <span id="playername">BehaarteUhse</span></h2><div class="section-tools"><span>Übersicht</span><span>Status</span><span>Aktive Vorgänge</span></div><p class="quote">„Andere haben einen Lebenslauf. Du hast einen Einkaufswagen.“</p><div class="overview-grid"><div class="overview-card"><b>Nächster Aufstieg</b><div class="progress"><span id="xpbar" style="width: 5.2%;"></span></div><small id="xptext">13 / 250</small></div><div class="overview-card"><b>Was jetzt?</b><p>Schick den Wagen los, bilde dich weiter oder verdien dir beim Schnorren die nächste Mahlzeit.</p></div></div></div></div></section>
 <div class="hero"><section id="pfand" class="panel"><h2>Pfandtour: Hinterhof am Bahnhof</h2><div class="section-tools"><span>Sammeln</span><span>Pfandkurs</span><span>Tourenprotokoll</span><span>Fundstücke</span></div><div class="inside">
 <div class="card" id="pfanduebersicht"><b>Übersicht</b><p id="pfanduebersichttext">Geschick wird geladen …</p></div>
-<div class="action"><h3>Pfandflaschen sammeln</h3><p id="pfandmoneytotal">Geld bisher erwirtschaftet: <b>0,00 €</b></p><p id="pfandgewinnca">Gewinn ca.: <b>0,00 €</b></p><label for="durationselect"><small>Zeit</small></label><br><select id="durationselect" class="ghost"><option value="10">10 Minuten</option><option value="30">30 Minuten</option><option value="60">1 Stunde</option><option value="240">4 Stunden</option><option value="480">8 Stunden</option></select><div class="timerbox"><small id="collectionlabel">Tour beendet</small><strong id="collectiontimer">BEREIT</strong><span id="collectionhint">Der Einkaufswagen wartet aufs Ausladen.</span></div><div class="progress" id="collectionprogresswrap"><span id="collectionprogress" style="width:0%"></span></div><div class="duration-grid hide"><button class="ghost duration selected" data-minutes="10">10 Min.</button><button class="ghost duration" data-minutes="30">30 Min.</button><button class="ghost duration" data-minutes="60">1 Stunde</button><button class="ghost duration" data-minutes="240">4 Stunden</button><button class="ghost duration" data-minutes="480">8 Stunden</button></div><button id="collect" class="big hide">🛒 Pfandtour starten</button> <button id="finishcollect" class="big">🧺 Einkaufswagen ausladen</button> <button id="cancelcollection" class="ghost hide">Abbrechen</button> <button id="sell" class="ghost">💰 Alle Flaschen verkaufen</button><p><small>Nach jeder Tour braucht der Einkaufswagen 30 Sekunden Pause. Der Kurs schwankt alle 20 Minuten zwischen 0,10 € und 0,30 €; dein Geldbehälter hat ein Limit.</small></p><div id="result"></div></div>
+<div class="action"><h3>Pfandflaschen sammeln</h3><p id="pfandmoneytotal">Geld bisher erwirtschaftet: <b>0,00 €</b></p><p id="pfandgewinnca">Gewinn ca.: <b>0,00 €</b></p><label for="durationselect"><small>Zeit</small></label><br><select id="durationselect" class="ghost"><option value="10">10 Minuten</option><option value="30">30 Minuten</option><option value="60">1 Stunde</option><option value="240">4 Stunden</option><option value="480">8 Stunden</option></select><div class="timerbox"><small id="collectionlabel">Tour beendet</small><strong id="collectiontimer">BEREIT</strong><span id="collectionhint">Der Einkaufswagen wartet aufs Ausladen.</span></div><div class="progress" id="collectionprogresswrap"><span id="collectionprogress" style="width:0%"></span></div><div class="duration-grid hide"><button class="ghost duration selected" data-minutes="10">10 Min.</button><button class="ghost duration" data-minutes="30">30 Min.</button><button class="ghost duration" data-minutes="60">1 Stunde</button><button class="ghost duration" data-minutes="240">4 Stunden</button><button class="ghost duration" data-minutes="480">8 Stunden</button></div><button id="collect" class="big hide">🛒 Pfandtour starten</button> <button id="finishcollect" class="big">🧺 Einkaufswagen ausladen</button> <button id="cancelcollection" class="ghost hide">Abbrechen</button> <button id="sell" class="ghost">💰 Alle Flaschen verkaufen</button><p><small>Nach jeder Tour braucht der Einkaufswagen 30 Sekunden Pause. Der Kurs schwankt alle 20 Minuten zwischen 0,10 € und 0,30 €; dein Geldbehälter hat ein Limit.</small></p><div id="result"></div><div class="card pfand-pricehistory-card"><b>Pfandkurs-Verlauf</b><p>Aktueller Kurs: <b id="pfandcurprice">0,00 €</b> · Nächster Kurswechsel in <b id="pfandpricecountdown">00:00</b></p><table class="info-table"><thead><tr><th>Zeitpunkt</th><th>Kurs</th></tr></thead><tbody id="pfandpricerows"></tbody></table></div></div>
 <input type="hidden" id="concentrationminutes" value="10"><button id="startconcentration" class="hide">Start</button><button id="cancelconcentration" class="hide">Abbrechen</button>
 <input type="hidden" id="begspotid" value="englischer_garten"><button id="begatspot" class="hide">Hingehen</button>
 <input type="hidden" id="craftitemid" value="nagelkeule"><button id="craftitem" class="hide">Herstellen</button>
@@ -205,36 +205,10 @@ const syncAlcohol=async()=>{const data=await window.kiezRefreshProfile();if(data
 (()=>{const modal=document.querySelector('#kiezmodal'),title=document.querySelector('#kiezmodaltitle'),body=document.querySelector('#kiezmodalbody');const value=id=>document.querySelector(id)?.textContent||'–';const goto=id=>{document.querySelector('.side [data-view="'+id+'"]')?.click();close()};const close=()=>{modal.classList.add('hide');modal.setAttribute('aria-hidden','true');if(window.kiezPriceInterval)clearInterval(window.kiezPriceInterval)};const show=(t,html)=>{title.textContent=t;body.innerHTML=html;modal.classList.remove('hide');modal.setAttribute('aria-hidden','false')};document.querySelector('#kiezmodalclose').onclick=close;modal.onclick=e=>{if(e.target===modal)close()};document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});
 const finance=()=>show('Bargeld & Einnahmen','<div class="status-detail-grid"><div class="status-detail"><small>In der Tasche</small><strong>'+value('#money')+'</strong><span>Dein Geldbehälter begrenzt den Bestand.</span></div><div class="status-detail"><small>Pfandbestand</small><strong>'+value('#bottles')+' Flaschen</strong><span>Zum aktuellen Kurs verkaufen.</span></div><div class="status-detail"><small>Straßenmusik</small><strong>'+value('#musicrate')+' / Min.</strong><span>Offline-Einnahmen im Hut sammeln.</span></div></div><p><button class="big modal-go" data-go="begging">Geld verdienen</button> <button class="ghost modal-go" data-go="income">Einnahmen verwalten</button></p>');
 const bottles=()=>show('Pfandlager & Pfandkurse','<div class="status-detail-grid"><div class="status-detail"><small>Dein Lager</small><strong>'+value('#bottles')+' Flaschen</strong><span>Pfandsack Stufe '+value('#baglvl')+'</span></div><div class="status-detail"><small>Aktueller Kurs</small><strong>'+(window.kiezPfandPrice?window.kiezPfandPrice().toFixed(2).replace('.',','):'–')+' €</strong><span>Ändert sich alle 20 Minuten</span></div><div class="status-detail"><small>Kursübersicht</small><strong>0,10–0,30 €</strong><span>Der Kurs ändert sich alle 20 Minuten neu</span></div></div><p><button class="big modal-go" data-go="pfand">Zur Pfandtour</button> <button class="ghost modal-go" data-go="gear">Pfandsack ausbauen</button></p>');
-const priceHistory=()=>{
- const bucketMs=1200000;
- const priceFor=b=>{const h=((b*1103515245+12345)%2147483648+2147483648)%2147483648;return Math.round((0.10+(h/2147483648)*0.20)*100)/100};
- const render=()=>{
-  const now=Date.now();
-  const curBucket=Math.floor(now/bucketMs);
-  const msToNext=bucketMs-(now%bucketMs);
-  const mm=String(Math.floor(msToNext/60000)).padStart(2,'0'),ss=String(Math.floor(msToNext/1000)%60).padStart(2,'0');
-  const rows=[];
-  for(let i=0;i<=6;i++){
-   const b=curBucket-i;
-   const label=i===0?'Jetzt':'vor '+(i*20)+' Min.';
-   rows.push('<tr><td>'+label+'</td><td>'+priceFor(b).toFixed(2).replace('.',',')+' €</td></tr>');
-  }
-  return {curPrice:priceFor(curBucket).toFixed(2).replace('.',','),mm:mm,ss:ss,rows:rows.join('')};
- };
- const r=render();
- show('Pfandkurs-Verlauf','<div class="status-detail-grid"><div class="status-detail"><small>Aktueller Kurs</small><strong>'+r.curPrice+' €</strong><span>pro Flasche</span></div><div class="status-detail"><small>Nächster Kurswechsel in</small><strong id="pricecountdown">'+r.mm+':'+r.ss+'</strong><span>Alle 20 Minuten neu ausgewürfelt</span></div></div><h3 style="margin:16px 0 8px">Letzte Kurse</h3><table class="info-table"><thead><tr><th>Zeitpunkt</th><th>Kurs</th></tr></thead><tbody>'+r.rows+'</tbody></table><p><button class="big modal-go" data-go="pfand">Zur Pfandtour</button></p>');
- if(window.kiezPriceInterval)clearInterval(window.kiezPriceInterval);
- window.kiezPriceInterval=setInterval(()=>{
-  const el=document.getElementById('pricecountdown');
-  if(!el){clearInterval(window.kiezPriceInterval);return}
-  const now=Date.now();const ms=bucketMs-(now%bucketMs);
-  el.textContent=String(Math.floor(ms/60000)).padStart(2,'0')+':'+String(Math.floor(ms/1000)%60).padStart(2,'0');
- },1000);
-};
 const alcohol=async()=>{const p=await window.kiezRefreshProfile();show('Kiosk: Alkohol & Pfandspürbonus',window.kiezDrinkShopHTML(p))};
 const training=()=>show('Aktuelle Weiterbildung','<div class="status-detail"><small>Status</small><strong>'+value('#toptraining')+'</strong><span>'+value('#trainingstatus')+'</span></div><p><button class="big modal-go" data-go="training">Weiterbildungszentrum öffnen</button></p>');
 const simple=(name,html,go,label)=>show(name,'<div class="status-detail-grid">'+html+'</div><p><button class="big modal-go" data-go="'+go+'">'+label+'</button></p>');
-const actions={money:finance,alcohol:alcohol,toptraining:training,topprice:priceHistory,bottles:()=>goto('plunder'),energy:()=>simple('Energie','<div class="status-detail"><small>Verfügbar</small><strong>'+value('#energy')+'</strong><span>Regeneriert automatisch um 1 pro Minute.</span></div>','missions','Aktionen öffnen'),level:()=>simple('Level & Fortschritt','<div class="status-detail"><small>Gesamtlevel</small><strong>'+value('#level')+'</strong><span>'+value('#xptext')+' XP bis zum nächsten Abschnitt.</span></div>','career','Laufbahn öffnen')};
+const actions={money:finance,alcohol:alcohol,toptraining:training,topprice:()=>goto('pfand'),bottles:()=>goto('plunder'),energy:()=>simple('Energie','<div class="status-detail"><small>Verfügbar</small><strong>'+value('#energy')+'</strong><span>Regeneriert automatisch um 1 pro Minute.</span></div>','missions','Aktionen öffnen'),level:()=>simple('Level & Fortschritt','<div class="status-detail"><small>Gesamtlevel</small><strong>'+value('#level')+'</strong><span>'+value('#xptext')+' XP bis zum nächsten Abschnitt.</span></div>','career','Laufbahn öffnen')};
 document.querySelectorAll('.stats .stat:not(.clean-stat)').forEach(card=>{card.setAttribute('role','button');card.tabIndex=0;const id=card.querySelector('b')?.id;const run=()=>actions[id]?.();card.onclick=run;card.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();run()}}});
 document.addEventListener('click',async e=>{const go=e.target.closest('.modal-go');if(go)return goto(go.dataset.go);const drink=e.target.closest('.buy-drink');if(drink){drink.disabled=true;const msg=document.querySelector('#drinkmsg');try{const d=await window.kiezBuyAlcohol(drink.dataset.drink);msg.innerHTML='<div class="notice good">'+d.label+' gekauft. Pegel: '+Number(d.promille).toFixed(2).replace('.',',')+' ‰ · Pfandbonus aktiv.</div>';const p=await window.kiezRefreshProfile();body.innerHTML=window.kiezDrinkShopHTML(p)}catch(err){msg.innerHTML='<div class="notice bad">'+err.message+'</div>'}drink.disabled=false;return}const pump=e.target.closest('#pumpstomach');if(pump){pump.disabled=true;try{await window.kiezPumpStomach();const p=await window.kiezRefreshProfile();body.innerHTML=window.kiezDrinkShopHTML(p);document.querySelector('#drinkmsg').innerHTML='<div class="notice good">Magen ausgepumpt. Du bist wieder nüchtern.</div>'}catch(err){document.querySelector('#drinkmsg').innerHTML='<div class="notice bad">'+err.message+'</div>'}return}const buyIns=e.target.closest('#buyinsurance');if(buyIns){buyIns.disabled=true;try{await window.kiezBuyInsurance();const p=await window.kiezRefreshProfile();body.innerHTML=window.kiezDrinkShopHTML(p);document.querySelector('#drinkmsg').innerHTML='<div class="notice good">Krankenversicherung abgeschlossen.</div>'}catch(err){document.querySelector('#drinkmsg').innerHTML='<div class="notice bad">'+err.message+'</div>'}return}const cancelIns=e.target.closest('#cancelinsurance');if(cancelIns){cancelIns.disabled=true;try{await window.kiezCancelInsurance();const p=await window.kiezRefreshProfile();body.innerHTML=window.kiezDrinkShopHTML(p);document.querySelector('#drinkmsg').innerHTML='<div class="notice good">Versicherung gekündigt.</div>'}catch(err){document.querySelector('#drinkmsg').innerHTML='<div class="notice bad">'+err.message+'</div>'}}});
 const CONTENT_ZONES={
@@ -922,6 +896,28 @@ function kiezPfandPrice(){
  const frac=h/2147483648;
  return Math.round((0.10+frac*0.20)*100)/100;
 }
+function updatePriceHistory(){
+ const curEl=document.getElementById('pfandcurprice');
+ if(!curEl)return;
+ const bucketMs=1200000;
+ const priceFor=b=>{const h=((b*1103515245+12345)%2147483648+2147483648)%2147483648;return Math.round((0.10+(h/2147483648)*0.20)*100)/100};
+ const now=Date.now();
+ const curBucket=Math.floor(now/bucketMs);
+ const msToNext=bucketMs-(now%bucketMs);
+ curEl.textContent=priceFor(curBucket).toFixed(2).replace('.',',')+' €';
+ document.getElementById('pfandpricecountdown').textContent=String(Math.floor(msToNext/60000)).padStart(2,'0')+':'+String(Math.floor(msToNext/1000)%60).padStart(2,'0');
+ const rows=document.getElementById('pfandpricerows');
+ if(rows&&!rows.dataset.bucket||Number(rows.dataset.bucket)!==curBucket){
+  const parts=[];
+  for(let i=0;i<=6;i++){
+   const b=curBucket-i;
+   const label=i===0?'Jetzt':'vor '+(i*20)+' Min.';
+   parts.push('<tr><td>'+label+'</td><td>'+priceFor(b).toFixed(2).replace('.',',')+' €</td></tr>');
+  }
+  rows.innerHTML=parts.join('');
+  rows.dataset.bucket=curBucket;
+ }
+}
 function updatePfandExtras(){
  const topprice=document.getElementById('topprice');
  if(topprice)topprice.textContent=kiezPfandPrice().toFixed(2).replace('.',',')+' €';
@@ -1058,7 +1054,7 @@ function routeQuickbarSpecials(){
   if(label==='Musikladen'){splitIncomeView('music');setTimeout(()=>document.getElementById('musicname')?.closest('.card')?.scrollIntoView({behavior:'smooth',block:'center'}),150)}
  });
 }
-function initAll(){addBioAndGuestbook();addHaeuserGalerie();addOverviewSlots();addPlunderSection();addWeatherBadge();addKronkorken();reorganizeStorePages();addInstrumentShop();updateInstrumentShop();addWashUpgrades();updateWashUpgrades();addConcentration();updateConcentration();addCrimeSystem();updateCrimeSystem();addSchnorrplaetze();addCraftingSection();updateCraftingSection();updatePfandExtras();updateBeerGlass();routeQuickbarSpecials();fixProfileSubTabs();}
+function initAll(){addBioAndGuestbook();addHaeuserGalerie();addOverviewSlots();addPlunderSection();addWeatherBadge();addKronkorken();reorganizeStorePages();addInstrumentShop();updateInstrumentShop();addWashUpgrades();updateWashUpgrades();addConcentration();updateConcentration();addCrimeSystem();updateCrimeSystem();addSchnorrplaetze();addCraftingSection();updateCraftingSection();updatePfandExtras();updatePriceHistory();updateBeerGlass();routeQuickbarSpecials();fixProfileSubTabs();}
 initAll();
 setInterval(initAll,1000);
 })();
@@ -1308,6 +1304,12 @@ section.panel .purchase-card.kiez-force-hide,section.panel .kiez-force-hide{disp
 .wrap:has(#auth:not(.hide)) .player-slip{display:none!important}
 .classic-mainnav.has-admin{grid-template-columns:repeat(6,1fr)!important}
 .classic-mainnav>button.adminnav-top:before{content:'🛡️'!important}
+.crime-list.cards{align-items:stretch!important}
+.crime-item.has-generated-thumb{display:flex!important;flex-direction:column!important;align-items:center!important;text-align:center!important;min-height:0!important;height:100%!important}
+.crime-item.has-generated-thumb:after{display:none!important}
+.crime-item .generated-item-thumb{float:none!important;margin:0 0 10px!important}
+.crime-item b,.crime-item p{width:100%}
+.crime-item .crime-pick{margin-top:auto!important}
 #begging .scene-visual{background-size:cover;background-position:center 35%;min-height:150px}
 </style>
 <script id="store-routing-cleanup-script-v50">
