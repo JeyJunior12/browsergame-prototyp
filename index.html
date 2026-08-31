@@ -1491,6 +1491,13 @@ section.panel .purchase-card .uniform-purchase-button{
   document.getElementById('defenseshop')?.classList.add('hide');
   const tools=store.querySelector(':scope>.section-tools');
   if(tools){if(label==='Zubehör')tools.style.setProperty('display','none','important');else tools.style.removeProperty('display')}
+  const invHeading=[...store.querySelectorAll(':scope>.inside>h3')].find(h=>h.textContent.trim()==='Dein Inventar');
+  const itemmsg=store.querySelector('#itemmsg');
+  const roadmap=store.querySelector(':scope>.inside>.feature-roadmap');
+  const zubehoerHide=label==='Zubehör';
+  if(invHeading)invHeading.style.display=zubehoerHide?'none':'';
+  if(itemmsg)itemmsg.style.display=zubehoerHide?'none':'';
+  if(roadmap)roadmap.style.display=zubehoerHide?'none':'';
   if(supermarket){if(title)title.textContent='Supermarkt';if(angebot)angebot.classList.add('kiez-force-hide');await renderDrinks();closeModal()}
   else if(label==='Waffenladen'){if(title)title.textContent='Waffenladen';inline.classList.remove('active');shoplist.style.display='';if(angebot)angebot.classList.remove('kiez-force-hide')}
   else if(label==='Kleidung'){if(title)title.textContent='Kleidung';inline.classList.remove('active');shoplist.style.display='';if(angebot)angebot.classList.remove('kiez-force-hide')}
