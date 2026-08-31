@@ -938,7 +938,7 @@ function updateQuickbar(){
    });
   }
   bar.classList.remove('kiez-quickbar-hide');
- }else if(activeId==='citymap'){
+ }else if(['store','pets','begging','income','gear','missions'].includes(activeId)){
   if(bar.dataset.kiezMode!=='city'){
    bar.dataset.kiezMode='city';
    bar.style.gridTemplateColumns='repeat('+cityTabItems.length+',1fr)';
@@ -957,7 +957,7 @@ function updateQuickbar(){
     };
    });
   }
-  bar.style.display='';
+  bar.classList.remove('kiez-quickbar-hide');
  }else{
   bar.classList.add('kiez-quickbar-hide');
  }
