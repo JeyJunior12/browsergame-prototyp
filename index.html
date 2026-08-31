@@ -828,6 +828,22 @@ function addWashUpgrades(){
   document.getElementById('buywash')?.click();
  });
 }
+function cleanupKatzenwaesche(){
+ const washBtn=document.getElementById('wash');
+ const list=document.querySelector('.wash-list');
+ if(!washBtn||!list||document.body.dataset.kiezWashCleanup)return;
+ const block=washBtn.closest('.action-block');
+ if(!block)return;
+ document.body.dataset.kiezWashCleanup='1';
+ block.querySelector('h3')?.remove();
+ block.querySelector(':scope>p')?.remove();
+ block.querySelector('.tip-list')?.remove();
+ const h3=document.createElement('h3');
+ h3.textContent='🚿 Waschen';
+ h3.style.marginTop='14px';
+ block.prepend(h3);
+ list.insertAdjacentElement('afterend',block);
+}
 function updateWashUpgrades(){
  const list=document.querySelector('.wash-list');
  if(!list)return;
@@ -1223,7 +1239,7 @@ function routeQuickbarSpecials(){
   if(label==='Musikladen'){splitIncomeView('music');setTimeout(()=>document.getElementById('musicname')?.closest('.card')?.scrollIntoView({behavior:'smooth',block:'center'}),150)}
  });
 }
-function initAll(){addBioAndGuestbook();addHaeuserGalerie();addOverviewSlots();addPlunderSection();addWeatherBadge();addKronkorken();reorganizeStorePages();addInstrumentShop();updateInstrumentShop();addWashUpgrades();updateWashUpgrades();addConcentration();updateConcentration();addCrimeSystem();updateCrimeSystem();addSchnorrplaetze();addCraftingSection();updateCraftingSection();updatePfandExtras();updatePriceHistory();updateBeerGlass();wireCityHub();updateQuickbar();addScratchTickets();addOverviewInventoryCard();updateOverviewInventoryCard();routeQuickbarSpecials();fixProfileSubTabs();}
+function initAll(){addBioAndGuestbook();addHaeuserGalerie();addOverviewSlots();addPlunderSection();addWeatherBadge();addKronkorken();reorganizeStorePages();addInstrumentShop();updateInstrumentShop();addWashUpgrades();updateWashUpgrades();cleanupKatzenwaesche();addConcentration();updateConcentration();addCrimeSystem();updateCrimeSystem();addSchnorrplaetze();addCraftingSection();updateCraftingSection();updatePfandExtras();updatePriceHistory();updateBeerGlass();wireCityHub();updateQuickbar();addScratchTickets();addOverviewInventoryCard();updateOverviewInventoryCard();routeQuickbarSpecials();fixProfileSubTabs();}
 initAll();
 setInterval(initAll,1000);
 })();
