@@ -1017,8 +1017,20 @@ function addOverviewInventoryCard(){
  const card=document.createElement('div');
  card.className='profile-wide-row overview-inventory-card';
  card.style.display='none';
- card.innerHTML='<b>Dein Inventar</b><p>🍾 Pfandflaschen: <b class="ov-inv-bottles">0</b> · 🔩 Nägel: <b class="ov-inv-nails">0</b> · 🪵 Holz: <b class="ov-inv-wood">0</b> · 🔺 Scherben: <b class="ov-inv-shards">0</b> · 🧵 Textil: <b class="ov-inv-textile">0</b></p>';
+ card.innerHTML='<b>Dein Inventar</b><p>🍾 Pfandflaschen: <b class="ov-inv-bottles">0</b> · 🔩 Nägel: <b class="ov-inv-nails">0</b> · 🪵 Holz: <b class="ov-inv-wood">0</b> · 🔺 Scherben: <b class="ov-inv-shards">0</b> · 🧵 Textil: <b class="ov-inv-textile">0</b></p><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px"><label style="display:flex;flex-direction:column;font-size:12px;gap:3px">Menge<input type="number" id="ovsellqty" min="1" step="1" placeholder="Anzahl" style="width:100px;padding:8px"></label><button class="ghost" id="ovsellbottlesbtn">Flaschen verkaufen</button><button class="ghost" id="ovsellallbtn">Alle verkaufen</button></div><div id="ovsellmsg"></div>';
  content.append(card);
+ const sellHandler=qty=>async()=>{
+  const {data,error}=await window.kiezSupabase.rpc('sell_bottles',qty?{qty}:{});
+  const msg=document.getElementById('ovsellmsg');
+  if(error){msg.innerHTML='<div class="notice bad">'+error.message+'</div>';return}
+  window.kiezRenderProfile(data.profile);
+  updateOverviewInventoryCard();
+  let t='Verkauft: '+data.sold+' Flaschen zu '+Number(data.price).toFixed(2).replace('.',',')+' € pro Flasche. Du bekommst '+Number(data.paid).toFixed(2).replace('.',',')+' €.';
+  if(Number(data.lost)>0)t+=' <b>'+Number(data.lost).toFixed(2).replace('.',',')+' € gingen verloren, weil dein Behälter voll war!</b>';
+  msg.innerHTML='<div class="notice good">'+t+'</div>';
+ };
+ document.getElementById('ovsellbottlesbtn').onclick=()=>sellHandler(Number(document.getElementById('ovsellqty').value)||null)();
+ document.getElementById('ovsellallbtn').onclick=()=>sellHandler(null)();
 }
 function updateOverviewInventoryCard(){
  const card=document.querySelector('.overview-inventory-card');
