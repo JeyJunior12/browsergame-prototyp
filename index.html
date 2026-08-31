@@ -849,10 +849,12 @@ function addWashUpgrades(){
   if(!btn||btn.disabled)return;
   btn.disabled=true;
   const status=btn.closest('.wash-card').querySelector('.wash-status');
-  const {data,error}=await window.kiezSupabase.rpc('wash_up',{tier:btn.dataset.tier});
-  if(error){status.innerHTML='<span class="wash-status-bad">'+error.message+'</span>'}
-  else{window.kiezRenderProfile(data.profile);status.innerHTML='<span class="wash-status-good">+'+data.gain+' % Sauberkeit für '+Number(data.price).toFixed(2).replace('.',',')+' €.</span>';updateWashUpgrades()}
-  btn.disabled=false;
+  try{
+   const {data,error}=await window.kiezSupabase.rpc('wash_up',{tier:btn.dataset.tier});
+   if(error){status.innerHTML='<span class="wash-status-bad">'+error.message+'</span>'}
+   else{window.kiezRenderProfile(data.profile);status.innerHTML='<span class="wash-status-good">+'+data.gain+' % Sauberkeit für '+Number(data.price).toFixed(2).replace('.',',')+' €.</span>'}
+  }catch(err){status.innerHTML='<span class="wash-status-bad">'+err.message+'</span>'}
+  finally{updateWashUpgrades()}
  });
 }
 function updateWashUpgrades(){
