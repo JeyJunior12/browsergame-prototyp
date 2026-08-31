@@ -238,7 +238,44 @@ const simple=(name,html,go,label)=>show(name,'<div class="status-detail-grid">'+
 const actions={money:finance,alcohol:alcohol,toptraining:training,topprice:priceHistory,bottles:()=>goto('plunder'),energy:()=>simple('Energie','<div class="status-detail"><small>Verfügbar</small><strong>'+value('#energy')+'</strong><span>Regeneriert automatisch um 1 pro Minute.</span></div>','missions','Aktionen öffnen'),level:()=>simple('Level & Fortschritt','<div class="status-detail"><small>Gesamtlevel</small><strong>'+value('#level')+'</strong><span>'+value('#xptext')+' XP bis zum nächsten Abschnitt.</span></div>','career','Laufbahn öffnen')};
 document.querySelectorAll('.stats .stat:not(.clean-stat)').forEach(card=>{card.setAttribute('role','button');card.tabIndex=0;const id=card.querySelector('b')?.id;const run=()=>actions[id]?.();card.onclick=run;card.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();run()}}});
 document.addEventListener('click',async e=>{const go=e.target.closest('.modal-go');if(go)return goto(go.dataset.go);const drink=e.target.closest('.buy-drink');if(drink){drink.disabled=true;const msg=document.querySelector('#drinkmsg');try{const d=await window.kiezBuyAlcohol(drink.dataset.drink);msg.innerHTML='<div class="notice good">'+d.label+' gekauft. Pegel: '+Number(d.promille).toFixed(2).replace('.',',')+' ‰ · Pfandbonus aktiv.</div>';const p=await window.kiezRefreshProfile();body.innerHTML=window.kiezDrinkShopHTML(p)}catch(err){msg.innerHTML='<div class="notice bad">'+err.message+'</div>'}drink.disabled=false;return}const pump=e.target.closest('#pumpstomach');if(pump){pump.disabled=true;try{await window.kiezPumpStomach();const p=await window.kiezRefreshProfile();body.innerHTML=window.kiezDrinkShopHTML(p);document.querySelector('#drinkmsg').innerHTML='<div class="notice good">Magen ausgepumpt. Du bist wieder nüchtern.</div>'}catch(err){document.querySelector('#drinkmsg').innerHTML='<div class="notice bad">'+err.message+'</div>'}return}const buyIns=e.target.closest('#buyinsurance');if(buyIns){buyIns.disabled=true;try{await window.kiezBuyInsurance();const p=await window.kiezRefreshProfile();body.innerHTML=window.kiezDrinkShopHTML(p);document.querySelector('#drinkmsg').innerHTML='<div class="notice good">Krankenversicherung abgeschlossen.</div>'}catch(err){document.querySelector('#drinkmsg').innerHTML='<div class="notice bad">'+err.message+'</div>'}return}const cancelIns=e.target.closest('#cancelinsurance');if(cancelIns){cancelIns.disabled=true;try{await window.kiezCancelInsurance();const p=await window.kiezRefreshProfile();body.innerHTML=window.kiezDrinkShopHTML(p);document.querySelector('#drinkmsg').innerHTML='<div class="notice good">Versicherung gekündigt.</div>'}catch(err){document.querySelector('#drinkmsg').innerHTML='<div class="notice bad">'+err.message+'</div>'}}});
-document.querySelectorAll('.panel>.section-tools span').forEach((s,i)=>{s.setAttribute('role','button');s.tabIndex=0;s.onclick=()=>{s.parentElement.querySelectorAll('span').forEach(x=>x.classList.remove('subtab-active'));s.classList.add('subtab-active');show(s.textContent,'Dieser Unterbereich gehört zu „'+s.closest('.panel').querySelector('h2')?.textContent+'“. Die Detailansicht wird innerhalb dieses Fensters geöffnet und in den nächsten Ausbauschritten weiter gefüllt.')};s.onkeydown=e=>{if(e.key==='Enter')s.click()}});
+const subtabTargets={
+ overview:[['Übersicht','.overview-grid'],['Status','.kiez-slots-row'],['Aktive Vorgänge','.profile-wide-row']],
+ pfand:[['Sammeln','.action'],['Pfandkurs','#durationselect'],['Tourenprotokoll','.timerbox'],['Fundstücke','@goto:plunder']],
+ begging:[['Schnorrplatz','#beg'],['Körperpflege','#wash'],['Ertragsfaktoren','.metric-row']],
+ income:[['Stadtteile','#areaname'],['Instrumente','.instrument-list'],['Schnorrplätze','.schnorr-spots'],['Waschhaus','@goto:begging']],
+ gear:[['Behälter','#containerlvl'],['Unterkünfte','.haeuser-gallery'],['Sammelausrüstung','#baglvl'],['Lager','@goto:plunder']],
+ training:[['Fähigkeiten','.skill-grid'],['Lernwarteschlange','.timerbox'],['Voraussetzungen','.section-lead'],['Protokoll','#trainmsg']],
+ messages:[['Posteingang','#inbox'],['Gesendet','#inbox'],['Bandenpost','@goto:gangs'],['System','.section-lead']],
+ gangs:[['Übersicht','#mygang'],['Mitglieder','#ganglist'],['Ausbau','.feature-roadmap'],['Kriege','.feature-roadmap'],['Liga','.feature-roadmap']],
+ missions:[['Tagesauftrag','#missiontext'],['Nebenjobs','.activity-grid'],['Kiezaktionen','.activity-grid'],['Belohnungsserie','#claimdaily']],
+ pets:[['Begleiter','#petshop'],['Training','#mypets'],['Kampfprofil','#mypets'],['Stall','#mypets']],
+ achievements:[['Karriere','@goto:career'],['Kämpfe','@goto:pvp'],['Sammeln','@goto:pfand'],['Bande','@goto:gangs'],['Langzeit','.feature-roadmap']],
+ pvp:[['Gegnersuche','#opponents'],['Kampfauftrag','#opponents'],['Kampfbericht','#fightlog'],['Schutzzeit','.mini-status']],
+ store:[['Waffen','@filter:waffen'],['Kleidung','@filter:kleidung'],['Zubehör','@filter:zubehoer'],['Verbrauchbares','@drink'],['Verkaufen','#inventorylist']],
+ leaderboard:[['Spieler','#leaders'],['Banden','@goto:gangs'],['Wochenrang','.mini-status'],['Saison','.mini-status']],
+ career:[['Ränge','#rankladder'],['Freischaltungen','#rankladder'],['Statistik','#ranktitle']],
+ plunder:[['Deine Funde','#plunderlist'],['Sammlung','.craft-list']]
+};
+document.querySelectorAll('.panel .section-tools span').forEach(s=>{
+ s.setAttribute('role','button');s.tabIndex=0;
+ const run=()=>{
+  s.parentElement.querySelectorAll('span').forEach(x=>x.classList.remove('subtab-active'));
+  s.classList.add('subtab-active');
+  const panel=s.closest('.panel');
+  const list=subtabTargets[panel?.id]||[];
+  const label=s.textContent.trim();
+  const entry=list.find(([l])=>l===label);
+  const sel=entry?entry[1]:null;
+  if(!sel)return;
+  if(sel.startsWith('@goto:')){goto(sel.slice(6));return}
+  if(sel.startsWith('@filter:')){setTimeout(()=>document.querySelector('#store')?.kiezApplyFilter?.(sel.slice(8)),50);return}
+  if(sel==='@drink'){window.openDrinkShopFromQuickbar?.();return}
+  const target=panel.querySelector(sel);
+  if(target)target.scrollIntoView({behavior:'smooth',block:'center'});
+ };
+ s.onclick=run;
+ s.onkeydown=e=>{if(e.key==='Enter')run()};
+});
 })();
 </script>
 <style id="training-layout-v24">
@@ -635,6 +672,7 @@ function addKronkorken(){
  k.onclick=()=>alert('Kronkorken-Shop kommt bald! Aktuell gesammelt: '+kk);
  statsRow.appendChild(k);
 }
+window.openDrinkShopFromQuickbar=openDrinkShopFromQuickbar;
 async function openDrinkShopFromQuickbar(){
  const modal=document.querySelector('#kiezmodal'),title=document.querySelector('#kiezmodaltitle'),body=document.querySelector('#kiezmodalbody');
  if(!modal||!title||!body)return;
