@@ -972,6 +972,16 @@ function updateQuickbar(){
  }else{
   bar.classList.add('kiez-quickbar-hide');
  }
+ if(!bar.classList.contains('kiez-quickbar-hide')){
+  const panel=document.querySelector('section.panel.active-view');
+  if(panel){
+   const pr=panel.getBoundingClientRect();
+   const pp=bar.parentElement.getBoundingClientRect();
+   const parentPadLeft=parseFloat(getComputedStyle(bar.parentElement).paddingLeft)||0;
+   bar.style.setProperty('margin-left',(pr.left-pp.left-parentPadLeft)+'px','important');
+   bar.style.setProperty('width',pr.width+'px','important');
+  }
+ }
 }
 function updatePriceHistory(){
  const curEl=document.getElementById('pfandcurprice');
@@ -1393,7 +1403,7 @@ section.panel .purchase-card.kiez-force-hide,section.panel .kiez-force-hide{disp
 .city-hub-card p{margin:0;font-size:12px;opacity:.85}
 #overview .profile-paper-tabs{display:none!important}
 .kiez-quickbar.kiez-quickbar-hide{display:none!important}
-.kiez-quickbar{display:flex!important;justify-content:flex-start!important;width:auto!important;margin-left:14px!important;flex-wrap:wrap!important;height:auto!important;min-height:27px!important}
+.kiez-quickbar{display:flex!important;justify-content:flex-start!important;flex-wrap:wrap!important;height:auto!important;min-height:27px!important;margin-top:0!important;margin-bottom:0!important;position:relative!important}
 .kiez-quickbar button{flex:0 0 auto!important;padding-left:10px!important;padding-right:10px!important}
 .player-slip{background-color:#211f1c!important;background-image:none!important;border:1px solid #5d4b32!important;box-shadow:0 8px 20px #000c!important;color:#d8cba6!important}
 .player-slip strong{color:#f0d998!important;text-shadow:none!important;border-bottom-color:#4a4030!important}
