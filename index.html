@@ -749,7 +749,7 @@ function reorganizeStorePages(){
   document.querySelectorAll('#shoplist .shop-category').forEach(head=>{
    const t=head.textContent;
    let show=true;
-   if(cat==='waffen')show=t.includes('Waffen')||t.includes('Grundausrüstung');
+   if(cat==='waffen')show=t.includes('Waffen');
    else if(cat==='kleidung')show=t.includes('Kleidung');
    else if(cat==='zubehoer')show=t.includes('Zubehör');
    head.classList.toggle('kiez-force-hide',!show);
