@@ -915,9 +915,18 @@ function wireCityHub(){
 }
 const profileTabItems=[['Profil ansehen','profil'],['Übersicht','uebersicht'],['Haustier','pets-go'],['Aktionen','missions-go'],['Inventar','inventar'],['Kronkorken','kronkorken']];
 const cityTabItems=[['Zubehör','store','Zubehör'],['Supermarkt','store','Verbrauchbares'],['Tierhandlung','pets',null],['Waffenladen','store','Waffen'],['Apotheke','apotheke',null],['Waschhaus','begging','Körperpflege'],['Schnorrplätze','income','Schnorrplätze'],['Musikladen','income','Instrumente'],['Eigenheime','gear',null],['Glücksspiel','missions',null]];
+const profileZones={profil:[0,1,6,7],uebersicht:[0,1,2,3,4,5]};
+function showProfileZone(key){
+ const content=document.querySelector('#overview .classic-profile-content');
+ if(!content)return;
+ const showIdx=profileZones[key];
+ if(!showIdx)return;
+ const set=new Set(showIdx);
+ [...content.children].forEach((child,i)=>{child.style.display=set.has(i)?'':'none'});
+}
 function profileTabAction(key){
- if(key==='profil'){document.querySelector('.kiez-bio-row')?.scrollIntoView({behavior:'smooth',block:'start'});return}
- if(key==='uebersicht'){document.querySelector('#overview')?.scrollIntoView({behavior:'smooth',block:'start'});return}
+ if(key==='profil'){showProfileZone('profil');document.querySelector('#overview')?.scrollIntoView({behavior:'smooth',block:'start'});return}
+ if(key==='uebersicht'){showProfileZone('uebersicht');document.querySelector('#overview')?.scrollIntoView({behavior:'smooth',block:'start'});return}
  if(key==='pets-go'){document.querySelector('.side [data-view="pets"]')?.click();return}
  if(key==='missions-go'){document.querySelector('.side [data-view="missions"]')?.click();return}
  if(key==='inventar'){document.querySelector('.side [data-view="store"]')?.click();setTimeout(()=>document.getElementById('inventorylist')?.scrollIntoView({behavior:'smooth',block:'start'}),150);return}
@@ -936,6 +945,8 @@ function updateQuickbar(){
     const key=profileTabItems[i][1];
     b.onclick=()=>{[...bar.children].forEach(x=>x.classList.remove('active'));b.classList.add('active');profileTabAction(key)};
    });
+   bar.children[1]?.classList.add('active');
+   showProfileZone('uebersicht');
   }
   bar.classList.remove('kiez-quickbar-hide');
  }else if(['store','pets','begging','income','gear','missions'].includes(activeId)){
@@ -1382,6 +1393,8 @@ section.panel .purchase-card.kiez-force-hide,section.panel .kiez-force-hide{disp
 .city-hub-card p{margin:0;font-size:12px;opacity:.85}
 #overview .profile-paper-tabs{display:none!important}
 .kiez-quickbar.kiez-quickbar-hide{display:none!important}
+.kiez-quickbar{display:flex!important;justify-content:flex-start!important;width:auto!important;margin-left:14px!important;flex-wrap:wrap!important;height:auto!important;min-height:27px!important}
+.kiez-quickbar button{flex:0 0 auto!important;padding-left:10px!important;padding-right:10px!important}
 #begging .scene-visual{background-size:cover;background-position:center 35%;min-height:150px}
 </style>
 <script id="store-routing-cleanup-script-v50">
