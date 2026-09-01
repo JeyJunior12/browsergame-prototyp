@@ -1871,6 +1871,35 @@ window.addEventListener('load',wireOpenButton);
 section.panel .card:has([data-id="street_sign"])>.asset-thumb,
 section.panel .card:has([data-id="street_sign"])>.generated-item-thumb{background-image:url('/weapon-sword-v1.png')!important;background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important}
 </style>
+
+<style id="accessory-image-cleanup-v62">
+#shoplist .accessory-image-card>.accessory-uniform-thumb,
+#inventorygrid .accessory-image-card>.accessory-uniform-thumb{display:block!important;width:112px!important;height:112px!important;min-width:112px!important;min-height:112px!important;float:none!important;margin:0 auto 10px!important;border:4px solid #655642!important;background-color:#171513!important;background-repeat:no-repeat!important;box-shadow:inset 0 0 10px #000,2px 3px 8px #0008!important}
+#shoplist .accessory-image-card>.asset-thumb,#shoplist .accessory-image-card>.generated-item-thumb:not(.accessory-uniform-thumb),
+#inventorygrid .accessory-image-card>.asset-thumb,#inventorygrid .accessory-image-card>.generated-item-thumb:not(.accessory-uniform-thumb){display:none!important}
+@media(max-width:620px){#shoplist .accessory-image-card>.accessory-uniform-thumb,#inventorygrid .accessory-image-card>.accessory-uniform-thumb{width:88px!important;height:88px!important;min-width:88px!important;min-height:88px!important}}
+</style>
+<script id="accessory-image-cleanup-script-v62">
+(()=>{
+ const names=['Kettenhandschuhe','Trillerpfeife','Klappspaten','Mofamotor für den Wagen','Unheimliche Glücksflasche','Pfandsack'];
+ const positions=['0% 0%','50% 0%','100% 0%','0% 100%','50% 100%','100% 100%'];
+ const titleOf=card=>(card.querySelector('b,h3,h4,.item-name')?.textContent||'').trim();
+ const accessoryCards=()=>[...document.querySelectorAll('#shoplist .card,#inventorygrid .card,#inventorygrid [data-category="zubehoer"]')];
+ const run=()=>accessoryCards().forEach(card=>{
+  const title=titleOf(card),index=names.findIndex(name=>title.includes(name));
+  if(index<0)return;
+  card.classList.add('accessory-image-card');
+  let image=card.querySelector(':scope>.accessory-uniform-thumb');
+  card.querySelectorAll(':scope>.asset-thumb,:scope>.generated-item-thumb').forEach(node=>{if(node!==image)node.remove()});
+  if(!image){image=document.createElement('div');image.className='generated-item-thumb accessory-uniform-thumb';card.prepend(image)}
+  image.setAttribute('role','img');image.setAttribute('aria-label',names[index]);
+  image.style.backgroundImage="url('/accessories-sprite-v1.png')";
+  image.style.backgroundSize='300% 200%';image.style.backgroundPosition=positions[index];
+ });
+ run();
+ new MutationObserver(run).observe(document.getElementById('store')||document.body,{childList:true,subtree:true});
+})();
+</script>
 <script id="single-sword-image-script-v60">
 (()=>{
  const fixSword=()=>document.querySelectorAll('section.panel .card:has([data-id="street_sign"])').forEach(card=>{
