@@ -247,8 +247,8 @@ window.kiezDrinkShopHTML=p=>{
 };
 window.kiezApothekeHTML=p=>{
  const level=Number(p?.alcohol_level||0),insured=!!p?.insurance_active,daysPaid=p?.insurance_days_paid||0,danger=level>=5;
- const pumpHtml=danger?'<div class="status-detail"><small>⚠️ Lebensgefahr</small><strong>'+level.toFixed(2).replace('.',',')+' ‰</strong><span>Bei 5 ‰ und mehr wird es lebensgefährlich.</span></div><button class="big" id="pumpstomach">Magen auspumpen lassen – 500,00 €</button>':'<div class="status-detail"><small>Alkoholpegel</small><strong>'+level.toFixed(2).replace('.',',')+' ‰</strong><span>Erst ab 5 ‰ ist ein Magenauspumpen nötig.</span></div><button class="big" id="pumpstomach" disabled>Magen auspumpen lassen – 500,00 €</button>';
- const insuranceHtml=insured?('<div class="status-detail"><small>Krankenversicherung</small><strong>🛡 Versichert</strong><span>'+daysPaid+'/14 Tage bezahlt'+(daysPaid>=14?' · kündbar':'')+'</span></div>'+(daysPaid>=14?'<button class="ghost" id="cancelinsurance">Versicherung kündigen</button>':'')):'<div class="status-detail"><small>Krankenversicherung</small><strong>Nicht versichert</strong><span>10 % vom Bargeld pro Tag, mindestens 14 Tage.</span></div><button class="ghost" id="buyinsurance">Krankenversicherung abschließen</button>';
+ const pumpHtml=danger?'<div class="status-detail pharmacy-card pharmacy-pump"><div class="pharmacy-thumb" role="img" aria-label="Magenpumpe"></div><small>⚠️ Lebensgefahr</small><strong>'+level.toFixed(2).replace('.',',')+' ‰</strong><span>Bei 5 ‰ und mehr wird es lebensgefährlich.</span></div><button class="big" id="pumpstomach">Magen auspumpen lassen – 500,00 €</button>':'<div class="status-detail pharmacy-card pharmacy-pump"><div class="pharmacy-thumb" role="img" aria-label="Magenpumpe"></div><small>Alkoholpegel</small><strong>'+level.toFixed(2).replace('.',',')+' ‰</strong><span>Erst ab 5 ‰ ist ein Magenauspumpen nötig.</span></div><button class="big" id="pumpstomach" disabled>Magen auspumpen lassen – 500,00 €</button>';
+ const insuranceHtml=insured?('<div class="status-detail pharmacy-card pharmacy-insurance"><div class="pharmacy-thumb" role="img" aria-label="Krankenversicherung"></div><small>Krankenversicherung</small><strong>🛡 Versichert</strong><span>'+daysPaid+'/14 Tage bezahlt'+(daysPaid>=14?' · kündbar':'')+'</span></div>'+(daysPaid>=14?'<button class="ghost" id="cancelinsurance">Versicherung kündigen</button>':'')):'<div class="status-detail pharmacy-card pharmacy-insurance"><div class="pharmacy-thumb" role="img" aria-label="Krankenversicherung"></div><small>Krankenversicherung</small><strong>Nicht versichert</strong><span>10 % vom Bargeld pro Tag, mindestens 14 Tage.</span></div><button class="ghost" id="buyinsurance">Krankenversicherung abschließen</button>';
  return '<p>Magen auspumpen hilft bei Alkoholvergiftung, eine Krankenversicherung schützt langfristig deinen Geldbeutel.</p><div class="status-detail-grid">'+pumpHtml+insuranceHtml+'</div><div id="drinkmsg"></div>';
 };
 const syncAlcohol=async()=>{const data=await window.kiezRefreshProfile();if(data&&document.querySelector('#alcohol'))document.querySelector('#alcohol').textContent=Number(data.alcohol_level||0).toFixed(2).replace('.',',')+' ‰'};setTimeout(syncAlcohol,1200);
@@ -2003,4 +2003,12 @@ new MutationObserver(run).observe(document.getElementById('store')||document.bod
 #missions .activity-card:has([data-action="windshield"])::before{content:"";display:block;width:112px;height:112px;margin:0 12px 10px 0;float:left;border:4px solid #655642;background:url('/activity-windshield-v1.png') center/cover no-repeat;box-shadow:inset 0 0 10px #000,2px 3px 8px #0008}
 #missions .activity-card:has([data-action="windshield"])::after{content:"";display:block;clear:both}
 @media(max-width:620px){#missions .activity-card:has([data-action="windshield"])::before{width:88px;height:88px}}
+</style>
+
+<style id="pharmacy-images-v63">
+#kiezmodalbody .pharmacy-card{display:flex!important;flex-direction:column!important;align-items:center!important;text-align:center!important}
+#kiezmodalbody .pharmacy-thumb{display:block!important;width:132px!important;height:132px!important;min-width:132px!important;margin:0 auto 10px!important;border:4px solid #655642!important;background-image:url('/pharmacy-sprite-v1.png')!important;background-size:200% 200%!important;background-repeat:no-repeat!important;box-shadow:inset 0 0 10px #000,2px 3px 8px #0008!important}
+#kiezmodalbody .pharmacy-pump .pharmacy-thumb{background-position:0% 50%!important}
+#kiezmodalbody .pharmacy-insurance .pharmacy-thumb{background-position:100% 50%!important}
+@media(max-width:620px){#kiezmodalbody .pharmacy-thumb{width:104px!important;height:104px!important;min-width:104px!important}}
 </style>
