@@ -1867,6 +1867,25 @@ window.addEventListener('load',wireOpenButton);
 })();
 </script>
 
+<style id="single-sword-image-v60">
+section.panel .card:has([data-id="street_sign"])>.asset-thumb,
+section.panel .card:has([data-id="street_sign"])>.generated-item-thumb{background-image:url('/weapon-sword-v1.png')!important;background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important}
+</style>
+<script id="single-sword-image-script-v60">
+(()=>{
+ const fixSword=()=>document.querySelectorAll('section.panel .card:has([data-id="street_sign"])').forEach(card=>{
+  let image=card.querySelector(':scope>.sword-single-thumb');
+  card.querySelectorAll(':scope>.asset-thumb,:scope>.generated-item-thumb').forEach(old=>{if(old!==image)old.remove()});
+  if(!image){image=document.createElement('div');image.className='generated-item-thumb weapon-uniform-thumb sword-single-thumb';image.setAttribute('role','img');image.setAttribute('aria-label','Schwert');card.prepend(image)}
+  image.style.setProperty('background-image',"url('/weapon-sword-v1.png')",'important');
+  image.style.setProperty('background-size','cover','important');
+  image.style.setProperty('background-position','center','important');
+ });
+ fixSword();
+ new MutationObserver(fixSword).observe(document.body,{childList:true,subtree:true});
+})();
+</script>
+
 <style id="unique-card-art-v58">
 /* If a newer generated thumbnail exists, suppress the older duplicate artwork. */
 section.panel .card:has(.generated-item-thumb)>.asset-thumb,
