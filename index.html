@@ -205,7 +205,7 @@ button.ghost{background:linear-gradient(180deg,#b7aa7e,#71684d)!important;border
 const thumb=(kind,pos,compact='')=>{const d=document.createElement('div');d.className='asset-thumb '+kind+'-sprite '+compact;d.dataset.pos=pos;return d};
 function enhance(){document.querySelectorAll('#shoplist .card:not([data-art]),#inventorylist .card:not([data-art])').forEach(c=>{const b=c.querySelector('[data-id]'),id=b&&b.dataset.id;if(id in shopPos){c.prepend(thumb('shop',shopPos[id]));c.dataset.art=1}});document.querySelectorAll('#petshop .card:not([data-art]),#mypets .card:not([data-art])').forEach(c=>{const b=c.querySelector('[data-id]'),id=b&&b.dataset.id;if(id in petPos){c.prepend(thumb('life',petPos[id]));c.dataset.art=1}});document.querySelectorAll('#achievementlist .card:not([data-art])').forEach((c,i)=>{c.prepend(thumb('life',8+Math.min(3,Math.floor(i/2)),'compact'));const t=document.createElement('span');t.className='achievement-tier';t.textContent=['Bronze','Silber','Gold','Platin'][Math.min(3,Math.floor(i/2))];c.append(t);c.dataset.art=1})}
 const gear=document.querySelectorAll('#gear .card');[[0,'Nächste Sack-Stufe',4],[1,'Nächste Unterkunft',5],[2,'Nächster Geldbehälter',6]].forEach(([i,label,next])=>{const c=gear[i];if(!c||c.dataset.art)return;c.prepend(thumb('equipment',i));const details=document.createElement('details');details.className='upgrade-peek';details.innerHTML='<summary>'+label+' ansehen</summary><div class="next-stage"><div class="asset-thumb equipment-sprite" data-pos="'+next+'"></div><div><b>'+label+'</b><p>Mehr Schutz, Platz und Möglichkeiten im Kiez.</p></div></div>';c.append(details);c.dataset.art=1});
-document.querySelectorAll('#missions .activity-card').forEach((c,i)=>{if(!c.dataset.art){c.prepend(thumb('life',4+i));c.dataset.art=1}});enhance();new MutationObserver(enhance).observe(document.body,{childList:true,subtree:true});
+enhance();new MutationObserver(enhance).observe(document.body,{childList:true,subtree:true});
 const stats=document.querySelector('.stats');if(stats&&!stats.querySelector('.alcohol-stat')){const a=document.createElement('div');a.className='stat alcohol-stat';a.innerHTML='<svg class="beer-glass-icon" viewBox="0 0 20 26" width="18" height="24"><rect x="3" y="2" width="12" height="20" rx="1.5" fill="#12100c" stroke="#8a7a55" stroke-width="1.3"/><rect class="beer-fill-rect" x="4" y="21" width="10" height="0" fill="#e3a634"/><rect x="3" y="2" width="12" height="20" rx="1.5" fill="none" stroke="#8a7a55" stroke-width="1.3"/><path d="M15 6h2a1.5 1.5 0 0 1 1.5 1.5v6A1.5 1.5 0 0 1 17 15h-2" fill="none" stroke="#8a7a55" stroke-width="1.3"/></svg><small>Alkoholpegel</small><b id="alcohol">0,00 ‰</b><em>Öffnet riskante Aktionen</em>';stats.insertBefore(a,stats.children[2]||null)}
 const mast=document.querySelector('.mast');if(mast&&!mast.querySelector('.player-slip')){const p=document.createElement('aside');p.className='player-slip';p.innerHTML='<strong id="slipname">Kiezbewohner</strong><span>Revier <i>Bahnhof</i></span><span>Level <i id="sliplevel">1</i></span><span>Nachrichten <i>Postfach</i></span>';mast.append(p);setInterval(()=>{const n=document.querySelector('#playername'),l=document.querySelector('#level');if(n)p.querySelector('#slipname').textContent=n.textContent;if(l)p.querySelector('#sliplevel').textContent=l.textContent},700)}
 if(stats&&!stats.querySelector('.top-training-stat')){const training=document.createElement('div');training.className='stat top-training-stat';training.innerHTML='<small>Weiterbildung</small><b id="toptraining">BEREIT</b><em>Aktueller Vorgang</em>';const price=document.createElement('div');price.className='stat price-stat';price.innerHTML='<small>Pfandpreis</small><b id="topprice">0,25 €</b><em>pro Flasche</em>';const bottle=stats.querySelector('#bottles')?.closest('.stat'),energy=stats.querySelector('#energy')?.closest('.stat'),level=stats.querySelector('#level')?.closest('.stat'),clean=stats.querySelector('#rank')?.closest('.stat'),alcohol=stats.querySelector('.alcohol-stat');if(clean)clean.classList.add('clean-stat');if(alcohol)stats.insertBefore(alcohol,stats.children[1]||null);stats.insertBefore(training,bottle||null);stats.insertBefore(price,bottle||null);if(energy)stats.append(energy);if(level)stats.append(level);setInterval(()=>{const source=document.querySelector('#trainingtimer'),target=document.querySelector('#toptraining'),status=document.querySelector('#trainingstatus');if(source&&target){target.textContent=source.textContent==='BEREIT'?'Bereit':source.textContent;target.title=status?status.textContent:''}},500)}
@@ -1863,6 +1863,29 @@ section.panel .purchase-card.kiez-force-hide,section.panel .kiez-force-hide{disp
  };
  wireOpenButton();
  setTimeout(wireOpenButton,0);
- window.addEventListener('load',wireOpenButton);
+window.addEventListener('load',wireOpenButton);
+})();
+</script>
+
+<style id="unique-card-art-v58">
+/* If a newer generated thumbnail exists, suppress the older duplicate artwork. */
+section.panel .card:has(.generated-item-thumb)>.asset-thumb,
+section.panel .activity-card:has(.generated-item-thumb)>.asset-thumb,
+section.panel .lead-card:has(.generated-item-thumb)>.asset-thumb{display:none!important}
+.city-hub-img{background-image:url('/city-locations-sprite-v1.png')!important;background-size:500% 200%!important;background-position:var(--card-pos,0% 0%)!important;background-repeat:no-repeat!important}
+</style>
+<script id="unique-card-art-script-v58">
+(()=>{
+ const cityPositions=['0% 0%','25% 0%','50% 0%','75% 0%','100% 0%','0% 100%','25% 100%','50% 100%','75% 100%','100% 100%'];
+ document.querySelectorAll('#citymap .city-hub-card').forEach((card,index)=>card.style.setProperty('--card-pos',cityPositions[index]||'0% 0%'));
+ const gumCard=[...document.querySelectorAll('#missions .activity-card')].find(card=>card.querySelector('[data-action="windshield"]'));
+ if(gumCard){
+  const title=gumCard.querySelector('h3');
+  const text=gumCard.querySelector('p');
+  const button=gumCard.querySelector('[data-action="windshield"]');
+  if(title)title.textContent='🍬 Kaugummiautomat knacken';
+  if(text)text.textContent='Rüttel am alten Automaten und sammle Münzen und Kaugummis ein. Geschick verbessert die Ausbeute.';
+  if(button)button.textContent='Automat knacken';
+ }
 })();
 </script>
