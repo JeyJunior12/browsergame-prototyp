@@ -1903,17 +1903,17 @@ section.panel .lead-card:has(.generated-item-thumb)>.asset-thumb{display:none!im
   const title=gumCard.querySelector('h3');
   const text=gumCard.querySelector('p');
   const button=gumCard.querySelector('[data-action="windshield"]');
-  if(title)title.textContent='🍬 Kaugummiautomat knacken';
-  if(text)text.textContent='Rüttel am alten Automaten und sammle Münzen und Kaugummis ein. Geschick verbessert die Ausbeute.';
-  if(button)button.textContent='Automat knacken';
+  if(title)title.textContent='🚦 Scheiben wischen';
+  if(text)text.textContent='Autos an der Ampel abklappern. Sprechen verbessert das Trinkgeld.';
+  if(button)button.textContent='Loslegen';
   gumCard.querySelectorAll(':scope>.asset-thumb').forEach(image=>image.remove());
   let image=gumCard.querySelector(':scope>.generated-item-thumb');
   if(!image){image=document.createElement('div');image.className='generated-item-thumb';gumCard.prepend(image)}
   image.setAttribute('role','img');
-  image.setAttribute('aria-label','Kaugummiautomat');
-  image.style.backgroundImage="url('/activities-sprite-v2.png')";
-  image.style.backgroundSize='500% 500%';
-  image.style.backgroundPosition='75% 100%';
+  image.setAttribute('aria-label','Scheiben wischen');
+  image.style.backgroundImage="url('/activity-windshield-v1.png')";
+  image.style.backgroundSize='cover';
+  image.style.backgroundPosition='center';
   gumCard.classList.add('has-generated-thumb');
  };
  updateGumCard();
@@ -1962,6 +1962,14 @@ section.panel .weapon-uniform-thumb,#defenseshop .store-special-thumb,.supermark
  };
  const run=()=>{cleanWeapons();cleanSpecials()};
  run();
- new MutationObserver(run).observe(document.getElementById('store')||document.body,{childList:true,subtree:true});
+new MutationObserver(run).observe(document.getElementById('store')||document.body,{childList:true,subtree:true});
 })();
 </script>
+
+<style id="windshield-image-guarantee-v61">
+#missions .activity-card:has([data-action="windshield"])>.asset-thumb,
+#missions .activity-card:has([data-action="windshield"])>.generated-item-thumb{display:none!important}
+#missions .activity-card:has([data-action="windshield"])::before{content:"";display:block;width:112px;height:112px;margin:0 12px 10px 0;float:left;border:4px solid #655642;background:url('/activity-windshield-v1.png') center/cover no-repeat;box-shadow:inset 0 0 10px #000,2px 3px 8px #0008}
+#missions .activity-card:has([data-action="windshield"])::after{content:"";display:block;clear:both}
+@media(max-width:620px){#missions .activity-card:has([data-action="windshield"])::before{width:88px;height:88px}}
+</style>
