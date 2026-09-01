@@ -1903,30 +1903,29 @@ new MutationObserver(updateGumCard).observe(document.body,{childList:true,subtre
 </script>
 
 <style id="store-image-cleanup-v59">
-#shoplist .weapon-uniform-thumb,#defenseshop .store-special-thumb,.supermarket-inline .store-special-thumb{display:block!important;width:112px!important;height:112px!important;min-width:112px!important;min-height:112px!important;float:none!important;margin:0 auto 10px!important;border:4px solid #655642!important;background-color:#171513!important;background-repeat:no-repeat!important;box-shadow:inset 0 0 10px #000,2px 3px 8px #0008!important}
+section.panel .weapon-uniform-thumb,#defenseshop .store-special-thumb,.supermarket-inline .store-special-thumb{display:block!important;width:112px!important;height:112px!important;min-width:112px!important;min-height:112px!important;float:none!important;margin:0 auto 10px!important;border:4px solid #655642!important;background-color:#171513!important;background-repeat:no-repeat!important;box-shadow:inset 0 0 10px #000,2px 3px 8px #0008!important}
 #shoplist .weapon-image-card{min-height:0!important;overflow:visible!important}
 #shoplist .weapon-image-card>.asset-thumb,#shoplist .weapon-image-card>.generated-item-thumb:not(.weapon-uniform-thumb),#defenseshop .card>.asset-thumb,#defenseshop .card>.generated-item-thumb:not(.store-special-thumb){display:none!important}
 .supermarket-inline .drink{display:flex!important;flex-direction:column!important;align-items:center!important;text-align:center!important}
-@media(max-width:620px){#shoplist .weapon-uniform-thumb,#defenseshop .store-special-thumb,.supermarket-inline .store-special-thumb{width:88px!important;height:88px!important;min-width:88px!important;min-height:88px!important}}
+@media(max-width:620px){section.panel .weapon-uniform-thumb,#defenseshop .store-special-thumb,.supermarket-inline .store-special-thumb{width:88px!important;height:88px!important;min-width:88px!important;min-height:88px!important}}
 </style>
 <script id="store-image-cleanup-script-v59">
 (()=>{
  const pos=(index,columns)=>((index%columns)/(columns-1)*100)+'% '+(Math.floor(index/columns)/(columns-1)*100)+'%';
  const makeThumb=(className,label,url,size,position)=>{const image=document.createElement('div');image.className='generated-item-thumb '+className;image.setAttribute('role','img');image.setAttribute('aria-label',label);image.style.backgroundImage='url('+url+')';image.style.backgroundSize=size;image.style.backgroundPosition=position;return image};
  const cleanWeapons=()=>{
-  const list=document.getElementById('shoplist');if(!list)return;
-  [...list.querySelectorAll('.shop-category')].filter(head=>head.textContent.trim()==='Waffen').forEach(head=>{
-   let node=head.nextElementSibling,index=0;
-   while(node&&!node.classList.contains('shop-category')){
-    if(node.classList.contains('card')){
-     node.classList.add('weapon-image-card');
-     const current=node.querySelector(':scope>.weapon-uniform-thumb');
-     node.querySelectorAll(':scope>.asset-thumb,:scope>.generated-item-thumb').forEach(image=>{if(image!==current)image.remove()});
-     if(!current)node.prepend(makeThumb('weapon-uniform-thumb',node.querySelector('b')?.textContent||'Waffe','/shop-sprite-v2.png','400% 400%',pos(index%16,4)));
-     index++;
-    }
-    node=node.nextElementSibling;
-   }
+  const names=['Krummes Zahnstocher-Bündel','Abgebrochene Limo-Flasche','Wasserbomben','Silvesterknaller','Spraydose','Gummiknüppel','Gullideckel','Kettenschloss','Schlagring','Heizungsrohr','Hammer','Pfefferspray','Elektroschocker','Feuerlöscher','Schwert','Nagelkeule'];
+  document.querySelectorAll('section.panel .card').forEach(card=>{
+   const title=(card.querySelector('b')?.textContent||'').trim();
+   const index=names.findIndex(name=>title.includes(name));if(index<0)return;
+   card.classList.add('weapon-image-card');
+   let current=card.querySelector(':scope>.weapon-uniform-thumb');
+   card.querySelectorAll(':scope>.asset-thumb,:scope>.generated-item-thumb').forEach(image=>{if(image!==current)image.remove()});
+   if(!current){current=makeThumb('weapon-uniform-thumb',names[index],'/weapons-sprite-v3.png','400% 400%',pos(index,4));card.prepend(current)}
+   current.style.backgroundImage="url('/weapons-sprite-v3.png')";
+   current.style.backgroundSize='400% 400%';
+   current.style.backgroundPosition=pos(index,4);
+   current.setAttribute('aria-label',names[index]);
   });
  };
  const cleanSpecials=()=>{
