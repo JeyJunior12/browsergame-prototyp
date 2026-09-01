@@ -76,9 +76,17 @@ body{background-image:linear-gradient(rgba(12,14,15,.78),rgba(12,14,15,.92)),url
 </head>
 <body><div class="wrap">
 <header class="mast"><div><div class="logo">KIEZKÖNIG</div><div class="tag">Von null nach ganz unten – und dann wieder hoch.</div></div><button id="logout" class="ghost">Abmelden</button></header>
-<div id="auth" class="auth panel hide"><h2>Rein in den Kiez</h2><div class="inside">
-<p>Kein Download. Kein Glanz. Nur du, eine knisternde Tüte und große Träume.</p>
-<div class="row"><button id="openlogin" class="big" type="button">Einloggen</button><button id="opensignup" class="ghost" type="button">Neu registrieren</button></div>
+<div id="auth" class="auth panel hide"><h2>Dein Weg in den Kiez</h2><div class="inside">
+<p class="auth-tagline">Kein Download. Kein Glanz. Nur du, eine knisternde Tüte und große Träume.</p>
+<p class="auth-lead">Du startest als Niemand auf der Parkbank – mit leeren Taschen und großen Plänen. Sammle Pfand, schnorr dich durch, bild dich weiter und bau dir Stück für Stück ein kleines Kiez-Imperium auf.</p>
+<div class="feature-roadmap auth-features">
+<div class="road"><small>Schritt 1</small><b>🛒 Pfand sammeln</b>Erste Flaschen, erstes Kleingeld, erste Ausrüstung.</div>
+<div class="road"><small>Schritt 2</small><b>🐕 Begleiter finden</b>Ein treuer Weggefährte für die schweren Nächte.</div>
+<div class="road"><small>Schritt 3</small><b>🏚 Aufsteigen</b>Vom Bürgersteig zum eigenen Unterschlupf.</div>
+<div class="road"><small>Schritt 4</small><b>👥 Bande gründen</b>Gemeinsam wird aus dem Kiez ein Revier.</div>
+</div>
+<div class="row"><button id="openlogin" class="big" type="button">Einloggen</button><button id="opensignup" class="ghost" type="button">Jetzt kostenlos starten</button></div>
+<p class="auth-footnote">Kostenlos, ohne Download. Dein Spielstand wird automatisch gespeichert – du kannst jederzeit im Browser weiterspielen.</p>
 </div></div>
 <div id="game" class="layout">
 <nav class="side"><button data-view="overview" class="">🏚 Übersicht</button><button data-view="citymap" class="">🏙 Stadt</button><button data-view="pfand" class="">🛒 Pfandtour</button><button data-view="begging" class="">🥤 Schnorren</button><button data-view="income" class="">🗺 Stadt &amp; Musik</button><button data-view="gear" class="">🛏 Unterkunft</button><button data-view="training" class="">🎓 Weiterbildung</button><button data-view="store" class="">🧥 Kiezladen</button><button data-view="pets" class="">🐕 Begleiter</button><button data-view="pvp" class="">👊 Prügelei</button><button data-view="gangs" class="">👥 Bande</button><button data-view="messages" class="">✉ Kiezpost</button><button data-view="missions" class="">📋 Tagesauftrag</button><button data-view="achievements" class="">🎖 Erfolge</button><button data-view="leaderboard" class="">🏆 Rangliste</button><button data-view="career" class="active">🪜 Karriere</button><button id="adminnav" class="" data-view="admin">🛡 Admin</button></nav>
@@ -457,8 +465,16 @@ html{min-height:100%;background:#111}body{min-height:100%;background-color:#1717
 (()=>{const panel=document.querySelector('#pfand');if(!panel||panel.dataset.v33)return;panel.dataset.v33='1';const scene=panel.querySelector('.section-scene');if(scene){scene.dataset.caption='Beschaffungen · Jahrmarkt und Pfandrevier';scene.style.setProperty('--scene-image','url("/scene-fairground-v1.png")')}const tabs=panel.querySelector(':scope>.section-tools');if(tabs){tabs.innerHTML='<span data-go="pvp">Verbrechen begehen</span><span data-go="pvp">Kämpfen</span><span data-go="pfand">Flaschen sammeln</span><span data-go="training">Weiterbilden</span><span data-go="store">Plunder erstellen</span>';tabs.querySelectorAll('[data-go]').forEach(x=>x.onclick=()=>document.querySelector('.side [data-view="'+x.dataset.go+'"]')?.click())}document.querySelector('.side [data-view="pfand"]')?.addEventListener('click',()=>{const main=document.querySelector('.main');main.style.setProperty('--page-hero','url("/scene-fairground-v1.png")');main.style.setProperty('--page-hero-position','center 58%')})})();
 </script>
 <style id="registration-page-v34">
-#auth.auth{max-width:760px!important;margin:28px auto 60px!important;border:6px solid #5f5b52!important;border-radius:0!important;background:#2e2f2f!important;box-shadow:0 14px 45px #000d!important;color:#c6c8c5!important}#auth>h2{margin:0!important;padding:8px 13px!important;background:#242525!important;border-bottom:1px solid #4b4d4a!important;color:#e0e1dd!important;font:18px Georgia,serif!important}#auth>.inside{padding:16px!important}
-@media(max-width:700px){#auth.auth{margin:10px 5px!important}}
+#auth.auth{max-width:760px!important;margin:28px auto 60px!important;border:6px solid #5f5b52!important;border-radius:0!important;background:#2e2f2f!important;box-shadow:0 14px 45px #000d!important;color:#c6c8c5!important}#auth>h2{margin:0!important;padding:14px 18px!important;background:linear-gradient(120deg,#242525,#2c2620)!important;border-bottom:1px solid #4b4d4a!important;color:#e8dcae!important;font:26px Georgia,serif!important;letter-spacing:.02em!important}#auth>.inside{padding:20px 22px 24px!important}
+#auth .auth-tagline{margin:0 0 6px!important;color:#e0e1dd!important;font:italic 15px Georgia,serif!important}
+#auth .auth-lead{margin:0 0 16px!important;color:#a9ada6!important;font-size:13px!important;line-height:1.55!important;max-width:56ch}
+#auth .auth-features{margin:0 0 20px!important}
+#auth .auth-features .road{transition:transform .15s,border-color .15s}
+#auth .auth-features .road:hover{transform:translateY(-2px);border-color:#7c8c6f}
+#auth .row{display:flex!important;gap:10px!important;flex-wrap:wrap}
+#auth .row #openlogin,#auth .row #opensignup{min-height:42px!important;padding:0 20px!important;font-size:13px!important}
+#auth .auth-footnote{margin:14px 0 0!important;color:#7d8179!important;font-size:11px!important}
+@media(max-width:700px){#auth.auth{margin:10px 5px!important}#auth>h2{font-size:21px!important}}
 </style>
 <script id="registration-page-script-v34">
 (()=>{const auth=document.querySelector('#auth'),inside=auth?.querySelector(':scope>.inside');if(!auth||!inside)return;auth.querySelector(':scope>h2').textContent='Dein Weg in den Kiez'})();
