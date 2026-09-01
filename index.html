@@ -1273,7 +1273,7 @@ function addAreaProgression(){
  const wrap=document.createElement('div');
  wrap.className='area-list cards';
  wrap.style.gridColumn='1/-1';
- wrap.innerHTML='<h3 class="shop-category" style="grid-column:1/-1">Schnorrgebiete</h3>'+areas.map((name,i)=>'<div class="card area-card" data-idx="'+i+'"><b>'+name+'</b><p>Flaschenfaktor: '+factors[i]+'</p><p class="area-status"></p>'+(i<4?'<button class="ghost area-unlock" data-idx="'+i+'">Freischalten – '+prices[i]+'</button>':'')+'<div class="area-msg"></div></div>').join('');
+ wrap.innerHTML='<h3 class="shop-category" style="grid-column:1/-1">Schnorrgebiete</h3>'+areas.map((name,i)=>'<div class="card area-card" data-idx="'+i+'"><div class="generated-item-thumb begging-area-thumb" role="img" aria-label="'+name+'"></div><b>'+name+'</b><p>Flaschenfaktor: '+factors[i]+'</p><p class="area-status"></p>'+(i<4?'<button class="ghost area-unlock" data-idx="'+i+'">Freischalten – '+prices[i]+'</button>':'')+'<div class="area-msg"></div></div>').join('');
  inside.appendChild(wrap);
  wrap.addEventListener('click',async e=>{
   const btn=e.target.closest('.area-unlock');
@@ -2012,3 +2012,17 @@ new MutationObserver(run).observe(document.getElementById('store')||document.bod
 #kiezmodalbody .pharmacy-insurance .pharmacy-thumb{background-position:100% 50%!important}
 @media(max-width:620px){#kiezmodalbody .pharmacy-thumb{width:104px!important;height:104px!important;min-width:104px!important}}
 </style>
+
+<style id="begging-area-images-v64">
+.schnorr-areas .area-card>.begging-area-thumb{display:block!important;width:150px!important;height:112px!important;min-width:150px!important;min-height:112px!important;margin:0 auto 10px!important;border:4px solid #655642!important;background-image:url('/begging-areas-sprite-v1.png')!important;background-size:500% 100%!important;background-repeat:no-repeat!important;box-shadow:inset 0 0 10px #000,2px 3px 8px #0008!important}
+.schnorr-areas .area-card[data-idx="0"]>.begging-area-thumb{background-position:0% 0%!important}
+.schnorr-areas .area-card[data-idx="1"]>.begging-area-thumb{background-position:25% 0%!important}
+.schnorr-areas .area-card[data-idx="2"]>.begging-area-thumb{background-position:50% 0%!important}
+.schnorr-areas .area-card[data-idx="3"]>.begging-area-thumb{background-position:75% 0%!important}
+.schnorr-areas .area-card[data-idx="4"]>.begging-area-thumb{background-position:100% 0%!important}
+.schnorr-areas .area-card>.asset-thumb,.schnorr-areas .area-card>.generated-item-thumb:not(.begging-area-thumb){display:none!important}
+@media(max-width:620px){.schnorr-areas .area-card>.begging-area-thumb{width:120px!important;height:90px!important;min-width:120px!important;min-height:90px!important}}
+</style>
+<script id="begging-area-image-cleanup-v64">
+(()=>{const run=()=>document.querySelectorAll('.schnorr-areas .area-card').forEach(card=>{let image=card.querySelector(':scope>.begging-area-thumb');card.querySelectorAll(':scope>.asset-thumb,:scope>.generated-item-thumb').forEach(node=>{if(node!==image)node.remove()});if(!image){image=document.createElement('div');image.className='generated-item-thumb begging-area-thumb';image.setAttribute('role','img');image.setAttribute('aria-label',card.querySelector('b')?.textContent||'Schnorrgebiet');card.prepend(image)}});run();new MutationObserver(run).observe(document.body,{childList:true,subtree:true})})();
+</script>
