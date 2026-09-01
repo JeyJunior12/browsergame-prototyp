@@ -1878,14 +1878,72 @@ section.panel .lead-card:has(.generated-item-thumb)>.asset-thumb{display:none!im
 (()=>{
  const cityPositions=['0% 0%','25% 0%','50% 0%','75% 0%','100% 0%','0% 100%','25% 100%','50% 100%','75% 100%','100% 100%'];
  document.querySelectorAll('#citymap .city-hub-card').forEach((card,index)=>card.style.setProperty('--card-pos',cityPositions[index]||'0% 0%'));
- const gumCard=[...document.querySelectorAll('#missions .activity-card')].find(card=>card.querySelector('[data-action="windshield"]'));
- if(gumCard){
+ const updateGumCard=()=>{
+  const gumCard=[...document.querySelectorAll('#missions .activity-card')].find(card=>card.querySelector('[data-action="windshield"]'));
+  if(!gumCard)return;
   const title=gumCard.querySelector('h3');
   const text=gumCard.querySelector('p');
   const button=gumCard.querySelector('[data-action="windshield"]');
   if(title)title.textContent='🍬 Kaugummiautomat knacken';
   if(text)text.textContent='Rüttel am alten Automaten und sammle Münzen und Kaugummis ein. Geschick verbessert die Ausbeute.';
   if(button)button.textContent='Automat knacken';
- }
+  gumCard.querySelectorAll(':scope>.asset-thumb').forEach(image=>image.remove());
+  let image=gumCard.querySelector(':scope>.generated-item-thumb');
+  if(!image){image=document.createElement('div');image.className='generated-item-thumb';gumCard.prepend(image)}
+  image.setAttribute('role','img');
+  image.setAttribute('aria-label','Kaugummiautomat');
+  image.style.backgroundImage="url('/activities-sprite-v2.png')";
+  image.style.backgroundSize='500% 500%';
+  image.style.backgroundPosition='75% 100%';
+  gumCard.classList.add('has-generated-thumb');
+ };
+ updateGumCard();
+new MutationObserver(updateGumCard).observe(document.body,{childList:true,subtree:true});
+})();
+</script>
+
+<style id="store-image-cleanup-v59">
+#shoplist .weapon-uniform-thumb,#defenseshop .store-special-thumb,.supermarket-inline .store-special-thumb{display:block!important;width:112px!important;height:112px!important;min-width:112px!important;min-height:112px!important;float:none!important;margin:0 auto 10px!important;border:4px solid #655642!important;background-color:#171513!important;background-repeat:no-repeat!important;box-shadow:inset 0 0 10px #000,2px 3px 8px #0008!important}
+#shoplist .weapon-image-card{min-height:0!important;overflow:visible!important}
+#shoplist .weapon-image-card>.asset-thumb,#shoplist .weapon-image-card>.generated-item-thumb:not(.weapon-uniform-thumb),#defenseshop .card>.asset-thumb,#defenseshop .card>.generated-item-thumb:not(.store-special-thumb){display:none!important}
+.supermarket-inline .drink{display:flex!important;flex-direction:column!important;align-items:center!important;text-align:center!important}
+@media(max-width:620px){#shoplist .weapon-uniform-thumb,#defenseshop .store-special-thumb,.supermarket-inline .store-special-thumb{width:88px!important;height:88px!important;min-width:88px!important;min-height:88px!important}}
+</style>
+<script id="store-image-cleanup-script-v59">
+(()=>{
+ const pos=(index,columns)=>((index%columns)/(columns-1)*100)+'% '+(Math.floor(index/columns)/(columns-1)*100)+'%';
+ const makeThumb=(className,label,url,size,position)=>{const image=document.createElement('div');image.className='generated-item-thumb '+className;image.setAttribute('role','img');image.setAttribute('aria-label',label);image.style.backgroundImage='url('+url+')';image.style.backgroundSize=size;image.style.backgroundPosition=position;return image};
+ const cleanWeapons=()=>{
+  const list=document.getElementById('shoplist');if(!list)return;
+  [...list.querySelectorAll('.shop-category')].filter(head=>head.textContent.trim()==='Waffen').forEach(head=>{
+   let node=head.nextElementSibling,index=0;
+   while(node&&!node.classList.contains('shop-category')){
+    if(node.classList.contains('card')){
+     node.classList.add('weapon-image-card');
+     const current=node.querySelector(':scope>.weapon-uniform-thumb');
+     node.querySelectorAll(':scope>.asset-thumb,:scope>.generated-item-thumb').forEach(image=>{if(image!==current)image.remove()});
+     if(!current)node.prepend(makeThumb('weapon-uniform-thumb',node.querySelector('b')?.textContent||'Waffe','/shop-sprite-v2.png','400% 400%',pos(index%16,4)));
+     index++;
+    }
+    node=node.nextElementSibling;
+   }
+  });
+ };
+ const cleanSpecials=()=>{
+  document.querySelectorAll('.supermarket-inline .drink').forEach((card,index)=>{
+   if(card.querySelector(':scope>.store-special-thumb'))return;
+   card.prepend(makeThumb('store-special-thumb',card.querySelector('b')?.textContent||'Getränk','/store-specials-sprite-v1.png','500% 300%',pos(index%5,5)));
+  });
+  document.querySelectorAll('#defenseshop .card').forEach((card,index)=>{
+   const current=card.querySelector(':scope>.store-special-thumb');
+   card.querySelectorAll(':scope>.asset-thumb,:scope>.generated-item-thumb').forEach(image=>{if(image!==current)image.remove()});
+   if(current)return;
+   const tile=5+(index%10),x=(tile%5)/4*100,y=Math.floor(tile/5)/2*100;
+   card.prepend(makeThumb('store-special-thumb',card.querySelector('b')?.textContent||'Verteidigung','/store-specials-sprite-v1.png','500% 300%',x+'% '+y+'%'));
+  });
+ };
+ const run=()=>{cleanWeapons();cleanSpecials()};
+ run();
+ new MutationObserver(run).observe(document.getElementById('store')||document.body,{childList:true,subtree:true});
 })();
 </script>
