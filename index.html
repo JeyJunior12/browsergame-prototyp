@@ -1745,3 +1745,62 @@ section.panel .purchase-card.kiez-force-hide,section.panel .kiez-force-hide{disp
  },true);
 })();
 </script>
+<style id="login-modal-style-v59">
+.login-modal{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;padding:20px;background:#090806c9;backdrop-filter:blur(3px)}
+.login-modal.hide{display:none}
+.login-modal-box{width:min(360px,94vw);border:6px solid #5f5b52;border-radius:0;background:#2e2f2f;box-shadow:0 14px 45px #000d;color:#c6c8c5}
+.login-modal-box>h2{margin:0;padding:10px 14px;background:#242525;border-bottom:1px solid #4b4d4a;color:#e0e1dd;font:18px Georgia,serif;display:flex;justify-content:space-between;align-items:center}
+.login-modal-box>h2 button{background:none;border:0;color:#aeb0ac;font-size:15px;cursor:pointer;line-height:1;padding:2px 4px}
+.login-modal-box .inside{padding:16px}
+.login-modal-box input{width:100%;height:34px;margin:0 0 10px;padding:6px 9px;border:1px solid #171818;background:#1f2020;color:#e3e3df;box-shadow:inset 0 0 6px #000;font-size:13px;box-sizing:border-box}
+.login-modal-box .row{display:flex;gap:8px;margin-top:4px}
+.login-modal-box .row button{flex:1}
+</style>
+<div id="loginmodal" class="login-modal hide" aria-hidden="true">
+<div class="login-modal-box" role="dialog" aria-modal="true" aria-labelledby="loginmodaltitle">
+<h2 id="loginmodaltitle">Einloggen<button id="loginmodalclose" type="button" aria-label="Fenster schließen">✕</button></h2>
+<div class="inside">
+<input id="loginmodalemail" type="email" placeholder="E-Mail" autocomplete="username">
+<input id="loginmodalpassword" type="password" placeholder="Passwort" autocomplete="current-password">
+<div id="loginmodalmsg"></div>
+<div class="row"><button id="loginmodalsubmit" class="big" type="button">Einloggen</button><button id="loginmodalcancel" class="ghost" type="button">Abbrechen</button></div>
+</div>
+</div>
+</div>
+<script id="login-modal-script-v59">
+(()=>{
+ if(document.documentElement.dataset.loginModalV59)return;
+ document.documentElement.dataset.loginModalV59='1';
+ const modal=document.querySelector('#loginmodal');
+ if(!modal)return;
+ const emailEl=modal.querySelector('#loginmodalemail'),passEl=modal.querySelector('#loginmodalpassword'),msgEl=modal.querySelector('#loginmodalmsg'),submitBtn=modal.querySelector('#loginmodalsubmit'),cancelBtn=modal.querySelector('#loginmodalcancel'),closeBtn=modal.querySelector('#loginmodalclose');
+ const say=(text,type)=>{msgEl.innerHTML='<div class="notice '+type+'">'+text+'</div>'};
+ const openModal=()=>{msgEl.innerHTML='';emailEl.value='';passEl.value='';modal.classList.remove('hide');modal.setAttribute('aria-hidden','false');setTimeout(()=>emailEl.focus(),30)};
+ const closeModal=()=>{modal.classList.add('hide');modal.setAttribute('aria-hidden','true')};
+ const doLogin=async()=>{
+  if(!emailEl.value||!passEl.value)return say('Bitte E-Mail und Passwort eingeben.','bad');
+  submitBtn.disabled=true;
+  const supa=window.kiezSupabase;
+  try{
+   const {error}=await supa.auth.signInWithPassword({email:emailEl.value.trim(),password:passEl.value});
+   if(error){say(error.message,'bad');submitBtn.disabled=false;return}
+   location.reload();
+  }catch(e){say((e&&e.message)||'Login fehlgeschlagen.','bad');submitBtn.disabled=false}
+ };
+ submitBtn.onclick=doLogin;
+ cancelBtn.onclick=closeModal;
+ closeBtn.onclick=closeModal;
+ modal.addEventListener('click',e=>{if(e.target===modal)closeModal()});
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!modal.classList.contains('hide'))closeModal()});
+ passEl.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
+ const wireLoginButton=()=>{
+  const loginBtn=document.querySelector('#auth #login');
+  if(!loginBtn)return;
+  loginBtn.type='button';
+  loginBtn.onclick=e=>{if(e)e.preventDefault();openModal()};
+ };
+ wireLoginButton();
+ setTimeout(wireLoginButton,0);
+ window.addEventListener('load',wireLoginButton);
+})();
+</script>
