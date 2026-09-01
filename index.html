@@ -1881,20 +1881,22 @@ section.panel .card:has([data-id="street_sign"])>.generated-item-thumb{backgroun
 </style>
 <script id="accessory-image-cleanup-script-v62">
 (()=>{
- const names=['Kettenhandschuhe','Trillerpfeife','Klappspaten','Mofamotor für den Wagen','Unheimliche Glücksflasche','Pfandsack'];
- const positions=['0% 0%','50% 0%','100% 0%','0% 100%','50% 100%','100% 100%'];
+ const originalNames=['Kettenhandschuhe','Trillerpfeife','Klappspaten','Mofamotor für den Wagen','Unheimliche Glücksflasche','Pfandsack'];
+ const originalPositions=['0% 0%','50% 0%','100% 0%','0% 100%','50% 100%','100% 100%'];
+ const extraNames=['Taschenlampe','Survival-Rucksack','Funkgeraet','Funkgerät','Solarpanel-Set','Gepanzerte Handkarre'];
+ const extraTiles={Taschenlampe:0,'Survival-Rucksack':1,Funkgeraet:2,'Funkgerät':2,'Solarpanel-Set':3,'Gepanzerte Handkarre':4};
  const titleOf=card=>(card.querySelector('b,h3,h4,.item-name')?.textContent||'').trim();
  const accessoryCards=()=>[...document.querySelectorAll('#shoplist .card,#inventorygrid .card,#inventorygrid [data-category="zubehoer"]')];
  const run=()=>accessoryCards().forEach(card=>{
-  const title=titleOf(card),index=names.findIndex(name=>title.includes(name));
-  if(index<0)return;
+  const title=titleOf(card),originalIndex=originalNames.findIndex(name=>title.includes(name)),extraName=extraNames.find(name=>title.includes(name));
+  if(originalIndex<0&&!extraName)return;
   card.classList.add('accessory-image-card');
   let image=card.querySelector(':scope>.accessory-uniform-thumb');
   card.querySelectorAll(':scope>.asset-thumb,:scope>.generated-item-thumb').forEach(node=>{if(node!==image)node.remove()});
   if(!image){image=document.createElement('div');image.className='generated-item-thumb accessory-uniform-thumb';card.prepend(image)}
-  image.setAttribute('role','img');image.setAttribute('aria-label',names[index]);
-  image.style.backgroundImage="url('/accessories-sprite-v1.png')";
-  image.style.backgroundSize='300% 200%';image.style.backgroundPosition=positions[index];
+  image.setAttribute('role','img');image.setAttribute('aria-label',originalIndex>=0?originalNames[originalIndex]:extraName);
+  if(originalIndex>=0){image.style.backgroundImage="url('/accessories-sprite-v1.png')";image.style.backgroundSize='300% 200%';image.style.backgroundPosition=originalPositions[originalIndex]}
+  else{const tile=extraTiles[extraName];image.style.backgroundImage="url('/accessories-extra-sprite-v1.png')";image.style.backgroundSize='500% 100%';image.style.backgroundPosition=(tile/4*100)+'% 0%'}
  });
  run();
  new MutationObserver(run).observe(document.getElementById('store')||document.body,{childList:true,subtree:true});
