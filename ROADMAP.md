@@ -36,6 +36,9 @@ GitHub push ──▶ Action: Tests (Postgres) ──▶ Migration live in Supab
 | Events (Admin), Wochenwettbewerb mit Preisen | ✔ | ✔ (0005) | 6 ✅ |
 | Highscore Spieler (Punkte), Häuser mit Preisen | ✔ | ✔ | 6 ✅ |
 | Admin/Moderation, Live-Check, Mobile | – | ✔ live | 7 ✅ |
+| Systemnachrichten (Kampfberichte, Anfragen, Gewinne), gelesen/ungelesen | ✔ | ✔ (0008) | 8 ✅ |
+| Profilbild, Einstellungen (Passwort, Name), Freunde werben | ✔ | ✔ (0008) | 8 ✅ |
+| Gegenstände verkaufen, Essen, Kiez-Lotto, Kiez-Brett, Kiez-News | ✔ | ✔ (0008/0009) | 8 ✅ |
 
 ## Etappen
 1. ✅ Bestandsaufnahme
@@ -45,3 +48,4 @@ GitHub push ──▶ Action: Tests (Postgres) ──▶ Migration live in Supab
 5. ✅ Banden komplett (0004)
 6. ✅ Langzeitmotivation (0005)
 7. ✅ Go-Live: Rechte-Check (0006), Admin (0007), Mobile geprüft, live auf Vercel
+8. ✅ Runde 2: Klick-Tests aller Seiten/Knöpfe, leere Reiter repariert, Verbrechen repariert (0009), restliche Pennergame-Funktionen (0008/0009)

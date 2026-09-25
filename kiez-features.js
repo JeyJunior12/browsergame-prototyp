@@ -32,7 +32,8 @@ function act(btn, box, fn) {
     btn.disabled = false;
   };
 }
-async function myId() { return (await sb.auth.getUser()).data.user?.id || null; }
+// Eigene Kennung aus dem geladenen Profil (kein zusätzlicher Server-Aufruf, der direkt nach dem Login scheitern kann)
+async function myId() { return window.kiezProfile?.id || (await sb.auth.getUser()).data.user?.id || null; }
 async function names(ids) {
   const list = [...new Set(ids.filter(Boolean))];
   if (!list.length) return {};
@@ -93,6 +94,7 @@ function show(id) {
   if (was) loaders[id]?.();
 }
 window.kiezGo = show;
+window.kiezLoaders = loaders;
 
 // ================= Profil =================
 const profBody = addPanel('profil', 'Profil', '🪪 Profil');
@@ -575,16 +577,18 @@ async function updateReferral(p) {
 
 // ================= Supermarkt: Essen (im Getränke-Fenster) =================
 const FOOD = [['broetchen', '🥖 Altes Brötchen', 0.5, '−0,2 ‰ · +5 Energie'], ['currywurst', '🌭 Currywurst', 2, '−0,5 ‰ · +15 Energie'], ['doener', '🥙 Döner mit allem', 4, '−1,0 ‰ · +25 Energie'], ['eintopf', '🍲 Eintopf', 7.5, '−2,0 ‰ · +40 Energie']];
-function addFood() {
-  const body = document.getElementById('kiezmodalbody');
+function addFood() { document.querySelectorAll('#kiezmodalbody, .supermarket-inline-body').forEach(addFoodTo); }
+function addFoodTo(body) {
   const list = body?.querySelector('.drink-list'); if (!list || body.querySelector('.kf-food')) return;
   const w = document.createElement('div'); w.className = 'kf-food';
   w.innerHTML = '<h3 style="margin:12px 0 6px">🍽 Essen</h3><p class="kf-muted">Macht nüchtern und gibt Energie.</p><div class="drink-list">' + FOOD.map(f => '<div class="drink"><b>' + f[1] + '</b><p>' + f[3] + '</p><button class="big kf-eat" data-id="' + f[0] + '">Kaufen – ' + eur(f[2]) + '</button></div>').join('') + '</div><div class="kf-foodmsg"></div>';
-  list.after(w);
+  (body.querySelector('#drinkmsg') || list).after(w);
   w.querySelectorAll('.kf-eat').forEach(b => act(b, w.querySelector('.kf-foodmsg'), async () => { const r = await rpc('buy_food', { food: b.dataset.id }); window.kiezRenderProfile?.(r.profile); return esc(r.label) + ' gegessen: +' + r.energy + ' Energie, Promille jetzt ' + Number(r.profile.alcohol_level).toFixed(2).replace('.', ',') + ' ‰.'; }));
 }
-const modalBody = document.getElementById('kiezmodalbody');
-if (modalBody) new MutationObserver(addFood).observe(modalBody, { childList: true });
+// Supermarkt gibt es als Fenster und im Laden (Reiter „Verbrauchbares“) – beide bekommen das Essen
+const foodWatch = new MutationObserver(addFood);
+function watchFood() { document.querySelectorAll('#kiezmodalbody, .supermarket-inline-body').forEach(b => { if (!b.dataset.kfFood) { b.dataset.kfFood = '1'; foodWatch.observe(b, { childList: true }); addFoodTo(b); } }); }
+watchFood(); setInterval(watchFood, 2000);
 
 // ================= Gerüchteküche: echte Kiez-News =================
 loaders.rumors = async () => {
@@ -595,7 +599,20 @@ loaders.rumors = async () => {
   } catch (e) { }
 };
 // Nach jedem Neuladen einer Seite die letzte Meldung wieder anzeigen
-Object.keys(loaders).forEach(k => { const f = loaders[k]; loaders[k] = async (...x) => { await f(...x); restoreFlash(); }; });
+Object.keys(loaders).forEach(k => {
+  const f = loaders[k];
+  loaders[k] = async (...x) => {
+    const body = document.querySelector('#' + k + ' .kf-body');
+    try {
+      await f(...x);
+      // Noch kein Profil geladen (z. B. direkt nach dem Login): gleich nochmal versuchen statt „Lade …“ stehen zu lassen
+      if (body && window.kiezProfile && body.textContent.trim() === 'Lade …') setTimeout(() => loaders[k](), 1500);
+    } catch (e) {
+      if (body) { body.innerHTML = '<div class="notice bad">Konnte nicht geladen werden: ' + esc(e.message) + '</div><button class="ghost kf-retry">Nochmal versuchen</button>'; body.querySelector('.kf-retry').onclick = () => loaders[k](); }
+    }
+    restoreFlash();
+  };
+});
 { const g = window.kiezLoadGang; window.kiezLoadGang = async (...x) => { await g(...x); restoreFlash(); }; }
 // Zuletzt geöffnete neue Seite wiederherstellen
 try { const last = localStorage.getItem('kiez_last_view'); if (loaders[last]) setTimeout(() => show(last), 1500); } catch (e) { }

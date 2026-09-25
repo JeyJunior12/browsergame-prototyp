@@ -39,6 +39,13 @@ Deutsches Browsergame im Stil von Pennergame (Pfand sammeln, Schnorren, Training
 - Oberfläche dafür in **`kiez-features.js`** (Modul, am Ende von `index.html` geladen): neue Seiten per `addPanel`, Loader pro Seite, Hooks `window.kiezShowView`, `kiezOnProfile`, `kiezOpenProfile(id)`, `kiezGo(view)`. Spielernamen mit Klasse `kiez-player` + `data-id` öffnen das Profil.
 - **Neue Tabellen brauchen `grant select … to authenticated`** (Supabase vergibt hier keine Rechte automatisch) – `test_0006.sh` prüft das für jede Tabelle mit Policy.
 
+## Pflicht-Tests vor jedem Push (Lehre aus Runde 2)
+- Server: `supabase/test/reset.sh` + alle `test_*.sh`. **`test_9999_rundgang.sh` ruft jede Spielfunktion auf** – neue RPCs dort eintragen (fand z. B. den kaputten `commit_crime`).
+- Browser: `test/browser/` (README dort): `crawl.js` (jeder Menüpunkt/Reiter, Erwartung `LEER: 0`), `spielen.js`, `laden.js` (jeder Kaufknopf braucht sichtbare Rückmeldung), `banden.js`. Wie ein Spieler klicken – nicht nur Code aufrufen.
+- **Bereiche nie per Position ein-/ausblenden** (`children[3]`), immer per Selektor – andere Skripte verschieben Elemente (`CONTENT_ZONES`, `profileZones`).
+- Meldungen erst **nach** dem Neuzeichnen setzen; es gibt doppelte IDs (z. B. `#drinkmsg` in Apotheke/Supermarkt/Fenster) → `kiezDrinkMsg()` oder im Container suchen.
+- Nach dem Login lädt die Seite absichtlich neu (`location.reload`) – Tests nutzen `lib.login()`.
+
 ## Stand Go-Live
-Alle Etappen 1–7 erledigt und in `main` (PR #1, #2), live auf https://browsergame-prototyp.vercel.app. Admin: BehaarteUhse (0007).
+Alle Etappen 1–7 erledigt und in `main` (PR #1, #2, #3). Runde 2: Systemnachrichten, Profilbild, Werbelink, Verkaufen, Kiez-Brett, Namensänderung, Lotto, Essen, Kiez-News, Einstellungen (0008/0009), live auf https://browsergame-prototyp.vercel.app. Admin: BehaarteUhse (0007).
 Testkonten: ClaudeTester, ClaudeTester2. Neue Arbeit immer auf neuem Stand von `main` beginnen.
