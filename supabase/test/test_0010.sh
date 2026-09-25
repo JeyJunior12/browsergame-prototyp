@@ -12,6 +12,7 @@ as_user $U "select tester_set_stats(500,2500,50,null,1,1)" >/dev/null
 as_user $T "select start_training('defense')" >/dev/null
 ok  "Vorspulen: Training fertig" "$(as_user $T "select tester_fast_forward(); select (finish_training())->>'finished'" | tail -1)" "defense"
 as_user $T "select attack_player('$U')" >/dev/null
+$P -tAc "update profiles set protection_until=null where id in ('$T','$U')"  # Schutz nach Sieg/Niederlage ist Zufall
 has "Kampfsperre greift normal" "$(as_user $T "select attack_player('$U')")" "3 Stunden"
 as_user $T "select tester_fast_forward()" >/dev/null
 has "Nach Vorspulen erneut angreifen" "$(as_user $T "select (attack_player('$U'))->>'result'")" "win\|loss"
