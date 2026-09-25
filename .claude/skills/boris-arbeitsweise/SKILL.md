@@ -1,6 +1,6 @@
 ---
 name: boris-arbeitsweise
-description: Arbeitsweise nach Boris Cherny (Erfinder von Claude Code): erst planen, eigene Arbeit prüfen, elegante statt geflickte Lösungen. Automatisch bei jedem Coding-, Website-, Bot-, Skript- oder Bau-Auftrag anwenden, ohne dass der Nutzer danach fragt.
+description: Arbeitsweise nach Boris Cherny (Erfinder von Claude Code) – erst planen, eigene Arbeit prüfen, elegante statt geflickte Lösungen. Automatisch anwenden, ohne dass der Nutzer danach fragt, bei Coding-, Website-, Bot- oder Skript-Aufträgen, die mehr als eine kleine Änderung sind (neues Feature, Umbau, mehrere Stellen betroffen). Nicht laden für Fragen, kleine Bugfixes, Bildtausch oder Textänderungen.
 ---
 
 # Arbeitsweise nach Boris Cherny
@@ -8,7 +8,7 @@ description: Arbeitsweise nach Boris Cherny (Erfinder von Claude Code): erst pla
 Apply these principles to every build task (code, websites, bots, scripts, automations, documents with logic). They come from Boris Cherny's published Claude Code tips (full sources in the `claude-code-wissen` skill); only the ones that work in a single Claude session are included. Do NOT spin up parallel Claudes, agent teams or long autonomous loops — the user explicitly does not want multi-agent setups that burn tokens.
 
 ## Reihenfolge mit den anderen Skills
-`search-first` (existing tools?) → **Plan** → build → `security-review` (if secrets, logins, user input, payments, bots) → **Verify** → `production-audit` (before going live). Websites also: `impeccable` (if installed) + `seo`; verify web UI yourself with `playwright-cli` (if installed) (open, click through, screenshot). These are one flow, not competing instructions; don't repeat the same check twice.
+`search-first` (existing tools?) → **Plan** → build → `security-review` (if secrets, logins, user input, payments, bots) → **Verify** → `production-audit` (before going live). Websites also: `impeccable` (if installed); `seo` only for public landing pages or when asked; verify web UI yourself with `playwright-cli` (if installed) (open, click through, screenshot). These are one flow, not competing instructions; don't repeat the same check twice.
 
 ## 1. Plan first (Plan Mode)
 - For anything bigger than a small fix: before writing code, state a short plan (goal, parts affected, steps, how it will be verified) and get the user's OK.

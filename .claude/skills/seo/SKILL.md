@@ -1,6 +1,6 @@
 ---
 name: seo
-description: Audit, plan, and implement SEO improvements across technical SEO, on-page optimization, structured data, Core Web Vitals, and content strategy. Use when the user wants better search visibility, SEO remediation, schema markup, sitemap/robots work, or keyword mapping. Apply automatically when building or reworking a public website.
+description: Audit, plan, and implement SEO improvements across technical SEO, on-page optimization, structured data, Core Web Vitals, and content strategy. Use when the user wants better search visibility, SEO remediation, schema markup, sitemap/robots work, or keyword mapping. Apply automatically only when building or reworking a public landing page or marketing site; skip it for in-game pages, logged-in areas and routine code changes.
 metadata:
   origin: ECC
 ---

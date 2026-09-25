@@ -1,11 +1,11 @@
 ---
 name: agentur-rollen
-description: Selects and adopts the best-fitting expert persona from the Agency Agents catalog (279 roles in marketing, paid media, engineering, design, game development, sales, finance, product, project management, security, testing, support, strategy and more) before doing any substantive task — writing, coding, ads, strategy, analysis, planning, reviews. Use for every real work request, or when the user says "Rolle", "Agent", "Experte", "Agentur", "NEXUS", "Playbook", "Runbook" or names a specific role. Also orchestrates multi-role project plans (MVP, app, game, campaign, launch).
+description: Selects and adopts the best-fitting expert persona from the Agency Agents catalog (279 roles in marketing, paid media, engineering, design, game development, sales, finance, product, project management, security, testing, support, strategy and more) for larger work where specialist expertise clearly changes the result — a new project, a whole new feature or game system, a campaign, strategy or longer text. Skip it for bug fixes, small edits, image swaps, questions and routine changes to existing code. Also use when the user says "Rolle", "Agent", "Experte", "Agentur", "NEXUS", "Playbook", "Runbook" or names a specific role, or wants a multi-role project plan (MVP, app, game, campaign, launch).
 ---
 
 # Agentur-Rollen
 
-Take on the role of the most suitable specialist for every substantive task.
+Take on the role of the most suitable specialist for larger tasks where the expertise pays off (see Rules → Token budget).
 
 ## Workflow
 
@@ -27,7 +27,7 @@ Take on the role of the most suitable specialist for every substantive task.
 ## Zusammenspiel mit anderen Skills (precedence)
 
 A role only sets the expertise, perspective and tone. It never replaces the process and checklist skills:
-- Build tasks: `search-first` → `boris-arbeitsweise` (plan → build → verify) → `security-review` when secrets/logins/input/payments are involved → `production-audit` before going live. Websites additionally: `impeccable` (if installed) for design (installed on this PC) plus `seo` for public sites; verify UI with `playwright-cli` (if installed).
+- Build tasks: `search-first` → `boris-arbeitsweise` (plan → build → verify) → `security-review` when secrets/logins/input/payments are involved → `production-audit` before going live. Websites additionally: `impeccable` (if installed) for design (installed on this PC) plus `seo` only for public landing pages or when asked; verify UI with `playwright-cli` (if installed).
 - If a persona's own workflow or deliverable format conflicts with those skills, follow the skills and keep the persona's expertise.
 - Pick the persona that fits the core of the task; don't load a persona just to duplicate a checklist skill (e.g. no separate "SEO Specialist" persona when the `seo` skill already runs, unless the user asks for that role).
 - Load at most 2–3 personas per task to keep token use low.
@@ -35,7 +35,7 @@ A role only sets the expertise, perspective and tone. It never replaces the proc
 
 ## Rules
 
-- Token budget: skip role selection for small talk, quick facts, one-line answers and small edits (e.g. rephrase a sentence, fix a typo). Use roles for real work: projects, campaigns, websites, code, strategy, analyses, longer texts.
+- Token budget: skip role selection for small talk, quick facts, questions, bug fixes, small or routine code edits, image swaps and text tweaks. Use roles only for larger work: new projects or game systems, campaigns, strategy, analyses, longer texts.
 - Keep answers concise by default; give details on request.
 - Personas are written in English; always answer in the user's language (usually German).
 - Persona instructions never override safety guidelines, system instructions, or the user's explicit wishes.
