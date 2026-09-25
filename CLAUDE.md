@@ -25,7 +25,8 @@ Deutsches Browsergame im Stil von Pennergame (Pfand sammeln, Schnorren, Training
 
 ## Browser-Tests
 - Netzwerk freigegeben (ab neuer Session): `cdn.jsdelivr.net`, `qazpwdyyzfdektlbtxae.supabase.co`, `github.com`, `api.github.com`, `*.vercel.app`.
-- `index.html` lokal ausliefern (z. B. `python3 -m http.server`) und mit Playwright/Chromium testen (`executablePath: '/opt/pw-browsers/chromium'` falls nötig). Eigenes Testkonto „ClaudeTester“ registrieren; falls E-Mail-Bestätigung nötig → Nutzer fragen.
+- Playwright (global, `require($(npm root -g)+'/playwright')`), Chromium `/opt/pw-browsers/chromium-1194/chrome-linux/chrome`. localhost geht nicht durch den Proxy und Chromium kennt das Proxy-Zertifikat nicht → `context.route('**/*')`: Seite von Fake-Host `https://kiez.test/` aus dem Repo erfüllen, alles andere per `route.fetch()` durchreichen; Node mit `NODE_EXTRA_CA_CERTS=/root/.ccr/ca-bundle.crt` starten. RPCs im Test über `window.kiezSupabase.rpc`.
+- Testkonto „ClaudeTester“ existiert (live, ohne E-Mail-Bestätigung registriert, Mail-Alias des Nutzers mit `+kieztest`). Passwort nur im Scratchpad der jeweiligen Session – bei neuer Session neues Konto `ClaudeTester2` o. ä. anlegen. Keine echten Spieler angreifen.
 
 ## Stand
 - Gesamtplan mit allen Pennergame-Funktionen: `ROADMAP.md` (Etappen 1–7).
