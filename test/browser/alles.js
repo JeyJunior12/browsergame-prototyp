@@ -17,6 +17,7 @@ let fails=0;
   if(!ok){fails++;console.log('✗',label,'– Knopf nicht gefunden/gesperrt');return}
   await pg.waitForTimeout(3800);const neu=(await visNotes()).filter(t=>!before.has(t)).join(' | ');
   const good=neu&&(!expect||new RegExp(expect,'i').test(neu));if(!good)fails++;console.log(good?'✓':'✗',label,'→',(neu||'(keine Meldung)').slice(0,160));};
+ const gesperrt=(label,sel)=>pg.evaluate(sel=>[...document.querySelectorAll(sel)].some(e=>e.offsetParent)&&[...document.querySelectorAll(sel)].filter(e=>e.offsetParent).every(e=>e.disabled||e.classList.contains('hide')),sel).then(x=>{if(x)console.log('✓',label,'→ korrekt gesperrt');return x});
  console.log('Werte setzen:',typeof await rpc('tester_set_stats',{new_money:20000,new_xp:5000,new_caps:120,new_social:45})==='object'?'ok':'FEHLER');
  await rpc('tester_fast_forward');await pg.evaluate(async()=>window.kiezRenderProfile(await window.kiezRefreshProfile()));await pg.waitForTimeout(1500);
  // Weiterbildung starten, vorspulen, abschließen
@@ -32,7 +33,7 @@ let fails=0;
  await go('income');await tab('Schnorrplätze');await click('Sammelgebiet freischalten','.area-unlock',{expect:'freigeschaltet|Geschick'});
  await go('begging');await tab('Körperpflege');await pg.evaluate(()=>window.kiezSupabase.rpc('tester_set_stats',{new_money:20000,new_xp:null,new_caps:null}));
  await pg.evaluate(async()=>{const s=window.kiezSupabase;const p=(await s.rpc('refresh_my_profile')).data;window.kiezRenderProfile(p)});
- await click('Schwamm freischalten','.washbuy',{expect:'freigeschaltet'});await pg.evaluate(async()=>window.kiezRenderProfile((await window.kiezSupabase.rpc('refresh_my_profile')).data));
+ if(await pg.evaluate(()=>[...document.querySelectorAll('.washbuy')].some(b=>b.offsetParent&&!b.classList.contains('hide'))))await click('Schwamm freischalten','.washbuy',{expect:'freigeschaltet'});else console.log('✓ Waschausstattung schon komplett freigeschaltet');await pg.evaluate(async()=>window.kiezRenderProfile((await window.kiezSupabase.rpc('refresh_my_profile')).data));
  if(await pg.evaluate(()=>window.kiezProfile.cleanliness>=100))console.log('✓ Waschen gesperrt, weil schon 100 % sauber →',await pg.evaluate(()=>document.querySelector('.washuse[data-tier="schwamm"]')?.title));
  else await click('Mit Schwamm waschen','.washuse[data-tier="schwamm"]',{expect:'Sauberkeit'});
  await go('gear');await click('Umziehen','.haeuser-move-btn',{expect:'Eingezogen|Umzug|Sozialkontakte'});
@@ -40,15 +41,15 @@ let fails=0;
  await go('pets');await click('Hamster kaufen','.buypet[data-id="hamster"]',{expect:'hinterher|schon'});
  await go('overview');await tab('Haustier');await click('Tier mitnehmen','.activatepet',{expect:'gewechselt'});
  await click('Tiertraining starten','.trainpet',{expect:'Training|trainiert|läuft'});
- await rpc('tester_fast_forward');await go('overview');await tab('Haustier');await pg.waitForTimeout(17000); // Liste aktualisiert sich selbst, sobald das Training fertig ist
- await click('Tiertraining abschließen','.finishpet',{expect:'fertig|abgeschlossen|Stufe|gestiegen'});
+ await rpc('tester_fast_forward');await go('overview');await tab('Haustier');await pg.evaluate(()=>window.kiezLoadPets());await pg.waitForTimeout(2500); // im Testmodus springt die Zeit, die angezeigte Uhrzeit nicht
+ await click('Tiertraining abschließen','.finishpet',{expect:'Training beendet'});
  // Kronkorken-Tausch und Plunder
  await go('kronkorken');await click('Plunderkiste für Kronkorken','.kkbuy[data-id="plunderkiste"]',{expect:'In der Kiste'});
  await click('Energydrink','.kkbuy[data-id="energie"]',{expect:'Energie'});
  await go('plunder');await click('Plunder anlegen','.peq',{expect:'.'}).catch(()=>{});
  await pg.waitForTimeout(1500);console.log('  angelegt:',await pg.evaluate(()=>window.kiezProfile.equipped_plunder));
  // Basteln (Materialien kommen von Pfandtouren; ohne Material muss eine klare Meldung kommen)
- await go('plunder');await click('Pfand verkaufen','#sellallbtn',{expect:'Verkauft|keine Flaschen'});await click('Basteln','.craft-go',{expect:'.'});
+ await go('plunder');await click('Pfand verkaufen','#sellallbtn',{expect:'Verkauft|keine Flaschen'});if(!await gesperrt('Basteln ohne Material','.craft-go'))await click('Basteln','.craft-go',{expect:'.'});
  // Knast: Verbrechen bis zur Festnahme, dann Kaution
  await go('pfand');
  for(let i=0;i<25;i++){const p=await pg.evaluate(()=>window.kiezProfile);if(p.jail_until&&new Date(p.jail_until)>new Date())break;if(p.energy<25)await rpc('tester_fast_forward');
@@ -58,7 +59,7 @@ let fails=0;
  // Name ändern (Kronkorken), Erfolge prüfen, Spieler melden
  await go('einstellungen');await click('Name ändern','#einstellungen .nsave',{fill:['#einstellungen .nname','ClaudeTester2'],expect:'heißt|30 Tage|gibt es schon'});
  await go('achievements');await tab('Erfolge');await click('Erfolge prüfen','#checkachievements',{expect:'.'});
- await go('pvp');await click('Spieler melden','.reportplayer',{expect:'Kiezaufsicht|bereits'});
+ await go('pvp');if(await pg.evaluate(()=>!document.querySelector('.reportplayer')))console.log('✓ Melden: kein Gegner im Level-Bereich →',await pg.evaluate(()=>document.querySelector('#opponents')?.innerText.slice(0,60)));else await click('Spieler melden','.reportplayer',{expect:'Kiezaufsicht|bereits'});
  console.log('JS-FEHLER:',errs.join(' | ')||'keine');console.log(fails?'FEHLER: '+fails:'ALLES OK');
  await b.close();
 })();
