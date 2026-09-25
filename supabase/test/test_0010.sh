@@ -16,4 +16,11 @@ $P -tAc "update profiles set protection_until=null where id in ('$T','$U')"  # S
 has "Kampfsperre greift normal" "$(as_user $T "select attack_player('$U')")" "3 Stunden"
 as_user $T "select tester_fast_forward()" >/dev/null
 has "Nach Vorspulen erneut angreifen" "$(as_user $T "select (attack_player('$U'))->>'result'")" "win\|loss"
+# 0011: Vorspulen laesst Kriege laufen, tester_end_wars beendet sie
+G1=$(as_user $T "select (create_gang('Testbande_A'))->>'id'"); G2=$(as_user $U "select (create_gang('Testbande_B'))->>'id'")
+V=$(newuser 'Tester_V'); W=$(newuser 'Tester_W'); $P -tAc "update profiles set is_tester=true, xp=2500 where id in ('$V','$W'); insert into gang_members(gang_id,user_id) values('$G1','$V'),('$G2','$W'); update gangs set balance=500"
+as_user $T "select declare_gang_war('$G2',50)" >/dev/null
+as_user $T "select tester_fast_forward()" >/dev/null
+ok  "Vorspulen beendet Krieg nicht" "$($P -tAc "select resolved from gang_wars where attacker_gang='$G1'")" "f"
+ok  "Krieg beenden" "$(as_user $T "select (tester_end_wars())->>'resolved'")" "1"
 exit ${FAILED:-0}
