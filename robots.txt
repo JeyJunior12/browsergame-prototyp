@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+Disallow: /test/
+Sitemap: https://browsergame-prototyp.vercel.app/sitemap.xml

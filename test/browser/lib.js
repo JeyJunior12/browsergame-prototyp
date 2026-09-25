@@ -9,7 +9,7 @@ exports.open=async(url='https://kiez.test/')=>{
   const u=new URL(r.request().url());
   if(u.hostname==='kiez.test'){let p=u.pathname;if(p==='/')p='/index.html';const f=path.join(ROOT,decodeURIComponent(p));
    if(!fs.existsSync(f))return r.fulfill({status:404,body:''});
-   const t={'.html':'text/html; charset=utf-8','.png':'image/png','.jpg':'image/jpeg','.js':'text/javascript'}[path.extname(f)]||'application/octet-stream';
+   const t={'.html':'text/html; charset=utf-8','.png':'image/png','.jpg':'image/jpeg','.js':'text/javascript','.css':'text/css','.webp':'image/webp','.svg':'image/svg+xml','.webmanifest':'application/manifest+json','.txt':'text/plain','.xml':'application/xml'}[path.extname(f)]||'application/octet-stream';
    return r.fulfill({status:200,contentType:t,body:fs.readFileSync(f)});}
   try{const resp=await r.fetch();return r.fulfill({response:resp});}catch(e){console.log('FETCHFAIL',u.href.slice(0,80),e.message.slice(0,120));return r.abort();}
  });
