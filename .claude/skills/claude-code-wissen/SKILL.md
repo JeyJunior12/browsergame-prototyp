@@ -1,6 +1,6 @@
 ---
 name: claude-code-wissen
-description: Knowledge base from the claude-code-best-practice repo (tips by Boris Cherny, Thariq, Cat Wu and the community; CLAUDE.md/memory, skills, commands, subagents, hooks, MCP, settings, startup flags, usage and rate limits, workflows). Consult it proactively, without being asked, whenever it would improve the work: starting or setting up a code project (offer a CLAUDE.md), the user hits limits or wastes tokens, a workflow repeats and could become a skill/command/hook, Claude Code settings or permissions come up, or the user asks how to use Claude or Claude Code better or mentions Boris Cherny.
+description: Knowledge base from the claude-code-best-practice repo (tips by Boris Cherny, Thariq, Cat Wu and the community; CLAUDE.md/memory, skills, commands, subagents, hooks, MCP, settings, startup flags, usage and rate limits, workflows). Use it when setting up a new code project (offer a CLAUDE.md), the user hits limits or asks about saving tokens, a workflow clearly repeats and could become a skill/command/hook, Claude Code settings or permissions come up, or the user asks how to use Claude or Claude Code better or mentions Boris Cherny. Not for normal coding tasks.
 ---
 
 # Claude-Code-Wissen

@@ -1,0 +1,21 @@
+achievement_defs.achievement defs public: cmd=SELECT using=true check=
+daily_missions.own missions visible: cmd=SELECT using=(user_id = auth.uid()) check=
+defense_items.defense_items_read: cmd=SELECT using=true check=
+fights.participants see fights: cmd=SELECT using=((attacker_id = auth.uid()) OR (defender_id = auth.uid())) check=
+gang_members.members visible: cmd=SELECT using=true check=
+gangs.gangs visible: cmd=SELECT using=true check=
+inventory.own inventory visible: cmd=SELECT using=(user_id = auth.uid()) check=
+messages.participants see messages: cmd=SELECT using=((sender_id = auth.uid()) OR (recipient_id = auth.uid())) check=
+pet_catalog.pets visible: cmd=SELECT using=true check=
+player_reports.reporter or admin sees reports: cmd=SELECT using=((reporter_id = auth.uid()) OR (EXISTS ( SELECT 1
+   FROM profiles p
+  WHERE ((p.id = auth.uid()) AND p.is_admin)))) check=
+profile_audit.admins see audit: cmd=SELECT using=(EXISTS ( SELECT 1
+   FROM profiles p
+  WHERE ((p.id = auth.uid()) AND p.is_admin))) check=
+profiles.profiles visible to authenticated: cmd=SELECT using=true check=
+shop_items.shop visible: cmd=SELECT using=true check=
+side_action_log.own side action log: cmd=SELECT using=(auth.uid() = user_id) check=
+user_achievements.own achievements: cmd=SELECT using=(auth.uid() = user_id) check=
+user_active_defenses.user_active_defenses_read: cmd=SELECT using=(auth.uid() = user_id) check=
+user_pets.own pets visible: cmd=SELECT using=(user_id = auth.uid()) check=

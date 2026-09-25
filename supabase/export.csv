@@ -1,0 +1,1195 @@
+kind,name,definition
+data,achievement_defs,"[{""id"":""first_bottles"",""name"":""Erster Sack"",""description"":""Sammle mindestens 20 Pfandflaschen."",""reward"":5.00,""sort_order"":1}, 
+ {""id"":""level_five"",""name"":""Kiezbekannt"",""description"":""Erreiche Level 5."",""reward"":15.00,""sort_order"":2}, 
+ {""id"":""first_win"",""name"":""Erste Schelle"",""description"":""Gewinne deine erste Prügelei."",""reward"":10.00,""sort_order"":3}, 
+ {""id"":""rich"",""name"":""Kleingeldkönig"",""description"":""Besitze mindestens 100 Euro."",""reward"":25.00,""sort_order"":4}, 
+ {""id"":""collector"",""name"":""Pfandbaron"",""description"":""Sammle insgesamt 100 Flaschen auf einmal."",""reward"":20.00,""sort_order"":5}, 
+ {""id"":""veteran"",""name"":""Kiezlegende"",""description"":""Erreiche Level 10."",""reward"":50.00,""sort_order"":6}]"
+data,defense_items,"[{""id"":""sand"",""name"":""Handvoll Sand werfen"",""kind"":""defense"",""amount"":1,""duration_type"":""until_attack"",""duration_minutes"":null,""price"":1000.00,""sort_order"":1}, 
+ {""id"":""bananas"",""name"":""Bananenschalen verteilen"",""kind"":""defense"",""amount"":1,""duration_type"":""fixed"",""duration_minutes"":360,""price"":1400.00,""sort_order"":2}, 
+ {""id"":""salt"",""name"":""Handvoll Salz"",""kind"":""defense"",""amount"":2,""duration_type"":""until_attack"",""duration_minutes"":null,""price"":1700.00,""sort_order"":3}, 
+ {""id"":""signpost"",""name"":""Wegweiser aufstellen"",""kind"":""skill"",""amount"":12,""duration_type"":""until_attack"",""duration_minutes"":null,""price"":10.00,""sort_order"":4}, 
+ {""id"":""itchpowder"",""name"":""Juckpulver verschleudern"",""kind"":""defense"",""amount"":3,""duration_type"":""until_attack"",""duration_minutes"":null,""price"":1800.00,""sort_order"":5}, 
+ {""id"":""playdead"",""name"":""Totstellen"",""kind"":""skill"",""amount"":20,""duration_type"":""until_attack"",""duration_minutes"":null,""price"":30.00,""sort_order"":6}, 
+ {""id"":""disguise"",""name"":""Tarnen"",""kind"":""skill"",""amount"":15,""duration_type"":""fixed"",""duration_minutes"":180,""price"":50.00,""sort_order"":7}, 
+ {""id"":""cats"",""name"":""Mit bösen Katzen werfen"",""kind"":""defense"",""amount"":2,""duration_type"":""fixed"",""duration_minutes"":10,""price"":2000.00,""sort_order"":8}, 
+ {""id"":""mirror"",""name"":""Mit Spiegel blenden"",""kind"":""defense"",""amount"":4,""duration_type"":""fixed"",""duration_minutes"":90,""price"":2000.79,""sort_order"":9}, 
+ {""id"":""poisonbeer"",""name"":""Vergiftetes Bier hinstellen"",""kind"":""defense"",""amount"":4,""duration_type"":""fixed"",""duration_minutes"":5,""price"":2400.00,""sort_order"":10}, 
+ {""id"":""electricfence"",""name"":""Elektrozaun aufstellen"",""kind"":""defense"",""amount"":5,""duration_type"":""fixed"",""duration_minutes"":30,""price"":2100.00,""sort_order"":11}, 
+ {""id"":""fishnet"",""name"":""Fischernetz spannen"",""kind"":""defense"",""amount"":7,""duration_type"":""until_attack"",""duration_minutes"":null,""price"":1900.00,""sort_order"":12}, 
+ {""id"":""barbwire"",""name"":""Stacheldraht aufstellen"",""kind"":""defense"",""amount"":8,""duration_type"":""until_attack"",""duration_minutes"":null,""price"":1940.00,""sort_order"":13}, 
+ {""id"":""turret"",""name"":""Selbstschussanlagen"",""kind"":""defense"",""amount"":8,""duration_type"":""fixed"",""duration_minutes"":90,""price"":2190.00,""sort_order"":14}, 
+ {""id"":""moat"",""name"":""Wassergraben"",""kind"":""defense"",""amount"":9,""duration_type"":""until_attack"",""duration_minutes"":null,""price"":1981.00,""sort_order"":15}, 
+ {""id"":""pitfall"",""name"":""Fallgruben buddeln"",""kind"":""defense"",""amount"":11,""duration_type"":""until_attack"",""duration_minutes"":null,""price"":2032.80,""sort_order"":16}, 
+ {""id"":""snaretrap"",""name"":""Schlingfalle mit Bierköder"",""kind"":""defense"",""amount"":12,""duration_type"":""until_attack"",""duration_minutes"":null,""price"":2059.20,""sort_order"":17}]"
+data,pet_catalog,"[{""id"":""cockroach"",""name"":""Kakerlake"",""description"":""Ueberlebt alles, sogar die naechste Miete."",""price"":0.01,""attack"":0,""defense"":0,""required_level"":1,""health"":0}, 
+ {""id"":""goldfish"",""name"":""Goldfisch"",""description"":""Dreht stumm seine Runden im Marmeladenglas."",""price"":1.00,""attack"":1,""defense"":1,""required_level"":3,""health"":1}, 
+ {""id"":""mouse"",""name"":""Maus"",""description"":""Flink, klein, und ueberall zuhause."",""price"":1.50,""attack"":2,""defense"":3,""required_level"":5,""health"":7}, 
+ {""id"":""hamster"",""name"":""Hamster"",""description"":""Sammelt Kronkorken in den Backentaschen."",""price"":3.80,""attack"":5,""defense"":4,""required_level"":7,""health"":12}, 
+ {""id"":""budgie"",""name"":""Wellensittich"",""description"":""Zwitschert lauter als der Nachbar schimpft."",""price"":5.00,""attack"":7,""defense"":5,""required_level"":9,""health"":16}, 
+ {""id"":""pigeon"",""name"":""Taube"",""description"":""Frisst deine Kruemel und manchmal deine Nerven."",""price"":7.50,""attack"":8,""defense"":3,""required_level"":11,""health"":1}, 
+ {""id"":""rat"",""name"":""Ratte"",""description"":""Kennt jede Kanalisation im Kiez."",""price"":15.00,""attack"":10,""defense"":5,""required_level"":13,""health"":0}, 
+ {""id"":""rabbit"",""name"":""Hase"",""description"":""Schneller weg als du gucken kannst."",""price"":22.50,""attack"":13,""defense"":10,""required_level"":15,""health"":17}, 
+ {""id"":""ferret"",""name"":""Frettchen"",""description"":""Schlau, frech und ueberall reingezwaengt."",""price"":75.00,""attack"":18,""defense"":15,""required_level"":17,""health"":19}, 
+ {""id"":""cat"",""name"":""Katze"",""description"":""Herrscht ueber jeden Hinterhof."",""price"":85.00,""attack"":25,""defense"":20,""required_level"":19,""health"":32}, 
+ {""id"":""falcon"",""name"":""Falke"",""description"":""Behaelt den ganzen Kiez im Blick."",""price"":88.00,""attack"":27,""defense"":25,""required_level"":21,""health"":22}, 
+ {""id"":""snake"",""name"":""Schlange"",""description"":""Lautlos, schnell, respekteinfloessend."",""price"":95.00,""attack"":44,""defense"":38,""required_level"":23,""health"":10}, 
+ {""id"":""goat"",""name"":""Hausziege"",""description"":""Frisst Beweise und gegnerische Kleidung."",""price"":100.00,""attack"":36,""defense"":40,""required_level"":25,""health"":21}, 
+ {""id"":""poodle"",""name"":""Pudel"",""description"":""Loyal, laut und ueberraschend schnell."",""price"":200.00,""attack"":26,""defense"":29,""required_level"":27,""health"":62}, 
+ {""id"":""trained_mouse"",""name"":""Dressierte Maus"",""description"":""Ausgebildet fuer den harten Strassenalltag."",""price"":220.00,""attack"":43,""defense"":37,""required_level"":29,""health"":253}, 
+ {""id"":""eagle"",""name"":""Adler"",""description"":""Schlaegt zu, bevor man ihn kommen sieht."",""price"":300.00,""attack"":39,""defense"":41,""required_level"":31,""health"":38}, 
+ {""id"":""shepherd_dog"",""name"":""Schaeferhund"",""description"":""Treuer Begleiter mit ordentlich Biss."",""price"":600.00,""attack"":55,""defense"":45,""required_level"":33,""health"":43}, 
+ {""id"":""pitbull"",""name"":""Pitbull"",""description"":""Kompakt gebaut und furchtlos im Kampf."",""price"":1000.00,""attack"":65,""defense"":59,""required_level"":35,""health"":1}, 
+ {""id"":""cocker_spaniel"",""name"":""Cocker Spaniel"",""description"":""Freundlich bis er es nicht mehr ist."",""price"":1470.00,""attack"":59,""defense"":40,""required_level"":37,""health"":56}, 
+ {""id"":""chihuahua"",""name"":""Chihuahua"",""description"":""Klein, laut und ueberraschend zaeh."",""price"":2000.00,""attack"":32,""defense"":28,""required_level"":39,""health"":133}, 
+ {""id"":""horse"",""name"":""Pferd"",""description"":""Bringt dich schneller durch den Kiez."",""price"":2500.00,""attack"":62,""defense"":69,""required_level"":40,""health"":80}, 
+ {""id"":""giraffe"",""name"":""Giraffe"",""description"":""Sieht den Aerger schon von weitem kommen."",""price"":3000.00,""attack"":71,""defense"":82,""required_level"":41,""health"":98}, 
+ {""id"":""crocodile"",""name"":""Krokodil"",""description"":""Wartet geduldig, schlaegt gnadenlos zu."",""price"":4800.00,""attack"":95,""defense"":75,""required_level"":42,""health"":30}, 
+ {""id"":""tiger"",""name"":""Tiger"",""description"":""Der Schrecken jeder dunklen Gasse."",""price"":5000.00,""attack"":136,""defense"":46,""required_level"":43,""health"":69}, 
+ {""id"":""monkey"",""name"":""Aeffchen"",""description"":""Flink, frech und ausdauernd im Kampf."",""price"":5800.00,""attack"":52,""defense"":43,""required_level"":44,""health"":230}, 
+ {""id"":""rhino"",""name"":""Nashorn"",""description"":""Nichts haelt diesen Koloss auf."",""price"":7000.00,""attack"":100,""defense"":95,""required_level"":45,""health"":39}]"
+data,shop_items,"[{""id"":""jacket"",""name"":""Mottenzerfressene Jacke"",""description"":""Hält weder warm noch dicht, aber Treffer ab."",""price"":8.00,""attack"":0,""defense"":2,""required_level"":1,""category"":""ausruestung""}, 
+ {""id"":""umbrella"",""name"":""Halber Regenschirm"",""description"":""Eine Hälfte Schutz ist besser als gar keiner."",""price"":15.00,""attack"":1,""defense"":4,""required_level"":2,""category"":""ausruestung""}, 
+ {""id"":""cart"",""name"":""Getunter Einkaufswagen"",""description"":""Quietscht einschüchternd und gibt Stabilität."",""price"":40.00,""attack"":5,""defense"":5,""required_level"":3,""category"":""ausruestung""}, 
+ {""id"":""traffic_vest"",""name"":""Ausgeblichene Warnweste"",""description"":""Man sieht dich kommen und trifft etwas schlechter."",""price"":28.00,""attack"":0,""defense"":6,""required_level"":3,""category"":""kleidung""}, 
+ {""id"":""cardboard_armor"",""name"":""Mehrlagige Kartonrüstung"",""description"":""Bei Regen nutzlos, davor erstaunlich stabil."",""price"":85.00,""attack"":1,""defense"":11,""required_level"":7,""category"":""kleidung""}, 
+ {""id"":""construction_helmet"",""name"":""Zerkratzter Bauhelm"",""description"":""Schutzklasse: irgendwo gefunden."",""price"":240.00,""attack"":2,""defense"":18,""required_level"":14,""category"":""kleidung""}, 
+ {""id"":""winter_coat"",""name"":""Veteranen-Wintermantel"",""description"":""Viele Taschen, noch mehr Geschichten."",""price"":650.00,""attack"":5,""defense"":28,""required_level"":22,""category"":""kleidung""}, 
+ {""id"":""cart_engine"",""name"":""Mofamotor für den Wagen"",""description"":""Späterer Geschwindigkeitsbonus für Pfandtouren."",""price"":900.00,""attack"":6,""defense"":12,""required_level"":28,""category"":""zubehoer""}, 
+ {""id"":""lucky_bottle"",""name"":""Unheimliche Glücksflasche"",""description"":""Niemand weiß, warum sie immer wieder auftaucht."",""price"":1400.00,""attack"":20,""defense"":20,""required_level"":35,""category"":""plunder""}, 
+ {""id"":""toothpick"",""name"":""Krummes Zahnstocher-Bündel"",""description"":""Sieht gefährlicher aus als es ist."",""price"":2.00,""attack"":1,""defense"":0,""required_level"":1,""category"":""waffen""}, 
+ {""id"":""bottle"",""name"":""Abgebrochene Limo-Flasche"",""description"":""Klassiker mit klebrigem Griff."",""price"":5.00,""attack"":3,""defense"":0,""required_level"":1,""category"":""waffen""}, 
+ {""id"":""taped_gloves"",""name"":""Wasserbomben"",""description"":""Kleine Ladung Wasser, große Wirkung - zumindest optisch."",""price"":32.00,""attack"":6,""defense"":0,""required_level"":4,""category"":""waffen""}, 
+ {""id"":""chain_lock"",""name"":""Kettenschloss"",""description"":""Eigentlich zum Abschließen gedacht. Eigentlich."",""price"":455.00,""attack"":25,""defense"":2,""required_level"":19,""category"":""waffen""}, 
+ {""id"":""shopping_cart_ram"",""name"":""Schlagring"",""description"":""Kalter Stahl an warmen Fingern. Trifft überraschend hart."",""price"":561.00,""attack"":28,""defense"":2,""required_level"":21,""category"":""waffen""}, 
+ {""id"":""street_sign"",""name"":""Schwert"",""description"":""Die Königsklasse unter den Kiez-Waffen. Herkunft ungeklärt."",""price"":1467.00,""attack"":47,""defense"":3,""required_level"":35,""category"":""waffen""}, 
+ {""id"":""silvesterknaller"",""name"":""Silvesterknaller"",""description"":""Lauter als jede Ausrede. Erschreckt Gegner und Tauben gleichermaßen."",""price"":68.00,""attack"":9,""defense"":0,""required_level"":7,""category"":""waffen""}, 
+ {""id"":""spraydose"",""name"":""Spraydose"",""description"":""Vielseitig einsetzbar - im Auge des Gegners besonders wirkungsvoll."",""price"":117.00,""attack"":12,""defense"":0,""required_level"":9,""category"":""waffen""}, 
+ {""id"":""gummiknueppel"",""name"":""Gummiknüppel"",""description"":""Nicht ganz legal, aber wer fragt schon einen Penner nach der Herkunft."",""price"":247.00,""attack"":18,""defense"":1,""required_level"":14,""category"":""waffen""}, 
+ {""id"":""heizungsrohr"",""name"":""Heizungsrohr"",""description"":""Aus einem verlassenen Keller. Schwer, aber überzeugend."",""price"":678.00,""attack"":31,""defense"":3,""required_level"":23,""category"":""waffen""}, 
+ {""id"":""hammer"",""name"":""Hammer"",""description"":""Baumarktqualität. Hält, was er verspricht - meistens dem Gegner."",""price"":804.00,""attack"":34,""defense"":3,""required_level"":26,""category"":""waffen""}, 
+ {""id"":""pfefferspray"",""name"":""Pfefferspray"",""description"":""Reizt nicht nur die Augen. Wirkung garantiert, Geruch unangenehm."",""price"":940.00,""attack"":37,""defense"":1,""required_level"":28,""category"":""waffen""}, 
+ {""id"":""elektroschocker"",""name"":""Elektroschocker"",""description"":""Kurzer Schock, lange Wirkung. Batterien nicht im Lieferumfang."",""price"":1140.00,""attack"":41,""defense"":4,""required_level"":31,""category"":""waffen""}, 
+ {""id"":""feuerloescher"",""name"":""Feuerlöscher"",""description"":""Löscht Brände und Gegner gleichermaßen effektiv."",""price"":1295.00,""attack"":44,""defense"":5,""required_level"":33,""category"":""waffen""}, 
+ {""id"":""gullideckel"",""name"":""Gullideckel"",""description"":""Schwer wie ein Grabstein und mindestens genauso überzeugend im Nahkampf."",""price"":329.00,""attack"":21,""defense"":2,""required_level"":16,""category"":""waffen""}, 
+ {""id"":""nagelkeule"",""name"":""Nagelkeule"",""description"":""Selbstgebaut aus Nägeln und Holz. Sieht brutal aus, ist es auch."",""price"":50.00,""attack"":15,""defense"":0,""required_level"":1,""category"":""craft""}, 
+ {""id"":""holzschild"",""name"":""Holzschild"",""description"":""Ein einfaches Schild aus Brettern und Nägeln."",""price"":25.00,""attack"":0,""defense"":8,""required_level"":1,""category"":""craft""}, 
+ {""id"":""stachelschild"",""name"":""Stachelschild"",""description"":""Holzschild mit ein paar zusätzlichen spitzen Nägeln."",""price"":60.00,""attack"":0,""defense"":14,""required_level"":1,""category"":""craft""}, 
+ {""id"":""glasstachelschild"",""name"":""Glasstachelschild"",""description"":""Scherben im Rand machen es besonders unangenehm zu treffen."",""price"":110.00,""attack"":0,""defense"":22,""required_level"":1,""category"":""craft""}, 
+ {""id"":""doppeltes_holzschild"",""name"":""Doppeltes Holzschild"",""description"":""Zwei Schichten Holz halten mehr aus als eine."",""price"":60.00,""attack"":0,""defense"":16,""required_level"":1,""category"":""craft""}, 
+ {""id"":""ramponierter_anzug"",""name"":""Ramponierter Anzug"",""description"":""Löchrig, aber wenigstens noch ein Anzug."",""price"":85.00,""attack"":1,""defense"":10,""required_level"":1,""category"":""craft""}, 
+ {""id"":""feiner_anzug"",""name"":""Feiner Anzug"",""description"":""Fast schon respektabel, wenn man nicht so genau hinsieht."",""price"":80.00,""attack"":2,""defense"":9,""required_level"":1,""category"":""craft""}, 
+ {""id"":""kaputter_regenschirm"",""name"":""Kaputter Regenschirm"",""description"":""Hält noch die Hälfte des Regens ab."",""price"":95.00,""attack"":0,""defense"":12,""required_level"":1,""category"":""craft""}, 
+ {""id"":""regenschirm"",""name"":""Regenschirm"",""description"":""Voll funktionsfähig. Fast schon Luxus."",""price"":250.00,""attack"":0,""defense"":30,""required_level"":1,""category"":""craft""}, 
+ {""id"":""chain_gloves"",""name"":""Kettenhandschuhe"",""description"":""Griffig und stichfest - perfekt zum Wühlen im Altglas."",""price"":15.00,""attack"":2,""defense"":3,""required_level"":2,""category"":""zubehoer""}, 
+ {""id"":""whistle"",""name"":""Trillerpfeife"",""description"":""Schreckt Ratten und ungebetene Konkurrenz gleichermassen ab."",""price"":45.00,""attack"":3,""defense"":4,""required_level"":5,""category"":""zubehoer""}, 
+ {""id"":""folding_spade"",""name"":""Klappspaten"",""description"":""Kompakt verstaubar, im Notfall auch ueberzeugend als Waffe."",""price"":95.00,""attack"":7,""defense"":3,""required_level"":8,""category"":""zubehoer""}, 
+ {""id"":""flashlight"",""name"":""Taschenlampe"",""description"":""Findet auch im dunkelsten Hinterhof noch das letzte Pfand."",""price"":160.00,""attack"":2,""defense"":9,""required_level"":11,""category"":""zubehoer""}, 
+ {""id"":""survival_backpack"",""name"":""Survival-Rucksack"",""description"":""Mehr Fächer, mehr Polsterung, mehr Ueberlebenschance."",""price"":280.00,""attack"":5,""defense"":12,""required_level"":15,""category"":""zubehoer""}, 
+ {""id"":""walkie_talkie"",""name"":""Funkgeraet"",""description"":""Warnt rechtzeitig vor Ordnungsamt und Konkurrenz."",""price"":420.00,""attack"":8,""defense"":10,""required_level"":19,""category"":""zubehoer""}, 
+ {""id"":""solar_panel_set"",""name"":""Solarpanel-Set"",""description"":""Laedt das Handy, waermt nachts wenigstens ein bisschen."",""price"":650.00,""attack"":6,""defense"":18,""required_level"":24,""category"":""zubehoer""}, 
+ {""id"":""armored_handcart"",""name"":""Gepanzerte Handkarre"",""description"":""Der Rolls-Royce unter den Einkaufswagen."",""price"":1100.00,""attack"":15,""defense"":20,""required_level"":32,""category"":""zubehoer""}]"
+function,activate_pet,"CREATE OR REPLACE FUNCTION public.activate_pet(wanted_pet text)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+begin if not exists(select 1 from public.user_pets where user_id=auth.uid() and pet_id=wanted_pet) then raise exception 'Begleiter gehört dir nicht';end if;
+ update public.user_pets set active=false where user_id=auth.uid();update public.user_pets set active=true where user_id=auth.uid() and pet_id=wanted_pet;
+ return jsonb_build_object('active',wanted_pet);end;$function$
+"
+function,admin_resolve_report,"CREATE OR REPLACE FUNCTION public.admin_resolve_report(report_id bigint, new_status text)
+ RETURNS void
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+begin
+ if not exists(select 1 from public.profiles where id=auth.uid() and is_admin) then raise exception 'Kein Adminzugriff';end if;
+ if new_status not in ('resolved','dismissed') then raise exception 'Ungültiger Status';end if;
+ update public.player_reports set status=new_status where id=report_id;
+end $function$
+"
+function,admin_set_ban,"CREATE OR REPLACE FUNCTION public.admin_set_ban(target_id uuid, ban_value boolean, reason text DEFAULT NULL::text)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+begin
+ if not exists(select 1 from public.profiles where id=auth.uid() and is_admin) then raise exception 'Kein Adminzugriff';end if;
+ update public.profiles set is_banned=ban_value,ban_reason=case when ban_value then reason else null end where id=target_id;
+ return jsonb_build_object('target',target_id,'banned',ban_value);
+end;$function$
+"
+function,admin_set_stats,"CREATE OR REPLACE FUNCTION public.admin_set_stats(target_id uuid, new_money numeric DEFAULT NULL::numeric, new_energy integer DEFAULT NULL::integer, new_alcohol numeric DEFAULT NULL::numeric, new_bottles integer DEFAULT NULL::integer)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$ declare caller uuid := auth.uid(); caller_is_admin boolean; p profiles; begin select is_admin into caller_is_admin from profiles where id = caller; if not coalesce(caller_is_admin, false) then raise exception 'not authorized'; end if; update profiles set money = coalesce(new_money, money), energy = coalesce(new_energy, energy), alcohol_level = coalesce(new_alcohol, alcohol_level), bottles = coalesce(new_bottles, bottles) where id = target_id returning * into p; return jsonb_build_object('money', p.money, 'energy', p.energy, 'alcohol_level', p.alcohol_level, 'bottles', p.bottles); end; $function$
+"
+function,attack_player,"CREATE OR REPLACE FUNCTION public.attack_player(target_id uuid)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$ declare a public.profiles;d public.profiles;a_item_att int:=0;d_item_def int:=0;a_pet_att int:=0;d_pet_def int:=0;a_gang_att int:=0;d_gang_def int:=0;d_defense_bonus int:=0;a_power int;d_power int;winner uuid;loot numeric(12,2):=0;result text; begin if target_id=auth.uid() then raise exception 'Du kannst dich nicht selbst vermöbeln';end if; select * into a from public.profiles where id=auth.uid() for update; select * into d from public.profiles where id=target_id for update; if a.id is null or a.is_banned then raise exception 'Zugriff gesperrt';end if; if d.id is null or d.is_banned then raise exception 'Gegner verschwunden';end if; if a.collection_ends_at is not null then raise exception 'Dein Einkaufswagen ist unterwegs oder wartet aufs Ausladen';end if; if a.energy<15 then raise exception 'Nicht genug Energie für eine Prügelei';end if; if d.protection_until is not null and d.protection_until>now() then raise exception 'Dieser Spieler steht noch unter Schutz';end if; if exists(select 1 from public.fights where attacker_id=auth.uid() and defender_id=target_id and created_at>now()-interval '10 minutes') then raise exception 'Diesen Spieler hast du kürzlich schon besucht';end if; select coalesce(sum(s.attack),0) into a_item_att from public.inventory i join public.shop_items s on s.id=i.item_id where i.user_id=auth.uid() and i.equipped; select coalesce(sum(s.defense),0) into d_item_def from public.inventory i join public.shop_items s on s.id=i.item_id where i.user_id=target_id and i.equipped; select coalesce(sum(pc.attack*up.attack_level),0) into a_pet_att from public.user_pets up join public.pet_catalog pc on pc.id=up.pet_id where up.user_id=auth.uid() and up.active; select coalesce(sum(pc.defense*up.defense_level),0) into d_pet_def from public.user_pets up join public.pet_catalog pc on pc.id=up.pet_id where up.user_id=target_id and up.active; select coalesce(g.attack_level*2,0) into a_gang_att from public.gang_members gm join public.gangs g on g.id=gm.gang_id where gm.user_id=auth.uid(); select coalesce(g.defense_level*2,0) into d_gang_def from public.gang_members gm join public.gangs g on g.id=gm.gang_id where gm.user_id=target_id; select coalesce(sum(amount),0) into d_defense_bonus from public.user_active_defenses where user_id=target_id and (expires_at is null or expires_at>now()); a_power:=a.attack_skill*3+a.streetwise+a_item_att+a_pet_att+a_gang_att+floor(random()*8)::int; d_power:=d.defense_skill*3+d.shelter_level*2+d_item_def+d_pet_def+d_gang_def+d_defense_bonus+floor(random()*8)::int; if a_power>d_power then winner:=a.id;loot:=least(round(d.money*0.10,2),greatest(0,a.cash_capacity-a.money));result:='win'; update public.profiles set money=money+loot,energy=energy-15,xp=xp+15,wins=wins+1 where id=a.id returning * into a; update public.profiles set money=greatest(0,money-loot),losses=losses+1,protection_until=now()+interval '5 minutes' where id=d.id; else winner:=d.id;result:='loss'; update public.profiles set energy=energy-15,losses=losses+1,protection_until=now()+interval '2 minutes' where id=a.id returning * into a; update public.profiles set wins=wins+1 where id=d.id; end if; delete from public.user_active_defenses where user_id=target_id and consume_on_attack=true and (expires_at is null or expires_at>now()); insert into public.fights(attacker_id,defender_id,winner_id,attacker_power,defender_power,loot) values(a.id,d.id,winner,a_power,d_power,loot); return jsonb_build_object('result',result,'attacker_power',a_power,'defender_power',d_power,'loot',loot,'opponent',d.username,'profile',to_jsonb(a),'pet_bonus',a_pet_att,'gang_bonus',a_gang_att,'defender_defense_bonus',d_defense_bonus); end $function$
+"
+function,audit_profile_change,"CREATE OR REPLACE FUNCTION public.audit_profile_change()
+ RETURNS trigger
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+begin
+ if (old.money is distinct from new.money) or (old.energy is distinct from new.energy) or (old.bottles is distinct from new.bottles) then
+  insert into public.profile_audit(user_id,old_money,new_money,old_energy,new_energy,old_bottles,new_bottles) values(new.id,old.money,new.money,old.energy,new.energy,old.bottles,new.bottles);
+ end if;
+ return new;
+end;$function$
+"
+function,beg_at_spot,"CREATE OR REPLACE FUNCTION public.beg_at_spot(spot_id text)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+    declare
+     p public.profiles;
+      rate numeric;
+       cnt int;
+        pet_sympathy int:=0;
+         total numeric;
+         begin
+          select * into p from public.profiles where id=auth.uid() for update;
+           if p.id is null or p.is_banned then raise exception 'Zugriff gesperrt';end if;
+            if p.energy<5 then raise exception 'Nicht genug Energie zum Schnorren';end if;
+             case spot_id
+               when 'englischer_garten' then rate:=0.10;
+                 when 'jahrmarkt' then rate:=0.50;
+                   else raise exception 'Diesen Schnorrplatz gibt es nicht';
+                    end case;
+                     select coalesce(pc.health*up.level,0) into pet_sympathy from public.user_pets up join public.pet_catalog pc on pc.id=up.pet_id where up.user_id=auth.uid() and up.active limit 1;
+                      cnt:=1+floor(random()*10)::int;
+                       total:=round(cnt*rate*least(3.0,1+pet_sympathy/200.0),2);
+                        total:=least(total,greatest(0,p.cash_capacity-p.money));
+                         update public.profiles set money=money+total,energy=energy-5 where id=auth.uid() returning * into p;
+                          return jsonb_build_object('spot',spot_id,'count',cnt,'rate',rate,'sympathy',pet_sympathy,'total',total,'profile',to_jsonb(p));
+                          end;
+                          $function$
+"
+function,beg_for_money,"CREATE OR REPLACE FUNCTION public.beg_for_money()
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare p public.profiles;gain int;cost int:=5;gross numeric(12,2);paid numeric(12,2);lost numeric(12,2);
+begin
+ select * into p from public.profiles where id=auth.uid() for update;
+ gain:=floor(extract(epoch from(now()-p.energy_updated_at))/60)::int;if gain>0 then p.energy:=least(100,p.energy+gain);end if;
+ if p.energy<cost then raise exception 'Nicht genug Energie';end if;
+ if p.last_beg_at is not null and p.last_beg_at>now()-interval '20 seconds' then raise exception 'Die Leute kennen deine Geschichte inzwischen';end if;
+ gross:=round((0.10+p.streetwise*0.08)*(0.25+p.cleanliness/100.0)::numeric,2);
+ paid:=least(gross,greatest(0,p.cash_capacity-p.money));lost:=gross-paid;
+ update public.profiles set money=money+paid,total_earned=total_earned+paid,energy=p.energy-cost,energy_updated_at=now(),last_beg_at=now() where id=auth.uid() returning * into p;
+ return jsonb_build_object('gross',gross,'paid',paid,'lost',lost,'profile',to_jsonb(p));
+end;$function$
+"
+function,block_banned_actor,"CREATE OR REPLACE FUNCTION public.block_banned_actor()
+ RETURNS trigger
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+begin
+ if auth.uid() is not null and exists(select 1 from public.profiles where id=auth.uid() and is_banned) then
+   raise exception 'Dieses Konto wurde gesperrt';
+ end if;
+ return case when tg_op='DELETE' then old else new end;
+end $function$
+"
+function,buy_alcohol,"CREATE OR REPLACE FUNCTION public.buy_alcohol(drink_type text)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+                                                    declare
+                                                      p public.profiles%rowtype;
+                                                        v_cost numeric;
+                                                          v_promille numeric;
+                                                            v_minutes integer;
+                                                              v_bonus integer;
+                                                                v_label text;
+                                                                  decay_hours numeric;
+                                                                  begin
+                                                                    select * into p from public.profiles where id = auth.uid() for update;
+                                                                      if p.id is null then raise exception 'Profil nicht gefunden.'; end if;
+                                                                        case drink_type
+                                                                            when 'beer' then v_cost:=1.00; v_promille:=0.12; v_minutes:=30; v_bonus:=10; v_label:='Dosenbier';
+                                                                                when 'wine' then v_cost:=2.50; v_promille:=0.25; v_minutes:=60; v_bonus:=20; v_label:='Kartonwein';
+                                                                                    when 'schnaps' then v_cost:=3.50; v_promille:=0.40; v_minutes:=45; v_bonus:=25; v_label:='Kurzer';
+                                                                                        when 'vodka' then v_cost:=6.00; v_promille:=0.70; v_minutes:=75; v_bonus:=32; v_label:='Wodka';
+                                                                                            when 'feuerwasser' then v_cost:=9.00; v_promille:=1.00; v_minutes:=120; v_bonus:=40; v_label:='Feuerwasser';
+                                                                                                else raise exception 'Dieses Getränk gibt es nicht.';
+                                                                                                  end case;
+                                                                                                    if p.money < v_cost then raise exception 'Dafür reicht dein Bargeld nicht.'; end if;
+                                                                                                      decay_hours := extract(epoch from (now()-p.alcohol_updated_at))/3600;
+                                                                                                        if decay_hours>0 then p.alcohol_level:=greatest(0,p.alcohol_level-decay_hours*0.50); end if;
+                                                                                                          update public.profiles set
+                                                                                                              money = money - v_cost,
+                                                                                                                  alcohol_level = least(7.00, p.alcohol_level + v_promille),
+                                                                                                                      alcohol_updated_at = now(),
+                                                                                                                          alcohol_bonus_until = greatest(coalesce(alcohol_bonus_until, now()), now()) + make_interval(mins => v_minutes)
+                                                                                                                            where id = auth.uid() returning * into p;
+                                                                                                                              return jsonb_build_object(
+                                                                                                                                  'profile', to_jsonb(p),
+                                                                                                                                      'label', v_label,
+                                                                                                                                          'cost', v_cost,
+                                                                                                                                              'promille', p.alcohol_level,
+                                                                                                                                                  'bonus_percent', v_bonus,
+                                                                                                                                                      'bonus_until', p.alcohol_bonus_until
+                                                                                                                                                        );
+                                                                                                                                                        end;
+                                                                                                                                                        $function$
+"
+function,buy_defense_item,"CREATE OR REPLACE FUNCTION public.buy_defense_item(wanted_item text)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$ declare p public.profiles; it public.defense_items; exp timestamptz; begin select * into p from public.profiles where id=auth.uid() for update; if p.id is null or p.is_banned then raise exception 'Zugriff gesperrt'; end if; select * into it from public.defense_items where id=wanted_item; if it.id is null then raise exception 'Unbekannter Gegenstand'; end if; if p.money<it.price then raise exception 'Nicht genug Geld'; end if; update public.profiles set money=money-it.price where id=auth.uid() returning * into p; if it.duration_type='fixed' then exp:=now()+(it.duration_minutes||' minutes')::interval; else exp:=null; end if; insert into public.user_active_defenses(user_id,item_id,amount,expires_at,consume_on_attack) values(auth.uid(),it.id,it.amount,exp,it.duration_type='until_attack'); return jsonb_build_object('item',it.name,'price',it.price,'profile',to_jsonb(p)); end $function$
+"
+function,buy_insurance,"CREATE OR REPLACE FUNCTION public.buy_insurance()
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+                                                                                                                           declare p public.profiles;
+                                                                                                                           begin
+                                                                                                                            select * into p from public.profiles where id=auth.uid() for update;
+                                                                                                                             if p.insurance_active then raise exception 'Du bist schon versichert';end if;
+                                                                                                                              update public.profiles set insurance_active=true,insurance_since=now(),insurance_next_charge_at=now()+interval '1 day',insurance_days_paid=0 where id=auth.uid() returning * into p;
+                                                                                                                               return to_jsonb(p);
+                                                                                                                               end;$function$
+"
+function,buy_item,"CREATE OR REPLACE FUNCTION public.buy_item(wanted_item text)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare p public.profiles;i public.shop_items;
+begin
+ select * into p from public.profiles where id=auth.uid() for update;select * into i from public.shop_items where id=wanted_item;
+ if i.id is null then raise exception 'Gegenstand unbekannt';end if;if p.level<i.required_level then raise exception 'Dein Level reicht nicht';end if;
+ if p.money<i.price then raise exception 'Dafür reicht deine Kohle nicht';end if;
+ update public.profiles set money=money-i.price where id=auth.uid() returning * into p;
+ insert into public.inventory(user_id,item_id,quantity) values(auth.uid(),i.id,1) on conflict(user_id,item_id) do update set quantity=inventory.quantity+1;
+ return jsonb_build_object('item',to_jsonb(i),'profile',to_jsonb(p));
+end;$function$
+"
+function,buy_pet,"CREATE OR REPLACE FUNCTION public.buy_pet(wanted_pet text)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+                               declare p public.profiles;pet public.pet_catalog;
+                               begin select * into p from public.profiles where id=auth.uid() for update;select * into pet from public.pet_catalog where id=wanted_pet;
+                                if pet.id is null then raise exception 'Begleiter unbekannt';end if;if p.social_skill<pet.required_level then raise exception 'Dafür brauchst du mehr Sozialkontakte (Stufe %)',pet.required_level;end if;
+                                 if p.money<pet.price then raise exception 'Dafür reicht deine Kohle nicht';end if;
+                                  update public.profiles set money=money-pet.price where id=auth.uid() returning * into p;
+                                   insert into public.user_pets(user_id,pet_id) values(auth.uid(),pet.id) on conflict do nothing;
+                                    return jsonb_build_object('pet',to_jsonb(pet),'profile',to_jsonb(p));end;$function$
+"
+function,buy_progress,"CREATE OR REPLACE FUNCTION public.buy_progress(progress_type text)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare p public.profiles; price numeric(12,2); label text;
+begin
+  select * into p from public.profiles where id=auth.uid() for update;
+    if progress_type='area' then
+        if p.area_level>=5 then raise exception 'Alle Gebiete freigeschaltet'; end if;
+            price:=(array[25,100,350,1200])[p.area_level];
+                label:='Sammelgebiet';
+                    if p.streetwise<p.area_level+1 then raise exception 'Dafuer brauchst du mehr Geschick'; end if;
+                        if p.money<price then raise exception 'Dafuer reicht deine Kohle nicht'; end if;
+                            update public.profiles set money=money-price,area_level=area_level+1 where id=auth.uid() returning * into p;
+                              elsif progress_type='music' then
+                                  if p.music_level>=9 then raise exception 'Du hast schon das beste Instrument'; end if;
+                                      price:=(array[1,5,20,60,180,450,900,1800,3500])[p.music_level+1];
+                                          label:='Instrument';
+                                              if p.music_skill<p.music_level+1 then raise exception 'Dafuer musst du erst mehr Musik-Weiterbildung machen'; end if;
+                                                  if p.money<price then raise exception 'Dafuer reicht deine Kohle nicht'; end if;
+                                                      update public.profiles set money=money-price,music_level=music_level+1,music_collected_at=now() where id=auth.uid() returning * into p;
+                                                        elsif progress_type='wash' then
+                                                            if p.wash_level>=2 then raise exception 'Du hast schon die beste Waschausstattung'; end if;
+                                                                price:=(array[6,25])[p.wash_level+1];
+                                                                    label:=(array['Schwamm','Waschanlage'])[p.wash_level+1];
+                                                                        if p.money<price then raise exception 'Dafuer reicht deine Kohle nicht'; end if;
+                                                                            update public.profiles set money=money-price,wash_level=wash_level+1 where id=auth.uid() returning * into p;
+                                                                              else
+                                                                                  raise exception 'Unbekannter Fortschritt';
+                                                                                    end if;
+                                                                                      return jsonb_build_object('label',label,'price',price,'profile',to_jsonb(p));
+                                                                                      end
+                                                                                      $function$
+"
+function,buy_scratch_ticket,"CREATE OR REPLACE FUNCTION public.buy_scratch_ticket()
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$ declare p public.profiles; r numeric; prize numeric; begin select * into p from public.profiles where id=auth.uid() for update; if p.id is null or p.is_banned then raise exception 'Zugriff gesperrt'; end if; if p.money<10 then raise exception 'Nicht genug Geld'; end if; r:=random()*1000; prize:=case when r<400 then 0 when r<650 then 1 when r<800 then 2 when r<900 then 5 when r<960 then 10 when r<985 then 20 when r<997 then 50 else 100 end; update public.profiles set money=money-10+prize where id=auth.uid() returning * into p; return jsonb_build_object('prize',prize,'profile',to_jsonb(p)); end $function$
+"
+function,buy_upgrade,"CREATE OR REPLACE FUNCTION public.buy_upgrade(upgrade_type text)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+    declare p public.profiles;price numeric(12,2);label text;newcap numeric(12,2);
+    begin
+     select * into p from public.profiles where id=auth.uid() for update;
+      if upgrade_type='bag' then price:=(array[3,12,45,180,700])[least(p.bag_level,5)];label:='Pfandsack';
+       elsif upgrade_type='container' then
+         if p.container_level>=5 then raise exception 'Größerer Geldbehälter ist nicht mehr verfügbar';end if;
+           price:=(array[20,150,3000,75000])[least(p.container_level,4)];
+             label:=(array['Große Tüte','Beutel','Einkaufswagen','Container'])[least(p.container_level,4)];
+              elsif upgrade_type='shelter' then raise exception 'Unterkünfte werden jetzt über Sozialkontakte freigeschaltet, nicht gekauft';
+               elsif upgrade_type='streetwise' then price:=5*p.streetwise*p.streetwise;label:='Geschick';
+                elsif upgrade_type='stamina' then price:=6*p.stamina*p.stamina;label:='Konzentration';
+                 else raise exception 'Unbekanntes Upgrade';end if;
+                  if p.money<price then raise exception 'Dafür reicht deine Kohle nicht';end if;
+                   if upgrade_type='bag' then update public.profiles set money=money-price,bag_level=bag_level+1 where id=auth.uid() returning * into p;
+                    elsif upgrade_type='container' then newcap:=(array[100,1000,10000,1000000])[least(p.container_level,4)];update public.profiles set money=money-price,container_level=container_level+1,cash_capacity=newcap where id=auth.uid() returning * into p;
+                     elsif upgrade_type='streetwise' then update public.profiles set money=money-price,streetwise=streetwise+1 where id=auth.uid() returning * into p;
+                      else update public.profiles set money=money-price,stamina=stamina+1 where id=auth.uid() returning * into p;end if;
+                       return jsonb_build_object('label',label,'price',price,'profile',to_jsonb(p));
+                       end;$function$
+"
+function,cancel_collection,"CREATE OR REPLACE FUNCTION public.cancel_collection()
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+                          declare p public.profiles;
+                          begin
+                           select * into p from public.profiles where id=auth.uid() for update;
+                            if p.collection_ends_at is null then raise exception 'Keine Pfandtour aktiv';end if;
+                             update public.profiles set collection_started_at=null,collection_ends_at=null,collection_minutes=null where id=auth.uid() returning * into p;
+                              return to_jsonb(p);
+                              end $function$
+"
+function,cancel_concentration,"CREATE OR REPLACE FUNCTION public.cancel_concentration()
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+                                                                                                                                                            declare p public.profiles;
+                                                                                                                                                            begin
+                                                                                                                                                             update public.profiles set concentration_ends_at=null where id=auth.uid() returning * into p;
+                                                                                                                                                              return to_jsonb(p);
+                                                                                                                                                              end $function$
+"
+function,cancel_insurance,"CREATE OR REPLACE FUNCTION public.cancel_insurance()
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+                                                                                                                                   declare p public.profiles;
+                                                                                                                                   begin
+                                                                                                                                    select * into p from public.profiles where id=auth.uid() for update;
+                                                                                                                                     if not p.insurance_active then raise exception 'Du bist nicht versichert';end if;
+                                                                                                                                      if p.insurance_days_paid<14 then raise exception 'Mindestlaufzeit von 14 Tagen noch nicht erreicht (%/14 Tage bezahlt)',p.insurance_days_paid;end if;
+                                                                                                                                       update public.profiles set insurance_active=false where id=auth.uid() returning * into p;
+                                                                                                                                        return to_jsonb(p);
+                                                                                                                                        end;$function$
+"
+function,check_achievements,"CREATE OR REPLACE FUNCTION public.check_achievements()
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare p public.profiles; unlocked jsonb:='[]'::jsonb; a record;
+begin
+ select * into p from public.profiles where id=auth.uid() for update;
+ if p.id is null or p.is_banned then raise exception 'Zugriff gesperrt'; end if;
+ for a in select * from public.achievement_defs d where
+   (d.id='first_bottles' and p.bottles>=20) or
+   (d.id='level_five' and p.level>=5) or
+   (d.id='first_win' and p.wins>=1) or
+   (d.id='rich' and p.money>=100) or
+   (d.id='collector' and p.bottles>=100) or
+   (d.id='veteran' and p.level>=10)
+ loop
+   if not exists(select 1 from public.user_achievements where user_id=p.id and achievement_id=a.id) then
+     insert into public.user_achievements(user_id,achievement_id) values(p.id,a.id);
+     update public.profiles set money=least(cash_capacity,money+a.reward) where id=p.id;
+     unlocked:=unlocked||jsonb_build_array(jsonb_build_object('name',a.name,'reward',a.reward));
+   end if;
+ end loop;
+ select * into p from public.profiles where id=auth.uid();
+ return jsonb_build_object('unlocked',unlocked,'profile',to_jsonb(p));
+end $function$
+"
+function,claim_daily_mission,"CREATE OR REPLACE FUNCTION public.claim_daily_mission()
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare m public.daily_missions;p public.profiles;reward numeric:=5;
+begin insert into public.daily_missions(user_id) values(auth.uid()) on conflict do nothing;
+ select * into m from public.daily_missions where user_id=auth.uid() and mission_day=current_date for update;
+ if m.progress<20 then raise exception 'Mission noch nicht geschafft';end if;if m.claimed then raise exception 'Belohnung bereits abgeholt';end if;
+ select * into p from public.profiles where id=auth.uid() for update;reward:=least(reward,greatest(0,p.cash_capacity-p.money));
+ update public.daily_missions set claimed=true where user_id=auth.uid() and mission_day=current_date;
+ update public.profiles set money=money+reward,xp=xp+25 where id=auth.uid() returning * into p;
+ return jsonb_build_object('reward',reward,'profile',to_jsonb(p));end;$function$
+"
+function,claim_daily_reward,"CREATE OR REPLACE FUNCTION public.claim_daily_reward()
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare p public.profiles;new_streak int;reward numeric(12,2);
+begin
+ select * into p from public.profiles where id=auth.uid() for update;
+ if p.id is null or p.is_banned then raise exception 'Zugriff gesperrt';end if;
+ if p.daily_claim_date=current_date then raise exception 'Tagesbelohnung bereits abgeholt';end if;
+ new_streak:=case when p.daily_claim_date=current_date-1 then p.login_streak+1 else 1 end;
+ reward:=least(12,2+new_streak*0.50);
+ update public.profiles set daily_claim_date=current_date,login_streak=new_streak,money=least(cash_capacity,money+reward),xp=xp+10 where id=p.id returning * into p;
+ return jsonb_build_object('streak',new_streak,'reward',reward,'profile',to_jsonb(p));
+end $function$
+"
+function,collect_bottles,"CREATE OR REPLACE FUNCTION public.collect_bottles()
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare p public.profiles;found_count int;new_xp int;new_level int;gain int;cost int;factor numeric;
+begin select * into p from public.profiles where id=auth.uid() for update;if p.id is null then raise exception 'Spielerprofil fehlt';end if;
+ gain:=floor(extract(epoch from(now()-p.energy_updated_at))/60)::int;if gain>0 then p.energy:=least(100,p.energy+gain);end if;
+ cost:=greatest(5,10-floor(p.stamina/3)::int);if p.energy<cost then raise exception 'Nicht genug Energie';end if;
+ if p.last_action_at is not null and p.last_action_at>now()-interval '8 seconds' then raise exception 'Der Einkaufswagen braucht kurz Pause';end if;
+ factor:=(array[1.0,1.25,1.55,1.95,2.5])[least(p.area_level,5)];
+ found_count:=floor((floor(random()*5)::int+2+p.streetwise+(p.bag_level-1)*2)*factor)::int;new_xp:=p.xp+5;new_level:=greatest(p.level,1+floor(new_xp/100)::int);
+ update public.profiles set bottles=bottles+found_count,energy=p.energy-cost,cleanliness=greatest(0,cleanliness-5),xp=new_xp,level=new_level,last_action_at=now(),energy_updated_at=now() where id=auth.uid() returning * into p;
+ insert into public.daily_missions(user_id,progress) values(auth.uid(),found_count) on conflict(user_id,mission_day) do update set progress=daily_missions.progress+excluded.progress;
+ return jsonb_build_object('found',found_count,'energy_cost',cost,'factor',factor,'profile',to_jsonb(p));end;$function$
+"
+function,collect_music_income,"CREATE OR REPLACE FUNCTION public.collect_music_income()
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+    declare p public.profiles;minutes int;rate numeric;gross numeric;paid numeric;lost numeric;
+    begin
+     select * into p from public.profiles where id=auth.uid() for update;
+      if p.music_level<1 then raise exception 'Du besitzt noch kein Instrument';end if;
+       minutes:=floor(extract(epoch from(now()-p.music_collected_at))/60)::int;
+        if minutes<1 then raise exception 'Dein Publikum braucht noch einen Moment';end if;
+         minutes:=least(minutes,720);rate:=(array[0.02,0.05,0.12,0.30,0.70,1.50,2.80,5.00,9.00])[p.music_level];
+          gross:=minutes*rate;paid:=least(gross,greatest(0,p.cash_capacity-p.money));lost:=gross-paid;
+           update public.profiles set money=money+paid,music_collected_at=now() where id=auth.uid() returning * into p;
+            return jsonb_build_object('minutes',minutes,'rate',rate,'paid',paid,'lost',lost,'profile',to_jsonb(p));
+            end;$function$
+"
+function,commit_crime,"CREATE OR REPLACE FUNCTION public.commit_crime(crime_id integer)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare
+  p public.profiles;
+    names text[]:=array['Handtaschenraub','Ladendiebstahl','Auto aufbrechen','Einbruch','Tankstellenüberfall','Bankraub','Kaugummiautomat aufbrechen'];
+      risks int[]:=array[15,22,30,42,55,70,18];
+        rewardmin numeric[]:=array[8,18,45,90,180,450,10];
+          rewardmax numeric[]:=array[18,35,80,160,320,900,20];
+            bails numeric[]:=array[8,18,35,70,150,400,10];
+              jailmins int[]:=array[8,12,20,35,60,120,9];
+                energy int[]:=array[6,8,10,14,18,22,7];
+                  idx int;
+                    caught boolean;
+                      reward numeric;
+                      begin
+                        select * into p from public.profiles where id=auth.uid() for update;
+                          if p.id is null or p.is_banned then raise exception 'Zugriff gesperrt'; end if;
+                            if p.jail_until is not null and p.jail_until>now() then raise exception 'Du sitzt schon im Knast'; end if;
+                              idx:=crime_id;
+                                if idx<1 or idx>array_length(names,1) then raise exception 'Unbekanntes Verbrechen'; end if;
+                                  if p.energy<energy[idx] then raise exception 'Dafür reicht deine Energie nicht'; end if;
+                                    caught:=random()*100<risks[idx];
+                                      if caught then
+                                          update public.profiles set energy=energy-energy[idx],jail_until=now()+make_interval(mins=>jailmins[idx]),jail_bail=bails[idx] where id=auth.uid() returning * into p;
+                                              insert into public.side_action_log(user_id,action_type,success,money_change,xp_change) values(auth.uid(),'crime:'||names[idx],false,0,0);
+                                                  return jsonb_build_object('caught',true,'name',names[idx],'bail',bails[idx],'jail_minutes',jailmins[idx],'profile',to_jsonb(p));
+                                                    else
+                                                        reward:=round((rewardmin[idx]+random()::numeric*(rewardmax[idx]-rewardmin[idx])),2);
+                                                            reward:=least(reward,greatest(0,p.cash_capacity-p.money));
+                                                                update public.profiles set energy=energy-energy[idx],money=money+reward,xp=xp+greatest(3,energy[idx]) where id=auth.uid() returning * into p;
+                                                                    insert into public.side_action_log(user_id,action_type,success,money_change,xp_change) values(auth.uid(),'crime:'||names[idx],true,reward,greatest(3,energy[idx]));
+                                                                        return jsonb_build_object('caught',false,'name',names[idx],'reward',reward,'profile',to_jsonb(p));
+                                                                          end if;
+                                                                          end;
+                                                                          $function$
+"
+function,craft_item,"CREATE OR REPLACE FUNCTION public.craft_item(wanted_item text)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+             declare
+              p public.profiles;
+               item public.shop_items;
+                need_nails int; need_wood int; need_shards int; need_textile int;
+                begin
+                 select * into p from public.profiles where id=auth.uid() for update;
+                  select * into item from public.shop_items where id=wanted_item and category='craft';
+                   if item.id is null then raise exception 'Das kannst du nicht herstellen';end if;
+                    case wanted_item
+                      when 'nagelkeule' then need_nails:=14;need_wood:=2;need_shards:=0;need_textile:=1;
+                        when 'holzschild' then need_nails:=2;need_wood:=8;need_shards:=0;need_textile:=1;
+                          when 'stachelschild' then need_nails:=26;need_wood:=10;need_shards:=0;need_textile:=1;
+                            when 'glasstachelschild' then need_nails:=38;need_wood:=24;need_shards:=18;need_textile:=0;
+                              when 'doppeltes_holzschild' then need_nails:=13;need_wood:=41;need_shards:=0;need_textile:=2;
+                                when 'ramponierter_anzug' then need_nails:=16;need_wood:=2;need_shards:=0;need_textile:=6;
+                                  when 'feiner_anzug' then need_nails:=8;need_wood:=2;need_shards:=0;need_textile:=16;
+                                    when 'kaputter_regenschirm' then need_nails:=11;need_wood:=6;need_shards:=0;need_textile:=8;
+                                      when 'regenschirm' then need_nails:=14;need_wood:=12;need_shards:=0;need_textile:=19;
+                                        else raise exception 'Unbekanntes Rezept';
+                                         end case;
+                                          if p.mat_nails<need_nails or p.mat_wood<need_wood or p.mat_shards<need_shards or p.mat_textile<need_textile then
+                                            raise exception 'Dafür fehlen dir noch Materialien';
+                                             end if;
+                                              if p.money<item.price then raise exception 'Dafür reicht deine Kohle nicht';end if;
+                                               update public.profiles set
+                                                 money=money-item.price,
+                                                   mat_nails=mat_nails-need_nails,
+                                                     mat_wood=mat_wood-need_wood,
+                                                       mat_shards=mat_shards-need_shards,
+                                                         mat_textile=mat_textile-need_textile
+                                                          where id=auth.uid() returning * into p;
+                                                           insert into public.inventory(user_id,item_id,quantity) values(auth.uid(),wanted_item,1)
+                                                            on conflict(user_id,item_id) do update set quantity=inventory.quantity+1;
+                                                             return jsonb_build_object('item',to_jsonb(item),'profile',to_jsonb(p));
+                                                             end;
+                                                             $function$
+"
+function,create_gang,"CREATE OR REPLACE FUNCTION public.create_gang(gang_name text)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare g public.gangs;p public.profiles;cost numeric:=10;
+begin if exists(select 1 from public.gang_members where user_id=auth.uid()) then raise exception 'Du bist bereits in einer Bande';end if;
+ select * into p from public.profiles where id=auth.uid() for update;if p.money<cost then raise exception 'Eine Bandengründung kostet 10 €';end if;
+ insert into public.gangs(name,owner_id) values(trim(gang_name),auth.uid()) returning * into g;
+ insert into public.gang_members(gang_id,user_id,role) values(g.id,auth.uid(),'owner');
+ update public.profiles set money=money-cost where id=auth.uid();return to_jsonb(g);end;$function$
+"
+function,do_side_action,"CREATE OR REPLACE FUNCTION public.do_side_action(action_type text)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$ declare p public.profiles;cost int;gain_money numeric(12,2):=0;gain_bottles int:=0;gain_xp int:=0;ok boolean:=true;label text;regen int; begin select * into p from public.profiles where id=auth.uid() for update; if p.id is null or p.is_banned then raise exception 'Zugriff gesperrt';end if; if p.collection_ends_at is not null then raise exception 'Der Einkaufswagen ist noch unterwegs oder nicht ausgeladen';end if; if p.last_side_action_at is not null and p.last_side_action_at>now()-interval '60 seconds' then raise exception 'Du brauchst kurz Luft. Nächste Aktion in spätestens 60 Sekunden';end if; regen:=floor(extract(epoch from(now()-p.energy_updated_at))/60)::int; if regen>0 then p.energy:=least(100,p.energy+regen);end if; case action_type when 'newspapers' then cost:=4;gain_money:=round((0.30+random()*0.55+p.speech_skill*0.02)::numeric,2);gain_xp:=3;label:='Abendblätter verteilt'; when 'sorting' then cost:=6;gain_bottles:=2+floor(random()*5)::int+floor(p.streetwise/4)::int;gain_xp:=4;label:='Pfand im Hinterhof sortiert'; when 'parking' then cost:=7;gain_money:=round((0.55+random()*1.10+p.social_skill*0.03)::numeric,2);gain_xp:=5;label:='Einkaufswagen bewacht'; when 'windshield' then cost:=5;gain_money:=round((0.25+random()*0.45+p.speech_skill*0.015)::numeric,2);gain_xp:=3;label:='Scheiben an der Ampel gewischt'; else raise exception 'Unbekannte Kiezaktion';end case; if p.energy<cost then raise exception 'Nicht genug Energie';end if; update public.profiles set energy=p.energy-cost,energy_updated_at=now(),money=least(cash_capacity,greatest(0,money+gain_money)),bottles=bottles+gain_bottles,xp=xp+gain_xp,last_side_action_at=now() where id=p.id returning * into p; insert into public.side_action_log(user_id,action_type,success,money_change,bottle_change,xp_change) values(p.id,action_type,ok,gain_money,gain_bottles,gain_xp); return jsonb_build_object('success',ok,'label',label,'money',gain_money,'bottles',gain_bottles,'xp',gain_xp,'energy_cost',cost,'profile',to_jsonb(p)); end $function$
+"
+function,donate_to_gang,"CREATE OR REPLACE FUNCTION public.donate_to_gang(amount numeric)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare gm public.gang_members;p public.profiles;
+begin if amount<=0 then raise exception 'Betrag ungültig';end if;select * into gm from public.gang_members where user_id=auth.uid();
+ if gm.gang_id is null then raise exception 'Du bist in keiner Bande';end if;select * into p from public.profiles where id=auth.uid() for update;
+ if p.money<amount then raise exception 'Dafür reicht deine Kohle nicht';end if;
+ update public.profiles set money=money-amount where id=auth.uid();update public.gangs set balance=balance+amount where id=gm.gang_id;
+ return jsonb_build_object('donated',amount);end;$function$
+"
+function,equip_item,"CREATE OR REPLACE FUNCTION public.equip_item(wanted_item text)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+begin
+ if not exists(select 1 from public.inventory where user_id=auth.uid() and item_id=wanted_item) then raise exception 'Gegenstand nicht im Inventar';end if;
+ update public.inventory set equipped=false where user_id=auth.uid();update public.inventory set equipped=true where user_id=auth.uid() and item_id=wanted_item;
+ return jsonb_build_object('equipped',wanted_item);
+end;$function$
+"
+function,finish_collection,"CREATE OR REPLACE FUNCTION public.finish_collection()
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$ declare p public.profiles; found_count int; factor numeric; efficiency numeric; alcohol_factor numeric := 1.0; new_xp int; gained_xp int; nail_chance numeric; wood_chance numeric; shard_chance numeric; textile_chance numeric; found_nails int; found_wood int; found_shards int; found_textile int; begin select * into p from public.profiles where id=auth.uid() for update; if p.id is null or p.is_banned then raise exception 'Zugriff gesperrt'; end if; if p.collection_ends_at is null then raise exception 'Keine Pfandtour aktiv'; end if; if p.collection_ends_at>now() then raise exception 'Der Einkaufswagen ist noch unterwegs'; end if; factor := (array[1.0,1.25,1.55,1.95,2.5])[least(p.area_level,5)]; efficiency := case p.collection_minutes when 10 then 1.0 when 30 then 0.88 when 60 then 0.78 when 240 then 0.62 when 480 then 0.52 else 0.50 end; if p.alcohol_level >= 5 then alcohol_factor := 0.6; else alcohol_factor := 1 + least(p.alcohol_level,4.99)*0.15; end if; found_count := greatest(1,floor((p.collection_minutes/10.0)*(5+p.streetwise*0.8+(p.bag_level-1)*2)*factor*efficiency*alcohol_factor*(0.85+random()*0.30))::int); gained_xp := greatest(5,floor(p.collection_minutes/10.0)::int*2); new_xp := p.xp+gained_xp; nail_chance := least(0.35,0.10+p.collection_minutes/480.0*0.20); wood_chance := least(0.32,0.09+p.collection_minutes/480.0*0.18); shard_chance := least(0.10,0.02+p.collection_minutes/480.0*0.06); textile_chance := least(0.28,0.08+p.collection_minutes/480.0*0.16); found_nails := case when random()<nail_chance then 1 else 0 end; found_wood := case when random()<wood_chance then 1 else 0 end; found_shards := case when random()<shard_chance then 1 else 0 end; found_textile := case when random()<textile_chance then 1 else 0 end; update public.profiles set bottles=bottles+found_count, mat_nails=mat_nails+found_nails, mat_wood=mat_wood+found_wood, mat_shards=mat_shards+found_shards, mat_textile=mat_textile+found_textile, cleanliness=greatest(0,cleanliness-least(80,p.collection_minutes/10)), xp=new_xp, level=least(150,greatest(level,1+floor(new_xp/250)::int)), collection_started_at=null, collection_ends_at=null, collection_minutes=null, collection_ready_at=now()+interval '30 seconds' where id=auth.uid() returning * into p; insert into public.daily_missions(user_id,progress) values(auth.uid(),found_count) on conflict(user_id,mission_day) do update set progress=daily_missions.progress+excluded.progress; return jsonb_build_object('found',found_count,'xp',gained_xp,'alcohol_bonus',alcohol_factor,'nails',found_nails,'wood',found_wood,'shards',found_shards,'textile',found_textile,'profile',to_jsonb(p)); end $function$
+"
+function,finish_pet_training,"CREATE OR REPLACE FUNCTION public.finish_pet_training(wanted_pet text)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$ declare up public.user_pets; begin select * into up from public.user_pets where user_id=auth.uid() and pet_id=wanted_pet for update; if up.pet_id is null or up.training_ends_at is null then raise exception 'Kein Training aktiv';end if; if up.training_ends_at>now() then raise exception 'Das Begleitertraining läuft noch';end if; if up.training_stat='attack' then update public.user_pets set attack_level=attack_level+1,training_ends_at=null,training_stat=null where user_id=auth.uid() and pet_id=wanted_pet returning * into up; elsif up.training_stat='defense' then update public.user_pets set defense_level=defense_level+1,training_ends_at=null,training_stat=null where user_id=auth.uid() and pet_id=wanted_pet returning * into up; else update public.user_pets set mitleid_level=mitleid_level+1,training_ends_at=null,training_stat=null where user_id=auth.uid() and pet_id=wanted_pet returning * into up; end if; return to_jsonb(up); end $function$
+"
+function,finish_training,"CREATE OR REPLACE FUNCTION public.finish_training()
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare p public.profiles;finished text;pts int;
+begin
+ select * into p from public.profiles where id=auth.uid() for update;
+ if p.training_type is null then raise exception 'Keine Weiterbildung aktiv';end if;
+ if p.training_ends_at>now() then raise exception 'Die Weiterbildung läuft noch';end if;
+ finished:=p.training_type;
+ update public.profiles set
+ attack_skill=attack_skill+(finished='attack')::int,
+ defense_skill=defense_skill+(finished='defense')::int,
+ streetwise=streetwise+(finished='streetwise')::int,
+ stamina=stamina+(finished='stamina')::int,
+ speech_skill=speech_skill+(finished='speech')::int,
+ music_skill=music_skill+(finished='music')::int,
+ social_skill=social_skill+(finished='social')::int,
+ pickpocket_skill=pickpocket_skill+(finished='pickpocket')::int,
+ training_type=null,training_ends_at=null
+ where id=auth.uid() returning * into p;
+ pts:=p.attack_skill+p.defense_skill+p.streetwise+p.stamina+p.speech_skill+p.music_skill+p.social_skill+p.pickpocket_skill;
+ update public.profiles set level=least(150,greatest(level,1+floor(pts/8.0)::int)) where id=auth.uid() returning * into p;
+ return jsonb_build_object('finished',finished,'profile',to_jsonb(p));
+end $function$
+"
+function,handle_new_user,"CREATE OR REPLACE FUNCTION public.handle_new_user()
+ RETURNS trigger
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+begin
+  insert into public.profiles(id, username)
+  values(new.id, coalesce(nullif(new.raw_user_meta_data->>'username',''), 'Kiezkind_' || substr(new.id::text,1,6)));
+  return new;
+end; $function$
+"
+function,join_gang,"CREATE OR REPLACE FUNCTION public.join_gang(wanted_gang uuid)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+begin if exists(select 1 from public.gang_members where user_id=auth.uid()) then raise exception 'Du bist bereits in einer Bande';end if;
+ if not exists(select 1 from public.gangs where id=wanted_gang) then raise exception 'Bande unbekannt';end if;
+ if (select count(*) from public.gang_members where gang_id=wanted_gang)>=30 then raise exception 'Bande ist voll';end if;
+ insert into public.gang_members(gang_id,user_id) values(wanted_gang,auth.uid());return jsonb_build_object('joined',wanted_gang);end;$function$
+"
+function,leave_gang,"CREATE OR REPLACE FUNCTION public.leave_gang()
+ RETURNS void
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare gid uuid; own uuid; members int;
+begin
+ select gang_id into gid from public.gang_members where user_id=auth.uid();
+ if gid is null then raise exception 'Du bist in keiner Bande'; end if;
+ select owner_id into own from public.gangs where id=gid;
+ select count(*) into members from public.gang_members where gang_id=gid;
+ if own=auth.uid() and members>1 then raise exception 'Der Chef kann eine nichtleere Bande nicht verlassen'; end if;
+ delete from public.gang_members where user_id=auth.uid();
+ if own=auth.uid() then delete from public.gangs where id=gid; end if;
+end $function$
+"
+function,move_in_house,"CREATE OR REPLACE FUNCTION public.move_in_house()
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+                                        declare p public.profiles;next_tier int;required_social int;
+                                        begin
+                                         select * into p from public.profiles where id=auth.uid() for update;
+                                          next_tier:=coalesce(p.shelter_level,1)+1;
+                                           if next_tier>20 then raise exception 'Du wohnst schon in der besten Unterkunft';end if;
+                                            required_social:=2*(next_tier-1);
+                                             if p.social_skill<required_social then raise exception 'Dafür brauchst du mehr Sozialkontakte (Stufe %)',required_social;end if;
+                                              update public.profiles set shelter_level=next_tier where id=auth.uid() returning * into p;
+                                               return to_jsonb(p);
+                                               end;$function$
+"
+function,pay_bail,"CREATE OR REPLACE FUNCTION public.pay_bail()
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+                                                                                                                                                                                                                                   declare p public.profiles;
+                                                                                                                                                                                                                                   begin
+                                                                                                                                                                                                                                    select * into p from public.profiles where id=auth.uid() for update;
+                                                                                                                                                                                                                                     if p.jail_until is null or p.jail_until<=now() then raise exception 'Du bist nicht im Knast';end if;
+                                                                                                                                                                                                                                      if p.money<p.jail_bail then raise exception 'Dafür reicht deine Kohle nicht';end if;
+                                                                                                                                                                                                                                       update public.profiles set money=money-jail_bail,jail_until=null,jail_bail=0 where id=auth.uid() returning * into p;
+                                                                                                                                                                                                                                        return to_jsonb(p);
+                                                                                                                                                                                                                                        end;$function$
+"
+function,pump_stomach,"CREATE OR REPLACE FUNCTION public.pump_stomach()
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+                                                                                                                  declare p public.profiles;
+                                                                                                                  begin
+                                                                                                                   select * into p from public.profiles where id=auth.uid() for update;
+                                                                                                                    if p.alcohol_level<=0 then raise exception 'Du bist doch schon nüchtern';end if;
+                                                                                                                     if p.money<500 then raise exception 'Dafür reicht deine Kohle nicht';end if;
+                                                                                                                      update public.profiles set money=money-500,alcohol_level=0,alcohol_bonus_until=null,alcohol_updated_at=now() where id=auth.uid() returning * into p;
+                                                                                                                       return to_jsonb(p);
+                                                                                                                       end;$function$
+"
+function,refresh_my_profile,"CREATE OR REPLACE FUNCTION public.refresh_my_profile()
+ RETURNS profiles
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare
+  p public.profiles;
+    gain int;
+      decay_hours numeric;
+        fee numeric;
+          loops int:=0;
+          begin
+            select * into p from public.profiles where id=auth.uid() for update;
+              if p.id is null then raise exception 'Spielerprofil fehlt'; end if;
+                gain := floor(extract(epoch from (now()-p.energy_updated_at))/60)::int;
+                  if gain>0 then
+                      update public.profiles set energy=least(100,energy+gain),energy_updated_at=now() where id=auth.uid() returning * into p;
+                        end if;
+                          decay_hours := extract(epoch from (now()-p.alcohol_updated_at))/3600;
+                            if decay_hours>0 and p.alcohol_level>0 then
+                                update public.profiles set alcohol_level=greatest(0,alcohol_level-decay_hours*0.50),alcohol_updated_at=now() where id=auth.uid() returning * into p;
+                                  end if;
+                                    while p.insurance_active and p.insurance_next_charge_at is not null and p.insurance_next_charge_at<=now() and loops<60 loop
+                                        fee:=round(p.money*0.10,2);
+                                            update public.profiles set money=greatest(0,money-fee),insurance_days_paid=insurance_days_paid+1,insurance_next_charge_at=insurance_next_charge_at+interval '1 day' where id=auth.uid() returning * into p;
+                                                loops:=loops+1;
+                                                  end loop;
+                                                    return p;
+                                                    end;
+                                                    $function$
+"
+function,report_player,"CREATE OR REPLACE FUNCTION public.report_player(target_id uuid, report_reason text)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare rid bigint;
+begin
+ if target_id=auth.uid() then raise exception 'Du kannst dich nicht selbst melden';end if;
+ insert into public.player_reports(reporter_id,reported_id,reason) values(auth.uid(),target_id,trim(report_reason)) returning id into rid;
+ return jsonb_build_object('id',rid);
+end;$function$
+"
+function,rls_auto_enable,"CREATE OR REPLACE FUNCTION public.rls_auto_enable()
+ RETURNS event_trigger
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'pg_catalog'
+AS $function$
+DECLARE
+  cmd record;
+BEGIN
+  FOR cmd IN
+    SELECT *
+    FROM pg_event_trigger_ddl_commands()
+    WHERE command_tag IN ('CREATE TABLE', 'CREATE TABLE AS', 'SELECT INTO')
+      AND object_type IN ('table','partitioned table')
+  LOOP
+     IF cmd.schema_name IS NOT NULL AND cmd.schema_name IN ('public') AND cmd.schema_name NOT IN ('pg_catalog','information_schema') AND cmd.schema_name NOT LIKE 'pg_toast%' AND cmd.schema_name NOT LIKE 'pg_temp%' THEN
+      BEGIN
+        EXECUTE format('alter table if exists %s enable row level security', cmd.object_identity);
+        RAISE LOG 'rls_auto_enable: enabled RLS on %', cmd.object_identity;
+      EXCEPTION
+        WHEN OTHERS THEN
+          RAISE LOG 'rls_auto_enable: failed to enable RLS on %', cmd.object_identity;
+      END;
+     ELSE
+        RAISE LOG 'rls_auto_enable: skip % (either system schema or not in enforced list: %.)', cmd.object_identity, cmd.schema_name;
+     END IF;
+  END LOOP;
+END;
+$function$
+"
+function,sell_bottles,"CREATE OR REPLACE FUNCTION public.sell_bottles(qty integer DEFAULT NULL::integer)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$ declare p public.profiles; price numeric(5,2); sellqty int; gross numeric(12,2); paid numeric(12,2); lost numeric(12,2); bucket numeric; h numeric; begin select * into p from public.profiles where id=auth.uid() for update; if p.bottles<1 then raise exception 'Du hast keine Flaschen im Sack'; end if; sellqty:=coalesce(qty,p.bottles); if sellqty<1 then raise exception 'Ungültige Menge'; end if; if sellqty>p.bottles then sellqty:=p.bottles; end if; bucket:=floor(extract(epoch from now())/1200); h:=mod(bucket*1103515245+12345,2147483648); price:=round(0.10+(h/2147483648.0)*0.20,2); gross:=sellqty*price;paid:=least(gross,greatest(0,p.cash_capacity-p.money));lost:=gross-paid; update public.profiles set money=money+paid,bottles=bottles-sellqty,bottles_lifetime_earned=bottles_lifetime_earned+paid where id=auth.uid() returning * into p; return jsonb_build_object('price',price,'sold',sellqty,'gross',gross,'paid',paid,'lost',lost,'profile',to_jsonb(p)); end;$function$
+"
+function,send_player_message,"CREATE OR REPLACE FUNCTION public.send_player_message(target_id uuid, message_body text)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare mid bigint;begin
+ if target_id=auth.uid() then raise exception 'Selbstgespräche zählen nicht als soziale Funktion';end if;
+ if char_length(trim(message_body))<1 or char_length(message_body)>500 then raise exception 'Nachricht muss 1 bis 500 Zeichen haben';end if;
+ if not exists(select 1 from public.profiles where id=target_id) then raise exception 'Empfänger unbekannt';end if;
+ insert into public.messages(sender_id,recipient_id,body) values(auth.uid(),target_id,trim(message_body)) returning id into mid;
+ return jsonb_build_object('id',mid);end;$function$
+"
+function,start_collection,"CREATE OR REPLACE FUNCTION public.start_collection(duration_minutes integer)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+              declare p public.profiles;
+              begin
+                select * into p from public.profiles where id=auth.uid() for update;
+                  if p.id is null or p.is_banned then raise exception 'Zugriff gesperrt'; end if;
+                    if p.jail_until is not null and p.jail_until>now() then raise exception 'Du sitzt im Knast'; end if;
+                      if p.cleanliness<20 then raise exception 'Du bist zu dreckig fuer die Tour, erst waschen (mindestens 20 Prozent Sauberkeit noetig)'; end if;
+                        if duration_minutes not in (10,30,60,240,480) then raise exception 'Ungueltige Sammelzeit'; end if;
+                          if p.collection_ends_at is not null and p.collection_ends_at>now() then raise exception 'Der Einkaufswagen ist noch unterwegs'; end if;
+                            if p.collection_ready_at is not null and p.collection_ready_at>now() then raise exception 'Der Einkaufswagen braucht noch Pause'; end if;
+                              update public.profiles set collection_started_at=now(),collection_ends_at=now()+make_interval(mins=>duration_minutes),collection_minutes=duration_minutes where id=auth.uid() returning * into p;
+                                return to_jsonb(p);
+                                end
+                                $function$
+"
+function,start_concentration,"CREATE OR REPLACE FUNCTION public.start_concentration(duration_minutes integer)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+                                                                                                                                                  declare p public.profiles;
+                                                                                                                                                  begin
+                                                                                                                                                   select * into p from public.profiles where id=auth.uid() for update;
+                                                                                                                                                    if p.id is null or p.is_banned then raise exception 'Zugriff gesperrt';end if;
+                                                                                                                                                     if duration_minutes<1 or duration_minutes>480 then raise exception 'Ungültige Konzentrationszeit';end if;
+                                                                                                                                                      if p.concentration_ends_at is not null and p.concentration_ends_at>now() then raise exception 'Du konzentrierst dich schon';end if;
+                                                                                                                                                       update public.profiles set concentration_ends_at=now()+make_interval(mins=>duration_minutes) where id=auth.uid() returning * into p;
+                                                                                                                                                        return to_jsonb(p);
+                                                                                                                                                        end $function$
+"
+function,start_pet_training,"CREATE OR REPLACE FUNCTION public.start_pet_training(wanted_pet text, stat_type text DEFAULT 'attack'::text)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$ declare up public.user_pets;p public.profiles;cost numeric(12,2);mins int;lvl int; begin select * into p from public.profiles where id=auth.uid() for update; if p.id is null or p.is_banned then raise exception 'Zugriff gesperrt';end if; select * into up from public.user_pets where user_id=auth.uid() and pet_id=wanted_pet for update; if up.pet_id is null then raise exception 'Dieser Begleiter gehört dir nicht';end if; if up.training_ends_at is not null then raise exception 'Begleitertraining läuft bereits oder wartet auf Abschluss';end if; if stat_type not in ('attack','defense','mitleid') then raise exception 'Unbekannter Trainingswert';end if; lvl:=case stat_type when 'attack' then up.attack_level when 'defense' then up.defense_level else up.mitleid_level end; if lvl>=50 then raise exception 'Dieser Wert ist bereits voll trainiert';end if; cost:=round(5*power(lvl::numeric,1.55),2);mins:=greatest(2,lvl*5); if p.money<cost then raise exception 'Dafür reicht deine Kohle nicht';end if; update public.profiles set money=money-cost where id=p.id returning * into p; update public.user_pets set training_ends_at=now()+make_interval(mins=>mins),training_stat=stat_type where user_id=p.id and pet_id=wanted_pet returning * into up; return jsonb_build_object('cost',cost,'minutes',mins,'stat',stat_type,'pet',to_jsonb(up),'profile',to_jsonb(p)); end $function$
+"
+function,start_training,"CREATE OR REPLACE FUNCTION public.start_training(skill_type text)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+    declare p public.profiles;price numeric;mins int;current_level int;base numeric;
+    begin
+     select * into p from public.profiles where id=auth.uid() for update;
+      if p.id is null or p.is_banned then raise exception 'Zugriff gesperrt';end if;
+       if p.training_ends_at is not null and p.training_ends_at>now() then raise exception 'Du lernst bereits etwas';end if;
+        case skill_type
+         when 'attack' then
+           current_level:=p.attack_skill;
+             if current_level>=150 then raise exception 'Maximalstufe 150 erreicht';end if;
+               price:=9.80+(current_level-1)*5.00;
+                 mins:=24+(current_level-1)*3;
+                  when 'defense' then
+                    current_level:=p.defense_skill;
+                      if current_level>=150 then raise exception 'Maximalstufe 150 erreicht';end if;
+                        price:=3.20+(current_level-1)*5.00;
+                          mins:=8+(current_level-1)*1;
+                           when 'streetwise' then
+                             current_level:=p.streetwise;
+                               if current_level>=150 then raise exception 'Maximalstufe 150 erreicht';end if;
+                                 price:=20.00+(current_level-1)*5.00;
+                                   mins:=50+(current_level-1)*5;
+                                    when 'social' then
+                                      current_level:=p.social_skill;
+                                        if current_level>=45 then raise exception 'Maximalstufe 45 erreicht (alle Begleiter und Unterkünfte freigeschaltet)';end if;
+                                          price:=round(10*power(current_level::numeric,1.65),2);
+                                            mins:=round(power(current_level::numeric,1.28)*2);
+                                             when 'music' then
+                                               current_level:=p.music_skill;
+                                                 if current_level>=9 then raise exception 'Maximalstufe 9 erreicht (mehr Instrumente gibt es noch nicht)';end if;
+                                                   price:=round(25*power(current_level::numeric,1.9),2);
+                                                     mins:=round(power(current_level::numeric,1.5)*3);
+                                                      when 'stamina' then current_level:=p.stamina;base:=6;
+                                                       when 'speech' then current_level:=p.speech_skill;base:=7;
+                                                        when 'pickpocket' then current_level:=p.pickpocket_skill;base:=12;
+                                                         else raise exception 'Unbekannte Weiterbildung';end case;
+                                                          if skill_type in ('stamina','speech','pickpocket') then
+                                                            if current_level>=150 then raise exception 'Maximalstufe 150 erreicht';end if;
+                                                              price:=round(base*power(current_level::numeric,1.65),2);
+                                                                mins:=least(10080,greatest(1,round(power(current_level::numeric,1.28)*2)::int));
+                                                                 end if;
+                                                                  if p.money<price then raise exception 'Dafür reicht deine Kohle nicht';end if;
+                                                                   mins:=least(10080,greatest(1,mins));
+                                                                    if p.concentration_ends_at is not null and p.concentration_ends_at>now() then mins:=greatest(1,round(mins*0.9)::int);end if;
+                                                                     update public.profiles set money=money-price,training_type=skill_type,training_ends_at=now()+make_interval(mins=>mins) where id=auth.uid() returning * into p;
+                                                                      return jsonb_build_object('minutes',mins,'price',price,'profile',to_jsonb(p));
+                                                                      end $function$
+"
+function,upgrade_gang,"CREATE OR REPLACE FUNCTION public.upgrade_gang(kind text)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare g public.gangs; gid uuid; cost numeric; lvl int;
+begin
+ select gm.gang_id into gid from public.gang_members gm where gm.user_id=auth.uid();
+ if gid is null then raise exception 'Du bist in keiner Bande'; end if;
+ select * into g from public.gangs where id=gid for update;
+ if g.owner_id<>auth.uid() then raise exception 'Nur der Bandenchef darf ausbauen'; end if;
+ if kind='attack' then lvl:=g.attack_level; else lvl:=g.defense_level; end if;
+ if lvl>=10 then raise exception 'Bereits maximal ausgebaut'; end if;
+ cost:=25*(lvl+1);
+ if g.balance<cost then raise exception 'Zu wenig in der Bandenkasse'; end if;
+ if kind='attack' then update public.gangs set balance=balance-cost,attack_level=attack_level+1 where id=gid returning * into g;
+ elsif kind='defense' then update public.gangs set balance=balance-cost,defense_level=defense_level+1 where id=gid returning * into g;
+ else raise exception 'Ungültiger Ausbau'; end if;
+ return to_jsonb(g);
+end $function$
+"
+function,wash_up,"CREATE OR REPLACE FUNCTION public.wash_up(tier text DEFAULT 'schwamm'::text)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare p public.profiles; price numeric(12,2); gain int; label text;
+begin
+  select * into p from public.profiles where id=auth.uid() for update;
+    if p.cleanliness>=100 then raise exception 'Sauberer wird es heute nicht'; end if;
+      if tier='waschanlage' then price:=25.00; gain:=50; label:='Waschanlage';
+        else price:=6.00; gain:=10; label:='Schwamm'; end if;
+          if p.money<price then raise exception 'Dafuer reicht deine Kohle nicht'; end if;
+            update public.profiles set money=money-price, cleanliness=least(100,cleanliness+gain) where id=auth.uid() returning * into p;
+              return jsonb_build_object('label',label,'price',price,'gain',gain,'profile',to_jsonb(p));
+              end
+              $function$
+"
+policy,achievement_defs.achievement defs public,cmd=SELECT using=true check=
+policy,daily_missions.own missions visible,cmd=SELECT using=(user_id = auth.uid()) check=
+policy,defense_items.defense_items_read,cmd=SELECT using=true check=
+policy,fights.participants see fights,cmd=SELECT using=((attacker_id = auth.uid()) OR (defender_id = auth.uid())) check=
+policy,gang_members.members visible,cmd=SELECT using=true check=
+policy,gangs.gangs visible,cmd=SELECT using=true check=
+policy,inventory.own inventory visible,cmd=SELECT using=(user_id = auth.uid()) check=
+policy,messages.participants see messages,cmd=SELECT using=((sender_id = auth.uid()) OR (recipient_id = auth.uid())) check=
+policy,pet_catalog.pets visible,cmd=SELECT using=true check=
+policy,player_reports.reporter or admin sees reports,"cmd=SELECT using=((reporter_id = auth.uid()) OR (EXISTS ( SELECT 1
+   FROM profiles p
+  WHERE ((p.id = auth.uid()) AND p.is_admin)))) check="
+policy,profile_audit.admins see audit,"cmd=SELECT using=(EXISTS ( SELECT 1
+   FROM profiles p
+  WHERE ((p.id = auth.uid()) AND p.is_admin))) check="
+policy,profiles.profiles visible to authenticated,cmd=SELECT using=true check=
+policy,shop_items.shop visible,cmd=SELECT using=true check=
+policy,side_action_log.own side action log,cmd=SELECT using=(auth.uid() = user_id) check=
+policy,user_achievements.own achievements,cmd=SELECT using=(auth.uid() = user_id) check=
+policy,user_active_defenses.user_active_defenses_read,cmd=SELECT using=(auth.uid() = user_id) check=
+policy,user_pets.own pets visible,cmd=SELECT using=(user_id = auth.uid()) check=
+table,achievement_defs,"id text not null,
+name text not null,
+description text not null,
+reward numeric(12,2) default 0 not null,
+sort_order integer default 0 not null"
+table,daily_missions,"user_id uuid not null,
+mission_day date default CURRENT_DATE not null,
+progress integer default 0 not null,
+claimed boolean default false not null"
+table,defense_items,"id text not null,
+name text not null,
+kind text not null,
+amount integer not null,
+duration_type text not null,
+duration_minutes integer,
+price numeric(12,2) not null,
+sort_order integer not null"
+table,fights,"id bigint not null,
+attacker_id uuid not null,
+defender_id uuid not null,
+winner_id uuid not null,
+attacker_power integer not null,
+defender_power integer not null,
+loot numeric(12,2) default 0 not null,
+created_at timestamp with time zone default now() not null"
+table,gang_members,"gang_id uuid not null,
+user_id uuid not null,
+role text default 'member'::text not null,
+joined_at timestamp with time zone default now() not null"
+table,gangs,"id uuid default gen_random_uuid() not null,
+name text not null,
+owner_id uuid not null,
+balance numeric(14,2) default 0 not null,
+attack_level integer default 0 not null,
+defense_level integer default 0 not null,
+created_at timestamp with time zone default now() not null"
+table,inventory,"user_id uuid not null,
+item_id text not null,
+quantity integer default 1 not null,
+equipped boolean default false not null"
+table,messages,"id bigint not null,
+sender_id uuid not null,
+recipient_id uuid not null,
+body text not null,
+created_at timestamp with time zone default now() not null,
+read_at timestamp with time zone"
+table,pet_catalog,"id text not null,
+name text not null,
+description text not null,
+price numeric(12,2) not null,
+attack integer default 0 not null,
+defense integer default 0 not null,
+required_level integer default 1 not null,
+health integer"
+table,player_reports,"id bigint not null,
+reporter_id uuid not null,
+reported_id uuid not null,
+reason text not null,
+status text default 'open'::text not null,
+created_at timestamp with time zone default now() not null"
+table,profile_audit,"id bigint not null,
+user_id uuid not null,
+old_money numeric(12,2),
+new_money numeric(12,2),
+old_energy integer,
+new_energy integer,
+old_bottles integer,
+new_bottles integer,
+changed_at timestamp with time zone default now() not null"
+table,profiles,"id uuid not null,
+username text not null,
+money numeric(12,2) default 0 not null,
+energy integer default 100 not null,
+bottles integer default 0 not null,
+xp integer default 0 not null,
+level integer default 1 not null,
+created_at timestamp with time zone default now() not null,
+last_action_at timestamp with time zone,
+bag_level integer default 1 not null,
+shelter_level integer default 1 not null,
+streetwise integer default 1 not null,
+stamina integer default 1 not null,
+energy_updated_at timestamp with time zone default now() not null,
+container_level integer default 1 not null,
+cash_capacity numeric(12,2) default 20 not null,
+cleanliness integer default 100 not null,
+area_level integer default 1 not null,
+music_level integer default 0 not null,
+music_collected_at timestamp with time zone default now() not null,
+last_beg_at timestamp with time zone,
+total_earned numeric(14,2) default 0 not null,
+training_type text,
+training_ends_at timestamp with time zone,
+attack_skill integer default 1 not null,
+defense_skill integer default 1 not null,
+protection_until timestamp with time zone,
+wins integer default 0 not null,
+losses integer default 0 not null,
+is_admin boolean default false not null,
+is_banned boolean default false not null,
+ban_reason text,
+collection_ends_at timestamp with time zone,
+collection_started_at timestamp with time zone,
+collection_minutes integer,
+collection_ready_at timestamp with time zone,
+speech_skill integer default 1 not null,
+music_skill integer default 1 not null,
+social_skill integer default 1 not null,
+pickpocket_skill integer default 1 not null,
+last_side_action_at timestamp with time zone,
+daily_claim_date date,
+login_streak integer default 0 not null,
+alcohol_level numeric default 0 not null,
+alcohol_bonus_until timestamp with time zone,
+wash_level integer default 0 not null,
+bottles_lifetime_earned numeric(14,2) default 0 not null,
+concentration_ends_at timestamp with time zone,
+jail_until timestamp with time zone,
+jail_bail numeric(12,2) default 0 not null,
+alcohol_updated_at timestamp with time zone default now() not null,
+insurance_active boolean default false not null,
+insurance_since timestamp with time zone,
+insurance_next_charge_at timestamp with time zone,
+insurance_days_paid integer default 0 not null,
+mat_nails integer default 0 not null,
+mat_wood integer default 0 not null,
+mat_shards integer default 0 not null,
+mat_textile integer default 0 not null"
+table,shop_items,"id text not null,
+name text not null,
+description text not null,
+price numeric(12,2) not null,
+attack integer default 0 not null,
+defense integer default 0 not null,
+required_level integer default 1 not null,
+category text default 'ausruestung'::text not null"
+table,side_action_log,"id bigint not null,
+user_id uuid not null,
+action_type text not null,
+success boolean not null,
+money_change numeric(12,2) default 0 not null,
+bottle_change integer default 0 not null,
+xp_change integer default 0 not null,
+created_at timestamp with time zone default now() not null"
+table,user_achievements,"user_id uuid not null,
+achievement_id text not null,
+unlocked_at timestamp with time zone default now() not null"
+table,user_active_defenses,"id bigint default nextval('user_active_defenses_id_seq'::regclass) not null,
+user_id uuid not null,
+item_id text not null,
+amount integer not null,
+expires_at timestamp with time zone,
+consume_on_attack boolean default false not null,
+created_at timestamp with time zone default now() not null"
+table,user_pets,"user_id uuid not null,
+pet_id text not null,
+level integer default 1 not null,
+active boolean default false not null,
+training_ends_at timestamp with time zone,
+attack_level integer default 1 not null,
+defense_level integer default 1 not null,
+mitleid_level integer default 1 not null,
+training_stat text"
+trigger,guard_banned_actor,CREATE TRIGGER guard_banned_actor BEFORE INSERT OR DELETE OR UPDATE ON public.gang_members FOR EACH ROW EXECUTE FUNCTION block_banned_actor()
+trigger,guard_banned_actor,CREATE TRIGGER guard_banned_actor BEFORE INSERT OR DELETE OR UPDATE ON public.inventory FOR EACH ROW EXECUTE FUNCTION block_banned_actor()
+trigger,guard_banned_actor,CREATE TRIGGER guard_banned_actor BEFORE INSERT OR DELETE OR UPDATE ON public.user_pets FOR EACH ROW EXECUTE FUNCTION block_banned_actor()
+trigger,guard_banned_actor,CREATE TRIGGER guard_banned_actor BEFORE INSERT OR DELETE OR UPDATE ON public.fights FOR EACH ROW EXECUTE FUNCTION block_banned_actor()
+trigger,guard_banned_actor,CREATE TRIGGER guard_banned_actor BEFORE INSERT OR DELETE OR UPDATE ON public.daily_missions FOR EACH ROW EXECUTE FUNCTION block_banned_actor()
+trigger,guard_banned_actor,CREATE TRIGGER guard_banned_actor BEFORE INSERT OR DELETE OR UPDATE ON public.gangs FOR EACH ROW EXECUTE FUNCTION block_banned_actor()
+trigger,guard_banned_actor,CREATE TRIGGER guard_banned_actor BEFORE INSERT OR DELETE OR UPDATE ON public.messages FOR EACH ROW EXECUTE FUNCTION block_banned_actor()
+trigger,guard_banned_actor,CREATE TRIGGER guard_banned_actor BEFORE INSERT OR DELETE OR UPDATE ON public.profiles FOR EACH ROW EXECUTE FUNCTION block_banned_actor()
+trigger,profile_change_audit,CREATE TRIGGER profile_change_audit AFTER UPDATE ON public.profiles FOR EACH ROW EXECUTE FUNCTION audit_profile_change()

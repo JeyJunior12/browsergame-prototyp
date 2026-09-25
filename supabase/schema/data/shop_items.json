@@ -1,0 +1,412 @@
+[
+ {
+  "id": "jacket",
+  "name": "Mottenzerfressene Jacke",
+  "description": "Hält weder warm noch dicht, aber Treffer ab.",
+  "price": 8.0,
+  "attack": 0,
+  "defense": 2,
+  "required_level": 1,
+  "category": "ausruestung"
+ },
+ {
+  "id": "umbrella",
+  "name": "Halber Regenschirm",
+  "description": "Eine Hälfte Schutz ist besser als gar keiner.",
+  "price": 15.0,
+  "attack": 1,
+  "defense": 4,
+  "required_level": 2,
+  "category": "ausruestung"
+ },
+ {
+  "id": "cart",
+  "name": "Getunter Einkaufswagen",
+  "description": "Quietscht einschüchternd und gibt Stabilität.",
+  "price": 40.0,
+  "attack": 5,
+  "defense": 5,
+  "required_level": 3,
+  "category": "ausruestung"
+ },
+ {
+  "id": "traffic_vest",
+  "name": "Ausgeblichene Warnweste",
+  "description": "Man sieht dich kommen und trifft etwas schlechter.",
+  "price": 28.0,
+  "attack": 0,
+  "defense": 6,
+  "required_level": 3,
+  "category": "kleidung"
+ },
+ {
+  "id": "cardboard_armor",
+  "name": "Mehrlagige Kartonrüstung",
+  "description": "Bei Regen nutzlos, davor erstaunlich stabil.",
+  "price": 85.0,
+  "attack": 1,
+  "defense": 11,
+  "required_level": 7,
+  "category": "kleidung"
+ },
+ {
+  "id": "construction_helmet",
+  "name": "Zerkratzter Bauhelm",
+  "description": "Schutzklasse: irgendwo gefunden.",
+  "price": 240.0,
+  "attack": 2,
+  "defense": 18,
+  "required_level": 14,
+  "category": "kleidung"
+ },
+ {
+  "id": "winter_coat",
+  "name": "Veteranen-Wintermantel",
+  "description": "Viele Taschen, noch mehr Geschichten.",
+  "price": 650.0,
+  "attack": 5,
+  "defense": 28,
+  "required_level": 22,
+  "category": "kleidung"
+ },
+ {
+  "id": "cart_engine",
+  "name": "Mofamotor für den Wagen",
+  "description": "Späterer Geschwindigkeitsbonus für Pfandtouren.",
+  "price": 900.0,
+  "attack": 6,
+  "defense": 12,
+  "required_level": 28,
+  "category": "zubehoer"
+ },
+ {
+  "id": "lucky_bottle",
+  "name": "Unheimliche Glücksflasche",
+  "description": "Niemand weiß, warum sie immer wieder auftaucht.",
+  "price": 1400.0,
+  "attack": 20,
+  "defense": 20,
+  "required_level": 35,
+  "category": "plunder"
+ },
+ {
+  "id": "toothpick",
+  "name": "Krummes Zahnstocher-Bündel",
+  "description": "Sieht gefährlicher aus als es ist.",
+  "price": 2.0,
+  "attack": 1,
+  "defense": 0,
+  "required_level": 1,
+  "category": "waffen"
+ },
+ {
+  "id": "bottle",
+  "name": "Abgebrochene Limo-Flasche",
+  "description": "Klassiker mit klebrigem Griff.",
+  "price": 5.0,
+  "attack": 3,
+  "defense": 0,
+  "required_level": 1,
+  "category": "waffen"
+ },
+ {
+  "id": "taped_gloves",
+  "name": "Wasserbomben",
+  "description": "Kleine Ladung Wasser, große Wirkung - zumindest optisch.",
+  "price": 32.0,
+  "attack": 6,
+  "defense": 0,
+  "required_level": 4,
+  "category": "waffen"
+ },
+ {
+  "id": "chain_lock",
+  "name": "Kettenschloss",
+  "description": "Eigentlich zum Abschließen gedacht. Eigentlich.",
+  "price": 455.0,
+  "attack": 25,
+  "defense": 2,
+  "required_level": 19,
+  "category": "waffen"
+ },
+ {
+  "id": "shopping_cart_ram",
+  "name": "Schlagring",
+  "description": "Kalter Stahl an warmen Fingern. Trifft überraschend hart.",
+  "price": 561.0,
+  "attack": 28,
+  "defense": 2,
+  "required_level": 21,
+  "category": "waffen"
+ },
+ {
+  "id": "street_sign",
+  "name": "Schwert",
+  "description": "Die Königsklasse unter den Kiez-Waffen. Herkunft ungeklärt.",
+  "price": 1467.0,
+  "attack": 47,
+  "defense": 3,
+  "required_level": 35,
+  "category": "waffen"
+ },
+ {
+  "id": "silvesterknaller",
+  "name": "Silvesterknaller",
+  "description": "Lauter als jede Ausrede. Erschreckt Gegner und Tauben gleichermaßen.",
+  "price": 68.0,
+  "attack": 9,
+  "defense": 0,
+  "required_level": 7,
+  "category": "waffen"
+ },
+ {
+  "id": "spraydose",
+  "name": "Spraydose",
+  "description": "Vielseitig einsetzbar - im Auge des Gegners besonders wirkungsvoll.",
+  "price": 117.0,
+  "attack": 12,
+  "defense": 0,
+  "required_level": 9,
+  "category": "waffen"
+ },
+ {
+  "id": "gummiknueppel",
+  "name": "Gummiknüppel",
+  "description": "Nicht ganz legal, aber wer fragt schon einen Penner nach der Herkunft.",
+  "price": 247.0,
+  "attack": 18,
+  "defense": 1,
+  "required_level": 14,
+  "category": "waffen"
+ },
+ {
+  "id": "heizungsrohr",
+  "name": "Heizungsrohr",
+  "description": "Aus einem verlassenen Keller. Schwer, aber überzeugend.",
+  "price": 678.0,
+  "attack": 31,
+  "defense": 3,
+  "required_level": 23,
+  "category": "waffen"
+ },
+ {
+  "id": "hammer",
+  "name": "Hammer",
+  "description": "Baumarktqualität. Hält, was er verspricht - meistens dem Gegner.",
+  "price": 804.0,
+  "attack": 34,
+  "defense": 3,
+  "required_level": 26,
+  "category": "waffen"
+ },
+ {
+  "id": "pfefferspray",
+  "name": "Pfefferspray",
+  "description": "Reizt nicht nur die Augen. Wirkung garantiert, Geruch unangenehm.",
+  "price": 940.0,
+  "attack": 37,
+  "defense": 1,
+  "required_level": 28,
+  "category": "waffen"
+ },
+ {
+  "id": "elektroschocker",
+  "name": "Elektroschocker",
+  "description": "Kurzer Schock, lange Wirkung. Batterien nicht im Lieferumfang.",
+  "price": 1140.0,
+  "attack": 41,
+  "defense": 4,
+  "required_level": 31,
+  "category": "waffen"
+ },
+ {
+  "id": "feuerloescher",
+  "name": "Feuerlöscher",
+  "description": "Löscht Brände und Gegner gleichermaßen effektiv.",
+  "price": 1295.0,
+  "attack": 44,
+  "defense": 5,
+  "required_level": 33,
+  "category": "waffen"
+ },
+ {
+  "id": "gullideckel",
+  "name": "Gullideckel",
+  "description": "Schwer wie ein Grabstein und mindestens genauso überzeugend im Nahkampf.",
+  "price": 329.0,
+  "attack": 21,
+  "defense": 2,
+  "required_level": 16,
+  "category": "waffen"
+ },
+ {
+  "id": "nagelkeule",
+  "name": "Nagelkeule",
+  "description": "Selbstgebaut aus Nägeln und Holz. Sieht brutal aus, ist es auch.",
+  "price": 50.0,
+  "attack": 15,
+  "defense": 0,
+  "required_level": 1,
+  "category": "craft"
+ },
+ {
+  "id": "holzschild",
+  "name": "Holzschild",
+  "description": "Ein einfaches Schild aus Brettern und Nägeln.",
+  "price": 25.0,
+  "attack": 0,
+  "defense": 8,
+  "required_level": 1,
+  "category": "craft"
+ },
+ {
+  "id": "stachelschild",
+  "name": "Stachelschild",
+  "description": "Holzschild mit ein paar zusätzlichen spitzen Nägeln.",
+  "price": 60.0,
+  "attack": 0,
+  "defense": 14,
+  "required_level": 1,
+  "category": "craft"
+ },
+ {
+  "id": "glasstachelschild",
+  "name": "Glasstachelschild",
+  "description": "Scherben im Rand machen es besonders unangenehm zu treffen.",
+  "price": 110.0,
+  "attack": 0,
+  "defense": 22,
+  "required_level": 1,
+  "category": "craft"
+ },
+ {
+  "id": "doppeltes_holzschild",
+  "name": "Doppeltes Holzschild",
+  "description": "Zwei Schichten Holz halten mehr aus als eine.",
+  "price": 60.0,
+  "attack": 0,
+  "defense": 16,
+  "required_level": 1,
+  "category": "craft"
+ },
+ {
+  "id": "ramponierter_anzug",
+  "name": "Ramponierter Anzug",
+  "description": "Löchrig, aber wenigstens noch ein Anzug.",
+  "price": 85.0,
+  "attack": 1,
+  "defense": 10,
+  "required_level": 1,
+  "category": "craft"
+ },
+ {
+  "id": "feiner_anzug",
+  "name": "Feiner Anzug",
+  "description": "Fast schon respektabel, wenn man nicht so genau hinsieht.",
+  "price": 80.0,
+  "attack": 2,
+  "defense": 9,
+  "required_level": 1,
+  "category": "craft"
+ },
+ {
+  "id": "kaputter_regenschirm",
+  "name": "Kaputter Regenschirm",
+  "description": "Hält noch die Hälfte des Regens ab.",
+  "price": 95.0,
+  "attack": 0,
+  "defense": 12,
+  "required_level": 1,
+  "category": "craft"
+ },
+ {
+  "id": "regenschirm",
+  "name": "Regenschirm",
+  "description": "Voll funktionsfähig. Fast schon Luxus.",
+  "price": 250.0,
+  "attack": 0,
+  "defense": 30,
+  "required_level": 1,
+  "category": "craft"
+ },
+ {
+  "id": "chain_gloves",
+  "name": "Kettenhandschuhe",
+  "description": "Griffig und stichfest - perfekt zum Wühlen im Altglas.",
+  "price": 15.0,
+  "attack": 2,
+  "defense": 3,
+  "required_level": 2,
+  "category": "zubehoer"
+ },
+ {
+  "id": "whistle",
+  "name": "Trillerpfeife",
+  "description": "Schreckt Ratten und ungebetene Konkurrenz gleichermassen ab.",
+  "price": 45.0,
+  "attack": 3,
+  "defense": 4,
+  "required_level": 5,
+  "category": "zubehoer"
+ },
+ {
+  "id": "folding_spade",
+  "name": "Klappspaten",
+  "description": "Kompakt verstaubar, im Notfall auch ueberzeugend als Waffe.",
+  "price": 95.0,
+  "attack": 7,
+  "defense": 3,
+  "required_level": 8,
+  "category": "zubehoer"
+ },
+ {
+  "id": "flashlight",
+  "name": "Taschenlampe",
+  "description": "Findet auch im dunkelsten Hinterhof noch das letzte Pfand.",
+  "price": 160.0,
+  "attack": 2,
+  "defense": 9,
+  "required_level": 11,
+  "category": "zubehoer"
+ },
+ {
+  "id": "survival_backpack",
+  "name": "Survival-Rucksack",
+  "description": "Mehr Fächer, mehr Polsterung, mehr Ueberlebenschance.",
+  "price": 280.0,
+  "attack": 5,
+  "defense": 12,
+  "required_level": 15,
+  "category": "zubehoer"
+ },
+ {
+  "id": "walkie_talkie",
+  "name": "Funkgeraet",
+  "description": "Warnt rechtzeitig vor Ordnungsamt und Konkurrenz.",
+  "price": 420.0,
+  "attack": 8,
+  "defense": 10,
+  "required_level": 19,
+  "category": "zubehoer"
+ },
+ {
+  "id": "solar_panel_set",
+  "name": "Solarpanel-Set",
+  "description": "Laedt das Handy, waermt nachts wenigstens ein bisschen.",
+  "price": 650.0,
+  "attack": 6,
+  "defense": 18,
+  "required_level": 24,
+  "category": "zubehoer"
+ },
+ {
+  "id": "armored_handcart",
+  "name": "Gepanzerte Handkarre",
+  "description": "Der Rolls-Royce unter den Einkaufswagen.",
+  "price": 1100.0,
+  "attack": 15,
+  "defense": 20,
+  "required_level": 32,
+  "category": "zubehoer"
+ }
+]
