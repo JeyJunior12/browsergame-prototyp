@@ -1,0 +1,172 @@
+[
+ {
+  "id": "sand",
+  "name": "Handvoll Sand werfen",
+  "kind": "defense",
+  "amount": 1,
+  "duration_type": "until_attack",
+  "duration_minutes": null,
+  "price": 1000.0,
+  "sort_order": 1
+ },
+ {
+  "id": "bananas",
+  "name": "Bananenschalen verteilen",
+  "kind": "defense",
+  "amount": 1,
+  "duration_type": "fixed",
+  "duration_minutes": 360,
+  "price": 1400.0,
+  "sort_order": 2
+ },
+ {
+  "id": "salt",
+  "name": "Handvoll Salz",
+  "kind": "defense",
+  "amount": 2,
+  "duration_type": "until_attack",
+  "duration_minutes": null,
+  "price": 1700.0,
+  "sort_order": 3
+ },
+ {
+  "id": "signpost",
+  "name": "Wegweiser aufstellen",
+  "kind": "skill",
+  "amount": 12,
+  "duration_type": "until_attack",
+  "duration_minutes": null,
+  "price": 10.0,
+  "sort_order": 4
+ },
+ {
+  "id": "itchpowder",
+  "name": "Juckpulver verschleudern",
+  "kind": "defense",
+  "amount": 3,
+  "duration_type": "until_attack",
+  "duration_minutes": null,
+  "price": 1800.0,
+  "sort_order": 5
+ },
+ {
+  "id": "playdead",
+  "name": "Totstellen",
+  "kind": "skill",
+  "amount": 20,
+  "duration_type": "until_attack",
+  "duration_minutes": null,
+  "price": 30.0,
+  "sort_order": 6
+ },
+ {
+  "id": "disguise",
+  "name": "Tarnen",
+  "kind": "skill",
+  "amount": 15,
+  "duration_type": "fixed",
+  "duration_minutes": 180,
+  "price": 50.0,
+  "sort_order": 7
+ },
+ {
+  "id": "cats",
+  "name": "Mit bösen Katzen werfen",
+  "kind": "defense",
+  "amount": 2,
+  "duration_type": "fixed",
+  "duration_minutes": 10,
+  "price": 2000.0,
+  "sort_order": 8
+ },
+ {
+  "id": "mirror",
+  "name": "Mit Spiegel blenden",
+  "kind": "defense",
+  "amount": 4,
+  "duration_type": "fixed",
+  "duration_minutes": 90,
+  "price": 2000.79,
+  "sort_order": 9
+ },
+ {
+  "id": "poisonbeer",
+  "name": "Vergiftetes Bier hinstellen",
+  "kind": "defense",
+  "amount": 4,
+  "duration_type": "fixed",
+  "duration_minutes": 5,
+  "price": 2400.0,
+  "sort_order": 10
+ },
+ {
+  "id": "electricfence",
+  "name": "Elektrozaun aufstellen",
+  "kind": "defense",
+  "amount": 5,
+  "duration_type": "fixed",
+  "duration_minutes": 30,
+  "price": 2100.0,
+  "sort_order": 11
+ },
+ {
+  "id": "fishnet",
+  "name": "Fischernetz spannen",
+  "kind": "defense",
+  "amount": 7,
+  "duration_type": "until_attack",
+  "duration_minutes": null,
+  "price": 1900.0,
+  "sort_order": 12
+ },
+ {
+  "id": "barbwire",
+  "name": "Stacheldraht aufstellen",
+  "kind": "defense",
+  "amount": 8,
+  "duration_type": "until_attack",
+  "duration_minutes": null,
+  "price": 1940.0,
+  "sort_order": 13
+ },
+ {
+  "id": "turret",
+  "name": "Selbstschussanlagen",
+  "kind": "defense",
+  "amount": 8,
+  "duration_type": "fixed",
+  "duration_minutes": 90,
+  "price": 2190.0,
+  "sort_order": 14
+ },
+ {
+  "id": "moat",
+  "name": "Wassergraben",
+  "kind": "defense",
+  "amount": 9,
+  "duration_type": "until_attack",
+  "duration_minutes": null,
+  "price": 1981.0,
+  "sort_order": 15
+ },
+ {
+  "id": "pitfall",
+  "name": "Fallgruben buddeln",
+  "kind": "defense",
+  "amount": 11,
+  "duration_type": "until_attack",
+  "duration_minutes": null,
+  "price": 2032.8,
+  "sort_order": 16
+ },
+ {
+  "id": "snaretrap",
+  "name": "Schlingfalle mit Bierköder",
+  "kind": "defense",
+  "amount": 12,
+  "duration_type": "until_attack",
+  "duration_minutes": null,
+  "price": 2059.2,
+  "sort_order": 17
+ }
+]

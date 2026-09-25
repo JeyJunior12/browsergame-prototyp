@@ -1,0 +1,262 @@
+[
+ {
+  "id": "cockroach",
+  "name": "Kakerlake",
+  "description": "Ueberlebt alles, sogar die naechste Miete.",
+  "price": 0.01,
+  "attack": 0,
+  "defense": 0,
+  "required_level": 1,
+  "health": 0
+ },
+ {
+  "id": "goldfish",
+  "name": "Goldfisch",
+  "description": "Dreht stumm seine Runden im Marmeladenglas.",
+  "price": 1.0,
+  "attack": 1,
+  "defense": 1,
+  "required_level": 3,
+  "health": 1
+ },
+ {
+  "id": "mouse",
+  "name": "Maus",
+  "description": "Flink, klein, und ueberall zuhause.",
+  "price": 1.5,
+  "attack": 2,
+  "defense": 3,
+  "required_level": 5,
+  "health": 7
+ },
+ {
+  "id": "hamster",
+  "name": "Hamster",
+  "description": "Sammelt Kronkorken in den Backentaschen.",
+  "price": 3.8,
+  "attack": 5,
+  "defense": 4,
+  "required_level": 7,
+  "health": 12
+ },
+ {
+  "id": "budgie",
+  "name": "Wellensittich",
+  "description": "Zwitschert lauter als der Nachbar schimpft.",
+  "price": 5.0,
+  "attack": 7,
+  "defense": 5,
+  "required_level": 9,
+  "health": 16
+ },
+ {
+  "id": "pigeon",
+  "name": "Taube",
+  "description": "Frisst deine Kruemel und manchmal deine Nerven.",
+  "price": 7.5,
+  "attack": 8,
+  "defense": 3,
+  "required_level": 11,
+  "health": 1
+ },
+ {
+  "id": "rat",
+  "name": "Ratte",
+  "description": "Kennt jede Kanalisation im Kiez.",
+  "price": 15.0,
+  "attack": 10,
+  "defense": 5,
+  "required_level": 13,
+  "health": 0
+ },
+ {
+  "id": "rabbit",
+  "name": "Hase",
+  "description": "Schneller weg als du gucken kannst.",
+  "price": 22.5,
+  "attack": 13,
+  "defense": 10,
+  "required_level": 15,
+  "health": 17
+ },
+ {
+  "id": "ferret",
+  "name": "Frettchen",
+  "description": "Schlau, frech und ueberall reingezwaengt.",
+  "price": 75.0,
+  "attack": 18,
+  "defense": 15,
+  "required_level": 17,
+  "health": 19
+ },
+ {
+  "id": "cat",
+  "name": "Katze",
+  "description": "Herrscht ueber jeden Hinterhof.",
+  "price": 85.0,
+  "attack": 25,
+  "defense": 20,
+  "required_level": 19,
+  "health": 32
+ },
+ {
+  "id": "falcon",
+  "name": "Falke",
+  "description": "Behaelt den ganzen Kiez im Blick.",
+  "price": 88.0,
+  "attack": 27,
+  "defense": 25,
+  "required_level": 21,
+  "health": 22
+ },
+ {
+  "id": "snake",
+  "name": "Schlange",
+  "description": "Lautlos, schnell, respekteinfloessend.",
+  "price": 95.0,
+  "attack": 44,
+  "defense": 38,
+  "required_level": 23,
+  "health": 10
+ },
+ {
+  "id": "goat",
+  "name": "Hausziege",
+  "description": "Frisst Beweise und gegnerische Kleidung.",
+  "price": 100.0,
+  "attack": 36,
+  "defense": 40,
+  "required_level": 25,
+  "health": 21
+ },
+ {
+  "id": "poodle",
+  "name": "Pudel",
+  "description": "Loyal, laut und ueberraschend schnell.",
+  "price": 200.0,
+  "attack": 26,
+  "defense": 29,
+  "required_level": 27,
+  "health": 62
+ },
+ {
+  "id": "trained_mouse",
+  "name": "Dressierte Maus",
+  "description": "Ausgebildet fuer den harten Strassenalltag.",
+  "price": 220.0,
+  "attack": 43,
+  "defense": 37,
+  "required_level": 29,
+  "health": 253
+ },
+ {
+  "id": "eagle",
+  "name": "Adler",
+  "description": "Schlaegt zu, bevor man ihn kommen sieht.",
+  "price": 300.0,
+  "attack": 39,
+  "defense": 41,
+  "required_level": 31,
+  "health": 38
+ },
+ {
+  "id": "shepherd_dog",
+  "name": "Schaeferhund",
+  "description": "Treuer Begleiter mit ordentlich Biss.",
+  "price": 600.0,
+  "attack": 55,
+  "defense": 45,
+  "required_level": 33,
+  "health": 43
+ },
+ {
+  "id": "pitbull",
+  "name": "Pitbull",
+  "description": "Kompakt gebaut und furchtlos im Kampf.",
+  "price": 1000.0,
+  "attack": 65,
+  "defense": 59,
+  "required_level": 35,
+  "health": 1
+ },
+ {
+  "id": "cocker_spaniel",
+  "name": "Cocker Spaniel",
+  "description": "Freundlich bis er es nicht mehr ist.",
+  "price": 1470.0,
+  "attack": 59,
+  "defense": 40,
+  "required_level": 37,
+  "health": 56
+ },
+ {
+  "id": "chihuahua",
+  "name": "Chihuahua",
+  "description": "Klein, laut und ueberraschend zaeh.",
+  "price": 2000.0,
+  "attack": 32,
+  "defense": 28,
+  "required_level": 39,
+  "health": 133
+ },
+ {
+  "id": "horse",
+  "name": "Pferd",
+  "description": "Bringt dich schneller durch den Kiez.",
+  "price": 2500.0,
+  "attack": 62,
+  "defense": 69,
+  "required_level": 40,
+  "health": 80
+ },
+ {
+  "id": "giraffe",
+  "name": "Giraffe",
+  "description": "Sieht den Aerger schon von weitem kommen.",
+  "price": 3000.0,
+  "attack": 71,
+  "defense": 82,
+  "required_level": 41,
+  "health": 98
+ },
+ {
+  "id": "crocodile",
+  "name": "Krokodil",
+  "description": "Wartet geduldig, schlaegt gnadenlos zu.",
+  "price": 4800.0,
+  "attack": 95,
+  "defense": 75,
+  "required_level": 42,
+  "health": 30
+ },
+ {
+  "id": "tiger",
+  "name": "Tiger",
+  "description": "Der Schrecken jeder dunklen Gasse.",
+  "price": 5000.0,
+  "attack": 136,
+  "defense": 46,
+  "required_level": 43,
+  "health": 69
+ },
+ {
+  "id": "monkey",
+  "name": "Aeffchen",
+  "description": "Flink, frech und ausdauernd im Kampf.",
+  "price": 5800.0,
+  "attack": 52,
+  "defense": 43,
+  "required_level": 44,
+  "health": 230
+ },
+ {
+  "id": "rhino",
+  "name": "Nashorn",
+  "description": "Nichts haelt diesen Koloss auf.",
+  "price": 7000.0,
+  "attack": 100,
+  "defense": 95,
+  "required_level": 45,
+  "health": 39
+ }
+]

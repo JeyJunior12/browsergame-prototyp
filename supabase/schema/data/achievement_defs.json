@@ -1,0 +1,44 @@
+[
+ {
+  "id": "first_bottles",
+  "name": "Erster Sack",
+  "description": "Sammle mindestens 20 Pfandflaschen.",
+  "reward": 5.0,
+  "sort_order": 1
+ },
+ {
+  "id": "level_five",
+  "name": "Kiezbekannt",
+  "description": "Erreiche Level 5.",
+  "reward": 15.0,
+  "sort_order": 2
+ },
+ {
+  "id": "first_win",
+  "name": "Erste Schelle",
+  "description": "Gewinne deine erste Prügelei.",
+  "reward": 10.0,
+  "sort_order": 3
+ },
+ {
+  "id": "rich",
+  "name": "Kleingeldkönig",
+  "description": "Besitze mindestens 100 Euro.",
+  "reward": 25.0,
+  "sort_order": 4
+ },
+ {
+  "id": "collector",
+  "name": "Pfandbaron",
+  "description": "Sammle insgesamt 100 Flaschen auf einmal.",
+  "reward": 20.0,
+  "sort_order": 5
+ },
+ {
+  "id": "veteran",
+  "name": "Kiezlegende",
+  "description": "Erreiche Level 10.",
+  "reward": 50.0,
+  "sort_order": 6
+ }
+]
