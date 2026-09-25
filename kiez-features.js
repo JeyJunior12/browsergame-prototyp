@@ -67,10 +67,23 @@ function addPanel(id, title, label) {
   const side = $('.side');
   let b = side?.querySelector('[data-view="' + id + '"]');
   if (side && !b) { b = document.createElement('button'); b.dataset.view = id; b.textContent = label; side.insertBefore(b, $('#adminnav')); }
-  if (b) b.onclick = () => { window.kiezShowView?.(id); loaders[id]?.(); };
+  if (b) b.onclick = () => show(id);
+  watchPanels();
   return sec.querySelector('.kf-body');
 }
-function show(id) { window.kiezShowView?.(id); loaders[id]?.(); }
+// Jede Seite lädt ihre Daten, sobald sie sichtbar wird – egal über welches Menü, welchen Reiter oder Link
+const activeWatch = new MutationObserver(ms => ms.forEach(m => {
+  const s = m.target;
+  if (s.classList.contains('active-view') && !(m.oldValue || '').includes('active-view')) loaders[s.id]?.();
+}));
+function watchPanels() {
+  document.querySelectorAll('section.panel').forEach(s => { if (!s.dataset.kfw) { s.dataset.kfw = '1'; activeWatch.observe(s, { attributes: true, attributeFilter: ['class'], attributeOldValue: true }); } });
+}
+function show(id) {
+  const was = document.getElementById(id)?.classList.contains('active-view');
+  window.kiezShowView?.(id);
+  if (was) loaders[id]?.();
+}
 window.kiezGo = show;
 
 // ================= Profil =================
@@ -81,7 +94,7 @@ loaders.profil = async () => {
   const me = await myId(); if (!me) return;
   const id = profileTarget || me, own = id === me;
   const [pr, gm, gb, fr, bl] = await Promise.all([
-    sb.from('profiles').select('id,username,level,xp,wins,losses,bio,motto,created_at,equipped_plunder,donations_received,donation_money,pet_wins,is_banned').eq('id', id).maybeSingle(),
+    sb.from('profiles').select('id,username,level,xp,wins,losses,bio,motto,created_at,equipped_plunder,donations_received,donation_money,pet_wins,is_banned,avatar').eq('id', id).maybeSingle(),
     sb.from('gang_members').select('gang_id,role').eq('user_id', id).maybeSingle(),
     sb.from('guestbook_entries').select('id,author_id,body,created_at').eq('owner_id', id).order('created_at', { ascending: false }).limit(30),
     sb.from('friendships').select('*').or('and(user_id.eq.' + me + ',friend_id.eq.' + id + '),and(user_id.eq.' + id + ',friend_id.eq.' + me + ')'),
@@ -93,7 +106,8 @@ loaders.profil = async () => {
   const plunderName = p.equipped_plunder ? (await sb.from('plunder_catalog').select('name').eq('id', p.equipped_plunder).maybeSingle()).data?.name : null;
   const authors = await names((gb.data || []).map(e => e.author_id));
   const f = (fr.data || [])[0], blocked = (bl.data || []).length > 0;
-  let h = '<div class="kf-box"><h3>' + esc(p.username) + (p.is_banned ? ' <span class="kf-muted">(gesperrt)</span>' : '') + '</h3>'
+  const av = p.avatar && /^data:image\/(jpeg|png|webp);base64,/.test(p.avatar) ? '<div style="float:right;width:84px;height:84px;margin:0 0 8px 10px;border:3px solid #756346;background:#11110f center/cover;background-image:url(\'' + p.avatar + '\')"></div>' : '';
+  let h = '<div class="kf-box">' + av + '<h3>' + esc(p.username) + (p.is_banned ? ' <span class="kf-muted">(gesperrt)</span>' : '') + '</h3>'
     + (p.motto ? '<p><i>„' + esc(p.motto) + '“</i></p>' : '')
     + '<table class="kf-table"><tr><td>Level</td><td>' + p.level + '</td><td>Punkte</td><td>' + p.xp + '</td></tr>'
     + '<tr><td>Siege / Niederlagen</td><td>' + p.wins + ' / ' + p.losses + '</td><td>Tierkampf-Siege</td><td>' + p.pet_wins + '</td></tr>'
@@ -372,8 +386,9 @@ async function updateHeader(p) {
 let firstProfile = true;
 window.kiezOnProfile = p => {
   updateHeader(p); if (p?.is_admin) addAdminEvents();
+  applyAvatar(p); updateReferral(p);
   // Nach dem Login: eine schon geöffnete neue Seite, die noch ohne Konto geladen wurde, nachladen
-  if (firstProfile) { firstProfile = false; const open = document.querySelector('section.panel.active-view'); if (open && loaders[open.id] && open.id !== 'gangs') loaders[open.id](); }
+  if (firstProfile) { firstProfile = false; watchPanels(); updateUnread(); const open = document.querySelector('section.panel.active-view'); if (open && loaders[open.id] && open.id !== 'gangs') loaders[open.id](); }
 };
 setInterval(() => { if (window.kiezProfile) updateHeader(window.kiezProfile); }, 5000);
 
@@ -406,6 +421,145 @@ if (spende) {
   document.body.appendChild(m);
   m.querySelector('.sclose').onclick = () => { m.remove(); history.replaceState(null, '', location.pathname); };
   act(m.querySelector('.sgo'), m.querySelector('.smsg'), async () => { const r = await rpc('donate_link', { target_name: spende }); m.querySelector('.sgo').remove(); return 'Danke! ' + esc(r.name) + ' bekommt ' + eur(r.amount) + '. Lust, selbst mitzuspielen? Einfach registrieren!'; });
+}
+
+
+// ================= Kiezpost: Systemnachrichten + gelesen/ungelesen =================
+const NKIND = { kampf: '👊', tierkampf: '🐾', freund: '🤝', gaestebuch: '📖', bande: '👥', wettbewerb: '🏆', werben: '📣', lotto: '🎰', erfolg: '🎖' };
+function ensureBox(panelSel, id, html) {
+  const inside = document.querySelector(panelSel + ' > .inside'); if (!inside) return null;
+  let el = document.getElementById(id);
+  if (!el) {
+    el = document.createElement('div'); el.id = id; el.style.display = 'none'; el.innerHTML = html || ''; inside.appendChild(el);
+    // aktiven Reiter neu anwenden, damit der neue Bereich gleich richtig ein-/ausgeblendet ist
+    setTimeout(() => document.querySelector(panelSel + ' .section-tools .subtab-active')?.click(), 0);
+  }
+  return el;
+}
+loaders.messages = async () => {
+  const box = ensureBox('#messages', 'kf-notifications');
+  if (!box) return;
+  const { data } = await sb.from('notifications').select('*').order('created_at', { ascending: false }).limit(50);
+  box.innerHTML = '<div class="kf-box"><h3>🔔 Systemnachrichten</h3><ul class="kf-list">' + ((data || []).map(n => '<li' + (n.read_at ? '' : ' style="font-weight:700"') + '>' + (NKIND[n.kind] || '•') + ' ' + esc(n.body) + ' <span class="kf-muted">' + when(n.created_at) + '</span></li>').join('') || '<li class="kf-muted">Noch keine Systemnachrichten.</li>') + '</ul></div>';
+  try { await rpc('mark_messages_read'); if ((data || []).some(n => !n.read_at)) await rpc('mark_notifications_read'); } catch (e) { }
+  updateUnread();
+};
+async function updateUnread() {
+  if (!window.kiezProfile) return;
+  let c; try { c = await rpc('unread_counts'); } catch (e) { return; }
+  const total = (c.messages || 0) + (c.notifications || 0);
+  const slip = document.querySelector('.slip-messages b');
+  if (slip) slip.textContent = total ? 'Postfach (' + total + ')' : 'Postfach';
+  const nav = [...document.querySelectorAll('.side [data-view="messages"]')][0];
+  if (nav) nav.textContent = '✉ Kiezpost' + (total ? ' (' + total + ')' : '');
+  const sys = [...document.querySelectorAll('#messages .section-tools span')].find(x => x.textContent.startsWith('System'));
+  if (sys) sys.textContent = 'System' + (c.notifications ? ' (' + c.notifications + ')' : '');
+}
+setInterval(updateUnread, 60000);
+
+// ================= Erfolge: kommende Meilensteine mit Fortschritt =================
+loaders.achievements = async () => {
+  const box = ensureBox('#achievements', 'kf-milestones'); if (!box) return;
+  const me = await myId(); if (!me) return;
+  const [st, defs, got] = await Promise.all([rpc('achievement_progress'), sb.from('achievement_defs').select('*').order('sort_order'), sb.from('user_achievements').select('achievement_id').eq('user_id', me)]);
+  const have = new Set((got.data || []).map(x => x.achievement_id));
+  const open = (defs.data || []).filter(d => d.stat && !have.has(d.id)).map(d => ({ d, cur: Number(st[d.stat] || 0), pct: Math.min(100, Math.floor(Number(st[d.stat] || 0) / d.threshold * 100)) })).sort((a, b) => b.pct - a.pct);
+  box.innerHTML = '<div class="kf-box"><h3>🎯 Kommende Meilensteine (' + open.length + ' offen, ' + have.size + ' geschafft)</h3><ul class="kf-list">' + open.map(o => '<li><b>' + esc(o.d.name) + '</b> – ' + esc(o.d.description) + '<div style="background:#11110f;height:8px;border-radius:4px;margin:4px 0"><div style="width:' + o.pct + '%;height:8px;border-radius:4px;background:#c4a747"></div></div><span class="kf-muted">' + Math.floor(o.cur) + ' / ' + Number(o.d.threshold) + ' · Belohnung ' + eur(o.d.reward) + (o.d.reward_caps ? ' + ' + o.d.reward_caps + ' 🧢' : '') + '</span></li>').join('') + '</ul></div>';
+};
+
+// ================= Glücksspiel: Kiez-Lotto =================
+loaders.missions = async () => {
+  const box = ensureBox('#missions', 'kf-lotto'); if (!box) return;
+  const L = await rpc('lotto_info');
+  box.innerHTML = '<div class="card" style="grid-column:1/-1"><b>🎰 Kiez-Lotto</b><p>Tippe eine Zahl von 1 bis 49 (2 € pro Los, bis zu 10 Lose pro Woche). Ziehung am ' + new Date(L.draw_at).toLocaleDateString('de-DE') + '. Wer richtig liegt, teilt sich den Topf – ohne Gewinner wandert er in den Jackpot.</p>'
+    + '<p><b>Topf: ' + eur(L.pot) + '</b> · ' + L.tickets + ' Lose im Spiel · Deine Zahlen: ' + ((L.mine || []).join(', ') || '–') + '</p>'
+    + (L.last ? '<p class="kf-muted">Letzte Ziehung: Zahl ' + L.last.number + ' · ' + (L.last.winners ? L.last.winners + ' Gewinner je ' + eur(L.last.prize) : 'kein Gewinner – Jackpot!') + '</p>' : '')
+    + '<div class="kf-row"><input type="number" min="1" max="49" class="lnum" value="' + (1 + Math.floor(Math.random() * 49)) + '" style="width:80px"><button class="ghost lbuy">Los kaufen – 2,00 €</button></div><div class="lmsg"></div></div>';
+  act(box.querySelector('.lbuy'), box.querySelector('.lmsg'), async () => {
+    const r = await rpc('buy_lotto_ticket', { chosen: Number(box.querySelector('.lnum').value) }); window.kiezRenderProfile?.(r.profile);
+    setTimeout(loaders.missions, 1500); return 'Los mit der Zahl ' + r.number + ' gekauft. Viel Glück!';
+  });
+};
+
+// ================= Kiezladen: Gegenstände verkaufen =================
+function enhanceInventory() {
+  document.querySelectorAll('#inventorylist .card').forEach(card => {
+    if (card.dataset.kfSell) return; const eq = card.querySelector('.equipitem'); if (!eq) return;
+    card.dataset.kfSell = '1';
+    const b = document.createElement('button'); b.className = 'ghost'; b.textContent = 'Verkaufen (50 %)'; eq.after(' ', b);
+    const box = document.createElement('div'); card.appendChild(box);
+    act(b, box, async () => { if (!confirm('Einen davon für den halben Preis verkaufen?')) return; const r = await rpc('sell_item', { wanted_item: eq.dataset.id }); window.kiezRenderProfile?.(r.profile); return esc(r.item) + ' verkauft für ' + eur(r.paid) + '.'; });
+  });
+}
+const invEl = document.getElementById('inventorylist');
+if (invEl) { new MutationObserver(enhanceInventory).observe(invEl, { childList: true }); enhanceInventory(); }
+
+// ================= Kiez-Brett (öffentliche Pinnwand) =================
+const boardBody = addPanel('brett', 'Kiez-Brett', '📌 Kiez-Brett');
+loaders.brett = async () => {
+  const me = await myId(); if (!me) return;
+  const { data } = await sb.from('board_posts').select('*').order('created_at', { ascending: false }).limit(50);
+  const nm = await names((data || []).map(x => x.user_id));
+  const admin = window.kiezProfile?.is_admin;
+  boardBody.innerHTML = '<p>Die Pinnwand für alle im Kiez: Suche, Angebote, Sprüche. Freundlich bleiben – Beleidigungen werden gelöscht.</p><div class="kf-box"><div class="kf-row"><input class="bpost" maxlength="300" placeholder="Was gibt es Neues im Kiez?" style="flex:1"><button class="big bsend">Anpinnen</button></div><div class="bmsg"></div></div>'
+    + '<div class="kf-box"><ul class="kf-list">' + ((data || []).map(x => '<li><b>' + playerLink(x.user_id, nm[x.user_id]) + ':</b> ' + esc(x.body) + ' <span class="kf-muted">' + when(x.created_at) + '</span>' + (x.user_id === me || admin ? ' <button class="ghost bdel" data-id="' + x.id + '">löschen</button>' : '') + '</li>').join('') || '<li class="kf-muted">Noch leer – schreib den ersten Beitrag!</li>') + '</ul></div>';
+  const box = boardBody.querySelector('.bmsg');
+  const send = boardBody.querySelector('.bsend');
+  act(send, box, async () => { await rpc('post_board', { message_body: boardBody.querySelector('.bpost').value }); setTimeout(loaders.brett, 300); });
+  boardBody.querySelector('.bpost').onkeydown = e => { if (e.key === 'Enter') send.click(); };
+  boardBody.querySelectorAll('.bdel').forEach(b => act(b, box, async () => { await rpc('delete_board_post', { post_id: Number(b.dataset.id) }); setTimeout(loaders.brett, 300); }));
+};
+
+// ================= Einstellungen =================
+const setBody = addPanel('einstellungen', 'Einstellungen', '⚙️ Einstellungen');
+loaders.einstellungen = async () => {
+  const p = await refreshProfile(); if (!p) return;
+  setBody.innerHTML = '<div class="kf-grid">'
+    + '<div class="kf-box"><h3>🖼 Profilbild</h3><div class="kf-row"><div class="kf-av" style="width:72px;height:72px;background:#11110f center/cover;border:2px solid #4a473f' + (p.avatar ? ';background-image:url(\'' + p.avatar + '\')' : '') + '"></div><input type="file" accept="image/png,image/jpeg,image/webp" class="avfile"></div><div class="kf-row"><button class="ghost avdel">Bild entfernen</button></div><div class="avmsg"></div></div>'
+    + '<div class="kf-box"><h3>✏️ Name ändern</h3><p class="kf-muted">Kostet 30 🧢 Kronkorken, höchstens alle 30 Tage. Du hast ' + p.bottlecaps + ' 🧢.</p><div class="kf-row"><input class="nname" maxlength="20" value="' + esc(p.username) + '"><button class="ghost nsave">Ändern</button></div><div class="nmsg"></div></div>'
+    + '<div class="kf-box"><h3>🔑 Passwort ändern</h3><div class="kf-row"><input type="password" class="pw1" placeholder="Neues Passwort (mind. 6 Zeichen)" autocomplete="new-password"></div><div class="kf-row"><input type="password" class="pw2" placeholder="Wiederholen" autocomplete="new-password"><button class="ghost psave">Speichern</button></div><div class="pmsg2"></div></div>'
+    + '<div class="kf-box"><h3>🚪 Abmelden</h3><p class="kf-muted">Meldet dich auf diesem Gerät ab.</p><button class="ghost lout">Abmelden</button></div></div>';
+  const q = x => setBody.querySelector(x);
+  q('.avfile').onchange = () => { const f = q('.avfile').files?.[0]; if (f) resizeAvatar(f).then(d => window.kiezSetAvatar(d)).then(() => { say(q('.avmsg'), 'Profilbild gespeichert.', true); setTimeout(loaders.einstellungen, 500); }).catch(e => say(q('.avmsg'), esc(e.message))); };
+  act(q('.avdel'), q('.avmsg'), async () => { await rpc('set_avatar', { image: null }); await refreshProfile(); setTimeout(loaders.einstellungen, 300); return 'Entfernt.'; });
+  act(q('.nsave'), q('.nmsg'), async () => { const r = await rpc('change_username', { new_name: q('.nname').value }); window.kiezRenderProfile?.(r); return 'Du heißt jetzt ' + esc(r.username) + '.'; });
+  act(q('.psave'), q('.pmsg2'), async () => {
+    const a = q('.pw1').value, b = q('.pw2').value;
+    if (a.length < 6) throw new Error('Mindestens 6 Zeichen'); if (a !== b) throw new Error('Die Passwörter stimmen nicht überein');
+    const { error } = await sb.auth.updateUser({ password: a }); if (error) throw new Error(error.message);
+    q('.pw1').value = q('.pw2').value = ''; return 'Passwort geändert.';
+  });
+  q('.lout').onclick = () => document.getElementById('logout')?.click();
+};
+function resizeAvatar(file) {
+  return new Promise((ok, fail) => {
+    if (file.size > 8 * 1024 * 1024) return fail(new Error('Das Bild darf höchstens 8 MB groß sein'));
+    const img = new Image(), rd = new FileReader();
+    rd.onload = () => img.src = rd.result; rd.onerror = () => fail(new Error('Bild nicht lesbar'));
+    img.onload = () => { const c = document.createElement('canvas'), sc = Math.min(1, 160 / Math.max(img.width, img.height)); c.width = Math.max(1, Math.round(img.width * sc)); c.height = Math.max(1, Math.round(img.height * sc)); c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); ok(c.toDataURL('image/jpeg', .8)); };
+    img.onerror = () => fail(new Error('Bild nicht lesbar')); rd.readAsDataURL(file);
+  });
+}
+window.kiezSetAvatar = async data => { await rpc('set_avatar', { image: data }); const p = await refreshProfile(); applyAvatar(p); };
+function applyAvatar(p) {
+  const av = document.querySelector('.player-slip .profile-avatar'); if (!av || !p) return;
+  if (p.avatar) { av.style.backgroundImage = 'url("' + p.avatar + '")'; av.classList.add('has-image'); }
+}
+
+// ================= Freunde werben (Werbelink) =================
+let refChecked = 0;
+async function updateReferral(p) {
+  const row = [...document.querySelectorAll('#overview .profile-wide-row')].find(r => r.textContent.includes('Freunde in den Kiez einladen') || r.classList.contains('kf-ref'));
+  if (!row || !p) return;
+  if (!row.classList.contains('kf-ref')) {
+    row.classList.add('kf-ref');
+    row.innerHTML = '<h3>📣 Freunde in den Kiez einladen</h3><p>Wer sich über deinen Link anmeldet und Level 5 erreicht, bringt dir <b>25 Kronkorken + 100 Punkte</b> (und ihm selbst 10 Kronkorken).</p><div class="kf-row"><input class="rlink" readonly style="flex:1;min-width:180px"><button class="ghost rcopy">Kopieren</button></div><p class="kf-muted rcount"></p>';
+    row.querySelector('.rcopy').onclick = () => { const i = row.querySelector('.rlink'); i.select(); navigator.clipboard?.writeText(i.value); row.querySelector('.rcount').textContent = 'Link kopiert.'; };
+  }
+  row.querySelector('.rlink').value = location.origin + '/?ref=' + encodeURIComponent(p.username);
+  if (Date.now() - refChecked < 60000) return; refChecked = Date.now();
+  const { count } = await sb.from('profiles').select('id', { count: 'exact', head: true }).eq('referred_by', p.id);
+  row.querySelector('.rcount').textContent = 'Bisher geworben: ' + (count || 0);
 }
 
 // Zuletzt geöffnete neue Seite wiederherstellen
