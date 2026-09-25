@@ -28,15 +28,11 @@ Deutsches Browsergame im Stil von Pennergame (Pfand sammeln, Schnorren, Training
 - `index.html` lokal ausliefern (z. B. `python3 -m http.server`) und mit Playwright/Chromium testen (`executablePath: '/opt/pw-browsers/chromium'` falls nötig). Eigenes Testkonto „ClaudeTester“ registrieren; falls E-Mail-Bestätigung nötig → Nutzer fragen.
 
 ## Stand
-- Etappe 1 (Bestandsaufnahme) erledigt. Etappe 2 teilweise: **Migration 0001 ist live** (Namen validiert, Upgrade-Cheats zu, Waschanlage/Begleiter-Doppelkauf, 3 Ausrüstungsplätze, Kampf-Absturz ohne Bande). XSS-Schutz in `index.html` liegt im Branch, **noch nicht in `main`** (braucht PR + Merge durch Nutzer).
+- Gesamtplan mit allen Pennergame-Funktionen: `ROADMAP.md` (Etappen 1–7).
+- Etappe 1+2 erledigt (Migration 0001 live). XSS-Schutz in `index.html` liegt im Branch, **noch nicht in `main`** (braucht PR + Merge durch Nutzer).
+- Etappe 3 (Balancing, Migration 0002): `xp` = **Punkte** (UI sagt „Punkte“), Level = `kiez_level(xp)` = 1+xp/250 (max. 150), per Trigger `profile_sync_level`, nie herabgestuft. Weiterbildung gibt 10+2×neue Stufe Punkte. Kampf nur Level 80–150 %, 3 Std. Sperre pro Gegner. Versicherung 1 €/Tag → Apotheke halb, halber Verlust. Konzentration: −10 % Trainingszeit, blockiert Tour/Kampf/Verbrechen/Kiezaktionen/Schnorren. Schnorren: nur `beg_at_spot` (6 Plätze nach Sammelgebiet), `beg_for_money` = Platz „strasse“.
+- Helfer für neue Funktionen: `kiez_actor()` (Profil sperren, Bann prüfen, Energie auffüllen), `kiez_assert_free(p)` (Knast/Konzentration). Geldgewinne immer bis `cash_capacity` deckeln.
 - Admin: Nutzer hat nur einen Account; `is_admin` muss er per SQL setzen (`update profiles set is_admin = true;`) – noch offen.
 
-## Offene Befunde → nächste Etappen
-Etappe 3 – Balancing (vorher Entscheidungen per Auswahlfrage):
-- Drei Level-Formeln (xp/100 in `collect_bottles`, xp/250 in `finish_collection`, Skillpunkte/8 in `finish_training`) → eine.
-- `attack_player`: kein Punkte-/Levelbereich, kein Knast-Check, Energie ohne Regeneration geprüft.
-- Krankenversicherung zieht täglich 10 % Bargeld, hat aber keinen Nutzen.
-- Konzentration gratis, ohne Nachteil (−10 % Trainingszeit), blockiert nichts.
-- Preise: Magen auspumpen 500 € vs. Bier 1 €; Rubbellos-Erwartungswert −69 %; Belohnungen teils über `cash_capacity`.
-- Zwei Bettel-Systeme (`beg_for_money`, `beg_at_spot`); `beg_at_spot` hat nur 2 Plätze.
-Etappe 4 – Fehlend/nur Oberfläche (kein Backend): Plunder, Kronkorken, Bio/Gästebuch, Wetter, Preisverlauf, Häuser-Galerie. Außerdem fehlen im Vergleich zu Pennergame u. a. Bandenkämpfe, Banden-Einladungen/Ränge, Spendenlink, Freundesliste, Events, mehr Erfolge (nur 6).
+## Nächste Etappe 4 (siehe ROADMAP.md)
+Spendenlink, Plunder, Kronkorken, Profil/Bio/Gästebuch, Freundesliste.

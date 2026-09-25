@@ -30,5 +30,5 @@ has "Bandenname eindeutig" "$(as_user $C "select create_gang('kiezritter')")" "g
 has "Leere Meldung abgelehnt" "$(as_user $B "select report_player('$A','')")" "3 bis 300"
 as_user $B "select report_player('$A','Beleidigt andere')" >/dev/null
 has "Doppelte Meldung abgelehnt" "$(as_user $B "select report_player('$A','nochmal')")" "bereits gemeldet"
-ok  "Angriff funktioniert weiter" "$(as_user $B "update profiles set energy=100 where id=auth.uid(); select (attack_player('$A'))->>'opponent' is not null")" "t"
+ok  "Angriff funktioniert weiter" "$(as_user $B "update profiles set energy=100, xp=12250 where id=auth.uid(); select (attack_player('$A'))->>'opponent' is not null")" "t"
 exit ${FAILED:-0}
