@@ -369,7 +369,12 @@ async function updateHeader(p) {
     slot.querySelector('.kf-mylink').onclick = e => { e.preventDefault(); window.kiezOpenProfile(); };
   }
 }
-window.kiezOnProfile = p => { updateHeader(p); if (p?.is_admin) addAdminEvents(); };
+let firstProfile = true;
+window.kiezOnProfile = p => {
+  updateHeader(p); if (p?.is_admin) addAdminEvents();
+  // Nach dem Login: eine schon geöffnete neue Seite, die noch ohne Konto geladen wurde, nachladen
+  if (firstProfile) { firstProfile = false; const open = document.querySelector('section.panel.active-view'); if (open && loaders[open.id] && open.id !== 'gangs') loaders[open.id](); }
+};
 setInterval(() => { if (window.kiezProfile) updateHeader(window.kiezProfile); }, 5000);
 
 // ================= Admin: Events =================
