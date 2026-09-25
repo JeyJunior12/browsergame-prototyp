@@ -259,5 +259,38 @@ html body:not(#kz1):not(#kz2) label small { font-size: 13px !important; }
   html body:not(#kz1):not(#kz2) .player-slip { padding: 8px 10px 8px 64px !important; min-height: 0 !important; }
   html body:not(#kz1):not(#kz2) .player-slip .profile-avatar { width: 44px !important; height: 44px !important; }
   html body:not(#kz1):not(#kz2) .player-slip .avatar-stats { display: none !important; }
-  html body:not(#kz1):not(#kz2) .player-slip #logout { position: absolute !important; right: 10px; top: 8px; margin: 0 !important; min-height: 30px !important; }
+  html body:not(#kz1):not(#kz2) .player-slip #logout { position: absolute !important; right: 10px !important; bottom: 10px !important; left: auto !important; top: auto !important; width: auto !important; height: auto !important; margin: 0 !important; min-height: 30px !important; }
 }
+
+/* ---------- Stempel-Zeichnungen (kiez-icons.svg) ---------- */
+html body:not(#kz1):not(#kz2) .panel .card > svg.kz-ill + b, html body:not(#kz1):not(#kz2) .activity-card > svg.kz-ill + header h3 {
+  font-family: var(--font-head) !important; font-size: 18px !important; color: var(--paper-light) !important;
+}
+html body:not(#kz1):not(#kz2) svg.kz-stamp, html body:not(#kz1):not(#kz2) svg.kz-ill {
+  box-sizing: border-box; color: var(--ink); border-radius: 50%; flex: none;
+  background: radial-gradient(circle at 35% 30%, #f6ecd4, var(--paper-light) 55%, var(--paper) 100%);
+  border: 2px solid var(--rust); box-shadow: inset 0 0 0 3px var(--paper-light), inset 0 0 0 4px rgba(155,60,31,.55), 0 3px 8px rgba(0,0,0,.4);
+}
+html body:not(#kz1):not(#kz2) svg.kz-stamp { width: 34px; height: 34px; padding: 5px; vertical-align: middle; margin: -4px 10px -4px 0; }
+html body:not(#kz1):not(#kz2) svg.kz-ill { display: block; width: 76px; height: 76px; padding: 12px; margin: 2px 0 10px; transform: rotate(-4deg); }
+html body:not(#kz1):not(#kz2) svg.kz-ill-right { float: right; margin: 0 0 8px 12px; }
+html body:not(#kz1):not(#kz2) .card:nth-child(even) > svg.kz-ill { transform: rotate(3deg); }
+html body:not(#kz1):not(#kz2) svg.kz-rar-selten { border-color: #3d6f96; box-shadow: inset 0 0 0 3px var(--paper-light), inset 0 0 0 4px rgba(61,111,150,.6), 0 3px 8px rgba(0,0,0,.4); }
+html body:not(#kz1):not(#kz2) svg.kz-rar-episch { border-color: #6d3f8f; box-shadow: inset 0 0 0 3px var(--paper-light), inset 0 0 0 4px rgba(109,63,143,.6), 0 3px 8px rgba(0,0,0,.4); }
+html body:not(#kz1):not(#kz2) svg.kz-rar-legendaer { border-color: var(--brass); background: radial-gradient(circle at 35% 30%, #fff3c9, #ecd28a 60%, #c9a24a 100%); box-shadow: inset 0 0 0 3px #f5e3b0, inset 0 0 0 4px rgba(156,122,46,.8), 0 0 14px rgba(209,169,79,.55), 0 3px 8px rgba(0,0,0,.4); }
+@media (max-width: 640px) { html body:not(#kz1):not(#kz2) svg.kz-ill { width: 64px; height: 64px; padding: 10px; } }
+/* Schnorrplätze: jedes Ziel mit eigenem Motiv statt immer derselben Gitarre */
+html body:not(#kz1):not(#kz2) .card[data-spot="bahnhof"] > .generated-item-thumb,
+html body:not(#kz1):not(#kz2) .card[data-spot="fussgaengerzone"] > .generated-item-thumb,
+html body:not(#kz1):not(#kz2) .card[data-spot="oper"] > .generated-item-thumb { background-image: url('/begging-areas-sprite-v1.webp') !important; background-size: 500% 100% !important; }
+html body:not(#kz1):not(#kz2) .card[data-spot="bahnhof"] > .generated-item-thumb { background-position: 0% 50% !important; }
+html body:not(#kz1):not(#kz2) .card[data-spot="fussgaengerzone"] > .generated-item-thumb { background-position: 75% 50% !important; }
+html body:not(#kz1):not(#kz2) .card[data-spot="oper"] > .generated-item-thumb { background-position: 100% 50% !important; }
+/* Hat eine Karte schon ein Foto, bleibt die Stempel-Zeichnung weg */
+html body:not(#kz1):not(#kz2) .card:has(> .generated-item-thumb) > svg.kz-ill { display: none; }
+html body:not(#kz1):not(#kz2) .kf-locked > svg.kz-ill { filter: grayscale(.8); opacity: .7; }
+html body:not(#kz1):not(#kz2) .card.kz-swap > .asset-thumb, html body:not(#kz1):not(#kz2) .card.kz-swap > .generated-item-thumb { display: none !important; }
+html body:not(#kz1):not(#kz2) .card.kz-swap > svg.kz-ill { display: block; }
+html body:not(#kz1):not(#kz2) .card.locked > svg.kz-ill, html body:not(#kz1):not(#kz2) .card:has(> b use[href$="#schloss"]) > svg.kz-ill { filter: grayscale(.85); opacity: .65; }
+html body:not(#kz1):not(#kz2) #rankladder .card.kz-swap { display: grid !important; grid-template-columns: auto 1fr; column-gap: 16px; align-items: center; }
+html body:not(#kz1):not(#kz2) #rankladder .card.kz-swap > svg.kz-ill { grid-row: 1 / span 3; margin: 0; width: 64px; height: 64px; padding: 10px; }
