@@ -50,7 +50,6 @@ Deutsches Browsergame im Stil von Pennergame (Pfand sammeln, Schnorren, Training
 
 ## Design (Runde 4)
 - **`kiez-theme.css`** = Designsystem „Kiez-Papier“, wird als letztes geladen. Farben/Schriften nur über die Tokens in `:root` ändern. Helles Papier für Kopf/Reiter/Knöpfe, dunkles Pergament für Inhalte, Akzente Messing/Rost. Schriften: Bitter (Überschriften), Source Sans 3 (Text), Alfa Slab One (Logo) – Google Fonts.
-- **Bilder**: `kiez-icons.svg` = eigene Stempel-Zeichnungen (`<symbol id>`, 64×64, Farbe per `currentColor`). In `kiez-features.js`: `ico(name, cls)`; `STAMP` ersetzt Emojis in Überschriften automatisch (Karte ohne Foto → große Zeichnung `kz-ill`, sonst kleiner Stempel `kz-stamp`), `STAMP_TEXT` für Überschriften ohne Emoji, `SWAP` gibt Erfolgen/Rängen/Lotto eigene Zeichnungen. Neue Karten: Emoji vor den Titel oder `ico()` – nie Karten ohne Bild.
 - Jede Regel hat den Präfix `html body:not(#kz1):not(#kz2)` (Vorrang vor alten `#seite`-Regeln in `index.html`). Neue Regeln genauso schreiben.
 - Mindestgrößen: Text 15–16 px, Beschriftungen ≥ 12 px, Knöpfe ≥ 14 px/40 px hoch. Prüfen: Skript sucht Elemente < 13 px (Runde 4: 100 → 10, Rest Großbuchstaben-Labels).
 - Bilder nur als **WebP** (84 MB PNG → 10,6 MB). SEO: Titel/Beschreibung/OG/Twitter/JSON-LD (WebSite, VideoGame, FAQPage) im `<head>`, H1 + Infobereich „Was dich im Kiez erwartet“ + FAQ auf der Startseite, `robots.txt`, `sitemap.xml`, `favicon.svg`, `og-image.jpg`, `site.webmanifest`. Domain steht in canonical/OG/Sitemap – bei eigener Domain dort ändern.

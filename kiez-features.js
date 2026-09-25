@@ -10,8 +10,6 @@ const say = (el, text, good) => { if (el) el.innerHTML = '<div class="notice ' +
 const ROLE = { owner: 'Chef', co: 'Vize', officer: 'Offizier', member: 'Mitglied' };
 const RANK = { member: 1, officer: 2, co: 3, owner: 4 };
 const RARITY = { gewoehnlich: 'Gewöhnlich', selten: 'Selten', episch: 'Episch', legendaer: 'Legendär' };
-// Eigene Stempel-Zeichnungen aus kiez-icons.svg (Farbe über CSS)
-const ico = (name, cls) => '<svg class="' + (cls || 'kz-stamp') + '" aria-hidden="true" focusable="false"><use href="/kiez-icons.svg#' + name + '"></use></svg>';
 
 async function rpc(fn, args) {
   const r = await sb.rpc(fn, args);
@@ -122,7 +120,7 @@ loaders.profil = async () => {
   if (t !== profSeq) return;
   const f = (fr.data || [])[0], blocked = (bl.data || []).length > 0;
   const av = p.avatar && /^data:image\/(jpeg|png|webp);base64,/.test(p.avatar) ? '<div style="float:right;width:84px;height:84px;margin:0 0 8px 10px;border:3px solid #756346;background:#11110f center/cover;background-image:url(\'' + p.avatar + '\')"></div>' : '';
-  let h = '<div class="kf-box">' + (av || ico('person', 'kz-ill kz-ill-right')) + '<h3>' + esc(p.username) + (p.is_banned ? ' <span class="kf-muted">(gesperrt)</span>' : '') + '</h3>'
+  let h = '<div class="kf-box">' + av + '<h3>' + esc(p.username) + (p.is_banned ? ' <span class="kf-muted">(gesperrt)</span>' : '') + '</h3>'
     + (p.motto ? '<p><i>„' + esc(p.motto) + '“</i></p>' : '')
     + '<table class="kf-table"><tr><td>Level</td><td>' + p.level + '</td><td>Punkte</td><td>' + p.xp + '</td></tr>'
     + '<tr><td>Siege / Niederlagen</td><td>' + p.wins + ' / ' + p.losses + '</td><td>Tierkampf-Siege</td><td>' + p.pet_wins + '</td></tr>'
@@ -215,7 +213,7 @@ loaders.plunder = async () => {
     + '<p class="kf-muted">Gefunden: ' + Object.keys(have).length + ' / ' + (cat.data || []).length + ' Sorten</p><div class="kf-grid">'
     + (cat.data || []).map(c => {
       const n = have[c.id] || 0, bonus = [c.attack ? 'ATT +' + c.attack : '', c.defense ? 'DEF +' + c.defense : '', c.bottle_bonus ? 'Pfand +' + c.bottle_bonus + ' %' : ''].filter(Boolean).join(' · ');
-      return '<div class="card' + (n ? '' : ' kf-locked') + '">' + ico(c.id, 'kz-ill kz-rar-' + c.rarity) + '<b class="kf-rar-' + c.rarity + '">' + esc(c.name) + (eq === c.id ? ' ✅' : '') + '</b><p class="kf-muted">' + RARITY[c.rarity] + (n ? ' · ' + n + '×' : ' · noch nicht gefunden') + '</p><p>' + esc(c.description) + '</p><p>' + bonus + '</p>'
+      return '<div class="card' + (n ? '' : ' kf-locked') + '"><b class="kf-rar-' + c.rarity + '">' + esc(c.name) + (eq === c.id ? ' ✅' : '') + '</b><p class="kf-muted">' + RARITY[c.rarity] + (n ? ' · ' + n + '×' : ' · noch nicht gefunden') + '</p><p>' + esc(c.description) + '</p><p>' + bonus + '</p>'
         + (n ? '<div class="kf-row">' + (eq === c.id ? '<button class="ghost pun">Ablegen</button>' : '<button class="ghost peq" data-id="' + c.id + '">Anlegen</button>')
           + ' <button class="ghost psell" data-id="' + c.id + '">Verkaufen (' + eur(c.sell_price) + ')</button></div>' : '') + '</div>';
     }).join('') + '</div><div class="plmsg"></div>';
@@ -228,17 +226,17 @@ loaders.plunder = async () => {
 // ================= Kronkorken =================
 const kkBody = addPanel('kronkorken', 'Kronkorken-Tausch', '🧢 Kronkorken');
 const OFFERS = [
-  ['energie', 5, 'Energydrink', '+50 Energie sofort', 'energie'],
-  ['waschen', 4, 'Heiße Dusche', 'Sauberkeit auf 100 %', 'dusche'],
-  ['nuechtern', 3, 'Starker Kaffee', 'Promille sofort auf 0', 'kaffee'],
-  ['knast', 8, 'Wärter bestechen', 'Sofort raus aus dem Knast', 'schluessel'],
-  ['plunderkiste', 15, 'Plunderkiste', 'Ein zufälliges Plunderstück', 'kiste']
+  ['energie', 5, '⚡ Energydrink', '+50 Energie sofort'],
+  ['waschen', 4, '🚿 Heiße Dusche', 'Sauberkeit auf 100 %'],
+  ['nuechtern', 3, '☕ Starker Kaffee', 'Promille sofort auf 0'],
+  ['knast', 8, '🔑 Wärter bestechen', 'Sofort raus aus dem Knast'],
+  ['plunderkiste', 15, '🎁 Plunderkiste', 'Ein zufälliges Plunderstück']
 ];
 loaders.kronkorken = async () => {
   const p = await refreshProfile();
   kkBody.innerHTML = '<p>Kronkorken findest du auf Pfandtouren, bekommst sie für die Tagesbelohnung, für Erfolge und im Wochenwettbewerb. Hier tauschst du sie ein.</p>'
-    + '<div class="kf-box"><h3>' + ico('kronkorken') + 'Dein Vorrat: ' + (p?.bottlecaps || 0) + ' Kronkorken</h3></div><div class="kf-grid">'
-    + OFFERS.map(o => '<div class="card">' + ico(o[4], 'kz-ill') + '<b>' + o[2] + '</b><p>' + o[3] + '</p><button class="big kkbuy" data-id="' + o[0] + '">Tauschen – ' + o[1] + ' 🧢</button></div>').join('') + '</div><div class="kkmsg"></div>';
+    + '<div class="kf-box"><h3>Dein Vorrat: 🧢 ' + (p?.bottlecaps || 0) + ' Kronkorken</h3></div><div class="kf-grid">'
+    + OFFERS.map(o => '<div class="card"><b>' + o[2] + '</b><p>' + o[3] + '</p><button class="big kkbuy" data-id="' + o[0] + '">Tauschen – ' + o[1] + ' 🧢</button></div>').join('') + '</div><div class="kkmsg"></div>';
   kkBody.querySelectorAll('.kkbuy').forEach(b => act(b, kkBody.querySelector('.kkmsg'), async () => {
     const r = await rpc('bottlecap_shop', { offer: b.dataset.id }); window.kiezRenderProfile?.(r.profile);
     setTimeout(loaders.kronkorken, 1200); return esc(r.message) + ' (−' + r.cost + ' 🧢)';
@@ -531,8 +529,8 @@ loaders.brett = async () => {
   const { data } = await sb.from('board_posts').select('*').order('created_at', { ascending: false }).limit(50);
   const nm = await names((data || []).map(x => x.user_id));
   const admin = window.kiezProfile?.is_admin;
-  boardBody.innerHTML = '<p>Die Pinnwand für alle im Kiez: Suche, Angebote, Sprüche. Freundlich bleiben – Beleidigungen werden gelöscht.</p><div class="kf-box"><h3>' + ico('stift') + 'Zettel anpinnen</h3><div class="kf-row"><input class="bpost" maxlength="300" placeholder="Was gibt es Neues im Kiez?" style="flex:1"><button class="big bsend">Anpinnen</button></div><div class="bmsg"></div></div>'
-    + '<div class="kf-box"><h3>' + ico('pinnwand') + 'Am Brett</h3><ul class="kf-list">' + ((data || []).map(x => '<li><b>' + playerLink(x.user_id, nm[x.user_id]) + ':</b> ' + esc(x.body) + ' <span class="kf-muted">' + when(x.created_at) + '</span>' + (x.user_id === me || admin ? ' <button class="ghost bdel" data-id="' + x.id + '">löschen</button>' : '') + '</li>').join('') || '<li class="kf-muted">Noch leer – schreib den ersten Beitrag!</li>') + '</ul></div>';
+  boardBody.innerHTML = '<p>Die Pinnwand für alle im Kiez: Suche, Angebote, Sprüche. Freundlich bleiben – Beleidigungen werden gelöscht.</p><div class="kf-box"><div class="kf-row"><input class="bpost" maxlength="300" placeholder="Was gibt es Neues im Kiez?" style="flex:1"><button class="big bsend">Anpinnen</button></div><div class="bmsg"></div></div>'
+    + '<div class="kf-box"><ul class="kf-list">' + ((data || []).map(x => '<li><b>' + playerLink(x.user_id, nm[x.user_id]) + ':</b> ' + esc(x.body) + ' <span class="kf-muted">' + when(x.created_at) + '</span>' + (x.user_id === me || admin ? ' <button class="ghost bdel" data-id="' + x.id + '">löschen</button>' : '') + '</li>').join('') || '<li class="kf-muted">Noch leer – schreib den ersten Beitrag!</li>') + '</ul></div>';
   const box = boardBody.querySelector('.bmsg');
   const send = boardBody.querySelector('.bsend');
   act(send, box, async () => { await rpc('post_board', { message_body: boardBody.querySelector('.bpost').value }); setTimeout(loaders.brett, 300); });
@@ -642,59 +640,3 @@ Object.keys(loaders).forEach(k => {
 // Zuletzt geöffnete neue Seite wiederherstellen
 try { const last = localStorage.getItem('kiez_last_view'); if (loaders[last]) setTimeout(() => show(last), 1500); } catch (e) { }
 if (window.kiezProfile) window.kiezOnProfile(window.kiezProfile);
-
-// Bilder überall: Emojis in Überschriften werden zu eigenen Stempel-Zeichnungen; Karten ohne Bild bekommen eine große Zeichnung
-const STAMP = { '🛒': 'wagen', '🔒': 'schloss', '👥': 'bande', '🐕': 'pfote', '🐾': 'pfote', '🏚': 'haus', '🏙': 'haus', '🛏': 'haus', '👊': 'faust', '🏆': 'pokal',
-  '🎓': 'buch', '🥤': 'energie', '⚡': 'energie', '🚿': 'dusche', '🎰': 'lotto', '♻️': 'recycling', '♻': 'recycling', '💰': 'muenzen', '✏️': 'stift', '✏': 'stift',
-  '📨': 'brief', '✉': 'brief', '✉️': 'brief', '🎉': 'fest', '🏴': 'flagge', '🎁': 'kiste', '📦': 'kiste', '🎒': 'kiste', '🗺': 'stadtplan', '🗺️': 'stadtplan',
-  '🧥': 'person', '📋': 'schriftrolle', '📜': 'schriftrolle', '🎖': 'medaille', '🎖️': 'medaille', '🪜': 'leiter', '🛡': 'schild', '🛡️': 'schild', '🧺': 'wagen',
-  '☕': 'kaffee', '🔪': 'schwerter', '⚔️': 'schwerter', '⚔': 'schwerter', '💊': 'pille', '🎸': 'gitarre', '🗞': 'zeitung', '🗞️': 'zeitung', '🚦': 'ampel',
-  '🍺': 'flasche', '🍷': 'flasche', '🥃': 'flasche', '🍸': 'flasche', '🔥': 'feuer', '⚠️': 'info', '⚠': 'info', '🎫': 'glueckspfandbon', '📖': 'buch',
-  '🔎': 'lupe', '🔍': 'lupe', '🤝': 'handschlag', '⏳': 'sanduhr', '🚫': 'verbot', '🌦': 'wetter', '🌦️': 'wetter', '⚙️': 'zahnrad', '⚙': 'zahnrad',
-  '💬': 'sprechblase', '🔔': 'glocke', '🎯': 'ziel', '🖼': 'bild', '🖼️': 'bild', '🔑': 'schluessel', '🚪': 'tuer', '📣': 'megafon', '🍽': 'essen', '🍽️': 'essen',
-  '🧢': 'kronkorken', '🍾': 'flasche', '🧼': 'seife', '💧': 'tropfen', '⭐': 'stern', '🏅': 'medaille', '🏠': 'haus', '❤️': 'herz', '📅': 'kalender', '🔧': 'werkzeug', '👛': 'geldbeutel', '🎩': 'hut' };
-// Überschriften ohne Emoji, die trotzdem einen Stempel bekommen
-const STAMP_TEXT = { 'Dein Inventar': 'kiste', 'Banden im Kiez': 'bande' };
-const STAMP_RE = new RegExp('^\\s*(' + Object.keys(STAMP).sort((a, b) => b.length - a.length).map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')\\uFE0F?\\s*');
-const hasPicture = c => !!c.querySelector('img,[class*="thumb"],[style*="url("],svg.kz-ill:not([data-auto])')
-  || [c, ...c.querySelectorAll('*')].some(x => { const bg = getComputedStyle(x).backgroundImage; return bg !== 'none' && /url\(/.test(bg) && !/altes-papier/.test(bg); });
-function stampify() {
-  // Hat die Karte inzwischen ein eigenes Bild bekommen, wird die große Zeichnung zum kleinen Stempel in der Überschrift
-  document.querySelectorAll('svg.kz-ill[data-auto]').forEach(s => { const c = s.parentElement; if (!c || !hasPicture(c)) return; s.remove(); const h = c.querySelector('h3,b'); if (h && !h.querySelector('.kz-stamp')) h.insertAdjacentHTML('afterbegin', ico(s.dataset.sym)); });
-  swapPictures();
-  document.querySelectorAll('section.panel h3, section.panel .card > b, #kiezmodalbody h3, #kiezmodalbody b').forEach(h => {
-    const tn = h.firstChild; if (!tn || tn.nodeType !== 3) return;
-    const m = tn.nodeValue.match(STAMP_RE), key = !m && STAMP_TEXT[tn.nodeValue.trim()];
-    if (!m && !key) return;
-    const sym = key || STAMP[m[1]]; if (m) tn.nodeValue = tn.nodeValue.slice(m[0].length);
-    const card = h.closest('.card,.activity-card,.drink');
-    if (card && !card.querySelector('svg.kz-ill') && !hasPicture(card)) { card.insertAdjacentHTML('afterbegin', ico(sym, 'kz-ill')); const s = card.firstElementChild; s.dataset.auto = '1'; s.dataset.sym = sym; }
-    else h.insertAdjacentHTML('afterbegin', ico(sym));
-  });
-}
-// Erfolge, Karriere-Ränge und Lotto teilten sich wenige Fotos – dort bekommt jede Karte ihre eigene Zeichnung
-const SWAP = [
-  ['#achievementlist .card', { 'Erster Sack': 'wagen', 'Pfandbaron': 'flasche', 'Containerkönig': 'recycling', 'Flaschenflüsterer': 'sprechblase', 'Pfandlegende': 'goldene_dose',
-    'Kiezbekannt': 'person', 'Kiezlegende': 'stern', 'Stadtgespräch': 'zeitung', 'Kiezfürst': 'medaille', 'Kiezkönig': 'alufolienkrone', 'Erste Schelle': 'faust',
-    'Hinterhof-Boxer': 'schwerter', 'Kiezschläger': 'feuer', 'Unbesiegbar': 'schild', 'Kleingeldkönig': 'muenzen', 'Geldsack': 'geldbeutel', 'Großverdiener': 'pokal',
-    'Schlagkräftig': 'fahrradkette', 'Dickes Fell': 'dosenpanzer', 'Kiezdiplomat': 'handschlag', 'Straßenmusiker': 'gitarre', 'Eigenes Dach': 'haus', 'Burgherr': 'flagge',
-    'Stadtkenner': 'stadtplan', 'Stammgast': 'kalender', 'Urgestein': 'sanduhr', 'Tierfreund': 'pfote', 'Tierflüsterer': 'taubenpfeife', 'Sammler': 'kiste',
-    'Plunderkönig': 'kiezzepter', 'Beliebt': 'herz', 'Bandenmitglied': 'bande', 'Spendenmagnet': 'hut', 'Unterwelt': 'knast' }],
-  ['#rankladder .card', { 'Tüten-Neuling': 'wagen', 'Pfand-Schnüffler': 'flasche', 'Kiosk-Bekannter': 'kaffee', 'Kiezgestalt': 'person', 'Gassen-Kapitän': 'flagge',
-    'Hinterhof-Boss': 'faust', 'Viertel-Schreck': 'feuer', 'Straßen-Veteran': 'medaille', 'Asphalt-Baron': 'hut', 'Unterwelt-Promi': 'stern', 'Pfand-Magnat': 'muenzen',
-    'Stadtteil-Legende': 'pokal', 'Beton-Kaiser': 'kiezzepter', 'KiezKönig': 'alufolienkrone' }, 'recycling'],
-  ['#kf-lotto .card', { 'Kiez-Lotto': 'lotto' }]
-];
-const TIER = { Silber: 'kz-rar-selten', Gold: 'kz-rar-legendaer', Platin: 'kz-rar-episch' };
-function swapPictures() {
-  SWAP.forEach(([sel, map, fallback]) => document.querySelectorAll(sel).forEach(c => {
-    if (c.querySelector(':scope > svg.kz-ill')) return;
-    const name = (c.querySelector('b')?.textContent || '').trim();
-    const key = Object.keys(map).find(k => name.includes(k)), sym = key ? map[key] : fallback; if (!sym) return;
-    const tier = TIER[c.querySelector('.achievement-tier')?.textContent.trim()] || '';
-    c.classList.add('kz-swap'); c.insertAdjacentHTML('afterbegin', ico(sym, 'kz-ill ' + tier));
-  }));
-}
-let stampT = 0;
-new MutationObserver(() => { clearTimeout(stampT); stampT = setTimeout(stampify, 120); }).observe(document.body, { childList: true, subtree: true });
-stampify();
