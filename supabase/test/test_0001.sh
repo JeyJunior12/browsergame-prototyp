@@ -12,10 +12,10 @@ has "Pfandsack nicht mehr kaufbar" "$(as_user $A "select buy_upgrade('bag')")" "
 has "Geschick nicht mehr kaufbar" "$(as_user $A "select buy_upgrade('streetwise')")" "nicht (mehr) kaufbar"
 ok  "Geldbehaelter geht weiter" "$(as_user $A "select (buy_upgrade('container'))->>'label'")" "Große Tüte"
 as_user $A "update profiles set cleanliness=10 where id=auth.uid()" >/dev/null
-has "Waschanlage ohne Kauf gesperrt" "$(as_user $A "select wash_up('waschanlage')")" "erst die Waschanlage"
-ok  "Schwamm geht" "$(as_user $A "select (wash_up('schwamm'))->>'gain'")" "10"
+has "Waschanlage ohne Kauf gesperrt" "$(as_user $A "select wash_up('waschanlage')")" "Waschanlage kaufen"
+ok  "Katzenwaesche geht" "$(as_user $A "select (wash_up())->>'gain'")" "35"
 as_user $A "select buy_progress('wash'); select buy_progress('wash')" >/dev/null
-ok  "Waschanlage nach Kauf" "$(as_user $A "select (wash_up('waschanlage'))->>'gain'")" "50"
+ok  "Waschanlage nach Kauf" "$(as_user $A "update profiles set cleanliness=10 where id=auth.uid(); select (wash_up('waschanlage'))->>'gain'" | tail -1)" "100"
 PET=$($P -tAc "select id from pet_catalog order by price limit 1")
 as_user $A "update profiles set social_skill=45 where id=auth.uid()" >/dev/null
 as_user $A "select buy_pet('$PET')" >/dev/null
