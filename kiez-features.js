@@ -388,7 +388,7 @@ window.kiezOnProfile = p => {
   updateHeader(p); if (p?.is_admin) addAdminEvents();
   applyAvatar(p); updateReferral(p);
   // Nach dem Login: eine schon geöffnete neue Seite, die noch ohne Konto geladen wurde, nachladen
-  if (firstProfile) { firstProfile = false; watchPanels(); updateUnread(); const open = document.querySelector('section.panel.active-view'); if (open && loaders[open.id] && open.id !== 'gangs') loaders[open.id](); }
+  if (firstProfile) { firstProfile = false; watchPanels(); updateUnread(); loaders.rumors(); const open = document.querySelector('section.panel.active-view'); if (open && loaders[open.id] && open.id !== 'gangs') loaders[open.id](); }
 };
 setInterval(() => { if (window.kiezProfile) updateHeader(window.kiezProfile); }, 5000);
 
@@ -562,6 +562,27 @@ async function updateReferral(p) {
   row.querySelector('.rcount').textContent = 'Bisher geworben: ' + (count || 0);
 }
 
+// ================= Supermarkt: Essen (im Getränke-Fenster) =================
+const FOOD = [['broetchen', '🥖 Altes Brötchen', 0.5, '−0,2 ‰ · +5 Energie'], ['currywurst', '🌭 Currywurst', 2, '−0,5 ‰ · +15 Energie'], ['doener', '🥙 Döner mit allem', 4, '−1,0 ‰ · +25 Energie'], ['eintopf', '🍲 Eintopf', 7.5, '−2,0 ‰ · +40 Energie']];
+function addFood() {
+  const body = document.getElementById('kiezmodalbody');
+  const list = body?.querySelector('.drink-list'); if (!list || body.querySelector('.kf-food')) return;
+  const w = document.createElement('div'); w.className = 'kf-food';
+  w.innerHTML = '<h3 style="margin:12px 0 6px">🍽 Essen</h3><p class="kf-muted">Macht nüchtern und gibt Energie.</p><div class="drink-list">' + FOOD.map(f => '<div class="drink"><b>' + f[1] + '</b><p>' + f[3] + '</p><button class="big kf-eat" data-id="' + f[0] + '">Kaufen – ' + eur(f[2]) + '</button></div>').join('') + '</div><div class="kf-foodmsg"></div>';
+  list.after(w);
+  w.querySelectorAll('.kf-eat').forEach(b => act(b, w.querySelector('.kf-foodmsg'), async () => { const r = await rpc('buy_food', { food: b.dataset.id }); window.kiezRenderProfile?.(r.profile); return esc(r.label) + ' gegessen: +' + r.energy + ' Energie, Promille jetzt ' + Number(r.profile.alcohol_level).toFixed(2).replace('.', ',') + ' ‰.'; }));
+}
+const modalBody = document.getElementById('kiezmodalbody');
+if (modalBody) new MutationObserver(addFood).observe(modalBody, { childList: true });
+
+// ================= Gerüchteküche: echte Kiez-News =================
+loaders.rumors = async () => {
+  const box = document.querySelector('#rumors .inside'); if (!box) return;
+  try {
+    const items = await rpc('kiez_news');
+    box.innerHTML = items.map(i => '<p>' + i.icon + ' ' + esc(i.text) + '</p>').join('') + '<p>🗞️ Der Pfandpreis wechselt alle 20 Minuten zwischen <b>0,10 €</b> und <b>0,30 €</b>.</p>';
+  } catch (e) { }
+};
 // Zuletzt geöffnete neue Seite wiederherstellen
 try { const last = localStorage.getItem('kiez_last_view'); if (loaders[last]) setTimeout(() => show(last), 1500); } catch (e) { }
 if (window.kiezProfile) window.kiezOnProfile(window.kiezProfile);
