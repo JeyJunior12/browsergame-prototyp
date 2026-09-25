@@ -9,5 +9,7 @@ $P -c "drop database if exists kiez" -c "create database kiez"
   cat supabase/schema/triggers.sql
   echo "create trigger on_auth_user_created after insert on auth.users for each row execute function public.handle_new_user();"
   cat supabase/test/01_data.sql
+  # wie live: bestehende Tabellen sind fuer eingeloggte Spieler lesbar, neue Tabellen bekommen keine automatischen Rechte
+  echo "grant select on all tables in schema public to authenticated;"
 } | $P -d kiez
 for m in supabase/migrations/*.sql; do $P -d kiez -f "$m"; done

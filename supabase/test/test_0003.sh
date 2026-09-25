@@ -36,8 +36,8 @@ AMT=$(as_user $A "select (donate_link('sozi_b'))->>'amount'")
 has "Spende angekommen" "$AMT" "0\.[0-9]"
 has "Nur einmal pro Tag" "$(as_user $A "select donate_link('Sozi_B')")" "heute schon"
 has "Nicht an sich selbst" "$(as_user $B "select donate_link('Sozi_B')")" "selbst"
-ok  "Anonyme Spende" "$($P -tAc "select (donate_link('Sozi_B'))->>'name'")" "Sozi_B"
-has "Anonym nur einmal" "$($P -tAc "select donate_link('Sozi_B')" 2>&1)" "heute schon"
+ok  "Anonyme Spende" "$($P -tAc "set request.headers='{\"x-forwarded-for\":\"1.1.1.1, 9.9.9.9\"}'; select (donate_link('Sozi_B'))->>'name'" | grep -v SET)" "Sozi_B"
+has "Anonym nur einmal (gefaelschte erste IP hilft nicht)" "$($P -tAc "set request.headers='{\"x-forwarded-for\":\"6.6.6.6, 9.9.9.9\"}'; select donate_link('Sozi_B')" 2>&1)" "heute schon"
 ok  "Spenden gezaehlt" "$($P -tAc "select donations_received from profiles where id='$B'")" "2"
 
 # Plunder
