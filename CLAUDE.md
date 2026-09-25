@@ -39,5 +39,6 @@ Deutsches Browsergame im Stil von Pennergame (Pfand sammeln, Schnorren, Training
 - Oberfläche dafür in **`kiez-features.js`** (Modul, am Ende von `index.html` geladen): neue Seiten per `addPanel`, Loader pro Seite, Hooks `window.kiezShowView`, `kiezOnProfile`, `kiezOpenProfile(id)`, `kiezGo(view)`. Spielernamen mit Klasse `kiez-player` + `data-id` öffnen das Profil.
 - **Neue Tabellen brauchen `grant select … to authenticated`** (Supabase vergibt hier keine Rechte automatisch) – `test_0006.sh` prüft das für jede Tabelle mit Policy.
 
-## Offen (Etappe 7)
-Admin-Konto setzen, PR nach `main` mergen (Nutzer), danach Live-Check auf der Vercel-Production-URL.
+## Stand Go-Live
+Alle Etappen 1–7 erledigt und in `main` (PR #1, #2), live auf https://browsergame-prototyp.vercel.app. Admin: BehaarteUhse (0007).
+Testkonten: ClaudeTester, ClaudeTester2. Neue Arbeit immer auf neuem Stand von `main` beginnen.

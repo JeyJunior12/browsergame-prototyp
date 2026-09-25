@@ -35,13 +35,13 @@ GitHub push ──▶ Action: Tests (Postgres) ──▶ Migration live in Supab
 | Wetter (Server, wirkt auf Pfand), Preisverlauf | ✔ | ✔ (0003) | 6 ✅ |
 | Events (Admin), Wochenwettbewerb mit Preisen | ✔ | ✔ (0005) | 6 ✅ |
 | Highscore Spieler (Punkte), Häuser mit Preisen | ✔ | ✔ | 6 ✅ |
-| Admin/Moderation, Live-Check, Mobile | – | ✔ (Merge nach `main` offen) | 7 |
+| Admin/Moderation, Live-Check, Mobile | – | ✔ live | 7 ✅ |
 
 ## Etappen
 1. ✅ Bestandsaufnahme
-2. ✅ Sicherheit & Logikfehler (0001) – offen: XSS-Fix per PR nach `main`
+2. ✅ Sicherheit & Logikfehler (0001)
 3. ✅ Balancing (0002): ein Punkte-System, Kampfbereich, Versicherung, Konzentration, Preise, Schnorren
 4. ✅ Soziales & Nebenwährungen (0003, 0006)
 5. ✅ Banden komplett (0004)
 6. ✅ Langzeitmotivation (0005)
-7. Go-Live: Rechte-Check (0006), Mobile geprüft, Admin-Events ✅ – offen: Admin-Konto setzen, Merge nach `main`
+7. ✅ Go-Live: Rechte-Check (0006), Admin (0007), Mobile geprüft, live auf Vercel
