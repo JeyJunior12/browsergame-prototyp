@@ -25,7 +25,7 @@ for f in "refresh_my_profile()" "claim_daily_reward()" "beg_for_money()" "beg_at
   "start_concentration(30)" "cancel_concentration()" "start_training('defense')" \
   "start_collection(10)" "cancel_collection()" "sell_bottles(10)" "sell_bottles()" "claim_daily_mission()" \
   "check_achievements()" "achievement_progress()" "update_bio('Bio','Motto')" "set_avatar('data:image/png;base64,QUJD')" \
-  "bottlecap_shop('energie')" "buy_lotto_ticket(7)" "lotto_info()" "get_weather()" "buy_food('broetchen')" "weekly_ranking('bottles')" "weekly_ranking('wins')" \
+  "bottlecap_shop('energie')" "buy_lotto_ticket(7)" "lotto_info()" "get_weather()" "tester_fast_forward()" "buy_food('broetchen')" "weekly_ranking('bottles')" "weekly_ranking('wins')" \
   "gang_highscore()" "kiez_news()" "unread_counts()" "mark_messages_read()" "mark_notifications_read()" "post_board('Hallo Kiez')" \
   "change_username('Rundgang_Neu')" "equip_plunder(null)" ; do call $A "select $f"; done
 
