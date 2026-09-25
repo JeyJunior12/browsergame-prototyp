@@ -35,5 +35,9 @@ Deutsches Browsergame im Stil von Pennergame (Pfand sammeln, Schnorren, Training
 - Helfer für neue Funktionen: `kiez_actor()` (Profil sperren, Bann prüfen, Energie auffüllen), `kiez_assert_free(p)` (Knast/Konzentration). Geldgewinne immer bis `cash_capacity` deckeln.
 - Admin: Nutzer hat nur einen Account; `is_admin` muss er per SQL setzen (`update profiles set is_admin = true;`) – noch offen.
 
-## Nächste Etappe 4 (siehe ROADMAP.md)
-Spendenlink, Plunder, Kronkorken, Profil/Bio/Gästebuch, Freundesliste.
+- Etappe 4–6 (Migrationen 0003–0005) live: Profil/Gästebuch/Freunde/Blockieren/Spendenlink, Plunder, Kronkorken, Wetter, Events, Banden (Ränge, Einladungen, Chat, Protokoll, Kriege), Tierkampf, Wochenwettbewerb, 34 Erfolge. Kampfwerte zentral in `kiez_attack_power`/`kiez_defense_power`.
+- Oberfläche dafür in **`kiez-features.js`** (Modul, am Ende von `index.html` geladen): neue Seiten per `addPanel`, Loader pro Seite, Hooks `window.kiezShowView`, `kiezOnProfile`, `kiezOpenProfile(id)`, `kiezGo(view)`. Spielernamen mit Klasse `kiez-player` + `data-id` öffnen das Profil.
+- **Neue Tabellen brauchen `grant select … to authenticated`** (Supabase vergibt hier keine Rechte automatisch) – `test_0006.sh` prüft das für jede Tabelle mit Policy.
+
+## Offen (Etappe 7)
+Admin-Konto setzen, PR nach `main` mergen (Nutzer), danach Live-Check auf der Vercel-Production-URL.

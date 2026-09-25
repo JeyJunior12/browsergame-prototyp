@@ -22,26 +22,26 @@ GitHub push ──▶ Action: Tests (Postgres) ──▶ Migration live in Supab
 | Schnorren, Schnorrplätze nach Gebiet, Musizieren | ✔ | ✔ (0002: 6 Plätze) | 3 ✅ |
 | Waschen/Sauberkeit, Unterkünfte, Geldbehälter | ✔ | ✔ | – |
 | Waffen/Schutz/Zubehör, Haustiere + Training | ✔ | ✔ | – |
-| Tagesbelohnung, Tagesmission, Erfolge | ✔ | teilweise (6 Erfolge) | 6 |
-| **Spendenlink** (andere geben dir Geld per Link) | ✔ | ✗ | 4 |
-| **Plunder** (Fundstücke mit Effekten, anlegen) | ✔ | nur Oberfläche | 4 |
-| **Kronkorken** (Nebenwährung, Tausch) | ✔ | nur Oberfläche | 4 |
-| **Profil: Bio, Gästebuch, Profilansicht** | ✔ | nur Oberfläche | 4 |
-| **Freundesliste / Blockieren** | ✔ | ✗ | 4 |
+| Tagesbelohnung, Tagesmission, Erfolge | ✔ | ✔ 34 Erfolge (0005) | 6 ✅ |
+| Spendenlink (auch ohne Login) | ✔ | ✔ (0003/0006) | 4 ✅ |
+| Plunder (14 Stück, anlegen, verkaufen) | ✔ | ✔ (0003) | 4 ✅ |
+| Kronkorken + Tauschladen | ✔ | ✔ (0003) | 4 ✅ |
+| Profil: Bio, Motto, Gästebuch, fremde Profile | ✔ | ✔ (0003) | 4 ✅ |
+| Freundesliste, Spielersuche, Blockieren | ✔ | ✔ (0003) | 4 ✅ |
 | Nachrichten | ✔ | ✔ | – |
-| **Bande: Einladungen, Ränge, Kasse-Protokoll** | ✔ | teilweise | 5 |
-| **Bandenkämpfe, Banden-Highscore** | ✔ | ✗ | 5 |
-| **Tierkämpfe** | ✔ | ✗ | 6 |
-| **Wetter, Flaschen-Preisverlauf** | ✔ | nur Oberfläche | 6 |
-| **Events / Wochen-Wettbewerbe, mehr Erfolge** | ✔ | ✗ | 6 |
-| Highscore Spieler (Punkte), Häuser-Galerie | ✔ | teilweise | 6 |
-| Admin/Moderation, Live-Check, Mobile, Startseite | – | teilweise | 7 |
+| Bande: Ränge, Einladungen, Bewerbungen, Chat, Protokoll | ✔ | ✔ (0004) | 5 ✅ |
+| Bandenkriege, Banden-Highscore | ✔ | ✔ (0004) | 5 ✅ |
+| Tierkämpfe | ✔ | ✔ (0005) | 6 ✅ |
+| Wetter (Server, wirkt auf Pfand), Preisverlauf | ✔ | ✔ (0003) | 6 ✅ |
+| Events (Admin), Wochenwettbewerb mit Preisen | ✔ | ✔ (0005) | 6 ✅ |
+| Highscore Spieler (Punkte), Häuser mit Preisen | ✔ | ✔ | 6 ✅ |
+| Admin/Moderation, Live-Check, Mobile | – | ✔ (Merge nach `main` offen) | 7 |
 
 ## Etappen
 1. ✅ Bestandsaufnahme
 2. ✅ Sicherheit & Logikfehler (0001) – offen: XSS-Fix per PR nach `main`
 3. ✅ Balancing (0002): ein Punkte-System, Kampfbereich, Versicherung, Konzentration, Preise, Schnorren
-4. Soziales & Nebenwährungen: Spendenlink, Plunder, Kronkorken, Profil/Bio/Gästebuch, Freunde
-5. Banden komplett: Einladungen, Ränge/Rechte, Kassenprotokoll, Bandenkämpfe, Banden-Highscore
-6. Langzeitmotivation: Tierkämpfe, Wetter, Preisverlauf, Events, Wettbewerbe, 30+ Erfolge, Highscores
-7. Go-Live: Production-Audit, Admin-Werkzeuge, Mobile-Feinschliff, Startseite/SEO, Merge nach `main`
+4. ✅ Soziales & Nebenwährungen (0003, 0006)
+5. ✅ Banden komplett (0004)
+6. ✅ Langzeitmotivation (0005)
+7. Go-Live: Rechte-Check (0006), Mobile geprüft, Admin-Events ✅ – offen: Admin-Konto setzen, Merge nach `main`
