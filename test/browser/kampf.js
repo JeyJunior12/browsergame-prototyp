@@ -7,7 +7,7 @@ let fails=0;
 async function as(n,fn){const {b,pg}=await lib.open();pg.on('dialog',d=>d.accept());const errs=[];pg.on('pageerror',e=>errs.push(e.message));
  await lib.login(pg,mail(n),pw);try{await fn(pg)}finally{if(errs.length){fails++;console.log('  JS-FEHLER:',errs.join(' | '))}await b.close()}}
 const rpc=(pg,f,a)=>pg.evaluate(async([f,a])=>{const r=await window.kiezSupabase.rpc(f,a);return r.error?'FEHLER '+r.error.message:r.data},[f,a]);
-const go=async(pg,v)=>{await pg.evaluate(v=>window.kiezGo(v),v);await pg.waitForTimeout(2500)};
+const go=async(pg,v)=>{await pg.evaluate(v=>window.kiezGo(v),v);await pg.waitForTimeout(1500);await pg.waitForFunction(v=>{const t=document.getElementById(v)?.innerText||'';return !/Lade( Bande)? …/.test(t)},v,{timeout:15000}).catch(()=>{});await pg.waitForTimeout(800)};
 const visNotes=pg=>pg.evaluate(()=>[...document.querySelectorAll('.notice')].filter(n=>n.offsetParent).map(n=>n.innerText.replace(/\s+/g,' ').trim()));
 // sichtbaren Knopf per Selektor (optional innerhalb einer Karte mit Text) klicken und neue Meldung verlangen
 async function click(pg,label,sel,{within,fill,expect}={}){
@@ -21,7 +21,7 @@ async function click(pg,label,sel,{within,fill,expect}={}){
  console.log(good?'✓':'✗',label,'→',(neu||'(keine Meldung)').slice(0,170));return neu;}
 (async()=>{
  // 1) Vorbereitung: alle vier auf Level 11 mit Geld, Sozialkontakten (für Tiere) und frischen Wartezeiten
- for(const n of [1,2,3,4])await as(n,async pg=>{await rpc(pg,'tester_set_stats',{new_money:3000,new_xp:2500,new_caps:60,new_social:45,new_attack:n===1||n===2?40:5,new_defense:5});await rpc(pg,'tester_fast_forward');});
+ for(const n of [1,2,3,4])await as(n,async pg=>{await rpc(pg,'tester_set_stats',{new_money:3000,new_xp:2500,new_caps:60,new_social:45,new_attack:n===1||n===2?40:5,new_defense:5});await rpc(pg,'tester_fast_forward');await rpc(pg,'tester_end_wars');});
  console.log('Vorbereitung fertig (Level 11, 3000 €)');
  // 2) Zweite Bande: ClaudeTester3 gründet, lädt ClaudeTester4 ein
  await as(3,async pg=>{await go(pg,'gangs');

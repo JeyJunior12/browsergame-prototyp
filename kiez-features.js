@@ -100,7 +100,9 @@ window.kiezLoaders = loaders;
 const profBody = addPanel('profil', 'Profil', '🪪 Profil');
 let profileTarget = null;
 window.kiezOpenProfile = id => { profileTarget = id || null; show('profil'); };
+let profSeq = 0;
 loaders.profil = async () => {
+  const t = ++profSeq;
   const me = await myId(); if (!me) return;
   const id = profileTarget || me, own = id === me;
   const [pr, gm, gb, fr, bl] = await Promise.all([
@@ -115,6 +117,7 @@ loaders.profil = async () => {
   if (gm.data) gm.data.gangs = (await sb.from('gangs').select('name').eq('id', gm.data.gang_id).maybeSingle()).data;
   const plunderName = p.equipped_plunder ? (await sb.from('plunder_catalog').select('name').eq('id', p.equipped_plunder).maybeSingle()).data?.name : null;
   const authors = await names((gb.data || []).map(e => e.author_id));
+  if (t !== profSeq) return;
   const f = (fr.data || [])[0], blocked = (bl.data || []).length > 0;
   const av = p.avatar && /^data:image\/(jpeg|png|webp);base64,/.test(p.avatar) ? '<div style="float:right;width:84px;height:84px;margin:0 0 8px 10px;border:3px solid #756346;background:#11110f center/cover;background-image:url(\'' + p.avatar + '\')"></div>' : '';
   let h = '<div class="kf-box">' + av + '<h3>' + esc(p.username) + (p.is_banned ? ' <span class="kf-muted">(gesperrt)</span>' : '') + '</h3>'
@@ -136,6 +139,7 @@ loaders.profil = async () => {
   h += '<div class="kf-box"><h3>📖 Gästebuch</h3>' + (!own ? '<div class="kf-row"><input class="gtext" maxlength="300" placeholder="Eintrag schreiben …" style="flex:1"><button class="ghost gsend">Eintragen</button></div><div class="gmsg"></div>' : '')
     + '<ul class="kf-list">' + ((gb.data || []).map(e => '<li><b>' + playerLink(e.author_id, authors[e.author_id]) + ':</b> ' + esc(e.body)
       + ' <span class="kf-muted">' + when(e.created_at) + '</span>' + ((own || e.author_id === me) ? ' <button class="ghost gdel" data-id="' + e.id + '">löschen</button>' : '') + '</li>').join('') || '<li class="kf-muted">Noch keine Einträge.</li>') + '</ul></div>';
+  if (t !== profSeq) return;
   profBody.innerHTML = h;
   const box = profBody.querySelector('.pmsg');
   if (own) {
@@ -197,6 +201,9 @@ loaders.freunde = async () => {
 
 // ================= Plunderkiste =================
 const plunderBody = addPanel('plunder', 'Plunderkiste', '🎒 Plunder');
+// Fester Platz für Inventar-Karte (Pfand verkaufen, Materialien) und Basteln aus index.html – die hängen sich vor #plunderlist
+{ const pl = document.getElementById('plunder')?.querySelector('.inside');
+  if (pl && !document.getElementById('plunderlist')) { const anchor = document.createElement('div'); anchor.id = 'plunderlist'; anchor.style.display = 'none'; pl.appendChild(anchor); } }
 loaders.plunder = async () => {
   const me = await myId(); if (!me) return;
   const [cat, mine] = await Promise.all([sb.from('plunder_catalog').select('*').order('sort_order'), sb.from('user_plunder').select('*').eq('user_id', me)]);
@@ -211,8 +218,8 @@ loaders.plunder = async () => {
           + ' <button class="ghost psell" data-id="' + c.id + '">Verkaufen (' + eur(c.sell_price) + ')</button></div>' : '') + '</div>';
     }).join('') + '</div><div class="plmsg"></div>';
   const box = plunderBody.querySelector('.plmsg');
-  plunderBody.querySelectorAll('.peq').forEach(b => act(b, box, async () => { window.kiezRenderProfile?.(await rpc('equip_plunder', { wanted: b.dataset.id })); loaders.plunder(); }));
-  plunderBody.querySelectorAll('.pun').forEach(b => act(b, box, async () => { window.kiezRenderProfile?.(await rpc('equip_plunder', { wanted: null })); loaders.plunder(); }));
+  plunderBody.querySelectorAll('.peq').forEach(b => act(b, box, async () => { window.kiezRenderProfile?.(await rpc('equip_plunder', { wanted: b.dataset.id })); setTimeout(loaders.plunder, 300); return 'Angelegt – wirkt ab sofort im Kampf und auf Pfandtouren.'; }));
+  plunderBody.querySelectorAll('.pun').forEach(b => act(b, box, async () => { window.kiezRenderProfile?.(await rpc('equip_plunder', { wanted: null })); setTimeout(loaders.plunder, 300); return 'Abgelegt.'; }));
   plunderBody.querySelectorAll('.psell').forEach(b => act(b, box, async () => { const r = await rpc('sell_plunder', { wanted: b.dataset.id, qty: 1 }); window.kiezRenderProfile?.(r.profile); setTimeout(loaders.plunder, 800); return 'Verkauft für ' + eur(r.paid) + (Number(r.lost) > 0 ? ' (Rest passte nicht in den Geldbehälter)' : '') + '.'; }));
 };
 
@@ -257,15 +264,20 @@ loaders.wettbewerb = async () => {
 let gangView = null;
 document.addEventListener('click', e => { const a = e.target.closest('.kiez-gang'); if (a) { e.preventDefault(); gangView = a.dataset.id; show('gangs'); window.kiezLoadGang(); } });
 loaders.gangs = () => window.kiezLoadGang();
+// Nur die neueste Ladeanfrage darf zeichnen (sonst überschreibt eine langsame alte Antwort neue Daten)
+let gangSeq = 0;
+const stale = t => t !== gangSeq;
 window.kiezLoadGang = async () => {
   const el = document.getElementById('kiezgang'); if (!el) return;
+  const t = ++gangSeq;
   const me = await myId(); if (!me) return;
   try { await rpc('resolve_gang_wars'); } catch (e) { /* nicht kritisch */ }
   const mine = (await sb.from('gang_members').select('*').eq('user_id', me).maybeSingle()).data;
-  if (gangView && (!mine || gangView !== mine.gang_id)) return renderGangPublic(el, gangView, mine);
+  if (stale(t)) return;
+  if (gangView && (!mine || gangView !== mine.gang_id)) return renderGangPublic(el, gangView, mine, t);
   gangView = null;
-  if (!mine) return renderNoGang(el, me);
-  return renderMyGang(el, me, mine);
+  if (!mine) return renderNoGang(el, me, t);
+  return renderMyGang(el, me, mine, t);
 };
 async function gangMembers(gid) {
   const { data } = await sb.from('gang_members').select('user_id,role,joined_at').eq('gang_id', gid);
@@ -275,10 +287,11 @@ async function gangMembers(gid) {
   (data || []).forEach(m => m.profiles = byId[m.user_id]);
   return (data || []).sort((a, b) => RANK[b.role] - RANK[a.role] || (b.profiles?.xp || 0) - (a.profiles?.xp || 0));
 }
-async function renderGangPublic(el, gid, mine) {
+async function renderGangPublic(el, gid, mine, t) {
   const g = (await sb.from('gangs').select('*').eq('id', gid).maybeSingle()).data;
   if (!g) { gangView = null; return window.kiezLoadGang(); }
   const mem = await gangMembers(gid);
+  if (stale(t)) return;
   el.innerHTML = '<div class="kf-row"><button class="ghost gback">← Zurück</button></div><div class="kf-box"><h3>' + esc(g.name) + '</h3><p class="kf-bio">' + (esc(g.description) || '<span class="kf-muted">Keine Beschreibung.</span>') + '</p>'
     + '<p class="kf-muted">' + mem.length + '/30 Mitglieder · Angriff ' + g.attack_level + '/10 · Verteidigung ' + g.defense_level + '/10 · Kriege ' + g.war_wins + ' S / ' + g.war_losses + ' N · ' + (g.is_open ? 'offen für alle' : 'nur mit Einladung') + '</p>'
     + (!mine ? '<div class="kf-row">' + (g.is_open ? '<button class="big gjoin">Beitreten</button>' : '<button class="big gapply">Bewerben</button>') + '</div>' : '')
@@ -289,10 +302,11 @@ async function renderGangPublic(el, gid, mine) {
   if (j) act(j, box, async () => { await rpc('join_gang', { wanted_gang: gid }); gangView = null; setTimeout(window.kiezLoadGang, 500); return 'Willkommen in der Bande!'; });
   if (a) act(a, box, async () => { await rpc('gang_apply', { wanted_gang: gid }); return 'Bewerbung verschickt.'; });
 }
-async function renderNoGang(el, me) {
+async function renderNoGang(el, me, t) {
   const [gangs, mem, req] = await Promise.all([sb.from('gangs').select('*').order('name'), sb.from('gang_members').select('gang_id'), sb.from('gang_requests').select('*').eq('user_id', me)]);
   const count = {}; (mem.data || []).forEach(m => count[m.gang_id] = (count[m.gang_id] || 0) + 1);
   const gn = Object.fromEntries((gangs.data || []).map(x => [x.id, x.name]));
+  if (stale(t)) return;
   const invites = (req.data || []).filter(r => r.kind === 'invite'), applied = new Set((req.data || []).filter(r => r.kind === 'apply').map(r => r.gang_id));
   el.innerHTML = (invites.length ? '<div class="kf-box"><h3>📨 Einladungen</h3><ul class="kf-list">' + invites.map(r => '<li><b>' + esc(gn[r.gang_id]) + '</b> <button class="ghost ginvacc" data-id="' + r.gang_id + '">Annehmen</button> <button class="ghost ginvdec" data-id="' + r.gang_id + '">Ablehnen</button></li>').join('') + '</ul></div>' : '')
     + '<div class="kf-box"><h3>🏴 Eigene Bande gründen</h3><div class="kf-row"><input class="gname" maxlength="30" placeholder="Bandenname" style="flex:1"><button class="big gcreate">Gründen – 50,00 €</button></div></div>'
@@ -304,7 +318,7 @@ async function renderNoGang(el, me) {
   el.querySelectorAll('.ginvdec,.gwd').forEach(b => act(b, box, async () => { await rpc('gang_request_delete', { wanted_gang: b.dataset.id, target_id: me }); reload(); }));
   el.querySelectorAll('.ga').forEach(b => act(b, box, async () => { await rpc('gang_apply', { wanted_gang: b.dataset.id }); reload(); return 'Bewerbung verschickt.'; }));
 }
-async function renderMyGang(el, me, mine) {
+async function renderMyGang(el, me, mine, t) {
   const gid = mine.gang_id, myRank = RANK[mine.role];
   const [g, mem, req, chat, log, wars, allGangs] = await Promise.all([
     sb.from('gangs').select('*').eq('id', gid).single(), gangMembers(gid),
@@ -318,6 +332,7 @@ async function renderMyGang(el, me, mine) {
   const nm = await names((req.data || []).map(r => r.user_id).concat((chat.data || []).map(c => c.user_id), (log.data || []).map(l => l.user_id)));
   const cost = l => 50 * Math.pow(l + 1, 2);
   const activeWar = (wars.data || []).find(w => !w.resolved);
+  if (stale(t)) return;
   const apps = (req.data || []).filter(r => r.kind === 'apply'), invs = (req.data || []).filter(r => r.kind === 'invite');
   el.innerHTML = '<div class="kf-box"><h3>🏴 ' + esc(G.name) + ' <span class="kf-muted">– du bist ' + ROLE[mine.role] + '</span></h3>'
     + '<p class="kf-bio">' + (esc(G.description) || '<span class="kf-muted">Keine Beschreibung.</span>') + '</p>'
