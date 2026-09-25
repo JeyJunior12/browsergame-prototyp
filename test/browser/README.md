@@ -10,3 +10,5 @@ G=$(npm root -g) NODE_EXTRA_CA_CERTS=/root/.ccr/ca-bundle.crt KIEZ_MAIL=… KIEZ
 - `spielen.js` – spielt per Klick (Verbrechen, Schnorren, Waschen, Kiezaktion, Weiterbildung, Pfandtour, Ausbau, Getränk, Lotto, Kiez-Brett, Kronkorken, Profilbild, Post) und zeigt die Meldungen.
 - `banden.js` – Bande gründen, Testkonto 2 einladen, Einladung annehmen, Chat, Einzahlen (zwei Konten).
 - `lib.js` – liefert die Seite vom Fake-Host `https://kiez.test/` aus dem Repo, alles andere geht über den Proxy.
+
+- `kampf.js` / `alles.js` – brauchen den Testmodus (siehe CLAUDE.md) und vier Testkonten (`KIEZ_MAIL_BASE`).

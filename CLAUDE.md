@@ -46,6 +46,8 @@ Deutsches Browsergame im Stil von Pennergame (Pfand sammeln, Schnorren, Training
 - Meldungen erst **nach** dem Neuzeichnen setzen; es gibt doppelte IDs (z. B. `#drinkmsg` in Apotheke/Supermarkt/Fenster) → `kiezDrinkMsg()` oder im Container suchen.
 - Nach dem Login lädt die Seite absichtlich neu (`location.reload`) – Tests nutzen `lib.login()`.
 
+- **Testmodus** (für Kampf/Tierkampf/Bandenkrieg per Klick): Migrationen 0010/0011 gaben Testkonten `tester_fast_forward()`, `tester_set_stats()`, `tester_end_wars()` – Balancing bleibt unverändert. 0014 hat ihn samt Testkonten wieder entfernt. Für neue Tests: 0010+0011 als neue Migration erneut anlegen, 4 Testkonten registrieren, `test/browser/kampf.js` und `alles.js` laufen lassen, danach wie 0014 aufräumen.
+
 ## Stand Go-Live
 Alle Etappen 1–7 erledigt und in `main` (PR #1, #2, #3). Runde 2: Systemnachrichten, Profilbild, Werbelink, Verkaufen, Kiez-Brett, Namensänderung, Lotto, Essen, Kiez-News, Einstellungen (0008/0009), live auf https://browsergame-prototyp.vercel.app. Admin: BehaarteUhse (0007).
-Testkonten: ClaudeTester, ClaudeTester2. Neue Arbeit immer auf neuem Stand von `main` beginnen.
+Testkonten wurden nach Runde 3 gelöscht (0014) – bei Bedarf neu anlegen. Neue Arbeit immer auf neuem Stand von `main` beginnen.
