@@ -2,7 +2,7 @@
 # Baut die lokale Test-DB neu auf: Schema-Export + Katalogdaten + alle Migrationen
 set -e
 cd "$(dirname "$0")/../.."
-P="psql -h /var/tmp/pgtest -p 55432 -U postgres -v ON_ERROR_STOP=1 -q"
+P="psql -h ${PGHOST:-/var/tmp/pgtest} -p ${PGPORT:-55432} -U postgres -v ON_ERROR_STOP=1 -q"
 $P -c "drop database if exists kiez" -c "create database kiez"
 { cat supabase/test/00_setup.sql
   for f in supabase/schema/functions/*.sql; do [ "$(basename $f)" = rls_auto_enable.sql ] || { cat "$f"; echo; }; done
