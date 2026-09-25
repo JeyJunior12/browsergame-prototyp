@@ -48,6 +48,12 @@ Deutsches Browsergame im Stil von Pennergame (Pfand sammeln, Schnorren, Training
 
 - **Testmodus** (für Kampf/Tierkampf/Bandenkrieg per Klick): Migrationen 0010/0011 gaben Testkonten `tester_fast_forward()`, `tester_set_stats()`, `tester_end_wars()` – Balancing bleibt unverändert. 0014 hat ihn samt Testkonten wieder entfernt. Für neue Tests: 0010+0011 als neue Migration erneut anlegen, 4 Testkonten registrieren, `test/browser/kampf.js` und `alles.js` laufen lassen, danach wie 0014 aufräumen.
 
+## Design (Runde 4)
+- **`kiez-theme.css`** = Designsystem „Kiez-Papier“, wird als letztes geladen. Farben/Schriften nur über die Tokens in `:root` ändern. Helles Papier für Kopf/Reiter/Knöpfe, dunkles Pergament für Inhalte, Akzente Messing/Rost. Schriften: Bitter (Überschriften), Source Sans 3 (Text), Alfa Slab One (Logo) – Google Fonts.
+- Jede Regel hat den Präfix `html body:not(#kz1):not(#kz2)` (Vorrang vor alten `#seite`-Regeln in `index.html`). Neue Regeln genauso schreiben.
+- Mindestgrößen: Text 15–16 px, Beschriftungen ≥ 12 px, Knöpfe ≥ 14 px/40 px hoch. Prüfen: Skript sucht Elemente < 13 px (Runde 4: 100 → 10, Rest Großbuchstaben-Labels).
+- Bilder nur als **WebP** (84 MB PNG → 10,6 MB). SEO: Titel/Beschreibung/OG/Twitter/JSON-LD (WebSite, VideoGame, FAQPage) im `<head>`, H1 + Infobereich „Was dich im Kiez erwartet“ + FAQ auf der Startseite, `robots.txt`, `sitemap.xml`, `favicon.svg`, `og-image.jpg`, `site.webmanifest`. Domain steht in canonical/OG/Sitemap – bei eigener Domain dort ändern.
+
 ## Stand Go-Live
 Alle Etappen 1–7 erledigt und in `main` (PR #1, #2, #3). Runde 2: Systemnachrichten, Profilbild, Werbelink, Verkaufen, Kiez-Brett, Namensänderung, Lotto, Essen, Kiez-News, Einstellungen (0008/0009), live auf https://browsergame-prototyp.vercel.app. Admin: BehaarteUhse (0007).
 Testkonten wurden nach Runde 3 gelöscht (0014) – bei Bedarf neu anlegen. Neue Arbeit immer auf neuem Stand von `main` beginnen.

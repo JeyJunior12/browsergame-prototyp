@@ -1,0 +1,263 @@
+/* ==========================================================================
+   Kiezkönig – Designsystem „Kiez-Papier“ (wird als letztes geladen)
+   Helles altes Papier für Kopf, Reiter, Knöpfe · dunkles Pergament für Inhalte
+   Zwei Schriften: Bitter (Überschriften) · Source Sans 3 (Text)
+   Mindestgrößen: Text 16px, Beschriftungen 12–13px, Knöpfe 14px / 40px hoch
+   ========================================================================== */
+:root {
+  --paper: #dccaa3; --paper-light: #efe2c3; --paper-dark: #b99f73; --paper-edge: #8a6f47;
+  --ink: #2a1f15; --ink-soft: #4a3a28;
+  --leather: #221a13; --leather-2: #2c2219; --leather-3: #372a1e;
+  --text: #f1e6cc; --muted: #c9b692; --brass: #d1a94f; --brass-dark: #9c7a2e;
+  --rust: #9b3c1f; --rust-dark: #6f2913; --moss: #5f7d3f; --blood: #a3362c;
+  --line: rgba(209,169,79,.28); --line-strong: rgba(209,169,79,.55);
+  --font-head: 'Bitter', Georgia, serif; --font-body: 'Source Sans 3', 'Segoe UI', Arial, sans-serif;
+  --radius: 6px; --shadow: 0 10px 30px rgba(0,0,0,.45), 0 2px 6px rgba(0,0,0,.35);
+  --paper-tex: url('/altes-papier-crop-v1.webp');
+}
+
+/* ---------- Grundlage ---------- */
+html body:not(#kz1):not(#kz2) { font-family: var(--font-body) !important; font-size: 16px !important; line-height: 1.5 !important; color: var(--text) !important; }
+html body:not(#kz1):not(#kz2) .wrap { max-width: 1180px !important; }
+html body:not(#kz1):not(#kz2) :is(h1,h2,h3,h4) { font-family: var(--font-head) !important; letter-spacing: .01em !important; }
+html body:not(#kz1):not(#kz2) :is(p, li, td, th, label, span, small, em, i, b, strong, a, div) { font-family: inherit; }
+html body:not(#kz1):not(#kz2) :is(input, select, textarea) {
+  font-family: var(--font-body) !important; font-size: 16px !important; color: var(--ink) !important;
+  background: #f6ecd4 !important; border: 1px solid var(--paper-edge) !important; border-radius: var(--radius) !important;
+  padding: 10px 12px !important; min-height: 44px; box-shadow: inset 0 1px 3px rgba(0,0,0,.18) !important;
+}
+html body:not(#kz1):not(#kz2) textarea { min-height: 110px; }
+html body:not(#kz1):not(#kz2) :is(input, select, textarea):focus { outline: 3px solid rgba(209,169,79,.6) !important; outline-offset: 1px; }
+html body:not(#kz1):not(#kz2) a { color: var(--brass) !important; }
+html body:not(#kz1):not(#kz2) :focus-visible { outline: 3px solid var(--brass) !important; outline-offset: 2px !important; }
+
+/* ---------- Kopf: Papier-Leiste ---------- */
+html body:not(#kz1):not(#kz2) .mast {
+  background: linear-gradient(180deg, rgba(255,245,220,.25), rgba(120,90,50,.18)), var(--paper-tex) center/cover !important;
+  border-bottom: 3px solid var(--paper-edge) !important; box-shadow: 0 6px 18px rgba(0,0,0,.5) !important;
+}
+html body:not(#kz1):not(#kz2) .mast .logo {
+  font-family: 'Alfa Slab One', var(--font-head) !important; font-size: 40px !important; color: var(--ink) !important;
+  letter-spacing: .04em !important; text-shadow: 1px 1px 0 rgba(255,240,210,.7), 3px 3px 0 rgba(111,41,19,.35) !important;
+}
+html body:not(#kz1):not(#kz2) .mast .tag { font-family: var(--font-head) !important; font-size: 13px !important; font-style: italic; color: var(--ink-soft) !important; height: auto !important; opacity: 1 !important; }
+html body:not(#kz1):not(#kz2) .classic-mainnav > button {
+  font-family: var(--font-head) !important; font-size: 13px !important; font-weight: 700 !important; color: var(--ink) !important;
+  letter-spacing: .06em !important; text-transform: uppercase !important; transition: background .15s, transform .15s;
+}
+html body:not(#kz1):not(#kz2) .classic-mainnav > button:hover, html body:not(#kz1):not(#kz2) .classic-mainnav > button.active { background: rgba(111,41,19,.12) !important; }
+html body:not(#kz1):not(#kz2) .classic-menu { border-radius: 0 0 var(--radius) var(--radius) !important; box-shadow: var(--shadow) !important; }
+html body:not(#kz1):not(#kz2) .classic-menu button { font-family: var(--font-head) !important; font-size: 15px !important; min-height: 42px !important; padding: 8px 14px !important; }
+
+/* ---------- Spieler-Kärtchen ---------- */
+html body:not(#kz1):not(#kz2) .player-slip {
+  width: 250px !important; height: auto !important; padding: 12px 12px 12px 84px !important; row-gap: 3px !important;
+  background: linear-gradient(180deg, var(--leather-3), var(--leather)) !important; border: 1px solid var(--line-strong) !important;
+  border-radius: var(--radius) !important; box-shadow: var(--shadow) !important; font-size: 13px !important;
+}
+html body:not(#kz1):not(#kz2) .player-slip #slipname { font-family: var(--font-head) !important; font-size: 18px !important; color: var(--paper-light) !important; }
+html body:not(#kz1):not(#kz2) .player-slip > span, html body:not(#kz1):not(#kz2) .player-slip > span * { font-size: 13px !important; line-height: 1.35 !important; }
+html body:not(#kz1):not(#kz2) .player-slip > span b { font-size: 11px !important; letter-spacing: .08em; color: var(--muted) !important; }
+html body:not(#kz1):not(#kz2) .player-slip .slip-messages b { font-size: 13px !important; color: var(--brass) !important; letter-spacing: 0; }
+html body:not(#kz1):not(#kz2) .player-slip #logout { font-size: 13px !important; padding: 4px 10px !important; min-height: 30px !important; position: static !important; margin-top: 4px; }
+html body:not(#kz1):not(#kz2) .player-slip .profile-avatar { width: 62px !important; height: 62px !important; border-radius: 4px !important; border: 2px solid var(--brass-dark) !important; }
+
+/* ---------- Statusleiste ---------- */
+html body:not(#kz1):not(#kz2) .stats {
+  background: linear-gradient(180deg, rgba(255,245,220,.22), rgba(90,65,35,.2)), var(--paper-tex) center/cover !important;
+  border-bottom: 2px solid var(--paper-edge) !important; min-height: 56px !important; box-shadow: 0 4px 12px rgba(0,0,0,.35) !important;
+}
+html body:not(#kz1):not(#kz2) .stats .stat { padding: 6px 12px 6px 40px !important; border-right: 1px solid rgba(90,65,35,.35) !important; }
+html body:not(#kz1):not(#kz2) .stats .stat small { font-family: var(--font-head) !important; font-size: 11px !important; font-weight: 700 !important; letter-spacing: .08em !important; color: var(--ink-soft) !important; text-transform: uppercase; }
+html body:not(#kz1):not(#kz2) .stats .stat b { font-family: var(--font-head) !important; font-size: 18px !important; color: var(--ink) !important; }
+html body:not(#kz1):not(#kz2) .stats .stat em { font-size: 12px !important; }
+
+/* ---------- Reiterleisten (Papierfahnen) ---------- */
+html body:not(#kz1):not(#kz2) .kiez-quickbar { height: auto !important; min-height: 40px !important; gap: 4px !important; }
+html body:not(#kz1):not(#kz2) .kiez-quickbar button, html body:not(#kz1):not(#kz2) .panel .section-tools span, html body:not(#kz1):not(#kz2) .panel .section-tools button {
+  font-family: var(--font-head) !important; font-size: 14px !important; font-weight: 700 !important; color: var(--ink) !important;
+  min-height: 38px !important; padding: 8px 14px !important; letter-spacing: .02em !important;
+  background: linear-gradient(180deg, var(--paper-light), var(--paper)) !important; border: 1px solid var(--paper-edge) !important;
+  border-bottom: none !important; border-radius: var(--radius) var(--radius) 0 0 !important; box-shadow: 0 -2px 6px rgba(0,0,0,.25) !important;
+  cursor: pointer; transition: transform .12s, filter .12s;
+}
+html body:not(#kz1):not(#kz2) .kiez-quickbar button:hover, html body:not(#kz1):not(#kz2) .panel .section-tools span:hover { filter: brightness(1.05); transform: translateY(-1px); }
+html body:not(#kz1):not(#kz2) .kiez-quickbar button.active, html body:not(#kz1):not(#kz2) .panel .section-tools span.subtab-active {
+  background: linear-gradient(180deg, #fff4da, var(--paper-light)) !important; box-shadow: 0 -3px 10px rgba(0,0,0,.35), inset 0 -3px 0 var(--rust) !important;
+}
+
+/* ---------- Inhaltsflächen: dunkles Pergament ---------- */
+html body:not(#kz1):not(#kz2) .panel.active-view {
+  background: linear-gradient(rgba(34,26,19,.93), rgba(30,23,16,.95)), var(--paper-tex) center/cover !important;
+  border: 1px solid var(--line-strong) !important; border-radius: var(--radius) !important; box-shadow: var(--shadow), inset 0 0 60px rgba(0,0,0,.45) !important;
+  color: var(--text) !important;
+}
+html body:not(#kz1):not(#kz2) .panel > h2 {
+  font-size: 28px !important; font-weight: 800 !important; color: var(--paper-light) !important; padding: 16px 22px 12px !important;
+  border-bottom: 1px solid var(--line) !important; background: none !important; text-shadow: 0 2px 0 rgba(0,0,0,.5) !important;
+}
+html body:not(#kz1):not(#kz2) .panel > h2::after { content: ''; display: block; width: 64px; height: 3px; margin-top: 8px; background: linear-gradient(90deg, var(--rust), var(--brass)); border-radius: 2px; }
+html body:not(#kz1):not(#kz2) .panel .inside { padding: 18px 22px 24px !important; font-size: 16px !important; }
+html body:not(#kz1):not(#kz2) .panel :is(p, li, td) { font-size: 16px; color: inherit; }
+html body:not(#kz1):not(#kz2) .panel h3 { font-size: 19px !important; color: var(--paper-light) !important; }
+html body:not(#kz1):not(#kz2) .section-scene { height: 120px !important; border-bottom: 2px solid var(--line-strong) !important; }
+
+/* Karten */
+html body:not(#kz1):not(#kz2) .panel .card, html body:not(#kz1):not(#kz2) .kf-box, html body:not(#kz1):not(#kz2) .profile-wide-row, html body:not(#kz1):not(#kz2) .activity-card, html body:not(#kz1):not(#kz2) .lead-card, html body:not(#kz1):not(#kz2) .status-detail, html body:not(#kz1):not(#kz2) .action-block {
+  background: linear-gradient(180deg, rgba(255,236,200,.06), rgba(255,236,200,.02)) !important;
+  border: 1px solid var(--line) !important; border-radius: var(--radius) !important;
+  box-shadow: 0 4px 14px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,240,210,.06) !important; color: var(--text) !important;
+}
+html body:not(#kz1):not(#kz2) .panel .card:hover { border-color: var(--line-strong) !important; }
+html body:not(#kz1):not(#kz2) .panel .card > b:first-child, html body:not(#kz1):not(#kz2) .kf-box h3, html body:not(#kz1):not(#kz2) .profile-wide-row > h3, html body:not(#kz1):not(#kz2) .activity-card h3 {
+  font-family: var(--font-head) !important; font-size: 18px !important; color: var(--paper-light) !important;
+}
+html body:not(#kz1):not(#kz2) .panel .card p, html body:not(#kz1):not(#kz2) .panel .card small, html body:not(#kz1):not(#kz2) .panel .card em { font-size: 15px !important; }
+html body:not(#kz1):not(#kz2) .kf-muted, html body:not(#kz1):not(#kz2) .panel .muted { color: var(--muted) !important; font-size: 14px !important; }
+
+/* Tabellen */
+html body:not(#kz1):not(#kz2) .panel table td, html body:not(#kz1):not(#kz2) .panel table th, html body:not(#kz1):not(#kz2) .profile-table td, html body:not(#kz1):not(#kz2) .info-table td, html body:not(#kz1):not(#kz2) .info-table th, html body:not(#kz1):not(#kz2) .kf-table td, html body:not(#kz1):not(#kz2) .kf-table th {
+  font-size: 15px !important; padding: 7px 10px !important; border-bottom: 1px solid var(--line) !important; color: var(--text) !important;
+}
+html body:not(#kz1):not(#kz2) .panel table th { font-family: var(--font-head) !important; color: var(--brass) !important; font-size: 13px !important; text-transform: uppercase; letter-spacing: .06em; }
+
+/* ---------- Knöpfe ---------- */
+html body:not(#kz1):not(#kz2) button.big, html body:not(#kz1):not(#kz2) .panel button.big {
+  font-family: var(--font-head) !important; font-size: 15px !important; font-weight: 700 !important; letter-spacing: .02em !important;
+  min-height: 44px !important; padding: 10px 18px !important; color: #fff6e3 !important;
+  background: linear-gradient(180deg, #b24a27, var(--rust) 55%, var(--rust-dark)) !important;
+  border: 1px solid #4d1c0c !important; border-radius: var(--radius) !important;
+  box-shadow: 0 3px 0 #4d1c0c, 0 6px 14px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,220,190,.35) !important;
+  text-shadow: 0 1px 0 rgba(0,0,0,.4) !important; cursor: pointer; transition: transform .1s, filter .15s;
+}
+html body:not(#kz1):not(#kz2) button.big:hover:not(:disabled) { filter: brightness(1.08); transform: translateY(-1px); }
+html body:not(#kz1):not(#kz2) button.big:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 #4d1c0c, 0 3px 8px rgba(0,0,0,.35) !important; }
+html body:not(#kz1):not(#kz2) button.ghost, html body:not(#kz1):not(#kz2) .panel button.ghost {
+  font-family: var(--font-head) !important; font-size: 14px !important; font-weight: 700 !important; min-height: 40px !important;
+  padding: 8px 14px !important; color: var(--ink) !important;
+  background: linear-gradient(180deg, var(--paper-light), var(--paper) 70%, var(--paper-dark)) !important;
+  border: 1px solid var(--paper-edge) !important; border-radius: var(--radius) !important;
+  box-shadow: 0 2px 0 var(--paper-edge), 0 4px 10px rgba(0,0,0,.3) !important; cursor: pointer; transition: transform .1s, filter .15s;
+}
+html body:not(#kz1):not(#kz2) button.ghost:hover:not(:disabled) { filter: brightness(1.06); transform: translateY(-1px); }
+html body:not(#kz1):not(#kz2) button:disabled, html body:not(#kz1):not(#kz2) button[disabled] { opacity: .55 !important; filter: grayscale(.5) !important; cursor: not-allowed !important; transform: none !important; }
+
+/* ---------- Meldungen ---------- */
+html body:not(#kz1):not(#kz2) .notice { font-size: 15px !important; padding: 10px 14px !important; border-radius: var(--radius) !important; border-left-width: 4px !important; line-height: 1.45 !important; }
+html body:not(#kz1):not(#kz2) .notice.good { background: rgba(95,125,63,.2) !important; border: 1px solid rgba(143,184,99,.5) !important; border-left: 4px solid #8fb863 !important; color: #e5f1d6 !important; }
+html body:not(#kz1):not(#kz2) .notice.bad { background: rgba(163,54,44,.2) !important; border: 1px solid rgba(214,108,94,.5) !important; border-left: 4px solid #d66c5e !important; color: #f7ddd8 !important; }
+
+/* ---------- Übersicht / Profil ---------- */
+html body:not(#kz1):not(#kz2) .classic-profile-title { font-family: var(--font-head) !important; font-size: 26px !important; color: var(--paper-light) !important; }
+html body:not(#kz1):not(#kz2) .profile-label { font-family: var(--font-head) !important; font-size: 14px !important; letter-spacing: .08em; text-transform: uppercase; color: var(--brass) !important; background: none !important; border-bottom: 1px solid var(--line) !important; }
+html body:not(#kz1):not(#kz2) .profile-warning, html body:not(#kz1):not(#kz2) .skill-requirements, html body:not(#kz1):not(#kz2) .skill-progress-label span, html body:not(#kz1):not(#kz2) .skill-info p { font-size: 13px !important; }
+html body:not(#kz1):not(#kz2) .kiez-slot b { font-size: 12px !important; } body .kiez-slot-link, html body:not(#kz1):not(#kz2) .kiez-slot-name { font-size: 14px !important; }
+html body:not(#kz1):not(#kz2) .kiez-weather-badge { font-size: 14px !important; padding: 5px 12px !important; background: rgba(0,0,0,.35) !important; border: 1px solid var(--line) !important; }
+html body:not(#kz1):not(#kz2) .metric small, html body:not(#kz1):not(#kz2) .status-detail small { font-size: 12px !important; }
+html body:not(#kz1):not(#kz2) .haeuser-status, html body:not(#kz1):not(#kz2) .area-status, html body:not(#kz1):not(#kz2) .achievement-tier { font-size: 13px !important; }
+html body:not(#kz1):not(#kz2) .kf-modal > div { background: linear-gradient(rgba(34,26,19,.95), rgba(30,23,16,.97)), var(--paper-tex) center/cover !important; border: 1px solid var(--line-strong) !important; border-radius: var(--radius); box-shadow: var(--shadow); }
+
+/* ---------- Start (ausgeloggt) ---------- */
+html body:not(#kz1):not(#kz2) #auth h1, html body:not(#kz1):not(#kz2) #auth h2 { font-size: 34px !important; color: var(--paper-light) !important; }
+html body:not(#kz1):not(#kz2) #auth p { font-size: 17px !important; }
+
+/* ---------- Handy ---------- */
+@media (max-width: 760px) {
+  html body:not(#kz1):not(#kz2) .mast .logo { font-size: 30px !important; }
+  html body:not(#kz1):not(#kz2) .classic-mainnav > button { font-size: 11px !important; letter-spacing: .02em !important; }
+  html body:not(#kz1):not(#kz2) .player-slip { position: relative !important; top: auto !important; right: auto !important; width: calc(100% - 16px) !important; margin: 8px !important; }
+  html body:not(#kz1):not(#kz2) .stats { display: grid !important; grid-template-columns: repeat(2, 1fr) !important; }
+  html body:not(#kz1):not(#kz2) .stats .stat b { font-size: 16px !important; }
+  html body:not(#kz1):not(#kz2) .kiez-quickbar { display: flex !important; overflow-x: auto !important; flex-wrap: nowrap !important; grid-template-columns: none !important; }
+  html body:not(#kz1):not(#kz2) .kiez-quickbar button { flex: 0 0 auto !important; }
+  html body:not(#kz1):not(#kz2) .panel > h2 { font-size: 23px !important; padding: 14px 16px 10px !important; }
+  html body:not(#kz1):not(#kz2) .panel .inside { padding: 14px 14px 18px !important; }
+  html body:not(#kz1):not(#kz2) .section-scene { height: 90px !important; }
+}
+
+/* ---------- Aufbau Desktop ---------- */
+html body:not(#kz1):not(#kz2) .mast { height: auto !important; min-height: 100px !important; }
+html body:not(#kz1):not(#kz2) .mast > div:first-child { width: auto !important; min-width: 300px; }
+html body:not(#kz1):not(#kz2) .mast .tag { white-space: nowrap; }
+html body:not(#kz1):not(#kz2) .player-slip { top: 170px !important; }
+html body:not(#kz1):not(#kz2) .main::before { height: 240px !important; }
+html body:not(#kz1):not(#kz2) #overview.active-view { grid-template-columns: minmax(0,1fr) !important; grid-template-areas: "profile" !important; }
+html body:not(#kz1):not(#kz2) #overview .classic-profile-content, html body:not(#kz1):not(#kz2) #overview .classic-profile-content > * { max-width: none !important; }
+html body:not(#kz1):not(#kz2) #overview .profile-paper-tabs { display: none !important; }
+html body:not(#kz1):not(#kz2) #auth.panel { background: linear-gradient(rgba(34,26,19,.94), rgba(30,23,16,.96)), var(--paper-tex) center/cover !important; border: 1px solid var(--line-strong) !important; border-radius: var(--radius) !important; box-shadow: var(--shadow) !important; }
+html body:not(#kz1):not(#kz2) #auth > h2 { font-size: 30px !important; color: var(--paper-light) !important; background: none !important; }
+html body:not(#kz1):not(#kz2) #auth .inside p.auth-lead, html body:not(#kz1):not(#kz2) #auth .inside p.auth-tagline { font-size: 17px !important; max-width: 60ch; color: var(--text) !important; }
+html body:not(#kz1):not(#kz2) #auth .inside p.auth-tagline { font-family: var(--font-head) !important; font-style: italic; color: var(--paper-light) !important; }
+html body:not(#kz1):not(#kz2) #auth .inside p.auth-footnote { font-size: 14px !important; color: var(--muted) !important; }
+html body:not(#kz1):not(#kz2) #auth .auth-features .road { background: rgba(255,236,200,.05) !important; border: 1px solid var(--line) !important; font-size: 15px !important; }
+html body:not(#kz1):not(#kz2) #auth .auth-features .road small { font-size: 12px !important; letter-spacing: .08em; text-transform: uppercase; color: var(--brass) !important; }
+html body:not(#kz1):not(#kz2) #auth .auth-features .road b { font-family: var(--font-head) !important; font-size: 17px !important; color: var(--paper-light) !important; }
+
+/* ---------- Aufbau Handy ---------- */
+@media (max-width: 760px) {
+  html body:not(#kz1):not(#kz2) .mast { display: grid !important; grid-template-columns: 1fr !important; grid-template-rows: auto auto auto !important; height: auto !important; min-height: 0 !important; padding: 8px 8px 0 !important; }
+  html body:not(#kz1):not(#kz2) .mast > div:first-child { grid-row: 1 !important; grid-column: 1 !important; min-width: 0; height: auto !important; }
+  html body:not(#kz1):not(#kz2) .mast .tag { white-space: normal; font-size: 12px !important; }
+  html body:not(#kz1):not(#kz2) .classic-mainnav { grid-row: 2 !important; grid-column: 1 !important; width: 100% !important; height: auto !important; }
+  html body:not(#kz1):not(#kz2) .classic-mainnav > button { height: auto !important; min-height: 64px !important; padding-top: 44px !important; }
+  html body:not(#kz1):not(#kz2) .player-slip { grid-row: 3 !important; grid-column: 1 !important; position: relative !important; top: auto !important; right: auto !important; width: 100% !important; margin: 8px 0 !important; min-height: 90px; }
+  html body:not(#kz1):not(#kz2) .main::before { height: 170px !important; }
+  html body:not(#kz1):not(#kz2) .stats .stat { padding-left: 36px !important; }
+}
+
+@media (prefers-reduced-motion: reduce) { html body:not(#kz1):not(#kz2) * { transition: none !important; } }
+
+/* ---------- Startseite: H1 und Infobereich (SEO-Inhalt, für Menschen geschrieben) ---------- */
+html body:not(#kz1):not(#kz2) #auth .auth-h1 { font-family: var(--font-head) !important; font-size: 20px !important; font-weight: 700; color: var(--brass) !important; margin: 0 0 8px !important; letter-spacing: .01em; }
+html body:not(#kz1):not(#kz2) #auth .auth-more { margin-top: 26px; padding-top: 18px; border-top: 1px solid var(--line); }
+html body:not(#kz1):not(#kz2) #auth .auth-more h2 { font-size: 24px !important; color: var(--paper-light) !important; margin: 8px 0 12px !important; }
+html body:not(#kz1):not(#kz2) #auth .auth-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+html body:not(#kz1):not(#kz2) #auth .auth-grid > div { background: rgba(255,236,200,.05); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; }
+html body:not(#kz1):not(#kz2) #auth .auth-grid h3 { font-size: 17px !important; margin: 0 0 6px !important; color: var(--paper-light) !important; }
+html body:not(#kz1):not(#kz2) #auth .auth-grid p, html body:not(#kz1):not(#kz2) #auth details p { font-size: 15px !important; color: var(--muted) !important; margin: 0; }
+html body:not(#kz1):not(#kz2) #auth details { border: 1px solid var(--line); border-radius: var(--radius); padding: 10px 14px; margin: 8px 0; background: rgba(0,0,0,.2); }
+html body:not(#kz1):not(#kz2) #auth summary { font-family: var(--font-head); font-weight: 700; font-size: 16px; cursor: pointer; color: var(--paper-light); }
+
+/* ---------- Übersicht: zweispaltig statt schmal ---------- */
+@media (min-width: 900px) {
+  html body:not(#kz1):not(#kz2) #overview .classic-profile-content { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 14px !important; align-items: start; }
+  html body:not(#kz1):not(#kz2) #overview .classic-profile-content > :is(.classic-profile-title, .profile-label, .classic-profile-core, .overview-actions-wrap, .overview-inventory-card, .overview-pet-wrap) { grid-column: 1 / -1 !important; }
+  html body:not(#kz1):not(#kz2) #overview .classic-profile-content > .profile-wide-row { margin: 0 !important; width: auto !important; }
+}
+html body:not(#kz1):not(#kz2) #overview .classic-profile-core { width: auto !important; max-width: none !important; }
+html body:not(#kz1):not(#kz2) .player-slip > span { display: flex !important; justify-content: space-between; gap: 6px; min-width: 0; }
+html body:not(#kz1):not(#kz2) .player-slip > span > :last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+html body:not(#kz1):not(#kz2) .player-slip #logout { background: linear-gradient(180deg, var(--paper-light), var(--paper)) !important; color: var(--ink) !important; border: 1px solid var(--paper-edge) !important; border-radius: var(--radius) !important; font-family: var(--font-head) !important; font-weight: 700 !important; }
+html body:not(#kz1):not(#kz2) .stats .stat { height: auto !important; min-height: 54px !important; }
+@media (max-width: 760px) { html body:not(#kz1):not(#kz2) .stats { grid-auto-rows: minmax(54px, auto) !important; } body .stats .stat { border-bottom: 1px solid rgba(90,65,35,.3) !important; } }
+
+/* ---------- Stärkere Regeln gegen ältere Stil-Schichten ---------- */
+html body:not(#kz1):not(#kz2) main section.panel > h2, html body:not(#kz1):not(#kz2) #overview .classic-profile-title {
+  font-family: var(--font-head) !important; font-size: 28px !important; font-weight: 800 !important; color: var(--paper-light) !important; letter-spacing: .01em !important;
+}
+html body:not(#kz1):not(#kz2) main section.panel .section-tools > span, html body:not(#kz1):not(#kz2) main section.panel .section-tools > button {
+  font-family: var(--font-head) !important; font-size: 14px !important; font-weight: 700 !important; letter-spacing: .03em !important; text-transform: none !important;
+  color: var(--ink) !important; min-height: 42px !important; line-height: 1.25 !important;
+}
+html body:not(#kz1):not(#kz2) main section.panel .inside, html body:not(#kz1):not(#kz2) main section.panel .scene-actions { background: transparent !important; }
+/* Seiten ohne Reiter: keine leere rechte Spalte */
+html body:not(#kz1):not(#kz2) main section.panel.active-view:not(:has(> .section-tools)) { grid-template-columns: minmax(0,1fr) !important; }
+html body:not(#kz1):not(#kz2) main section.panel.active-view:not(:has(> .section-tools)) > * { grid-column: 1 / -1 !important; }
+html body:not(#kz1):not(#kz2) .kiez-slots-row p { font-size: 14px !important; line-height: 1.5 !important; color: var(--muted) !important; }
+html body:not(#kz1):not(#kz2) .kiez-slots-row p b, html body:not(#kz1):not(#kz2) .kiez-slots-row p a { font-size: 14px !important; }
+html body:not(#kz1):not(#kz2) .profile-avatar-box small, html body:not(#kz1):not(#kz2) .classic-profile-core small { font-size: 12px !important; }
+html body:not(#kz1):not(#kz2) .scene-copy .eyebrow, html body:not(#kz1):not(#kz2) .section-scene::after { font-size: 13px !important; }
+
+/* ---------- Letzte Mindestgrößen ---------- */
+html body:not(#kz1):not(#kz2) .stats .stat small, html body:not(#kz1):not(#kz2) .player-slip > span b { font-size: 12px !important; }
+html body:not(#kz1):not(#kz2) .mini-status small, html body:not(#kz1):not(#kz2) .metric small, html body:not(#kz1):not(#kz2) .status-detail small, html body:not(#kz1):not(#kz2) .kiez-slot b { font-size: 12.5px !important; letter-spacing: .06em; }
+html body:not(#kz1):not(#kz2) .panel label { font-size: 14px !important; }
+html body:not(#kz1):not(#kz2) .mini-status b { font-size: 15px !important; }
+html body:not(#kz1):not(#kz2) #training .inside > p { font-size: 15px !important; color: var(--muted) !important; }
+html body:not(#kz1):not(#kz2) label small { font-size: 13px !important; }
+@media (max-width: 760px) {
+  html body:not(#kz1):not(#kz2) .player-slip { padding: 8px 10px 8px 64px !important; min-height: 0 !important; }
+  html body:not(#kz1):not(#kz2) .player-slip .profile-avatar { width: 44px !important; height: 44px !important; }
+  html body:not(#kz1):not(#kz2) .player-slip .avatar-stats { display: none !important; }
+  html body:not(#kz1):not(#kz2) .player-slip #logout { position: absolute !important; right: 10px; top: 8px; margin: 0 !important; min-height: 30px !important; }
+}
