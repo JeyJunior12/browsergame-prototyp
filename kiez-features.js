@@ -17,10 +17,17 @@ async function rpc(fn, args) {
   return r.data;
 }
 // Button-Klick mit Fehlermeldung; fn liefert Erfolgstext (HTML, bereits escaped)
+// Letzte Meldung merken: Seiten laden nach einer Aktion neu, die Meldung soll danach sichtbar bleiben
+let flash = null;
+function restoreFlash() {
+  if (!flash || Date.now() - flash.t > 8000) return;
+  const el = document.querySelector('section.panel.active-view .' + flash.cls.split(' ')[0]);
+  if (el && !el.innerHTML) say(el, flash.text, flash.good);
+}
 function act(btn, box, fn) {
   btn.onclick = async () => {
     btn.disabled = true;
-    try { const t = await fn(); if (t) say(box, t, true); }
+    try { const t = await fn(); if (t) { say(box, t, true); if (box?.className) flash = { cls: box.className, text: t, good: true, t: Date.now() }; } }
     catch (e) { say(box, esc(e.message), false); }
     btn.disabled = false;
   };
@@ -49,6 +56,7 @@ style.textContent = `
 .kf-table{width:100%;border-collapse:collapse;font-size:12px}.kf-table td,.kf-table th{padding:4px 6px;border-bottom:1px solid #2e2d29;text-align:left}
 .kf-rar-selten{color:#7fb3ff}.kf-rar-episch{color:#c68cff}.kf-rar-legendaer{color:#ffc34d}
 .kf-locked{opacity:.45}.kf-chat{max-height:260px;overflow:auto}
+.panel a,.kf-box a,.kiez-slots-row a{color:#c4a747}.panel a:hover{color:#e8dcc0}
 .kf-modal{position:fixed;inset:0;background:#000b;display:flex;align-items:center;justify-content:center;z-index:9999;padding:16px}
 .kf-modal>div{background:#242321;border:4px solid #756346;max-width:420px;width:100%;padding:18px;color:#e8dcc0;text-align:center}
 @media(max-width:600px){.kf-grid{grid-template-columns:1fr}}`;
@@ -369,6 +377,9 @@ async function updateHeader(p) {
     if (!k) { k = document.createElement('div'); k.className = 'stat kronkorken-stat'; k.style.cursor = 'pointer'; k.innerHTML = '<small>Kronkorken</small><b id="kkcount">0</b><em>Tauschen im Kiez</em>'; k.onclick = () => show('kronkorken'); stats.appendChild(k); }
     k.querySelector('b').textContent = p.bottlecaps ?? 0;
   }
+  // Warnung, wenn der Geldbehälter voll ist (Einnahmen gehen sonst still verloren)
+  const mEm = document.getElementById('money')?.parentElement?.querySelector('em');
+  if (mEm) { const full = Number(p.money) >= Number(p.cash_capacity) - 0.001; mEm.textContent = full ? '⚠️ Behälter voll – ausbauen!' : 'Begrenzt durch Behälter'; mEm.style.color = full ? '#ff8a6a' : ''; }
   const title = $('#overview .classic-profile-title');
   if (title) {
     try { weather = weather || await rpc('get_weather'); } catch (e) { }
@@ -583,6 +594,9 @@ loaders.rumors = async () => {
     box.innerHTML = items.map(i => '<p>' + i.icon + ' ' + esc(i.text) + '</p>').join('') + '<p>🗞️ Der Pfandpreis wechselt alle 20 Minuten zwischen <b>0,10 €</b> und <b>0,30 €</b>.</p>';
   } catch (e) { }
 };
+// Nach jedem Neuladen einer Seite die letzte Meldung wieder anzeigen
+Object.keys(loaders).forEach(k => { const f = loaders[k]; loaders[k] = async (...x) => { await f(...x); restoreFlash(); }; });
+{ const g = window.kiezLoadGang; window.kiezLoadGang = async (...x) => { await g(...x); restoreFlash(); }; }
 // Zuletzt geöffnete neue Seite wiederherstellen
 try { const last = localStorage.getItem('kiez_last_view'); if (loaders[last]) setTimeout(() => show(last), 1500); } catch (e) { }
 if (window.kiezProfile) window.kiezOnProfile(window.kiezProfile);

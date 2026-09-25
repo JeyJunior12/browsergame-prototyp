@@ -1241,7 +1241,7 @@ function addSchnorrplaetze(){
   if(error){resultBox.innerHTML='<div class="notice bad">'+error.message+'</div>';}
   else{
    window.kiezRenderProfile(data.profile);
-   resultBox.innerHTML='<div class="notice good">+'+Number(data.total).toFixed(2).replace('.',',')+' € von '+data.count+' Spenden kassiert.</div>';
+   resultBox.innerHTML='<div class="notice good">+'+Number(data.total).toFixed(2).replace('.',',')+' € von '+data.count+' Spenden kassiert.'+(Number(data.lost)>0?' <b>'+Number(data.lost).toFixed(2).replace('.',',')+' € passten nicht mehr in deinen Geldbehälter – bau ihn unter Unterkunft aus!</b>':'')+'</div>';
   }
   btn.disabled=false;
   btn.textContent='Hingehen';
