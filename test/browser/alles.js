@@ -29,7 +29,7 @@ let fails=0;
  await click('Konzentration abbrechen','.concentration-cancel',{expect:'abgebrochen|beendet|Konzentration'});
  // Ausbauten mit genug Geld
  await go('store');await tab('Zubehör');await click('Geldbehälter ausbauen','#containertiers button',{expect:'verbessert|gekauft'});
- await go('income');await tab('Schnorrplätze');await click('Sammelgebiet freischalten','#buyarea',{expect:'freigeschaltet|gekauft|Geschick'});
+ await go('income');await tab('Schnorrplätze');await click('Sammelgebiet freischalten','.area-unlock',{expect:'freigeschaltet|Geschick'});
  await go('begging');await tab('Körperpflege');await pg.evaluate(()=>window.kiezSupabase.rpc('tester_set_stats',{new_money:20000,new_xp:null,new_caps:null}));
  await pg.evaluate(async()=>{const s=window.kiezSupabase;const p=(await s.rpc('refresh_my_profile')).data;window.kiezRenderProfile(p)});
  await click('Schwamm freischalten','.washbuy',{expect:'freigeschaltet'});await pg.evaluate(async()=>window.kiezRenderProfile((await window.kiezSupabase.rpc('refresh_my_profile')).data));
@@ -40,7 +40,7 @@ let fails=0;
  await go('pets');await click('Hamster kaufen','.buypet[data-id="hamster"]',{expect:'hinterher|schon'});
  await go('overview');await tab('Haustier');await click('Tier mitnehmen','.activatepet',{expect:'gewechselt'});
  await click('Tiertraining starten','.trainpet',{expect:'Training|trainiert|läuft'});
- await rpc('tester_fast_forward');await pg.evaluate(async()=>window.kiezRenderProfile(await window.kiezRefreshProfile()));await go('overview');await tab('Haustier');
+ await rpc('tester_fast_forward');await go('overview');await tab('Haustier');await pg.waitForTimeout(17000); // Liste aktualisiert sich selbst, sobald das Training fertig ist
  await click('Tiertraining abschließen','.finishpet',{expect:'fertig|abgeschlossen|Stufe|gestiegen'});
  // Kronkorken-Tausch und Plunder
  await go('kronkorken');await click('Plunderkiste für Kronkorken','.kkbuy[data-id="plunderkiste"]',{expect:'In der Kiste'});

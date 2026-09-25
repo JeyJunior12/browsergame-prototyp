@@ -605,6 +605,14 @@ const foodWatch = new MutationObserver(addFood);
 function watchFood() { document.querySelectorAll('#kiezmodalbody, .supermarket-inline-body').forEach(b => { if (!b.dataset.kfFood) { b.dataset.kfFood = '1'; foodWatch.observe(b, { childList: true }); addFoodTo(b); } }); }
 watchFood(); setInterval(watchFood, 2000);
 
+// ================= Tiertraining: Liste aktualisieren, sobald ein Training fertig ist =================
+setInterval(() => {
+  const list = document.getElementById('mypets');
+  if (!list?.offsetParent || !window.kiezProfile) return;
+  const due = [...list.querySelectorAll('small')].some(sm => { const m = /bis (\d{1,2}):(\d{2})/.exec(sm.textContent); if (!m) return false; const d = new Date(); d.setHours(+m[1], +m[2], 59, 0); return d <= new Date(); });
+  if (due) window.kiezLoadPets?.();
+}, 15000);
+
 // ================= Gerüchteküche: echte Kiez-News =================
 loaders.rumors = async () => {
   const box = document.querySelector('#rumors .inside'); if (!box) return;
