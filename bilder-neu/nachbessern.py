@@ -36,7 +36,7 @@ NEU = {
  "ausbau-0": "a torn plastic bag full of empty deposit bottles",
  "ausbau-6": "an open black metal cash box with euro banknotes",
  "ausbau-7": "a shopping cart with a small lawnmower engine and exhaust pipe mounted at the back, homemade motor vehicle",
- "laden-schirm-halb": "an umbrella torn apart, only the handle and a few bent ribs with shreds of black fabric left",
+ "laden-schirm-halb": "a broken black umbrella with half of its fabric ripped away so the bare metal ribs stick out on one side",
  "laden-trillerpfeife": "a shiny metal sports whistle on a lanyard",
  "laden-taschenlampe": "a black flashlight switched on, casting a light beam",
  "laden-geldversteck": "an old tin can with rolled euro banknotes hidden inside",
@@ -46,17 +46,17 @@ NEU = {
  "waffe-gummiknueppel": "a black police rubber baton",
  "waffe-nagelkeule": "a wooden baseball bat with many nails hammered through it",
  "essen-kartonwein": "a cheap red wine tetra pak carton with a straw",
- "vert-bananen": "three empty brown banana peels lying flat on the sidewalk, no whole bananas",
+ "vert-bananen": "banana peels scattered on the ground",
  "vert-tarnen": "a man lying covered head to toe under a pile of autumn leaves in a park, only his face peeking out",
  "heim-brunnen": "a sleeping bag next to an old stone city fountain with water",
  "heim-wolfsrudel": "a homeless man sleeping on blankets surrounded by several stray dogs",
  "verbrechen-einbruch": "close-up of a red crowbar prying open a wooden door, wood splinters",
  "verbrechen-bank": "a black ski mask and a sack of euro banknotes lying on the ground",
  "kampf-verteidigung": "a homeless man holding a round metal trash can lid in front of his body like a shield",
- "rubbellose": "close-up of a coin scratching the silver layer off a colorful paper scratch card",
+ "rubbellose": "a small shabby street kiosk window with a rack of colorful scratch cards and lottery tickets, a hand holding a coin, no text",
 }
 # Szenen- statt Gegenstands-Vorlage (sonst liegt alles auf dem Gehweg)
-ART = {"kampf-verteidigung": "q", "kk-dusche": "q", "bande-gruenden": "q", "bande-liste": "q", "rang-08": "q", "vert-elektrozaun": "q",
+ART = {"rubbellose": "q", "kampf-verteidigung": "q", "kk-dusche": "q", "bande-gruenden": "q", "bande-liste": "q", "rang-08": "q", "vert-elektrozaun": "q",
        "vert-fallgrube": "q", "heim-brunnen": "q", "heim-wolfsrudel": "q", "vert-tarnen": "q", "verbrechen-einbruch": "q"}
 
 if __name__ == "__main__":
