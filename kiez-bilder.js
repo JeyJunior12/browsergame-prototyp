@@ -225,6 +225,13 @@
         el.style.setProperty('--scene-image', 'url("/bilder/' + file + '.webp")');
       }
     });
+    // Großes Bild oben auf der Übersicht
+    const hero = document.querySelector('#overview .overview-hero');
+    if (hero && hero.dataset.kzbild !== 'szene-uebersicht' && exists('szene-uebersicht')) {
+      hero.dataset.kzbild = 'szene-uebersicht';
+      hero.style.backgroundImage = 'linear-gradient(0deg,rgba(9,11,12,.93),transparent 72%),url("/bilder/szene-uebersicht.webp")';
+      hero.style.backgroundPosition = 'center';
+    }
     // Ausbau-Vorschau (Unterkunft, Geldbehälter …)
     document.querySelectorAll('.equipment-sprite[data-pos]').forEach(el => {
       const file = 'ausbau-' + el.dataset.pos;
@@ -243,9 +250,18 @@
       d.className = 'kz-avatar'; d.setAttribute('role', 'img'); d.setAttribute('aria-label', 'Kein Profilbild');
       head.before(d);
     }
+    heroNow();
   }
   let queued = false;
   const later = () => { if (!queued) { queued = true; requestAnimationFrame(() => { queued = false; run(); }); } };
+  // Seitenhintergrund (.main:before, --page-hero): das alte Skript setzt ihn bei jedem Menüklick, danach überschreiben
+  const pageHero = id => {
+    const file = id === 'overview' ? 'szene-uebersicht' : SZENE[id], main = document.querySelector('.main');
+    if (main && file && exists(file)) { main.style.setProperty('--page-hero', 'url("/bilder/' + file + '.webp")'); main.style.setProperty('--page-hero-position', 'center'); }
+  };
+  document.querySelectorAll('.side [data-view]').forEach(b => b.addEventListener('click', () => pageHero(b.dataset.view)));
+  const heroNow = () => pageHero(document.querySelector('section.active-view')?.id || 'overview');
   run();
+  heroNow(); setTimeout(heroNow, 1500);
   new MutationObserver(later).observe(document.body, { childList: true, subtree: true });
 })();
