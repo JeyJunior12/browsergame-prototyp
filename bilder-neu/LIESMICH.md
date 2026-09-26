@@ -1,5 +1,7 @@
 # Neue Bilder für Kiezkönig
 
+> Neu: Die vollständige Liste steht in **BILDERLISTE.md** – die Befehle unten sind nur noch für ChatGPT/Gemini gedacht.
+
 So geht es:
 1. Öffne ChatGPT (chatgpt.com) oder Gemini (gemini.google.com).
 2. Kopiere einen Befehl unten komplett hinein und schicke ihn ab.
