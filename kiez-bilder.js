@@ -209,7 +209,7 @@
       });
     }
     // Sammelgebiete (Stadt & Einkommen → Schnorrplätze)
-    document.querySelectorAll('.schnorr-areas .area-card[data-idx]').forEach(card => {
+    document.querySelectorAll('.area-card[data-idx]').forEach(card => {
       const file = 'gebiet-' + ['bahnhof', 'altglas', 'park', 'touristen', 'luxus'][card.dataset.idx];
       if (card.dataset.kzbild !== file && exists(file)) {
         card.dataset.kzbild = file;
