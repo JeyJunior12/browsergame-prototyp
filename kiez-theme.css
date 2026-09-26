@@ -270,3 +270,14 @@ html body:not(#kz1):not(#kz2) .card[data-spot="oper"] > .generated-item-thumb { 
 html body:not(#kz1):not(#kz2) .card[data-spot="bahnhof"] > .generated-item-thumb { background-position: 0% 50% !important; }
 html body:not(#kz1):not(#kz2) .card[data-spot="fussgaengerzone"] > .generated-item-thumb { background-position: 75% 50% !important; }
 html body:not(#kz1):not(#kz2) .card[data-spot="oper"] > .generated-item-thumb { background-position: 100% 50% !important; }
+/* Eigene Fotos aus /bilder (kiez-bilder.js setzt --kzbild je Karte) */
+html body:not(#kz1):not(#kz2) .kz-bild > .generated-item-thumb, html body:not(#kz1):not(#kz2) .kz-bild > .asset-thumb { background: #151310 var(--kzbild) center / cover no-repeat !important; }
+html body:not(#kz1):not(#kz2) .kf-box.kz-bild, html body:not(#kz1):not(#kz2) .profile-wide-row.kz-bild { overflow: hidden; }
+html body:not(#kz1):not(#kz2) .kf-box.kz-bild > .kz-pic, html body:not(#kz1):not(#kz2) .profile-wide-row.kz-bild > .kz-pic { float: left; width: 96px; height: 96px; margin: 0 12px 8px 0; border-radius: 6px; }
+html body:not(#kz1):not(#kz2) #achievementlist .card.kz-gesperrt > .generated-item-thumb, html body:not(#kz1):not(#kz2) #rankladder .card.locked > .generated-item-thumb { filter: grayscale(1) brightness(.55) !important; }
+html body:not(#kz1):not(#kz2) #profil .kz-avatar { float: right; width: 84px; height: 84px; margin: 0 0 8px 10px; border: 3px solid #756346; background: #11110f url('/bilder/profil-standard.webp') center / cover; }
+@media (max-width: 620px) { html body:not(#kz1):not(#kz2) .kf-box.kz-bild > .kz-pic, html body:not(#kz1):not(#kz2) .profile-wide-row.kz-bild > .kz-pic { width: 72px; height: 72px; } }
+/* Startseite */
+html body:not(#kz1):not(#kz2) #auth .kz-hero { display: block; width: 100%; height: auto; aspect-ratio: 16 / 7; object-fit: cover; border-radius: 8px; margin: 0 0 14px; border: 1px solid var(--line); }
+html body:not(#kz1):not(#kz2) #auth .auth-grid .kz-pic { display: block; width: 100%; height: auto; aspect-ratio: 8 / 5; object-fit: cover; border-radius: 6px; margin: 0 0 10px; }
+html body:not(#kz1):not(#kz2) #auth .auth-features .road .kz-pic { display: block; width: 100%; height: auto; aspect-ratio: 8 / 5; object-fit: cover; border-radius: 5px; margin: 0 0 8px; }
