@@ -64,7 +64,7 @@ BILDER2 = [
  ("waffe-wasserbomben", "o", "a few colorful water balloons"),
  ("waffe-kettenschloss", "o", "a heavy bicycle chain lock"),
  ("waffe-schlagring", "o", "a brass knuckle duster"),
- ("waffe-schwert", "o", "an old rusty sword"),
+ ("waffe-schwert", "o", "a big old rusty medieval sword with a leather grip lying diagonally, clearly visible, close-up"),
  ("waffe-silvesterknaller", "o", "red firecrackers"),
  ("waffe-spraydose", "o", "a used spray paint can without label"),
  ("waffe-gummiknueppel", "o", "a black rubber baton"),
@@ -86,7 +86,7 @@ BILDER2 = [
  ("essen-doener", "o", "a doner kebab in flatbread wrapped in paper"),
  ("essen-eintopf", "o", "a tin bowl of hot stew with a spoon"),
  # Verteidigung (die ersten 10)
- ("vert-sand", "o", "an open hand holding a pile of fine sand, sand trickling through the fingers"),
+ ("vert-sand", "o", "close-up of a dirty hand scooping a heap of yellow sand from a sandbox"),
  ("vert-bananen", "o", "banana peels scattered on the ground"),
  ("vert-salz", "o", "a hand full of coarse salt"),
  ("vert-wegweiser", "q", "a wooden signpost with blank arrows pointing in different directions"),
@@ -187,7 +187,7 @@ BILDER2 = [
  ("verbrechen-kaugummi", "o", "a broken red gumball machine with gumballs spilling out"),
  # Kampf, Post, Aktionen, Übersicht
  ("kampf-gegner", "q", "a scruffy homeless man with taped fists ready to fight in a backyard"),
- ("kampf-staerke", "o", "two fists wrapped in dirty white tape, raised in a fighting pose"),
+ ("kampf-staerke", "o", "close-up of two fists wrapped in dirty white boxing tape, knuckles bruised"),
  ("kampf-verteidigung", "o", "a trash can lid used as a shield next to a cardboard armor"),
  ("post-schreiben", "o", "a pencil and a crumpled letter"),
  ("post-fach", "o", "an old rusty letterbox full of letters"),
