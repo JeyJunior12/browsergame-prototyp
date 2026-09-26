@@ -1,14 +1,19 @@
 # Erzeugt alle Bilder aus BILDERLISTE.md über die lokale Forge-API (SD WebUI) -> bilder/*.webp
 # Aufruf: python bilder-neu/erzeugen.py [dateiname ...]   (ohne Namen: alle fehlenden)
-import base64, io, json, os, sys, urllib.request
+import base64, io, json, os, sys, urllib.request, zlib
 from PIL import Image
 
 API = "http://127.0.0.1:7860/sdapi/v1/txt2img"
 OUT = os.path.join(os.path.dirname(__file__), "..", "bilder")
 # Stil "Handyfoto Tageslicht" (vom Nutzer gewählt): echt wirkende Schnappschüsse, kein Kino-Look
 OBJ = ("amateur smartphone photo of {}, old, worn and dirty, belonging of a homeless person, "
-       "lying on flattened cardboard on a grubby sidewalk in a German city, empty deposit bottles and litter nearby, "
-       "grey overcast daylight, unedited, raw, candid everyday snapshot, real photo")
+       "{ort}, German city, grey overcast daylight, unedited, raw, candid everyday snapshot, real photo")
+# Wechselnde Unterlagen, damit nicht alles auf dem Pflaster liegt (Nutzerwunsch); Auswahl fest je Dateiname
+ORTE = ["lying on flattened cardboard on a grubby sidewalk", "lying on a weathered park bench",
+        "inside a rusty shopping cart", "lying on an old grey wool blanket", "standing on an old wooden crate",
+        "lying on a stained mattress under a bridge", "lying in the grass of a city park", "on a dirty windowsill",
+        "on the lid of a trash bin", "on a camping table in a squat", "on the steps of a subway entrance",
+        "on a pile of old newspapers"]
 SCN = ("amateur smartphone photo of {}, homeless street life in a run-down German city district, "
        "cardboard, old sleeping bag, empty deposit bottles, plastic bags, litter, faded graffiti, "
        "grey overcast daylight, unedited, raw, candid everyday snapshot, real photo")
@@ -22,8 +27,8 @@ BILDER = [
  ("start-hero", "h", "a narrow night street in a German city district, wet cobblestones, empty deposit bottles lined up at the curb, warm street lamp, small kiosk glowing in the background"),
  ("start-pfand", "s", "a shopping cart full of empty glass and plastic bottles in a side alley"),
  ("start-weiterbilden", "s", "a stack of worn dog-eared books and a burning candle on a park bench"),
- ("start-kampf", "s", "bandaged fists of a street fighter, next to him a scruffy dog, backyard"),
- ("start-bande", "s", "a group of anonymous silhouettes under a bridge around a burning fire barrel"),
+ ("start-kampf", "s", "two scruffy homeless men boxing each other with taped fists in a backyard, a scruffy dog watching"),
+ ("start-bande", "s", "a group of homeless people standing together around a burning fire barrel under a bridge"),
  ("start-plunder", "s", "a wooden crate full of junk and trinkets, bottle caps and lottery balls"),
  ("start-wettbewerb", "s", "a dented tin trophy cup standing on stacked beer crates, spotlight"),
  # B Profil
@@ -59,7 +64,7 @@ BILDER = [
  ("kk-energie", "o", "a blank energy drink can with a lightning bolt drawn on it"),
  ("kk-dusche", "o", "a steaming hot shower head with water drops"),
  ("kk-kaffee", "o", "a chipped mug of strong black coffee with steam"),
- ("kk-knast", "o", "a bundle of banknotes next to a prison key ring"),
+ ("kk-knast", "o", "a small bundle of euro banknotes next to an old prison key ring"),
  ("kk-plunderkiste", "o", "an old wooden crate overflowing with junk and trinkets"),
  # E Banden
  ("bande-gruenden", "o", "a black flag with a white bottle cap symbol on a wooden pole"),
@@ -74,14 +79,14 @@ BILDER = [
  ("freunde", "o", "two hands in fingerless gloves shaking hands"),
  # G Wettbewerb
  ("wetter", "q", "a street lamp in the rain with a puddle reflecting the light"),
- ("events", "q", "a string of fairy lights hanging over a narrow alley"),
+ ("events", "q", "a string of colorful glowing fairy lights hanging between houses over a narrow alley at dusk"),
  ("wettbewerb-pokal", "o", "a dented tin trophy cup"),
  ("wettbewerb-banden", "o", "a small wooden winner podium with three steps"),
  # H Erfolge
  ("erfolg-01", "o", "a plastic bag with a few empty deposit bottles"),
  ("erfolg-02", "o", "a crate full of empty glass bottles"),
  ("erfolg-03", "q", "an overflowing glass recycling container"),
- ("erfolg-04", "o", "a hand holding a glass bottle to an ear, listening"),
+ ("erfolg-04", "o", "a scruffy man in a worn jacket holding an empty glass bottle up to his ear, listening, seen from the side"),
  ("erfolg-05", "o", "a golden glowing pile of bottles"),
  ("erfolg-06", "o", "a blank metal street sign with a star sticker"),
  ("erfolg-07", "o", "a worn old medal on a ribbon"),
@@ -93,8 +98,8 @@ BILDER = [
  ("erfolg-13", "o", "a brass knuckle made of bottle caps"),
  ("erfolg-14", "o", "a metal trash can lid used as a shield"),
  ("erfolg-15", "o", "a small pile of copper coins"),
- ("erfolg-16", "o", "a bulging jute money sack"),
- ("erfolg-17", "o", "a thick bundle of banknotes with a rubber band"),
+ ("erfolg-16", "o", "a bulging jute sack full of euro coins"),
+ ("erfolg-17", "o", "a thick bundle of euro banknotes held with a rubber band"),
  ("erfolg-18", "o", "a flexed muscular arm with a bottle tattoo"),
  ("erfolg-19", "o", "a thick worn leather jacket"),
  ("erfolg-20", "o", "a handshake over two paper coffee cups"),
@@ -157,12 +162,16 @@ BILDER = [
  ("klein-park", "q", "a meadow with a small camp made of cardboard boxes"),
 ]
 
+sys.path.insert(0, os.path.dirname(__file__))
+from bilder2 import BILDER2  # Runde 2: alte Sprite-Bilder
+BILDER += BILDER2
+
 GEN = {"o": (1024, 1024), "q": (1024, 1024), "s": (1216, 760), "h": (1536, 672)}
 ZIEL = {"o": (512, 512), "q": (512, 512), "s": (800, 500), "h": (1600, 700)}
 
 def erzeuge(name, art, motiv):
     w, h = GEN[art]
-    body = {"prompt": (OBJ if art == "o" else SCN).format(motiv), "negative_prompt": NEG,
+    body = {"prompt": OBJ.format(motiv, ort=ORTE[zlib.crc32(name.encode()) % len(ORTE)]) if art == "o" else SCN.format(motiv), "negative_prompt": NEG,
             "width": w, "height": h, "steps": 26, "cfg_scale": 4.5, "sampler_name": "DPM++ 2M SDE",
             "scheduler": "Karras", "seed": -1}
     req = urllib.request.Request(API, json.dumps(body).encode(), {"Content-Type": "application/json"})
