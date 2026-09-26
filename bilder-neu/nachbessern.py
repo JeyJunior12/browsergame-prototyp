@@ -40,7 +40,7 @@ NEU = {
  "laden-trillerpfeife": "a shiny metal sports whistle on a lanyard",
  "laden-taschenlampe": "a black flashlight switched on, casting a light beam",
  "laden-geldversteck": "an old tin can with rolled euro banknotes hidden inside",
- "waffe-limoflasche": "a green glass bottle broken in half, the upper part shattered into sharp jagged glass shards, broken glass pieces around it",
+ "waffe-limoflasche": "the broken-off top of a green glass bottle, only the neck and shoulder with a sharp jagged broken edge, surrounded by green glass shards, close-up",
  "waffe-schlagring": "brass knuckles with four finger holes, metal knuckle duster weapon, close-up",
  "waffe-silvesterknaller": "red firecrackers with fuses and a lighter",
  "waffe-gummiknueppel": "a black police rubber baton",
@@ -67,7 +67,7 @@ if __name__ == "__main__":
     out = os.path.join(os.environ["TEMP"], "kzstil", "kandidaten"); os.makedirs(out, exist_ok=True)
     e.OUT = out; e.CFG = 6
     for name in (sys.argv[1:] or NEU):
-        for i in range(1):
+        for i in range(int(os.environ.get("KZ_N", "1"))):
             if os.path.exists(os.path.join(out, name + "-" + str(i) + ".webp")): continue
             for versuch in range(3):
                 try: e.erzeuge(name + "-" + str(i), art[name], NEU[name]); break
