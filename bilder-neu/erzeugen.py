@@ -165,14 +165,17 @@ BILDER = [
 sys.path.insert(0, os.path.dirname(__file__))
 from bilder2 import BILDER2  # Runde 2: alte Sprite-Bilder
 BILDER += BILDER2
+from nachbessern import NEU  # Motive nach Einzelprüfung
+BILDER = [(n, a, NEU.get(n, m)) for n, a, m in BILDER]
 
+CFG = 4.5  # Motivtreue; nachbessern.py nutzt 6
 GEN = {"o": (1024, 1024), "q": (1024, 1024), "s": (1216, 760), "h": (1536, 672)}
 ZIEL = {"o": (512, 512), "q": (512, 512), "s": (800, 500), "h": (1600, 700)}
 
 def erzeuge(name, art, motiv):
     w, h = GEN[art]
     body = {"prompt": OBJ.format(motiv, ort=ORTE[zlib.crc32(name.encode()) % len(ORTE)]) if art == "o" else SCN.format(motiv), "negative_prompt": NEG,
-            "width": w, "height": h, "steps": 26, "cfg_scale": 4.5, "sampler_name": "DPM++ 2M SDE",
+            "width": w, "height": h, "steps": 26, "cfg_scale": CFG, "sampler_name": "DPM++ 2M SDE",
             "scheduler": "Karras", "seed": -1}
     req = urllib.request.Request(API, json.dumps(body).encode(), {"Content-Type": "application/json"})
     img = Image.open(io.BytesIO(base64.b64decode(json.load(urllib.request.urlopen(req, timeout=900))["images"][0])))
