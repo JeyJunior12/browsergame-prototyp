@@ -5,16 +5,16 @@ from PIL import Image
 
 API = "http://127.0.0.1:7860/sdapi/v1/txt2img"
 OUT = os.path.join(os.path.dirname(__file__), "..", "bilder")
-OBJ = ("realistic documentary photo of {}, old, worn, dirty and used, belonging of a homeless person, "
-       "lying on flattened dirty cardboard on a grimy sidewalk, cigarette butts and grime around, "
-       "German city at night, warm orange street light from the side, dark background, "
-       "gritty, shabby, cheap, candid 35mm film photo, shallow depth of field, highly detailed")
-SCN = ("realistic documentary street photo of {}, homeless street life in a run-down German city district, "
-       "dirty, litter, trash bags, empty bottles, faded graffiti, cardboard, wet pavement, late at night, dark night sky, "
-       "orange sodium street light, gritty, bleak, candid 35mm film photo, highly detailed")
-NEG = ("text, letters, words, numbers, writing, logo, brand, label, watermark, signature, caption, "
-       "cartoon, anime, illustration, painting, 3d render, fantasy, luxury, glamour, clean, shiny new, polished, studio, "
-       "blurry, lowres, deformed, extra fingers, bad hands, face closeup")
+# Stil "Handyfoto Tageslicht" (vom Nutzer gewählt): echt wirkende Schnappschüsse, kein Kino-Look
+OBJ = ("amateur smartphone photo of {}, old, worn and dirty, belonging of a homeless person, "
+       "lying on flattened cardboard on a grubby sidewalk in a German city, empty deposit bottles and litter nearby, "
+       "grey overcast daylight, unedited, raw, candid everyday snapshot, real photo")
+SCN = ("amateur smartphone photo of {}, homeless street life in a run-down German city district, "
+       "cardboard, old sleeping bag, empty deposit bottles, plastic bags, litter, faded graffiti, "
+       "grey overcast daylight, unedited, raw, candid everyday snapshot, real photo")
+NEG = ("cinematic, dramatic lighting, hdr, cgi, 3d render, digital art, illustration, painting, cartoon, anime, "
+       "oversaturated, color grading, glow, rim light, studio lighting, bokeh, perfect, polished, fantasy, "
+       "text, letters, words, numbers, writing, logo, brand, label, watermark, signature, blurry, deformed, bad hands")
 
 # (datei, art, motiv)  art: o = Gegenstand 512, q = Szene quadratisch 512, s = Szene 800x500, h = 1600x700
 BILDER = [
@@ -157,13 +157,13 @@ BILDER = [
  ("klein-park", "q", "a meadow with a small camp made of cardboard boxes"),
 ]
 
-GEN = {"o": (896, 896), "q": (896, 896), "s": (1152, 720), "h": (1536, 672)}
+GEN = {"o": (1024, 1024), "q": (1024, 1024), "s": (1216, 760), "h": (1536, 672)}
 ZIEL = {"o": (512, 512), "q": (512, 512), "s": (800, 500), "h": (1600, 700)}
 
 def erzeuge(name, art, motiv):
     w, h = GEN[art]
     body = {"prompt": (OBJ if art == "o" else SCN).format(motiv), "negative_prompt": NEG,
-            "width": w, "height": h, "steps": 20, "cfg_scale": 6, "sampler_name": "DPM++ 2M",
+            "width": w, "height": h, "steps": 26, "cfg_scale": 4.5, "sampler_name": "DPM++ 2M SDE",
             "scheduler": "Karras", "seed": -1}
     req = urllib.request.Request(API, json.dumps(body).encode(), {"Content-Type": "application/json"})
     img = Image.open(io.BytesIO(base64.b64decode(json.load(urllib.request.urlopen(req, timeout=600))["images"][0])))
