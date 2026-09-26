@@ -164,7 +164,7 @@
     messages: 'szene-post', gangs: 'szene-bande', missions: 'szene-auftrag', pets: 'szene-tiere', achievements: 'szene-erfolge',
     pvp: 'szene-pruegelei', store: 'szene-laden', leaderboard: 'szene-rangliste', career: 'szene-karriere' };
   const EMOJI = /^[\p{Extended_Pictographic}\u{1F1E6}-\u{1F1FF}️‍\s]+/u;
-  const titleOf = c => c.querySelector(':scope>h3, :scope>b, :scope>h4, :scope>h2');
+  const titleOf = c => c.querySelector(':scope>h3, :scope>b, :scope>h4, :scope>h2') || c.querySelector(':scope>.skill-info>b');
   const text = el => (el?.textContent || '').replace(EMOJI, '').replace(/^✅\s*/, '').trim();
 
   // Nur Bilder verwenden, die es wirklich gibt – sonst bleibt das alte Vorschaubild stehen
@@ -180,6 +180,15 @@
     return ok[file] === true;
   };
 
+  // Andere Skripte setzen alte Bilder als Inline-Stil (teils !important) – deshalb das Foto ebenfalls inline festnageln
+  const pin = (el, url) => {
+    if (el.style.getPropertyValue('background-image') === url) return;
+    el.style.setProperty('background-image', url, 'important');
+    el.style.setProperty('background-size', 'cover', 'important');
+    el.style.setProperty('background-position', 'center', 'important');
+    el.style.setProperty('background-repeat', 'no-repeat', 'important');
+  };
+
   function apply(card, file, title) {
     // Gesperrter Erfolg: 🔒 durch graues Bild ersetzen
     if (title && /^🔒/.test(title.textContent)) { card.classList.add('kz-gesperrt'); }
@@ -187,9 +196,11 @@
       const v = title.firstChild.nodeValue.replace(EMOJI, '');
       if (v !== title.firstChild.nodeValue) title.firstChild.nodeValue = v;
     }
+    const url = 'url("/bilder/' + file + '.webp")';
+    card.querySelectorAll(THUMB).forEach(t => pin(t, url));
     if (card.dataset.kzbild === file && card.querySelector(THUMB)) return;
     card.dataset.kzbild = file;
-    card.style.setProperty('--kzbild', 'url("/bilder/' + file + '.webp")');
+    card.style.setProperty('--kzbild', url);
     card.classList.add('kz-bild');
     if (!card.querySelector(THUMB)) {
       const d = document.createElement('div');
@@ -211,19 +222,16 @@
     // Sammelgebiete (Stadt & Einkommen → Schnorrplätze)
     document.querySelectorAll('.area-card[data-idx]').forEach(card => {
       const file = 'gebiet-' + ['bahnhof', 'altglas', 'park', 'touristen', 'luxus'][card.dataset.idx];
-      if (card.dataset.kzbild !== file && exists(file)) {
-        card.dataset.kzbild = file;
-        card.style.setProperty('--kzbild', 'url("/bilder/' + file + '.webp")');
-        card.classList.add('kz-bild');
-      }
+      if (exists(file)) apply(card, file, null);
     });
     // Seitenköpfe
     document.querySelectorAll('section.panel > .section-scene').forEach(el => {
-      const file = SZENE[el.parentElement.id];
-      if (file && el.dataset.kzbild !== file && exists(file)) {
-        el.dataset.kzbild = file;
-        el.style.setProperty('--scene-image', 'url("/bilder/' + file + '.webp")');
-      }
+      const file = SZENE[el.parentElement.id], url = 'url("/bilder/' + file + '.webp")';
+      if (file && el.style.getPropertyValue('--scene-image') !== url && exists(file)) el.style.setProperty('--scene-image', url);
+    });
+    document.querySelectorAll('section.panel .scene-visual').forEach(el => {
+      const file = SZENE[el.closest('section.panel').id];
+      if (file && exists(file)) pin(el, 'url("/bilder/' + file + '.webp")');
     });
     // Großes Bild oben auf der Übersicht
     const hero = document.querySelector('#overview .overview-hero');
