@@ -166,7 +166,7 @@ def erzeuge(name, art, motiv):
             "width": w, "height": h, "steps": 26, "cfg_scale": 4.5, "sampler_name": "DPM++ 2M SDE",
             "scheduler": "Karras", "seed": -1}
     req = urllib.request.Request(API, json.dumps(body).encode(), {"Content-Type": "application/json"})
-    img = Image.open(io.BytesIO(base64.b64decode(json.load(urllib.request.urlopen(req, timeout=600))["images"][0])))
+    img = Image.open(io.BytesIO(base64.b64decode(json.load(urllib.request.urlopen(req, timeout=900))["images"][0])))
     tw, th = ZIEL[art]
     s = max(tw / img.width, th / img.height)
     img = img.convert("RGB").resize((round(img.width * s), round(img.height * s)), Image.LANCZOS)
@@ -180,6 +180,12 @@ if __name__ == "__main__":
         ziel = os.path.join(OUT, name + ".webp")
         if (wahl and name not in wahl) or (not wahl and os.path.exists(ziel)):
             continue
-        erzeuge(name, art, motiv)
+        for versuch in range(3):  # Forge hängt manchmal – dann neu versuchen
+            try:
+                erzeuge(name, art, motiv); break
+            except Exception as e:
+                print("fehler", name, e, flush=True)
+        else:
+            continue
         print("ok", name, os.path.getsize(ziel) // 1024, "KB", flush=True)
     print("fertig", len(BILDER))
