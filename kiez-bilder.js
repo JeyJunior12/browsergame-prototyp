@@ -3,8 +3,8 @@
 // Vorhandene Vorschaubilder (.generated-item-thumb/.asset-thumb) bekommen das Foto per CSS-Variable --kzbild
 // (Regel in kiez-theme.css), fehlende werden als .kz-pic ergänzt. Emoji vor dem Titel fällt weg.
 (() => {
-  const CARD = '.card, .activity-card, .lead-card, .kf-box, .profile-wide-row';
-  // [Bereich, Titel (RegExp), Datei]  – Titel = erstes b/h3/h4 der Karte
+  const CARD = '.card, .activity-card, .lead-card, .kf-box, .profile-wide-row, .drink';
+  // [Bereich, Titel (RegExp), Datei]  – Titel = erstes b/h3/h4 der Karte; Bereich mit '=' = Selektor der Karte selbst
   const R = [
     // Profil
     ['#profil', /Dein Spendenlink/, 'profil-spende'],
@@ -48,7 +48,7 @@
     ['#gangs', /^Mitglieder/, 'bande-mitglieder'],
     ['#gangs', /^(Bandenkasse|Protokoll)/, 'bande-kasse'],
     // Kiez-Brett und Freunde
-    ['#brett', /^$/, 'brett'],
+    ['=#brett .kf-box:has(.bpost)', /.*/, 'brett'],
     ['#freunde', /^Spieler suchen/, 'freunde-suche'],
     ['#freunde', /^Deine Freunde/, 'freunde'],
     // Wettbewerb
@@ -88,8 +88,81 @@
     ['#overview', /^Freunde in den Kiez einladen/, 'klein-werben'],
     ['#overview', /Container/, 'klein-container'],
     ['body', /^Grashalmflöte/, 'klein-grashalm'],
-    ['body', /^Park$/, 'klein-park']
+    ['body', /^Park$/, 'klein-park'],
+    // ===== Runde 2: alte Sprite-Bilder =====
+    // Stadtplan
+    ...[['Zubehör', 'zubehoer'], ['Supermarkt', 'supermarkt'], ['Tierhandlung', 'tierhandlung'], ['Waffenladen', 'waffenladen'],
+      ['Apotheke', 'apotheke'], ['Waschhaus', 'waschhaus'], ['Schnorrplätze', 'schnorrplaetze'], ['Musikladen', 'musikladen'],
+      ['Eigenheime', 'eigenheime'], ['Glücksspiel', 'gluecksspiel']].map(([n, f]) => ['#citymap', new RegExp('^' + n + '$'), 'stadt-' + f]),
+    // Apotheke
+    ['=.pharmacy-card.pharmacy-pump', /.*/, 'apo-magenpumpe'],
+    ['=.pharmacy-card.pharmacy-insurance', /.*/, 'apo-versicherung'],
+    // Laden
+    ...[['Mottenzerfressene Jacke', 'laden-jacke'], ['Halber Regenschirm', 'laden-schirm-halb'], ['Getunter Einkaufswagen', 'laden-wagen'],
+      ['Ausgeblichene Warnweste', 'laden-warnweste'], ['Mehrlagige Kartonrüstung', 'laden-kartonruestung'], ['Zerkratzter Bauhelm', 'laden-bauhelm'],
+      ['Veteranen-Wintermantel', 'laden-wintermantel'], ['Mofamotor für den Wagen', 'laden-mofamotor'], ['Unheimliche Glücksflasche', 'laden-gluecksflasche'],
+      ['Kettenhandschuhe', 'laden-kettenhandschuhe'], ['Trillerpfeife', 'laden-trillerpfeife'], ['Klappspaten', 'laden-klappspaten'],
+      ['Taschenlampe', 'laden-taschenlampe'], ['Survival-Rucksack', 'laden-rucksack'], ['Funkgeraet', 'laden-funkgeraet'],
+      ['Solarpanel-Set', 'laden-solarpanel'], ['Gepanzerte Handkarre', 'laden-handkarre'], ['Zubehör: Geldversteck', 'laden-geldversteck'],
+      ['Krummes Zahnstocher-Bündel', 'waffe-zahnstocher'], ['Abgebrochene Limo-Flasche', 'waffe-limoflasche'], ['Wasserbomben', 'waffe-wasserbomben'],
+      ['Kettenschloss', 'waffe-kettenschloss'], ['Schlagring', 'waffe-schlagring'], ['Schwert', 'waffe-schwert'],
+      ['Silvesterknaller', 'waffe-silvesterknaller'], ['Spraydose', 'waffe-spraydose'], ['Gummiknüppel', 'waffe-gummiknueppel'],
+      ['Heizungsrohr', 'waffe-heizungsrohr'], ['Hammer', 'waffe-hammer'], ['Pfefferspray', 'waffe-pfefferspray'],
+      ['Elektroschocker', 'waffe-elektroschocker'], ['Feuerlöscher', 'waffe-feuerloescher'], ['Gullideckel', 'waffe-gullideckel'],
+      ['Nagelkeule', 'waffe-nagelkeule'],
+      ['Dosenbier', 'essen-dosenbier'], ['Kartonwein', 'essen-kartonwein'], ['Kurzer', 'essen-kurzer'], ['Wodka', 'essen-wodka'],
+      ['Feuerwasser', 'essen-feuerwasser'], ['Altes Brötchen', 'essen-broetchen'], ['Currywurst', 'essen-currywurst'],
+      ['Döner mit allem', 'essen-doener'], ['Eintopf', 'essen-eintopf'],
+      ['Handvoll Sand werfen', 'vert-sand'], ['Bananenschalen verteilen', 'vert-bananen'], ['Handvoll Salz', 'vert-salz'],
+      ['Wegweiser aufstellen', 'vert-wegweiser'], ['Juckpulver verschleudern', 'vert-juckpulver'], ['Totstellen', 'vert-totstellen'],
+      ['Tarnen', 'vert-tarnen'], ['Mit bösen Katzen werfen', 'vert-katzen'], ['Mit Spiegel blenden', 'vert-spiegel'],
+      ['Vergiftetes Bier hinstellen', 'vert-giftbier'],
+      // Begleiter
+      ['Kakerlake', 'tier-kakerlake'], ['Goldfisch', 'tier-goldfisch'], ['Maus', 'tier-maus'], ['Hamster', 'tier-hamster'],
+      ['Wellensittich', 'tier-wellensittich'], ['Taube', 'tier-taube'], ['Ratte', 'tier-ratte'], ['Hase', 'tier-hase'],
+      ['Frettchen', 'tier-frettchen'], ['Katze', 'tier-katze'], ['Falke', 'tier-falke'], ['Schlange', 'tier-schlange'],
+      ['Hausziege', 'tier-ziege'], ['Pudel', 'tier-pudel'], ['Dressierte Maus', 'tier-dressierte-maus'], ['Adler', 'tier-adler'],
+      ['Schaeferhund', 'tier-schaeferhund'], ['Pitbull', 'tier-pitbull'], ['Cocker Spaniel', 'tier-cocker'], ['Chihuahua', 'tier-chihuahua'],
+      ['Pferd', 'tier-pferd'], ['Giraffe', 'tier-giraffe'], ['Krokodil', 'tier-krokodil'], ['Tiger', 'tier-tiger'],
+      ['Aeffchen', 'tier-affe'], ['Nashorn', 'tier-nashorn'], ['Taubenpfeife', 'plunder-taubenpfeife'],
+      // Unterkünfte
+      ['Bürgersteig', 'heim-buergersteig'], ['Parkbank', 'heim-parkbank'], ['Pennerbox', 'heim-pennerbox'], ['Brunnen', 'heim-brunnen'],
+      ['Brücke', 'heim-bruecke'], ['Katakomben', 'heim-katakomben'], ['Elbstrand', 'heim-elbstrand'], ['Baumhaus', 'heim-baumhaus'],
+      ['Zelt', 'heim-zelt'], ['Wolfsrudel', 'heim-wolfsrudel'], ['Wohnwagen', 'heim-wohnwagen'], ['Boot', 'heim-boot'],
+      ['Grabkammer', 'heim-grabkammer'], ['Tiefgarage', 'heim-tiefgarage'], ['Kakaofabrik', 'heim-kakaofabrik'], ['Kran', 'heim-kran'],
+      ['Leuchtturm', 'heim-leuchtturm'], ['Alte Kirche', 'heim-kirche'], ['Burg', 'heim-burg'],
+      // Schnorrplätze, Körperpflege, Musik
+      ['Englischer Garten', 'schnorr-garten'], ['Hauptbahnhof', 'schnorr-bahnhof'], ['Fußgängerzone', 'schnorr-fussgaengerzone'],
+      ['Jahrmarkt', 'schnorr-jahrmarkt'], ['Vor der Oper', 'schnorr-oper'],
+      ['Katzenwäsche', 'pflege-katzenwaesche'], ['Schwamm & Seife', 'pflege-schwamm'], ['Waschanlage', 'pflege-waschanlage'],
+      ['Flaschenflöte', 'musik-flaschenfloete'], ['Glocke', 'musik-glocke'], ['Trommel', 'musik-trommel'], ['Akkordion', 'musik-akkordeon'],
+      ['Radio', 'musik-radio'], ['Gitarre', 'musik-gitarre'], ['Saxophon', 'musik-saxophon'], ['Chor', 'musik-chor'],
+      ['Straßenmusik-Kasse', 'musik-kasse'],
+      // Verbrechen, Training, Aktionen
+      ['Handtaschenraub', 'verbrechen-handtasche'], ['Ladendiebstahl', 'verbrechen-laden'], ['Auto aufbrechen', 'verbrechen-auto'],
+      ['Einbruch', 'verbrechen-einbruch'], ['Tankstellenüberfall', 'verbrechen-tankstelle'], ['Bankraub', 'verbrechen-bank'],
+      ['Kaugummiautomat aufbrechen', 'verbrechen-kaugummi'],
+      ['Konzentrieren', 'training-konzentrieren'], ['Parallele Entwicklung', 'training-parallel'], ['Steigende Anforderungen', 'training-anforderungen'],
+      ['Nachricht schreiben', 'post-schreiben'], ['Postfach', 'post-fach'], ['Heute im Kiez', 'mission-heute'], ['Rubbellose', 'rubbellose'],
+      ['Nächster Aufstieg', 'uebersicht-aufstieg']
+    ].map(([n, f]) => ['body', new RegExp('^' + n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$'), f]),
+    ['#income', /^Instrument$/, 'musik-instrument'],
+    ['#pfand', /^Übersicht$/, 'pfand-uebersicht'],
+    ['#pfand', /^Pfandkurs-Verlauf$/, 'pfand-kurs'],
+    ['body', /^Tägliche Serie/, 'mission-serie'],
+    ...[['Angriff', 'angriff'], ['Verteidigung', 'verteidigung'], ['Geschick', 'geschick'], ['Ausdauer', 'ausdauer'], ['Sprechen', 'sprechen'],
+      ['Musik', 'musik'], ['Sozialkontakte', 'sozial'], ['Taschentricks', 'taschentricks']]
+      .map(([n, f]) => ['body', new RegExp('^' + n + ' \\d+$'), 'skill-' + f]),
+    ['#pvp', /^Kampfstärke$/, 'kampf-staerke'],
+    ['#pvp', /^Verteidigung$/, 'kampf-verteidigung'],
+    ['#pvp', /^(?!Kampfstärke$|Verteidigung$).+/, 'kampf-gegner']
   ];
+  // Vorschaubilder, die das Foto über --kzbild bekommen (Rest wird als .kz-pic ergänzt)
+  const THUMB = ':scope>.generated-item-thumb, :scope>.asset-thumb, :scope .skill-portrait, :scope .city-hub-img, :scope>.pharmacy-thumb';
+  // Seitenköpfe je Bereich
+  const SZENE = { pfand: 'szene-pfand', begging: 'szene-schnorren', income: 'szene-stadt', gear: 'szene-unterkunft', training: 'szene-training',
+    messages: 'szene-post', gangs: 'szene-bande', missions: 'szene-auftrag', pets: 'szene-tiere', achievements: 'szene-erfolge',
+    pvp: 'szene-pruegelei', store: 'szene-laden', leaderboard: 'szene-rangliste', career: 'szene-karriere' };
   const EMOJI = /^[\p{Extended_Pictographic}\u{1F1E6}-\u{1F1FF}️‍\s]+/u;
   const titleOf = c => c.querySelector(':scope>h3, :scope>b, :scope>h4, :scope>h2');
   const text = el => (el?.textContent || '').replace(EMOJI, '').replace(/^✅\s*/, '').trim();
@@ -114,11 +187,11 @@
       const v = title.firstChild.nodeValue.replace(EMOJI, '');
       if (v !== title.firstChild.nodeValue) title.firstChild.nodeValue = v;
     }
-    if (card.dataset.kzbild === file && card.querySelector(':scope>.generated-item-thumb, :scope>.asset-thumb')) return;
+    if (card.dataset.kzbild === file && card.querySelector(THUMB)) return;
     card.dataset.kzbild = file;
     card.style.setProperty('--kzbild', 'url("/bilder/' + file + '.webp")');
     card.classList.add('kz-bild');
-    if (!card.querySelector(':scope>.generated-item-thumb, :scope>.asset-thumb')) {
+    if (!card.querySelector(THUMB)) {
       const d = document.createElement('div');
       d.className = 'generated-item-thumb kz-pic';
       d.setAttribute('role', 'img');
@@ -130,7 +203,7 @@
 
   function run() {
     for (const [scope, re, file] of R) {
-      document.querySelectorAll(scope === 'body' ? CARD : CARD.split(',').map(c => scope + ' ' + c.trim()).join(',')).forEach(card => {
+      document.querySelectorAll(scope === 'body' ? CARD : scope[0] === '=' ? scope.slice(1) : CARD.split(',').map(c => scope + ' ' + c.trim()).join(',')).forEach(card => {
         const t = titleOf(card);
         if (re.test(text(t)) && exists(file)) apply(card, file, t);
       });
@@ -144,6 +217,25 @@
         card.classList.add('kz-bild');
       }
     });
+    // Seitenköpfe
+    document.querySelectorAll('section.panel > .section-scene').forEach(el => {
+      const file = SZENE[el.parentElement.id];
+      if (file && el.dataset.kzbild !== file && exists(file)) {
+        el.dataset.kzbild = file;
+        el.style.setProperty('--scene-image', 'url("/bilder/' + file + '.webp")');
+      }
+    });
+    // Ausbau-Vorschau (Unterkunft, Geldbehälter …)
+    document.querySelectorAll('.equipment-sprite[data-pos]').forEach(el => {
+      const file = 'ausbau-' + el.dataset.pos;
+      if (el.dataset.kzbild !== file && exists(file)) {
+        el.dataset.kzbild = file;
+        el.style.setProperty('background', '#151310 url("/bilder/' + file + '.webp") center / cover no-repeat', 'important');
+      }
+    });
+    // Aktueller Karriererang oben auf der Karriere-Seite
+    const rt = document.getElementById('ranktitle'), rn = rt?.textContent.match(/Karriererang (\d+)/);
+    if (rn) { const file = 'rang-' + rn[1].padStart(2, '0'); if (exists(file)) apply(rt.parentElement, file, rt); }
     // Profilkopf ohne eigenes Bild
     const head = document.querySelector('#profil .kf-box > h3:first-child');
     if (head && !head.parentElement.querySelector(':scope>.kz-avatar, :scope>div[style*="background-image"]')) {
