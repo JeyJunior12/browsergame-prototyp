@@ -214,3 +214,15 @@ Die jeweils ersten 7 behalten ihr Foto.
 | Übersicht: Container | Emoji 📦 | Blechdose als Spendenbehälter | klein-container.webp | 512×512 |
 | Instrument / Gitarre | gleiches Foto | Grashalmflöte → Grashalm zwischen Fingern | klein-grashalm.webp | 512×512 |
 | Park / Parkbank | gleiches Foto | Wiese mit Pappkarton-Lager | klein-park.webp | 512×512 |
+
+## O · Neu in Runde 6 (Bilder bisher geliehen – bei Gelegenheit eigene erzeugen)
+
+| Stelle | jetzt | Bild-Vorschlag | Datei | Größe |
+|---|---|---|---|---|
+| Zockerbude: Hütchenspiel | Spielautomaten-Foto | Drei umgedrehte Becher auf Pappkarton, Kugel daneben | zock-huetchen.webp | 512×512 |
+| Zockerbude: Würfelduell | Lottokugeln | Zwei Würfel auf nassem Pflaster, Münzen | zock-wuerfel.webp | 512×512 |
+| Schließfach | Geldversteck | Reihe alter Bahnhofs-Schließfächer, eines offen | bank-schliessfach.webp | 512×512 |
+| Plunder-Basar (Stadtplan-Ort) | Inventar-Sack | Flohmarkt-Decke mit Krimskrams auf dem Gehweg | basar.webp | 512×512 |
+| Kiez-Chat | Funkgeräte | Gruppe am Kiosk im Gespräch (von hinten) | chat.webp | 512×512 |
+| Kiez-Geschichte | Erfolgsfotos | Alter Mann mit Tüte am Bahnhof („Kalle“), von hinten | geschichte-kalle.webp | 512×512 |
+| Stadtteile Hafen / Altstadt / Markt | geliehen | Hafenkai mit Kränen; Altstadtgasse; Marktplatz mit Ständen | viertel-hafen/altstadt/markt.webp | 512×512 |
