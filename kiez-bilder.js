@@ -47,6 +47,21 @@
     ['#gangs', /^Bandenchat/, 'bande-chat'],
     ['#gangs', /^Mitglieder/, 'bande-mitglieder'],
     ['#gangs', /^(Bandenkasse|Protokoll)/, 'bande-kasse'],
+    // Runde 6: Stadtteile, Basar, Zockerbude, Schließfach, Kiez-Geschichte, Chat, Kampfprotokoll, Titel
+    ['#stadtteile', /^Dein Revier/, 'start-bande'],
+    ['#stadtteile', /^Bahnhofsviertel/, 'gebiet-bahnhof'], ['#stadtteile', /^Altstadt/, 'gebiet-touristen'], ['#stadtteile', /^Hafen/, 'heim-kran'],
+    ['#stadtteile', /^Stadtpark/, 'gebiet-park'], ['#stadtteile', /^Marktplatz/, 'schnorr-fussgaengerzone'], ['#stadtteile', /^Villenviertel/, 'gebiet-luxus'],
+    ['#basar', /^Plunder anbieten/, 'lager-inventar'], ['#basar', /^Deine Angebote/, 'kk-plunderkiste'],
+    ['#zockerbude', /^Hütchenspiel/, 'stadt-gluecksspiel'], ['#zockerbude', /^Würfelduell/, 'lotto'],
+    ['#schliessfach', /^Dein Schließfach/, 'laden-geldversteck'], ['#schliessfach', /^Bargeld in der Tasche/, 'musik-kasse'],
+    ['#schliessfach', /^Einzahlen/, 'profil-spende'], ['#schliessfach', /^Abheben/, 'bande-kasse'],
+    ...['erfolg-01', 'skill-sprechen', 'skill-angriff', 'erfolg-27', 'erfolg-11', 'erfolg-04', 'erfolg-19', 'erfolg-32', 'erfolg-31', 'erfolg-29',
+      'erfolg-24', 'erfolg-12', 'uebersicht-aufstieg', 'verbrechen-einbruch', 'erfolg-22', 'erfolg-02', 'erfolg-10'].map((f, i) => ['#geschichte', new RegExp('^Kapitel ' + (i + 1) + ':'), f]),
+    ['#geschichte', /^Geschaffte Kapitel/, 'erfolg-meilensteine'], ['#geschichte', /^Geschichte durchgespielt/, 'rang-15'],
+    ['#chat', /^Nachricht an alle/, 'post-schreiben'], ['#chat', /^Im Chat/, 'bande-chat'],
+    ['#kampfprotokoll', /^Angriffe/, 'kampf-staerke'], ['#kampfprotokoll', /^Verteidigungen/, 'kampf-verteidigung'],
+    ['#kampfprotokoll', /^Beute/, 'bande-kasse'], ['#kampfprotokoll', /^Letzte Kämpfe/, 'kampf-gegner'],
+    ['#einstellungen', /^Titel/, 'erfolg-07'],
     // Kiez-Brett und Freunde
     ['=#brett .kf-box:has(.bpost)', /.*/, 'brett'],
     ['#freunde', /^Spieler suchen/, 'freunde-suche'],
@@ -157,10 +172,13 @@
     ['#pvp', /^Verteidigung$/, 'kampf-verteidigung'],
     ['#pvp', /^(?!Kampfstärke$|Verteidigung$).+/, 'kampf-gegner']
   ];
+  // Basar: dieselben Plunder-Fotos wie in der Plunderkiste
+  R.push(...R.filter(r => r[0] === '#plunder' && r[2].startsWith('plunder-')).map(r => ['#basar', r[1], r[2]]));
   // Vorschaubilder, die das Foto über --kzbild bekommen (Rest wird als .kz-pic ergänzt)
   const THUMB = ':scope>.generated-item-thumb, :scope>.asset-thumb, :scope .skill-portrait, :scope .city-hub-img, :scope>.pharmacy-thumb';
   // Seitenköpfe je Bereich
-  const SZENE = { pfand: 'szene-pfand', begging: 'szene-schnorren', income: 'szene-stadt', gear: 'szene-unterkunft', training: 'szene-training',
+  const SZENE = { stadtteile: 'szene-bande', basar: 'szene-laden', zockerbude: 'szene-stadt', schliessfach: 'szene-unterkunft', geschichte: 'szene-auftrag',
+    chat: 'szene-post', kampfprotokoll: 'szene-pruegelei', pfand: 'szene-pfand', begging: 'szene-schnorren', income: 'szene-stadt', gear: 'szene-unterkunft', training: 'szene-training',
     messages: 'szene-post', gangs: 'szene-bande', missions: 'szene-auftrag', pets: 'szene-tiere', achievements: 'szene-erfolge',
     pvp: 'szene-pruegelei', store: 'szene-laden', leaderboard: 'szene-rangliste', career: 'szene-karriere' };
   const EMOJI = /^[\p{Extended_Pictographic}\u{1F1E6}-\u{1F1FF}️‍\s]+/u;

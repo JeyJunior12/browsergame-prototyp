@@ -58,3 +58,11 @@ Deutsches Browsergame im Stil von Pennergame (Pfand sammeln, Schnorren, Training
 ## Stand Go-Live
 Alle Etappen 1–7 erledigt und in `main` (PR #1, #2, #3). Runde 2: Systemnachrichten, Profilbild, Werbelink, Verkaufen, Kiez-Brett, Namensänderung, Lotto, Essen, Kiez-News, Einstellungen (0008/0009), live auf https://browsergame-prototyp.vercel.app. Admin: BehaarteUhse (0007).
 Testkonten wurden nach Runde 3 gelöscht (0014) – bei Bedarf neu anlegen. Neue Arbeit immer auf neuem Stand von `main` beginnen.
+
+## Runde 6 (26.09.2026): Pennergame-Aufbau
+- **Sicherung vorher:** Branch `sicherung-2026-09-26` (= `main` vor Runde 6). Zurücksetzen der Oberfläche: `main` auf diesen Stand bringen (PR) oder in Vercel „Instant Rollback“. Migration 0015 fügt nur Neues hinzu und kann bleiben.
+- **Migration 0015** (live): Stadtteile (`districts`, Einfluss per Trigger auf `weekly_scores`: Flasche 1, Sieg 20 Punkte → Wochensieger besitzt Viertel, +250 € Bandenkasse, `resolve_districts` lazy in `district_overview`), Plunder-Basar (`market_*`, 5 % Gebühr, Plunder wird beim Einstellen reserviert), Zockerbude (`shell_game` 2,7×, max. 30/Tag; `dice_*` Würfelduell mit Einsatz-Treuhand), Schließfach (`bank_*`, 2 % Gebühr, Grenze 100+50×Level, nicht klaubar), Kiez-Geschichte (`quest_defs`, 17 Kapitel, Werte aus `kiez_stats`), Kiez-Chat (`chat_messages`, 5 s Sperre), Titel (`set_title`), `fight_history`.
+- **`kiez_pay(uid, betrag)`**: Auszahlung an Spieler – Tasche bis Geldbehälter voll, Rest ins Schließfach. Für neue Gewinne benutzen statt Geld zu kappen.
+- **Menü** (`NAV` in `kiez-features.js`): 7 Bereiche wie Pennergame – Mein Kiez, Aktionen, Stadt, Kampf, Bande, Kommunikation, Highscore; Fotos als Symbole, Unterpunkte klappen auf (Hover/Tippen). `go(view, reiter)` / `window.kiezGoTab` öffnet Seite + Reiter. Altes `.classic-mainnav` ist nur ausgeblendet.
+- **Stadtplan** (`#citymap`): gezeichnete Karte mit 6 Stadtteilen (Besitzer farbig) und 17 Orten (`PLACES`: Name, Seite, Reiter, Foto, x, y in 1000×620). Handy: Karte wischbar + Liste „Alle Orte“.
+- Tests: `supabase/test/test_0015.sh`, `test/browser/runde6.js` (Klicks), `crawl.js` nutzt das neue Menü und die Kartenorte (177 Wege, LEER 0).

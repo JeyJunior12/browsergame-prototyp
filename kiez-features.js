@@ -106,7 +106,7 @@ loaders.profil = async () => {
   const me = await myId(); if (!me) return;
   const id = profileTarget || me, own = id === me;
   const [pr, gm, gb, fr, bl] = await Promise.all([
-    sb.from('profiles').select('id,username,level,xp,wins,losses,bio,motto,created_at,equipped_plunder,donations_received,donation_money,pet_wins,is_banned,avatar').eq('id', id).maybeSingle(),
+    sb.from('profiles').select('id,username,title,level,xp,wins,losses,bio,motto,created_at,equipped_plunder,donations_received,donation_money,pet_wins,is_banned,avatar').eq('id', id).maybeSingle(),
     sb.from('gang_members').select('gang_id,role').eq('user_id', id).maybeSingle(),
     sb.from('guestbook_entries').select('id,author_id,body,created_at').eq('owner_id', id).order('created_at', { ascending: false }).limit(30),
     sb.from('friendships').select('*').or('and(user_id.eq.' + me + ',friend_id.eq.' + id + '),and(user_id.eq.' + id + ',friend_id.eq.' + me + ')'),
@@ -120,7 +120,7 @@ loaders.profil = async () => {
   if (t !== profSeq) return;
   const f = (fr.data || [])[0], blocked = (bl.data || []).length > 0;
   const av = p.avatar && /^data:image\/(jpeg|png|webp);base64,/.test(p.avatar) ? '<div style="float:right;width:84px;height:84px;margin:0 0 8px 10px;border:3px solid #756346;background:#11110f center/cover;background-image:url(\'' + p.avatar + '\')"></div>' : '';
-  let h = '<div class="kf-box">' + av + '<h3>' + esc(p.username) + (p.is_banned ? ' <span class="kf-muted">(gesperrt)</span>' : '') + '</h3>'
+  let h = '<div class="kf-box">' + av + '<h3>' + esc(p.username) + (p.is_banned ? ' <span class="kf-muted">(gesperrt)</span>' : '') + '</h3>' + (p.title ? '<p class="kf-title">„' + esc(p.title) + '“</p>' : '')
     + (p.motto ? '<p><i>„' + esc(p.motto) + '“</i></p>' : '')
     + '<table class="kf-table"><tr><td>Level</td><td>' + p.level + '</td><td>Punkte</td><td>' + p.xp + '</td></tr>'
     + '<tr><td>Siege / Niederlagen</td><td>' + p.wins + ' / ' + p.losses + '</td><td>Tierkampf-Siege</td><td>' + p.pet_wins + '</td></tr>'
@@ -453,7 +453,7 @@ if (spende) {
 
 
 // ================= Kiezpost: Systemnachrichten + gelesen/ungelesen =================
-const NKIND = { kampf: '👊', tierkampf: '🐾', freund: '🤝', gaestebuch: '📖', bande: '👥', wettbewerb: '🏆', werben: '📣', lotto: '🎰', erfolg: '🎖' };
+const NKIND = { kampf: '👊', tierkampf: '🐾', freund: '🤝', gaestebuch: '📖', bande: '👥', wettbewerb: '🏆', werben: '📣', lotto: '🎰', erfolg: '🎖', basar: '🛍', zocken: '🎲', quest: '📜', revier: '🏴' };
 function ensureBox(panelSel, id, html) {
   const inside = document.querySelector(panelSel + ' > .inside'); if (!inside) return null;
   let el = document.getElementById(id);
@@ -546,6 +546,7 @@ loaders.einstellungen = async () => {
     + '<div class="kf-box"><h3>🖼 Profilbild</h3><div class="kf-row"><div class="kf-av" style="width:72px;height:72px;background:#11110f center/cover;border:2px solid #4a473f' + (p.avatar ? ';background-image:url(\'' + p.avatar + '\')' : '') + '"></div><input type="file" accept="image/png,image/jpeg,image/webp" class="avfile"></div><div class="kf-row"><button class="ghost avdel">Bild entfernen</button></div><div class="avmsg"></div></div>'
     + '<div class="kf-box"><h3>✏️ Name ändern</h3><p class="kf-muted">Kostet 30 🧢 Kronkorken, höchstens alle 30 Tage. Du hast ' + p.bottlecaps + ' 🧢.</p><div class="kf-row"><input class="nname" maxlength="20" value="' + esc(p.username) + '"><button class="ghost nsave">Ändern</button></div><div class="nmsg"></div></div>'
     + '<div class="kf-box"><h3>🔑 Passwort ändern</h3><div class="kf-row"><input type="password" class="pw1" placeholder="Neues Passwort (mind. 6 Zeichen)" autocomplete="new-password"></div><div class="kf-row"><input type="password" class="pw2" placeholder="Wiederholen" autocomplete="new-password"><button class="ghost psave">Speichern</button></div><div class="pmsg2"></div></div>'
+    + '<div class="kf-box"><h3>🎖 Titel</h3><p class="kf-muted">Zeig einen deiner Erfolge als Titel unter deinem Namen.</p><div class="kf-row"><select class="tsel" style="flex:1"><option value="">– kein Titel –</option></select><button class="ghost tsave">Übernehmen</button></div><div class="tmsg"></div></div>'
     + '<div class="kf-box"><h3>🚪 Abmelden</h3><p class="kf-muted">Meldet dich auf diesem Gerät ab.</p><button class="ghost lout">Abmelden</button></div></div>';
   const q = x => setBody.querySelector(x);
   q('.avfile').onchange = () => { const f = q('.avfile').files?.[0]; if (f) resizeAvatar(f).then(d => window.kiezSetAvatar(d)).then(() => { say(q('.avmsg'), 'Profilbild gespeichert.', true); setTimeout(loaders.einstellungen, 500); }).catch(e => say(q('.avmsg'), esc(e.message))); };
@@ -558,6 +559,10 @@ loaders.einstellungen = async () => {
     q('.pw1').value = q('.pw2').value = ''; return 'Passwort geändert.';
   });
   q('.lout').onclick = () => document.getElementById('logout')?.click();
+  const [ua, ad] = await Promise.all([sb.from('user_achievements').select('achievement_id').eq('user_id', p.id), sb.from('achievement_defs').select('id,name').order('sort_order')]);
+  const got = new Set((ua.data || []).map(x => x.achievement_id));
+  q('.tsel').innerHTML += (ad.data || []).filter(a => got.has(a.id)).map(a => '<option value="' + esc(a.id) + '"' + (a.name === p.title ? ' selected' : '') + '>' + esc(a.name) + '</option>').join('');
+  act(q('.tsave'), q('.tmsg'), async () => { const r = await rpc('set_title', { achievement: q('.tsel').value || null }); window.kiezRenderProfile?.(r.profile); return r.title ? 'Dein Titel: „' + esc(r.title) + '“' : 'Titel entfernt.'; });
 };
 function resizeAvatar(file) {
   return new Promise((ok, fail) => {
@@ -637,6 +642,368 @@ Object.keys(loaders).forEach(k => {
   };
 });
 { const g = window.kiezLoadGang; window.kiezLoadGang = async (...x) => { await g(...x); restoreFlash(); }; }
+// ================= Runde 6: Stadtteile, Basar, Zockerbude, Schließfach, Kiez-Geschichte, Kiez-Chat, Kampfprotokoll =================
+const num = v => Number(String(v ?? '').replace(',', '.'));
+const bar = (v, max) => '<div class="kf-bar"><span style="width:' + Math.max(0, Math.min(100, Math.round(100 * v / (max || 1)))) + '%"></span></div>';
+
+// ---------- Stadtteile ----------
+const distBody = addPanel('stadtteile', 'Stadtteile', '🏴 Stadtteile');
+let distSeq = 0;
+loaders.stadtteile = async () => {
+  const t = ++distSeq;
+  const o = await rpc('district_overview'); if (t !== distSeq) return;
+  const p = window.kiezProfile || {};
+  distBody.innerHTML = '<div class="kf-box"><h3>Dein Revier</h3><p>'
+    + (o.my_district ? 'Du bist im <b>' + esc((o.districts.find(d => d.id === o.my_district) || {}).name) + '</b> unterwegs.' : 'Du hast noch kein Revier gewählt.')
+    + (o.my_gang ? '' : ' <span class="kf-muted">Ohne Bande sammelst du keinen Einfluss – <a href="#" class="kf-go" data-v="gangs">zur Bande</a>.</span>')
+    + '</p><p class="kf-muted">Jede Pfandflasche, die du sammelst, bringt deiner Bande 1 Einflusspunkt in deinem Revier, jeder gewonnene Kampf 20. '
+    + 'Die Bande mit dem meisten Einfluss besitzt das Viertel die ganze nächste Woche und bekommt 250 € in die Bandenkasse. '
+    + 'Wertung endet am ' + new Date(o.week_ends).toLocaleDateString('de-DE') + '. Revier wechseln: einmal am Tag.</p></div>'
+    + '<div class="kf-grid">' + o.districts.map(d => '<div class="card kf-district' + (d.id === o.my_district ? ' kf-mine' : '') + '"><b>' + esc(d.name) + '</b>'
+      + '<p>' + esc(d.description) + '</p>'
+      + '<p>Besitzer: ' + (d.owner ? '<b>🏴 ' + esc(d.owner) + '</b>' : '<span class="kf-muted">niemand</span>') + ' · ' + d.players + ' Spieler</p>'
+      + '<p class="kf-muted">Diese Woche: ' + (d.top.length ? d.top.map((g, i) => (i + 1) + '. ' + esc(g.gang) + ' (' + g.points + ')').join(' · ') : 'noch kein Einfluss') + '</p>'
+      + (o.my_gang ? '<p>Deine Bande: <b>' + d.mine + '</b> Punkte</p>' : '')
+      + (d.id === o.my_district ? '<p><b>✔ Dein Revier</b></p>' : '<button class="big dpick" data-id="' + d.id + '">Hier Revier wählen</button>') + '</div>').join('')
+    + '</div><div class="dmsg"></div>';
+  const box = distBody.querySelector('.dmsg');
+  distBody.querySelectorAll('.dpick').forEach(b => act(b, box, async () => { const r = await rpc('choose_district', { wanted: b.dataset.id }); window.kiezRenderProfile?.(r.profile); setTimeout(loaders.stadtteile, 300); return 'Dein Revier ist jetzt ' + esc(r.district) + '.'; }));
+  distBody.querySelectorAll('.kf-go').forEach(a => a.onclick = e => { e.preventDefault(); show(a.dataset.v); });
+  restoreFlash();
+  if (!p.id) return;
+};
+
+// ---------- Plunder-Basar ----------
+const basarBody = addPanel('basar', 'Plunder-Basar', '🛍 Basar');
+let basarSeq = 0;
+loaders.basar = async () => {
+  const t = ++basarSeq;
+  const me = await myId(); if (!me) return;
+  const [ls, cat, mine] = await Promise.all([
+    sb.from('market_listings').select('*').order('created_at', { ascending: false }).limit(150),
+    sb.from('plunder_catalog').select('id,name,rarity,sell_price').order('sort_order'),
+    sb.from('user_plunder').select('plunder_id,quantity').eq('user_id', me)]);
+  if (t !== basarSeq) return;
+  const C = Object.fromEntries((cat.data || []).map(c => [c.id, c]));
+  const nm = await names((ls.data || []).map(l => l.seller_id)); if (t !== basarSeq) return;
+  const own = (ls.data || []).filter(l => l.seller_id === me), other = (ls.data || []).filter(l => l.seller_id !== me);
+  const eq = window.kiezProfile?.equipped_plunder;
+  basarBody.innerHTML = '<p>Hier handeln Spieler untereinander mit Plunder. Du bekommst den Kaufpreis minus 5 % Marktgebühr. '
+    + 'Was nicht mehr in deinen Geldbehälter passt, landet sicher im Schließfach.</p>'
+    + '<div class="kf-box"><h3>Plunder anbieten</h3>' + ((mine.data || []).length ? '<div class="kf-row"><select class="msel" style="flex:2">'
+      + (mine.data || []).map(x => '<option value="' + esc(x.plunder_id) + '">' + esc(C[x.plunder_id]?.name || x.plunder_id) + ' (' + x.quantity + '×' + (eq === x.plunder_id ? ', angelegt' : '') + ')</option>').join('')
+      + '</select><input class="mqty" type="number" min="1" value="1" style="width:70px" aria-label="Menge"><input class="mprice" type="number" min="0.1" step="0.1" placeholder="Preis/Stück €" style="width:120px" aria-label="Preis pro Stück"><button class="big mlist">Einstellen</button></div>'
+      + '<p class="kf-muted mhint"></p>' : '<p class="kf-muted">Du hast noch keinen Plunder. Den findest du auf Pfandtouren.</p>') + '<div class="mmsg"></div></div>'
+    + (own.length ? '<div class="kf-box"><h3>Deine Angebote (' + own.length + '/10)</h3><ul class="kf-list">' + own.map(l => '<li>' + l.qty + '× <b>' + esc(C[l.plunder_id]?.name) + '</b> für ' + eur(l.price) + ' pro Stück <button class="ghost mcancel" data-id="' + l.id + '">Zurückziehen</button></li>').join('') + '</ul></div>' : '')
+    + '<h3 class="shop-category">Angebote im Kiez</h3>'
+    + (other.length ? '<div class="kf-grid">' + other.map(l => { const c = C[l.plunder_id] || {};
+      return '<div class="card"><b class="kf-rar-' + c.rarity + '">' + esc(c.name) + '</b><p class="kf-muted">' + (RARITY[c.rarity] || '') + ' · von ' + playerLink(l.seller_id, nm[l.seller_id]) + '</p>'
+        + '<p>' + l.qty + '× für je <b>' + eur(l.price) + '</b> <span class="kf-muted">(Händler zahlt ' + eur(c.sell_price) + ')</span></p>'
+        + '<div class="kf-row"><button class="big mbuy" data-id="' + l.id + '" data-q="1">1 kaufen – ' + eur(l.price) + '</button>'
+        + (l.qty > 1 ? '<button class="ghost mbuy" data-id="' + l.id + '" data-q="' + l.qty + '">Alle ' + l.qty + ' – ' + eur(l.qty * l.price) + '</button>' : '') + '</div></div>'; }).join('') + '</div>'
+      : '<p class="kf-muted">Gerade bietet niemand etwas an.</p>') + '<div class="mmsg2"></div>';
+  const q = x => basarBody.querySelector(x), box = q('.mmsg'), box2 = q('.mmsg2');
+  const hint = () => { const c = C[q('.msel')?.value]; if (c && q('.mhint')) q('.mhint').textContent = 'Der Händler zahlt ' + eur(c.sell_price) + ' pro Stück – im Basar kannst du mehr verlangen.'; };
+  if (q('.msel')) { q('.msel').onchange = hint; hint(); }
+  if (q('.mlist')) act(q('.mlist'), box, async () => { await rpc('market_list', { wanted: q('.msel').value, qty: parseInt(q('.mqty').value, 10), price: num(q('.mprice').value) }); setTimeout(loaders.basar, 300); return 'Im Basar eingestellt.'; });
+  basarBody.querySelectorAll('.mcancel').forEach(b => act(b, box, async () => { const r = await rpc('market_cancel', { listing: +b.dataset.id }); setTimeout(loaders.basar, 300); return r.returned + '× zurück in deiner Plunderkiste.'; }));
+  basarBody.querySelectorAll('.mbuy').forEach(b => act(b, box2, async () => { const r = await rpc('market_buy', { listing: +b.dataset.id, qty: +b.dataset.q }); window.kiezRenderProfile?.(r.profile); setTimeout(loaders.basar, 300); return 'Gekauft: ' + r.bought + '× ' + esc(r.name) + ' für ' + eur(r.cost) + '.'; }));
+  restoreFlash();
+};
+
+// ---------- Zockerbude ----------
+const zockBody = addPanel('zockerbude', 'Zockerbude', '🎲 Zockerbude');
+let zockSeq = 0;
+loaders.zockerbude = async () => {
+  const t = ++zockSeq;
+  const p = await refreshProfile(); const me = p?.id; if (!me || t !== zockSeq) return;
+  const [open, done] = await Promise.all([
+    sb.from('dice_challenges').select('*').eq('status', 'open').order('created_at', { ascending: false }).limit(40),
+    sb.from('dice_challenges').select('*').eq('status', 'done').or('challenger_id.eq.' + me + ',opponent_id.eq.' + me).order('resolved_at', { ascending: false }).limit(8)]);
+  const nm = await names([...(open.data || []), ...(done.data || [])].flatMap(c => [c.challenger_id, c.opponent_id])); if (t !== zockSeq) return;
+  const maxShell = Math.min(25, 1 + p.level), maxDice = Math.min(100, 5 * p.level);
+  zockBody.innerHTML = '<p>Hinterzimmer hinter dem Kiosk. Hier wird gezockt – mit echtem Bargeld. Gewinne, die nicht mehr in deinen Geldbehälter passen, gehen ins Schließfach.</p>'
+    + '<div class="kf-grid"><div class="card"><b>Hütchenspiel</b><p>Unter einem der drei Becher liegt die Kugel. Richtig getippt: <b>2,7-facher Einsatz</b>. Einsatz 0,10 € bis ' + eur(maxShell) + ' (steigt mit dem Level), höchstens 30 Runden am Tag.</p>'
+    + '<div class="kf-row"><input class="sstake" type="number" min="0.1" step="0.1" value="1" style="width:90px" aria-label="Einsatz in Euro"> €</div>'
+    + '<div class="kf-cups">' + [1, 2, 3].map(i => '<button class="kf-cup" data-i="' + i + '" aria-label="Becher ' + i + '"><i class="kf-cupimg"></i><i class="kf-ballimg"></i>Becher ' + i + '</button>').join('') + '</div><div class="smsg"></div></div>'
+    + '<div class="card"><b>Würfelduell</b><p>Setz einen Betrag, ein anderer Spieler hält dagegen. Beide würfeln mit zwei Würfeln, die höhere Zahl gewinnt den Topf (minus 5 % für den Wirt). Einsatz 1 € bis ' + eur(maxDice) + '.</p>'
+    + '<div class="kf-row"><input class="dstake" type="number" min="1" step="1" value="5" style="width:90px" aria-label="Einsatz in Euro"> € <button class="big dnew">Duell anbieten</button></div><div class="dmsg2"></div></div></div>'
+    + '<h3 class="shop-category">Offene Würfelduelle</h3>'
+    + ((open.data || []).length ? '<ul class="kf-list">' + open.data.map(c => '<li>' + playerLink(c.challenger_id, nm[c.challenger_id]) + ' setzt <b>' + eur(c.stake) + '</b> '
+      + (c.challenger_id === me ? '<button class="ghost dcancel" data-id="' + c.id + '">Zurückziehen</button>' : '<button class="big dacc" data-id="' + c.id + '">Dagegenhalten</button>') + '</li>').join('') + '</ul>'
+      : '<p class="kf-muted">Gerade will niemand würfeln. Biete selbst ein Duell an!</p>') + '<div class="dmsg3"></div>'
+    + ((done.data || []).length ? '<h3 class="shop-category">Deine letzten Duelle</h3><ul class="kf-list">' + done.data.map(c => { const iAmC = c.challenger_id === me, other = iAmC ? c.opponent_id : c.challenger_id;
+      return '<li>' + (c.winner_id === me ? '✅ Gewonnen' : '❌ Verloren') + ' gegen ' + playerLink(other, nm[other]) + ' · ' + (iAmC ? c.challenger_roll + ' : ' + c.opponent_roll : c.opponent_roll + ' : ' + c.challenger_roll) + ' · Einsatz ' + eur(c.stake) + ' <span class="kf-muted">' + when(c.resolved_at) + '</span></li>'; }).join('') + '</ul>' : '');
+  const q = x => zockBody.querySelector(x);
+  zockBody.querySelectorAll('.kf-cup').forEach(b => act(b, q('.smsg'), async () => {
+    const r = await rpc('shell_game', { stake: num(q('.sstake').value), pick: +b.dataset.i }); window.kiezRenderProfile?.(r.profile);
+    zockBody.querySelectorAll('.kf-cup').forEach(c => c.classList.toggle('kf-ball', +c.dataset.i === r.ball));
+    return r.win ? 'Treffer! Die Kugel lag unter Becher ' + r.ball + '. Du bekommst ' + eur(r.payout) + '.' : 'Daneben – die Kugel lag unter Becher ' + r.ball + '. Einsatz weg.';
+  }));
+  act(q('.dnew'), q('.dmsg2'), async () => { const r = await rpc('dice_challenge', { stake: num(q('.dstake').value) }); window.kiezRenderProfile?.(r.profile); setTimeout(loaders.zockerbude, 300); return 'Duell angeboten. Dein Einsatz liegt beim Wirt, bis jemand dagegenhält.'; });
+  zockBody.querySelectorAll('.dacc').forEach(b => act(b, q('.dmsg3'), async () => { const r = await rpc('dice_accept', { challenge: +b.dataset.id }); window.kiezRenderProfile?.(r.profile); setTimeout(loaders.zockerbude, 300);
+    return '🎲 Du würfelst ' + r.my_roll + ', dein Gegner ' + r.their_roll + ' – ' + (r.win ? 'gewonnen! +' + eur(r.pot) : 'verloren.'); }));
+  zockBody.querySelectorAll('.dcancel').forEach(b => act(b, q('.dmsg3'), async () => { const r = await rpc('dice_cancel', { challenge: +b.dataset.id }); window.kiezRenderProfile?.(r.profile); setTimeout(loaders.zockerbude, 300); return 'Zurückgezogen, ' + eur(r.refund) + ' zurück.'; }));
+  restoreFlash();
+};
+
+// ---------- Schließfach ----------
+const bankBody = addPanel('schliessfach', 'Schließfach', '🔐 Schließfach');
+loaders.schliessfach = async () => {
+  const p = await refreshProfile(); if (!p) return;
+  const lim = 100 + p.level * 50, free = Math.max(0, p.cash_capacity - p.money);
+  bankBody.innerHTML = '<p>Im Schließfach am Bahnhof ist dein Geld sicher: Bei einer Prügelei kann dir nur das Bargeld in der Tasche geklaut werden. '
+    + 'Einzahlen kostet 2 % Gebühr, Abheben ist kostenlos – aber nur so viel, wie in deinen Geldbehälter passt.</p>'
+    + '<div class="kf-grid"><div class="card"><b>Dein Schließfach</b><p class="kf-big">' + eur(p.bank_balance) + '</p><p class="kf-muted">Platz bis ' + eur(lim) + ' (wächst mit dem Level)</p>' + bar(p.bank_balance, lim) + '</div>'
+    + '<div class="card"><b>Bargeld in der Tasche</b><p class="kf-big">' + eur(p.money) + '</p><p class="kf-muted">Geldbehälter: ' + eur(p.cash_capacity) + ' · frei ' + eur(free) + '</p>' + bar(p.money, p.cash_capacity) + '</div></div>'
+    + '<div class="kf-grid"><div class="kf-box"><h3>Einzahlen</h3><div class="kf-row"><input class="bin" type="number" min="1" step="1" value="' + Math.floor(p.money) + '" style="width:110px" aria-label="Betrag einzahlen"> € <button class="big bdep">Einzahlen</button></div></div>'
+    + '<div class="kf-box"><h3>Abheben</h3><div class="kf-row"><input class="bout" type="number" min="0.01" step="0.01" value="' + Math.min(Number(p.bank_balance), free).toFixed(2) + '" style="width:110px" aria-label="Betrag abheben"> € <button class="big bwd">Abheben</button></div></div></div><div class="bmsg"></div>';
+  const q = x => bankBody.querySelector(x), box = q('.bmsg');
+  act(q('.bdep'), box, async () => { const r = await rpc('bank_deposit', { amount: num(q('.bin').value) }); window.kiezRenderProfile?.(r.profile); setTimeout(loaders.schliessfach, 300); return eur(r.stored) + ' liegen jetzt im Schließfach (Gebühr ' + eur(r.fee) + ').'; });
+  act(q('.bwd'), box, async () => { const r = await rpc('bank_withdraw', { amount: num(q('.bout').value) }); window.kiezRenderProfile?.(r.profile); setTimeout(loaders.schliessfach, 300); return 'Abgehoben.'; });
+  restoreFlash();
+};
+
+// ---------- Kiez-Geschichte ----------
+const questBody = addPanel('geschichte', 'Kiez-Geschichte', '📜 Kiez-Geschichte');
+loaders.geschichte = async () => {
+  const [s, defs] = await Promise.all([rpc('quest_status'), sb.from('quest_defs').select('step,title').order('step')]);
+  const done = (defs.data || []).filter(d => d.step < s.step);
+  if (s.finished) {
+    questBody.innerHTML = '<div class="kf-box"><h3>Geschichte durchgespielt</h3><p>Du hast alle ' + s.total + ' Kapitel geschafft. Der Kiez erzählt sich deine Geschichte.</p></div>';
+  } else {
+    const q = s.quest;
+    questBody.innerHTML = '<div class="card kf-quest"><b>Kapitel ' + q.step + ': ' + esc(q.title) + '</b><p class="kf-muted">Kapitel ' + q.step + ' von ' + s.total + '</p>'
+      + '<p><i>' + esc(q.story) + '</i></p><p><b>Aufgabe:</b> ' + esc(q.task) + '</p>'
+      + '<p>Fortschritt: ' + Math.min(s.value, q.goal).toLocaleString('de-DE') + ' / ' + Number(q.goal).toLocaleString('de-DE') + '</p>' + bar(s.value, q.goal)
+      + '<p>Belohnung: ' + eur(q.reward_money) + ' · ' + q.reward_xp + ' Punkte' + (q.reward_caps ? ' · ' + q.reward_caps + ' 🧢' : '') + '</p>'
+      + (s.done ? '<button class="big qclaim">Belohnung abholen</button>' : '<button class="big" disabled>Noch nicht geschafft</button>') + '<div class="qmsg"></div></div>';
+    const b = questBody.querySelector('.qclaim');
+    if (b) act(b, questBody.querySelector('.qmsg'), async () => { const r = await rpc('claim_quest'); window.kiezRenderProfile?.(r.profile); setTimeout(loaders.geschichte, 400); return 'Kapitel „' + esc(r.title) + '“ geschafft: +' + eur(r.money) + ', +' + r.xp + ' Punkte' + (r.caps ? ', +' + r.caps + ' 🧢' : '') + '.'; });
+  }
+  if (done.length) questBody.insertAdjacentHTML('beforeend', '<div class="kf-box"><h3>Geschaffte Kapitel</h3><ul class="kf-list">' + done.map(d => '<li>✅ ' + d.step + '. ' + esc(d.title) + '</li>').join('') + '</ul></div>');
+  restoreFlash();
+};
+
+// ---------- Kiez-Chat ----------
+const chatBody = addPanel('chat', 'Kiez-Chat', '💬 Kiez-Chat');
+let chatTimer = null;
+loaders.chat = async () => {
+  const me = await myId(); if (!me) return;
+  if (!chatBody.querySelector('.cin')) {
+    chatBody.innerHTML = '<p>Der Treffpunkt für alle im Kiez. Freundlich bleiben – Beleidigungen werden gelöscht.</p>'
+      + '<div class="kf-box"><h3>Nachricht an alle</h3><div class="kf-row"><input class="cin" maxlength="300" placeholder="Nachricht an alle …" style="flex:1" aria-label="Nachricht"><button class="big csend">Senden</button></div><div class="cmsg"></div></div>'
+      + '<div class="kf-box"><h3>Im Chat</h3><ul class="kf-list kf-chat"></ul></div>';
+    const q = x => chatBody.querySelector(x);
+    act(q('.csend'), q('.cmsg'), async () => { await rpc('post_chat', { message_body: q('.cin').value }); q('.cin').value = ''; await drawChat(); return 'Gesendet.'; });
+    q('.cin').onkeydown = e => { if (e.key === 'Enter') q('.csend').click(); };
+  }
+  await drawChat();
+  clearInterval(chatTimer);
+  chatTimer = setInterval(() => { if (document.getElementById('chat')?.classList.contains('active-view') && !document.hidden) drawChat(); else clearInterval(chatTimer); }, 8000);
+};
+async function drawChat() {
+  const me = await myId();
+  const { data } = await sb.from('chat_messages').select('*').order('created_at', { ascending: false }).limit(60);
+  const nm = await names((data || []).map(m => m.user_id)), admin = !!window.kiezProfile?.is_admin;
+  const list = chatBody.querySelector('.kf-chat'); if (!list) return;
+  list.innerHTML = (data || []).map(m => '<li><b>' + playerLink(m.user_id, nm[m.user_id]) + ':</b> ' + esc(m.body) + ' <span class="kf-muted">' + when(m.created_at) + '</span>'
+    + (m.user_id === me || admin ? ' <button class="ghost cdel" data-id="' + m.id + '" aria-label="Löschen">✕</button>' : '') + '</li>').join('') || '<li class="kf-muted">Noch still hier. Sag Hallo!</li>';
+  list.querySelectorAll('.cdel').forEach(b => b.onclick = async () => { try { await rpc('delete_chat', { message_id: +b.dataset.id }); say(chatBody.querySelector('.cmsg'), 'Nachricht gelöscht.', true); drawChat(); } catch (e) { say(chatBody.querySelector('.cmsg'), esc(e.message)); } });
+}
+
+// ---------- Kampfprotokoll ----------
+const fightBody = addPanel('kampfprotokoll', 'Kampfprotokoll', '📋 Kampfprotokoll');
+loaders.kampfprotokoll = async () => {
+  const r = await rpc('fight_history'), s = r.stats || {};
+  const pct = (a, b) => b ? Math.round(100 * a / b) + ' %' : '–';
+  fightBody.innerHTML = '<div class="kf-grid">'
+    + '<div class="card"><b>Angriffe</b><p class="kf-big">' + s.attack_wins + ' / ' + s.attacks + '</p><p class="kf-muted">gewonnen · Quote ' + pct(s.attack_wins, s.attacks) + '</p></div>'
+    + '<div class="card"><b>Verteidigungen</b><p class="kf-big">' + s.defense_wins + ' / ' + s.defenses + '</p><p class="kf-muted">abgewehrt · Quote ' + pct(s.defense_wins, s.defenses) + '</p></div>'
+    + '<div class="card"><b>Beute</b><p class="kf-big">+' + eur(s.loot_won) + '</p><p class="kf-muted">verloren: ' + eur(s.loot_lost) + '</p></div></div>'
+    + '<div class="kf-box"><h3>Letzte Kämpfe</h3>' + (r.fights.length ? '<table class="kf-table"><tr><th>Wann</th><th>Gegner</th><th>Art</th><th>Stärke</th><th>Ausgang</th><th>Beute</th></tr>'
+      + r.fights.map(f => '<tr><td>' + when(f.created_at) + '</td><td>' + playerLink(f.opponent_id, f.opponent) + '</td><td>' + (f.i_attacked ? 'Angriff' : 'Verteidigung') + '</td><td>'
+        + (f.i_attacked ? f.attacker_power + ' : ' + f.defender_power : f.defender_power + ' : ' + f.attacker_power) + '</td><td>' + (f.won ? '✅ Sieg' : '❌ Niederlage') + '</td><td>' + (f.won ? '+' : '−') + eur(f.loot) + '</td></tr>').join('') + '</table>'
+      : '<p class="kf-muted">Noch keine Kämpfe. <a href="#" class="kf-go" data-v="pvp">Gegner suchen</a></p>') + '</div>';
+  fightBody.querySelectorAll('.kf-go').forEach(a => a.onclick = e => { e.preventDefault(); show(a.dataset.v); });
+};
+
+// ---------- Seite öffnen, optional mit Reiter ----------
+function go(view, tab) {
+  window.kiezCloseNav?.();
+  show(view);
+  if (!tab) return;
+  let n = 0;
+  const pick = () => {
+    const s = [...document.querySelectorAll('#' + view + ' .section-tools span, #' + view + ' .section-tools button')].find(x => x.textContent.trim() === tab);
+    if (s) s.click(); else if (++n < 10) setTimeout(pick, 150);
+  };
+  setTimeout(pick, 120);
+}
+window.kiezGoTab = go;
+
+// ---------- Hauptmenü nach Pennergame-Aufbau: 7 Bereiche, Unterpunkte klappen auf ----------
+const NAV = [
+  ['Mein Kiez', 'szene-uebersicht', [['Übersicht', 'overview'], ['Mein Profil', 'profil'], ['Plunderkiste & Inventar', 'plunder'], ['Kronkorken', 'kronkorken'],
+    ['Begleiter', 'pets'], ['Unterkunft', 'gear'], ['Karriere', 'career'], ['Erfolge', 'achievements'], ['Einstellungen', 'einstellungen']]],
+  ['Aktionen', 'szene-pfand', [['Pfand sammeln', 'pfand'], ['Verbrechen', 'pfand', 'Verbrechen begehen'], ['Schnorren', 'begging'], ['Weiterbildung', 'training'],
+    ['Kiez-Geschichte', 'geschichte'], ['Tagesauftrag', 'missions']]],
+  ['Stadt', 'szene-stadt', [['Stadtplan', 'citymap'], ['Stadtteile', 'stadtteile'], ['Kiezladen', 'store'], ['Apotheke', 'apotheke'], ['Schnorrplätze & Musik', 'income'],
+    ['Plunder-Basar', 'basar'], ['Zockerbude', 'zockerbude'], ['Glücksspiel & Lotto', 'missions', 'Glücksspiel'], ['Schließfach', 'schliessfach']]],
+  ['Kampf', 'szene-pruegelei', [['Gegner suchen', 'pvp'], ['Kampfprotokoll', 'kampfprotokoll'], ['Begleiter trainieren', 'pets']]],
+  ['Bande', 'szene-bande', [['Meine Bande', 'gangs'], ['Stadtteile erobern', 'stadtteile'], ['Banden-Highscore', 'wettbewerb']]],
+  ['Kommunikation', 'szene-post', [['Kiezpost', 'messages'], ['Kiez-Chat', 'chat'], ['Kiez-Brett', 'brett'], ['Freunde', 'freunde']]],
+  ['Highscore', 'szene-rangliste', [['Rangliste', 'leaderboard'], ['Wettbewerb & Events', 'wettbewerb'], ['Erfolge', 'achievements']]]
+];
+function buildNav() {
+  const mast = document.querySelector('.mast'); if (!mast || mast.querySelector('.kz-nav')) return;
+  const nav = document.createElement('nav'); nav.className = 'kz-nav'; nav.setAttribute('aria-label', 'Hauptmenü');
+  const drop = document.createElement('div'); drop.className = 'kz-drop hide'; drop.setAttribute('role', 'menu');
+  let openIdx = -1, hideT = 0;
+  const close = () => { drop.classList.add('hide'); openIdx = -1; nav.querySelectorAll('.kz-top').forEach(b => { b.classList.remove('on'); b.setAttribute('aria-expanded', 'false'); }); };
+  const open = (i, btn) => {
+    clearTimeout(hideT);
+    if (openIdx === i) return;
+    const items = NAV[i][2].concat(i === 0 && window.kiezProfile?.is_admin ? [['Admin', 'admin']] : []);
+    drop.innerHTML = items.map(([n, v, tb]) => '<button role="menuitem" data-v="' + v + '"' + (tb ? ' data-t="' + esc(tb) + '"' : '') + '>' + esc(n) + '</button>').join('');
+    drop.querySelectorAll('button').forEach(x => x.onclick = () => { close(); go(x.dataset.v, x.dataset.t); });
+    nav.querySelectorAll('.kz-top').forEach(b => { b.classList.remove('on'); b.setAttribute('aria-expanded', 'false'); });
+    btn.classList.add('on'); btn.setAttribute('aria-expanded', 'true');
+    const r = btn.getBoundingClientRect();
+    drop.classList.remove('hide');
+    drop.style.top = (r.bottom + window.scrollY) + 'px';
+    drop.style.left = Math.max(8, Math.min(r.left + window.scrollX, document.documentElement.clientWidth - drop.offsetWidth - 8)) + 'px';
+    openIdx = i;
+  };
+  NAV.forEach(([label, pic], i) => {
+    const b = document.createElement('button'); b.className = 'kz-top'; b.type = 'button'; b.setAttribute('aria-haspopup', 'true'); b.setAttribute('aria-expanded', 'false');
+    b.innerHTML = '<span class="kz-ico" style="background-image:url(\'/bilder/' + pic + '.webp\')"></span><span class="kz-lbl">' + label + '</span>';
+    b.onclick = e => { e.stopPropagation(); if (openIdx === i) close(); else open(i, b); };
+    b.onmouseenter = () => { if (matchMedia('(hover:hover)').matches) open(i, b); };
+    b.onmouseleave = () => { hideT = setTimeout(close, 250); };
+    nav.appendChild(b);
+  });
+  drop.onmouseenter = () => clearTimeout(hideT);
+  drop.onmouseleave = () => { hideT = setTimeout(close, 250); };
+  document.addEventListener('click', e => { if (!drop.contains(e.target) && !nav.contains(e.target)) close(); });
+  window.addEventListener('resize', close);
+  window.kiezCloseNav = close;
+  const old = mast.querySelector('.classic-mainnav');
+  if (old) old.after(nav); else mast.appendChild(nav);
+  document.body.appendChild(drop);
+}
+buildNav();
+setTimeout(buildNav, 1500);
+
+// ---------- Stadtplan zum Anklicken ----------
+// Karte in Viewbox-Koordinaten 1000×620; Orte liegen in den sechs Stadtteilen
+const DIST_SHAPES = {
+  bahnhof: '0,0 360,0 330,250 0,280', altstadt: '360,0 680,0 650,260 330,250', villen: '680,0 1000,0 1000,300 650,260',
+  stadtpark: '0,280 330,250 360,620 0,620', markt: '330,250 650,260 640,620 360,620', hafen: '650,260 1000,300 1000,620 640,620'
+};
+const DIST_TINT = { bahnhof: 'rgba(96,90,84,.22)', altstadt: 'rgba(160,92,52,.18)', villen: 'rgba(214,190,120,.28)', stadtpark: 'rgba(110,140,80,.18)', markt: 'rgba(196,146,82,.20)', hafen: 'rgba(80,104,124,.22)' };
+const DIST_LABEL = { bahnhof: [170, 40], altstadt: [510, 40], villen: [840, 40], stadtpark: [170, 300], markt: [500, 300], hafen: [860, 300] };
+const PLACES = [
+  ['Pfandannahme', 'pfand', '', 'szene-pfand', 90, 120], ['Schnorrplätze', 'income', 'Schnorrplätze', 'stadt-schnorrplaetze', 250, 175],
+  ['Kiezladen', 'store', 'Zubehör', 'stadt-zubehoer', 420, 110], ['Waffenladen', 'store', 'Waffen', 'stadt-waffenladen', 590, 115], ['Volkshochschule', 'training', '', 'szene-training', 480, 200],
+  ['Schließfach', 'schliessfach', '', 'laden-geldversteck', 770, 110], ['Apotheke', 'apotheke', '', 'stadt-apotheke', 910, 190],
+  ['Tierhandlung', 'pets', '', 'stadt-tierhandlung', 90, 370], ['Hinterhof', 'pvp', '', 'szene-pruegelei', 240, 440], ['Waschhaus', 'begging', 'Körperpflege', 'stadt-waschhaus', 110, 540],
+  ['Supermarkt', 'store', 'Verbrauchbares', 'stadt-supermarkt', 420, 370], ['Plunder-Basar', 'basar', '', 'lager-inventar', 580, 370], ['Musikladen', 'income', 'Instrumente', 'stadt-musikladen', 430, 530],
+  ['Zockerbude', 'zockerbude', '', 'stadt-gluecksspiel', 570, 520],
+  ['Eigenheime', 'gear', '', 'stadt-eigenheime', 720, 400], ['Bandenversteck', 'gangs', '', 'szene-bande', 890, 425], ['Lottobude', 'missions', 'Glücksspiel', 'rubbellose', 720, 500]
+];
+async function buildCityMap() {
+  const inside = document.querySelector('#citymap .inside'); if (!inside) return;
+  if (!inside.querySelector('.kz-map')) {
+    inside.innerHTML = '<p class="kz-maphint">Tipp auf einen Ort, um hineinzugehen. Farbige Viertel gehören gerade einer Bande – tipp auf den Namen eines Viertels für die Stadtteile.</p>'
+      + '<div class="kz-mapwrap"><div class="kz-map"><svg viewBox="0 0 1000 620" preserveAspectRatio="none" aria-hidden="true">'
+      + '<defs><pattern id="kzhatch" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="10" height="10" fill="rgba(155,60,31,.10)"/><line x1="0" y1="0" x2="0" y2="10" stroke="rgba(155,60,31,.35)" stroke-width="3"/></pattern>'
+      + '<pattern id="kzmine" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)"><rect width="10" height="10" fill="rgba(209,169,79,.18)"/><line x1="0" y1="0" x2="0" y2="10" stroke="rgba(156,122,46,.45)" stroke-width="3"/></pattern></defs>'
+      + '<rect width="1000" height="620" fill="#e6d6b1"/>'
+      + Object.entries(DIST_SHAPES).map(([id, pts]) => '<polygon points="' + pts + '" fill="' + DIST_TINT[id] + '"/><polygon class="kz-dist" data-d="' + id + '" points="' + pts + '"/>').join('')
+      // Park, Fluss, Bahn, Straßen
+      + '<path d="M20 330 C120 300 250 310 300 360 L320 600 L20 600 Z" fill="#b9c79a" opacity=".55"/>'
+      + [[70, 330], [140, 320], [200, 350], [60, 460], [180, 480], [260, 380], [270, 560], [40, 590]].map(([x, y]) => '<circle cx="' + x + '" cy="' + y + '" r="14" fill="#7f9a5a" opacity=".6"/>').join('')
+      + '<path d="M640 620 C760 560 820 470 1000 380 L1000 620 Z" fill="#8fa7b0" opacity=".75"/><path d="M640 620 C760 560 820 470 1000 380" stroke="#5f7b86" stroke-width="3" fill="none"/>'
+      + '<path d="M0 240 L330 205 L660 215 L1000 250" stroke="#5a4a36" stroke-width="5" fill="none" stroke-dasharray="14 8"/>'
+      + ['M0 280 L330 250 L650 260 L1000 300', 'M360 0 L330 250 L360 620', 'M680 0 L650 260 L640 620', 'M330 250 L180 620', 'M650 260 L820 0', 'M0 150 L360 120', 'M650 440 L1000 470'].map(d =>
+        '<path d="' + d + '" stroke="#fbf4e2" stroke-width="12" fill="none" stroke-linecap="round"/><path d="' + d + '" stroke="#a48f6b" stroke-width="2" fill="none" stroke-dasharray="6 6"/>').join('')
+      + '<circle cx="500" cy="440" r="26" fill="#fbf4e2" stroke="#a48f6b" stroke-width="2"/>'
+      + '<g class="kz-compass" transform="translate(955 575)"><circle r="26" fill="#fbf4e2" stroke="#6b5838" stroke-width="2"/><path d="M0 -20 L6 0 L0 20 L-6 0 Z" fill="#9b3c1f"/><text y="-28" text-anchor="middle" font-size="14" fill="#2a1f15">N</text></g>'
+      + '</svg>'
+      + Object.entries(DIST_LABEL).map(([id, [x, y]]) => '<button class="kz-dlabel" data-d="' + id + '" style="left:' + (x / 10) + '%;top:' + (y / 6.2) + '%"><b></b><small></small></button>').join('')
+      + PLACES.map(([n, v, tb, pic, x, y]) => '<button class="kz-place" data-v="' + v + '"' + (tb ? ' data-t="' + tb + '"' : '') + ' style="left:' + (x / 10) + '%;top:' + (y / 6.2) + '%"><span style="background-image:url(\'/bilder/' + pic + '.webp\')"></span><em>' + n + '</em></button>').join('')
+      + '</div></div>'
+      + '<div class="kz-placelist"><b>Alle Orte:</b> ' + PLACES.map(([n, v, tb]) => '<button class="ghost kz-place2" data-v="' + v + '"' + (tb ? ' data-t="' + tb + '"' : '') + '>' + n + '</button>').join('') + '</div>';
+    inside.querySelectorAll('.kz-place, .kz-place2').forEach(b => b.onclick = () => go(b.dataset.v, b.dataset.t));
+    inside.querySelectorAll('.kz-dlabel').forEach(b => b.onclick = () => show('stadtteile'));
+  }
+  try {
+    const o = await rpc('district_overview');
+    o.districts.forEach(d => {
+      const poly = inside.querySelector('.kz-dist[data-d="' + d.id + '"]'), lab = inside.querySelector('.kz-dlabel[data-d="' + d.id + '"]');
+      if (poly) poly.setAttribute('class', 'kz-dist' + (d.owner_id ? (d.owner_id === o.my_gang ? ' kz-own-mine' : ' kz-own') : '') + (d.id === o.my_district ? ' kz-here' : ''));
+      if (lab) { lab.querySelector('b').textContent = d.name; lab.querySelector('small').textContent = d.owner ? '🏴 ' + d.owner : 'frei'; }
+    });
+  } catch (e) { /* Karte bleibt auch ohne Stadtteil-Daten benutzbar */ }
+}
+loaders.citymap = buildCityMap;
+buildCityMap();
+
+// ---------- Aussehen ----------
+const style6 = document.createElement('style');
+style6.textContent = `
+html body:not(#kz1):not(#kz2) .classic-mainnav, html body:not(#kz1):not(#kz2) .classic-menu { display: none !important; }
+html body:not(#kz1):not(#kz2) .kz-nav { display: flex; align-self: end; justify-self: center; gap: 2px; grid-column: 2; grid-row: 1; flex-wrap: nowrap; max-width: 100%; overflow-x: auto; scrollbar-width: none; }
+html body:not(#kz1):not(#kz2) .kz-nav::-webkit-scrollbar { display: none; }
+html body:not(#kz1):not(#kz2) .kz-top { flex: 0 0 auto; white-space: nowrap; display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 78px; padding: 6px 4px 7px; background: transparent !important; border: 0 !important; border-radius: 8px 8px 0 0 !important; color: var(--ink) !important; font: 700 12px/1.1 var(--font-head) !important; text-transform: uppercase; letter-spacing: .04em; cursor: pointer; box-shadow: none !important; min-height: 0 !important; }
+html body:not(#kz1):not(#kz2) .kz-top .kz-ico { width: 50px; height: 50px; border-radius: 50%; background: #3b2e22 center/cover no-repeat; border: 3px solid var(--paper-light); box-shadow: 0 0 0 2px var(--paper-edge), 0 4px 10px rgba(0,0,0,.35); transition: transform .15s; }
+html body:not(#kz1):not(#kz2) .kz-top:hover .kz-ico, html body:not(#kz1):not(#kz2) .kz-top.on .kz-ico { transform: translateY(-2px) scale(1.06); box-shadow: 0 0 0 2px var(--rust), 0 6px 14px rgba(0,0,0,.4); }
+html body:not(#kz1):not(#kz2) .kz-top.on { background: rgba(42,31,21,.12) !important; }
+html body:not(#kz1):not(#kz2) .kz-drop { position: absolute; z-index: 9999; min-width: 230px; padding: 6px; background: var(--leather); border: 2px solid var(--brass-dark); border-radius: 0 0 var(--radius) var(--radius); box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 2px; }
+html body:not(#kz1):not(#kz2) .kz-drop.hide { display: none; }
+html body:not(#kz1):not(#kz2) .kz-drop button { text-align: left; padding: 11px 14px !important; min-height: 44px; background: transparent !important; color: var(--text) !important; border: 0 !important; border-radius: 4px !important; font: 600 15px var(--font-body) !important; box-shadow: none !important; }
+html body:not(#kz1):not(#kz2) .kz-drop button:hover, html body:not(#kz1):not(#kz2) .kz-drop button:focus-visible { background: rgba(209,169,79,.16) !important; color: var(--brass) !important; }
+html body:not(#kz1):not(#kz2) .kz-maphint { color: var(--muted); }
+html body:not(#kz1):not(#kz2) .kz-mapwrap { overflow-x: auto; border-radius: var(--radius); border: 3px solid var(--paper-edge); box-shadow: var(--shadow); }
+html body:not(#kz1):not(#kz2) .kz-map { position: relative; min-width: 860px; aspect-ratio: 1000 / 620; background: #e6d6b1 var(--paper-tex) center/cover; }
+html body:not(#kz1):not(#kz2) .kz-map svg { position: absolute; inset: 0; width: 100%; height: 100%; mix-blend-mode: multiply; }
+html body:not(#kz1):not(#kz2) .kz-dist { fill: transparent; stroke: #4e3f2a; stroke-width: 3; stroke-dasharray: 12 6; }
+html body:not(#kz1):not(#kz2) .kz-dist.kz-own { fill: url(#kzhatch); }
+html body:not(#kz1):not(#kz2) .kz-dist.kz-own-mine { fill: url(#kzmine); }
+html body:not(#kz1):not(#kz2) .kz-dist.kz-here { stroke: #9b3c1f; stroke-width: 5; stroke-dasharray: none; }
+html body:not(#kz1):not(#kz2) .kz-dlabel { position: absolute; transform: translate(-50%, 0); background: rgba(251,244,226,.88) !important; border: 1px solid #6b5838 !important; border-radius: 4px !important; padding: 3px 10px !important; min-height: 0 !important; color: #2a1f15 !important; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,.25) !important; line-height: 1.15; }
+html body:not(#kz1):not(#kz2) .kz-dlabel b { display: block; font: 800 14px var(--font-head) !important; text-transform: uppercase; letter-spacing: .06em; color: #2a1f15 !important; }
+html body:not(#kz1):not(#kz2) .kz-dlabel small { font: 600 12px var(--font-body); color: #6f2913; }
+html body:not(#kz1):not(#kz2) .kz-place { position: absolute; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 3px; background: none !important; border: 0 !important; padding: 0 !important; min-height: 0 !important; box-shadow: none !important; cursor: pointer; z-index: 2; }
+html body:not(#kz1):not(#kz2) .kz-place span { width: 62px; height: 62px; border-radius: 50%; background: #3b2e22 center/cover no-repeat; border: 3px solid #fbf4e2; box-shadow: 0 0 0 2px #6b5838, 0 5px 12px rgba(0,0,0,.45); transition: transform .15s; }
+html body:not(#kz1):not(#kz2) .kz-place em { font: 700 12.5px var(--font-body); font-style: normal; color: #fbf4e2; background: #2a1f15; padding: 2px 8px; border-radius: 3px; white-space: nowrap; box-shadow: 0 2px 5px rgba(0,0,0,.35); }
+html body:not(#kz1):not(#kz2) .kz-place:hover span, html body:not(#kz1):not(#kz2) .kz-place:focus-visible span { transform: scale(1.12); box-shadow: 0 0 0 3px #9b3c1f, 0 8px 16px rgba(0,0,0,.5); }
+html body:not(#kz1):not(#kz2) .kz-place:hover em { background: #9b3c1f; }
+html body:not(#kz1):not(#kz2) .kz-placelist { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+html body:not(#kz1):not(#kz2) .kz-placelist .ghost { min-height: 40px; padding: 6px 12px !important; }
+html body:not(#kz1):not(#kz2) .kf-bar { height: 10px; background: rgba(0,0,0,.35); border-radius: 5px; overflow: hidden; margin: 6px 0; }
+html body:not(#kz1):not(#kz2) .kf-bar span { display: block; height: 100%; background: linear-gradient(90deg, var(--rust), var(--brass)); }
+html body:not(#kz1):not(#kz2) .kf-big { font: 700 26px var(--font-head); color: var(--paper-light); margin: 4px 0; }
+html body:not(#kz1):not(#kz2) .kf-title { color: var(--brass); font-style: italic; margin: -4px 0 8px; }
+html body:not(#kz1):not(#kz2) .kf-mine { border-color: var(--brass) !important; }
+html body:not(#kz1):not(#kz2) .kf-cups { display: flex; gap: 8px; margin: 10px 0; }
+html body:not(#kz1):not(#kz2) .kf-cup { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 4px !important; min-height: 70px; }
+html body:not(#kz1):not(#kz2) .kf-cup { position: relative; font-size: 14px !important; }
+html body:not(#kz1):not(#kz2) .kf-cupimg { display: block; width: 44px; height: 46px; background: linear-gradient(90deg, #6f2913, #b4532c 45%, #6f2913); clip-path: polygon(18% 0, 82% 0, 100% 100%, 0 100%); border-radius: 4px 4px 0 0; box-shadow: inset 0 -6px 0 rgba(0,0,0,.25); transition: transform .3s; }
+html body:not(#kz1):not(#kz2) .kf-ballimg { position: absolute; top: 34px; width: 16px; height: 16px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fff6d8, #d1a94f 60%, #7a5a1c); opacity: 0; }
+html body:not(#kz1):not(#kz2) .kf-cup.kf-ball .kf-cupimg { transform: translateY(-16px) rotate(-8deg); }
+html body:not(#kz1):not(#kz2) .kf-cup.kf-ball .kf-ballimg { opacity: 1; }
+html body:not(#kz1):not(#kz2) .kf-chat li { padding: 6px 0; border-bottom: 1px solid var(--line); }
+@media (max-width: 760px) {
+  html body:not(#kz1):not(#kz2) .kz-nav { grid-column: 1 / -1; grid-row: auto; justify-self: stretch; justify-content: flex-start; padding: 0 6px; }
+  html body:not(#kz1):not(#kz2) .kz-top { min-width: 64px; padding: 6px 7px 7px !important; font-size: 11px !important; }
+  html body:not(#kz1):not(#kz2) .kz-nav { -webkit-mask-image: linear-gradient(90deg, #000 88%, transparent); mask-image: linear-gradient(90deg, #000 88%, transparent); }
+  html body:not(#kz1):not(#kz2) .kz-maphint::after { content: ' Die Karte kannst du zur Seite wischen.'; }
+  html body:not(#kz1):not(#kz2) .kz-top .kz-ico { width: 42px; height: 42px; }
+}`;
+document.head.appendChild(style6);
+
 // Zuletzt geöffnete neue Seite wiederherstellen
 try { const last = localStorage.getItem('kiez_last_view'); if (loaders[last]) setTimeout(() => show(last), 1500); } catch (e) { }
 if (window.kiezProfile) window.kiezOnProfile(window.kiezProfile);

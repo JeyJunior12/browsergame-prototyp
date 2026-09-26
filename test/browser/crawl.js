@@ -29,15 +29,16 @@ const MAIL=process.argv[3]||process.env.KIEZ_MAIL;
      if(e2)await pg.screenshot({path:require('os').tmpdir()+'/kiez-leer_'+n+'.png'});
    }};
  // Hauptmenü
- const groups=await pg.evaluate(()=>[...document.querySelectorAll('.classic-mainnav > button')].filter(b=>b.offsetParent).map(b=>b.textContent.trim()));
+ const groups=await pg.evaluate(()=>[...document.querySelectorAll('.kz-nav > .kz-top')].filter(b=>b.offsetParent).map(b=>b.textContent.trim()));
+ report.push('--- Hauptmenü: '+groups.join(', '));
  for(const g of groups){
-   await pg.evaluate(g=>[...document.querySelectorAll('.classic-mainnav > button')].find(b=>b.textContent.trim()===g).click(),g);await pg.waitForTimeout(700);
-   const items=await pg.evaluate(()=>[...document.querySelectorAll('.classic-menu:not(.hide) button')].map(b=>b.textContent.trim()));
+   await pg.evaluate(g=>[...document.querySelectorAll('.kz-nav > .kz-top')].find(b=>b.textContent.trim()===g).click(),g);await pg.waitForTimeout(700);
+   const items=await pg.evaluate(()=>[...document.querySelectorAll('.kz-drop:not(.hide) button')].map(b=>b.textContent.trim()));
    if(!items.length){await check('Menü '+g);continue}
    for(const it of items){
-     await pg.evaluate(g=>{const m=document.querySelector('.classic-menu');if(m.classList.contains('hide'))[...document.querySelectorAll('.classic-mainnav > button')].find(b=>b.textContent.trim()===g).click()},g);
+     await pg.evaluate(g=>{const m=document.querySelector('.kz-drop');if(m.classList.contains('hide'))[...document.querySelectorAll('.kz-nav > .kz-top')].find(b=>b.textContent.trim()===g).click()},g);
      await pg.waitForTimeout(500);
-     await pg.evaluate(it=>[...document.querySelectorAll('.classic-menu:not(.hide) button')].find(b=>b.textContent.trim()===it)?.click(),it);
+     await pg.evaluate(it=>[...document.querySelectorAll('.kz-drop:not(.hide) button')].find(b=>b.textContent.trim()===it)?.click(),it);
      await check(g+' › '+it);
    }
  }
@@ -52,11 +53,11 @@ const MAIL=process.argv[3]||process.env.KIEZ_MAIL;
    await check('Reiterleiste „'+t+'“');
    await pg.evaluate(()=>{const m=document.querySelector('#kiezmodal');if(m&&!m.classList.contains('hide'))document.querySelector('#kiezmodalclose')?.click()})}
  }
- // Stadtkarte-Kacheln
+ // Stadtplan: jeder Ort auf der Karte
  await pg.evaluate(()=>window.kiezGo('citymap'));await pg.waitForTimeout(1500);
- const tiles=await pg.evaluate(()=>[...document.querySelectorAll('#citymap [data-go]')].map((b,i)=>i+':'+(b.querySelector('b,h3,strong')?.textContent||b.textContent).trim().slice(0,30)));
+ const tiles=await pg.evaluate(()=>[...document.querySelectorAll('#citymap .kz-place')].map((b,i)=>i+':'+(b.querySelector('em')?.textContent||b.textContent).trim().slice(0,30)));
  for(const t of tiles){const i=Number(t.split(':')[0]);await pg.evaluate(()=>window.kiezGo('citymap'));await pg.waitForTimeout(900);
-   await pg.evaluate(i=>document.querySelectorAll('#citymap [data-go]')[i]?.click(),i);await check('Stadtkarte „'+t.slice(t.indexOf(':')+1)+'“');}
+   await pg.evaluate(i=>document.querySelectorAll('#citymap .kz-place')[i]?.click(),i);await check('Stadtkarte „'+t.slice(t.indexOf(':')+1)+'“');}
  console.log(report.join('\n'));
  console.log('\nLEER:',report.filter(r=>r.includes('LEER')).length,'von',n);
  console.log('JS-FEHLER:',[...new Set(errs)].join('\n  ')||'keine');

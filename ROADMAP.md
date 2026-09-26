@@ -39,6 +39,12 @@ GitHub push ──▶ Action: Tests (Postgres) ──▶ Migration live in Supab
 | Systemnachrichten (Kampfberichte, Anfragen, Gewinne), gelesen/ungelesen | ✔ | ✔ (0008) | 8 ✅ |
 | Profilbild, Einstellungen (Passwort, Name), Freunde werben | ✔ | ✔ (0008) | 8 ✅ |
 | Gegenstände verkaufen, Essen, Kiez-Lotto, Kiez-Brett, Kiez-News | ✔ | ✔ (0008/0009) | 8 ✅ |
+| Stadtteile erobern (Banden-Einfluss, Wochenbesitz, Revierkasse) | ✔ | ✔ (0015) | 9 ✅ |
+| Plunder-Basar zwischen Spielern | ✔ | ✔ (0015) | 9 ✅ |
+| Zockerbude: Hütchenspiel, Würfelduell | ✔ | ✔ (0015) | 9 ✅ |
+| Schließfach (Geld sicher vor Überfällen) | ✔ | ✔ (0015) | 9 ✅ |
+| Aufgabenkette „Kiez-Geschichte“, Kiez-Chat, Titel, Kampfprotokoll | ✔ | ✔ (0015) | 9 ✅ |
+| Menü mit 7 Bereichen, klickbarer Stadtplan | ✔ | ✔ | 9 ✅ |
 
 ## Etappen
 1. ✅ Bestandsaufnahme
