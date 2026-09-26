@@ -165,8 +165,8 @@ BILDER = [
 sys.path.insert(0, os.path.dirname(__file__))
 from bilder2 import BILDER2  # Runde 2: alte Sprite-Bilder
 BILDER += BILDER2
-from nachbessern import NEU  # Motive nach Einzelprüfung
-BILDER = [(n, a, NEU.get(n, m)) for n, a, m in BILDER]
+from nachbessern import NEU, ART  # Motive/Vorlage nach Einzelprüfung
+BILDER = [(n, ART.get(n, a), NEU.get(n, m)) for n, a, m in BILDER]
 
 CFG = 4.5  # Motivtreue; nachbessern.py nutzt 6
 GEN = {"o": (1024, 1024), "q": (1024, 1024), "s": (1216, 760), "h": (1536, 672)}
