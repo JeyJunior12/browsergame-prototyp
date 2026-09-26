@@ -1004,6 +1004,61 @@ html body:not(#kz1):not(#kz2) .kf-chat li { padding: 6px 0; border-bottom: 1px s
 }`;
 document.head.appendChild(style6);
 
+
+// ---------- Meldungen direkt beim gedrückten Knopf (wie bei Pennergame, nicht irgendwo unten auf der Seite) ----------
+// Merkt sich den zuletzt gedrückten Knopf. Erscheint danach eine Meldung weit weg davon, wird sie in die Karte des Knopfs
+// gespiegelt und das Original ausgeblendet. Wird die Karte neu gezeichnet, findet sie sich über Seite + Kartentitel wieder.
+const NEAR_CARD = '.card, .kf-box, .activity-card, .drink, .lead-card, .action-block, .status-detail, .profile-wide-row, li';
+let lastHit = null;
+document.addEventListener('click', e => {
+  const b = e.target.closest('button, .crime-pick, [role="button"]');
+  // Unsichtbare Knöpfe werden von alten Skripten intern angeklickt – die zählen nicht
+  if (!b || !b.offsetParent || b.classList.contains('hide') || b.closest('.kz-nav, .kz-drop, .kz-map, .section-tools, .kiez-quickbar, nav')) return;
+  const card = b.closest(NEAR_CARD);
+  lastHit = { btn: b, card, t: Date.now(), panel: b.closest('section.panel')?.id,
+    title: (card?.querySelector('h3, b, h4')?.textContent || '').trim(), label: b.textContent.trim() };
+}, true);
+function nearCard() {
+  if (!lastHit || Date.now() - lastHit.t > 9000) return null;
+  if (lastHit.card?.isConnected) return lastHit.card;
+  if (!lastHit.title || !lastHit.panel) return null;
+  // Karte wurde neu gezeichnet: gleiche Seite, gleicher Titel
+  return [...document.querySelectorAll('#' + lastHit.panel + ' ' + NEAR_CARD.split(', ').join(', #' + lastHit.panel + ' '))]
+    .find(c => c.offsetParent && (c.querySelector('h3, b, h4')?.textContent || '').trim() === lastHit.title) || null;
+}
+function placeNotice(n) {
+  if (!n.isConnected || n.closest('.kz-near') || n.classList.contains('kz-moved') || !n.offsetParent) return;
+  if (n.closest('#kiezmodal, .kf-modal, #loginmodal, #signupmodal, #auth')) return;
+  const card = nearCard(); if (!card || card.contains(n)) return;
+  const btn = lastHit.btn?.isConnected ? lastHit.btn : null;
+  // Schon nah genug am Knopf (gleicher Bildschirmbereich)? Dann bleibt sie, wo sie ist
+  const a = (btn || card).getBoundingClientRect(), r = n.getBoundingClientRect();
+  if (Math.abs(r.top - a.bottom) < 140) return;
+  let slot = card.querySelector(':scope > .kz-near');
+  if (!slot) { slot = document.createElement('div'); slot.className = 'kz-near'; card.appendChild(slot); }
+  slot.innerHTML = '';
+  const c = n.cloneNode(true); c.removeAttribute('id'); slot.appendChild(c);
+  n.classList.add('kz-moved');
+  const box = slot.getBoundingClientRect();
+  if (box.bottom > innerHeight || box.top < 0) slot.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+}
+new MutationObserver(ms => {
+  if (!lastHit || Date.now() - lastHit.t > 9000) return;
+  const found = new Set();
+  ms.forEach(m => {
+    const tgt = m.target.nodeType === 1 ? m.target : m.target.parentElement;
+    const own = tgt?.closest?.('.notice'); if (own) found.add(own);
+    m.addedNodes.forEach(x => { if (x.nodeType !== 1) return; if (x.matches('.notice')) found.add(x); x.querySelectorAll?.('.notice').forEach(y => found.add(y)); });
+  });
+  if (found.size) requestAnimationFrame(() => found.forEach(placeNotice));
+}).observe(document.body, { childList: true, subtree: true, characterData: true });
+const style7 = document.createElement('style');
+style7.textContent = `html body:not(#kz1):not(#kz2) .notice.kz-moved { display: none !important; }
+html body:not(#kz1):not(#kz2) .kz-near { clear: both; margin-top: 10px; }
+html body:not(#kz1):not(#kz2) .kz-near .notice { margin: 0; animation: kzpop .25s ease-out; }
+@keyframes kzpop { from { transform: translateY(-4px); opacity: 0; } to { transform: none; opacity: 1; } }`;
+document.head.appendChild(style7);
+
 // Zuletzt geöffnete neue Seite wiederherstellen
 try { const last = localStorage.getItem('kiez_last_view'); if (loaders[last]) setTimeout(() => show(last), 1500); } catch (e) { }
 if (window.kiezProfile) window.kiezOnProfile(window.kiezProfile);
