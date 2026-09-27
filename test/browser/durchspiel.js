@@ -96,6 +96,25 @@ const eurOf = (s) => { const m = String(s).match(/(\d[\d.]*,\d\d) ?€/); return
 // Preisauswahl: teuerster bezahlbarer Knopf bis Anteil des Geldes
 const priceFn = (money, share) => `e=>{const m=e.textContent.match(/(\\d[\\d.]*,\\d\\d) ?€/);if(!m)return null;const p=+m[1].replace(/\\./g,'').replace(',','.');return p<=${money * share}?p:null}`;
 
+// Sparen: 60-Min.-Touren (Zeit per Zeitsprung), ausladen + verkaufen, bis Tasche + Schließfach den Preis decken (höchstens 3 Spieltage)
+async function earnFor(price, what) {
+  let p = await prof(); const start = p.money + p.bank; let tours = 0, mins = 0;
+  while (p.money + p.bank < price && mins < 72 * 60) {
+    await go('pfand', 'Pfand sammeln'); await pg.selectOption('#durationselect', '60').catch(() => {});
+    await click('Spar-Tour', '#collect', { quiet: true });
+    await rpc('tester_skip_time', { minutes: 61 }); mins += 61; await refresh();
+    await go('pfand', 'Pfand sammeln'); await click('Spar-Ausladen', '.kz-quick', { quiet: true });
+    if (tours % 6 === 5) { await go('income', 'Instrumente'); await click('Spar-Hut', '#musiccollect', { quiet: true }); }
+    tours++; p = await prof();
+  }
+  const ok = p.money + p.bank >= price;
+  log({ v: visit, typ: 'SPAREN', label: what, level: p.level, preis: price, touren: tours, std: +(mins / 60).toFixed(1), geschafft: ok, geldbehaelter: p.cap,
+    msg: `${what}: ${price} € bei Level ${p.level} – ${tours} Touren à 60 Min. = ${(mins / 60).toFixed(1)} Std. Spielzeit (Start ${start.toFixed(2)} €)` + (ok ? '' : ' – NICHT geschafft') + (price > p.cap ? ' – Preis größer als Geldbehälter!' : '') });
+}
+async function withdraw(need) {
+  const p = await prof(); if (p.money >= need || p.bank <= 0) return;
+  await go('schliessfach'); await click('Abheben', '.bwd', { fill: [['section.panel.active-view .bout', Math.ceil(Math.min(p.bank, p.cap - p.money, need - p.money + 1))]] });
+}
 // ---------- ein Besuch ----------
 async function besuch() {
   let p = await prof();
@@ -147,6 +166,10 @@ async function besuch() {
   await go('training', 'Fähigkeiten'); p = await prof();
   const prio = ['streetwise', 'attack', 'defense', 'social', 'stamina', 'speech', 'music', 'pickpocket'];
   const order = prio.slice().sort((a, b) => ((visit + prio.indexOf(a)) % 4) - ((visit + prio.indexOf(b)) % 4));
+  // Reicht das Geld nicht für die gewünschte Weiterbildung: Pfand sammeln, bis es reicht – und messen, wie lange das dauert
+  const busy = await pg.evaluate(() => { const t = window.kiezProfile?.training_ends_at; return !!t && new Date(t) > new Date(); });
+  const pr = await pg.evaluate(s => { const b = document.querySelector(`.trainbtn[data-skill="${s}"]`); const m = b && b.textContent.match(/(\d[\d.]*,\d\d) ?€/); return m ? +m[1].replace(/\./g, '').replace(',', '.') : null; }, order[0]);
+  if (!busy && pr != null && (await prof()).money < pr) { await earnFor(pr, 'Weiterbildung ' + order[0]); await withdraw(pr); await go('training', 'Fähigkeiten'); }
   for (const s of order) if (/gestartet/i.test(await click('Weiterbildung ' + s, `.trainbtn[data-skill="${s}"]`, { quiet: true }) || '')) break;
   await go('training', 'Lernwarteschlange');
   let q = 0; for (const s of order) { if (q >= 2) break; await pg.selectOption('section.panel.active-view .kz-q-skill', { index: prio.indexOf(s) }).catch(() => {}); const m = await click('Einplanen ' + s, '.kz-q-add', { quiet: true }); if (m == null || /voll|maximal/i.test(m)) break; if (/eingeplant/i.test(m)) q++; }
