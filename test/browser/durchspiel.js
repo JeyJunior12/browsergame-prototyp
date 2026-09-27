@@ -33,8 +33,27 @@ async function go(view, tab) {
   await pg.waitForTimeout(700);
   await pg.waitForFunction(v => !/Lade[^\n]{0,20}…/.test(document.getElementById(v)?.innerText || ''), view, { timeout: 12000 }).catch(() => log({ v: visit, typ: 'LÄDT-EWIG', wo: view + '/' + (tab || '') }));
   await pg.waitForTimeout(400); await popups(view);
+  await look(view, tab);
   const leer = await pg.evaluate(v => { const s = document.getElementById(v); return !s || s.innerText.trim().length < 40; }, view);
   if (leer) log({ v: visit, typ: 'LEER', wo: view + '/' + (tab || '') });
+}
+// Aussehen jeder Seite: kleine/enge Knöpfe, winzige Schrift, Überlappungen, Querscrollen; alle 25 Besuche Bildschirmfoto zum Selbst-Anschauen
+const shot = new Set();
+async function look(view, tab) {
+  const key = view + '_' + (tab || '').replace(/\W+/g, '');
+  const r = await pg.evaluate(() => { const s = document.querySelector('section.panel.active-view'); if (!s) return []; const out = [];
+    const vis = [...s.querySelectorAll('button,a,select,input')].filter(e => e.offsetParent && e.getBoundingClientRect().width > 0);
+    vis.forEach(e => { const b = e.getBoundingClientRect(), fs = parseFloat(getComputedStyle(e).fontSize);
+      if (e.tagName !== 'A' && b.height < 36) out.push('Knopf zu klein (' + Math.round(b.height) + ' px): ' + (e.textContent || e.placeholder || '').trim().slice(0, 30));
+      if (fs < 13) out.push('Schrift zu klein (' + fs + ' px): ' + (e.textContent || '').trim().slice(0, 30)); });
+    for (let i = 0; i < vis.length; i++) for (let j = i + 1; j < vis.length; j++) { const a = vis[i].getBoundingClientRect(), b = vis[j].getBoundingClientRect();
+      if (!vis[i].contains(vis[j]) && !vis[j].contains(vis[i]) && a.left < b.right - 2 && b.left < a.right - 2 && a.top < b.bottom - 2 && b.top < a.bottom - 2) out.push('Knöpfe überlappen: ' + vis[i].textContent.trim().slice(0, 20) + ' / ' + vis[j].textContent.trim().slice(0, 20)); }
+    [...s.querySelectorAll('p,span,small,b,div,li,td')].filter(e => e.offsetParent && e.childElementCount === 0 && e.textContent.trim().length > 2).forEach(e => { const fs = parseFloat(getComputedStyle(e).fontSize); if (fs < 12) out.push('Text zu klein (' + fs + ' px): ' + e.textContent.trim().slice(0, 30)); });
+    if (document.documentElement.scrollWidth > innerWidth + 2) out.push('Seite scrollt quer');
+    return [...new Set(out)].slice(0, 12); });
+  r.forEach(m => log({ v: visit, typ: 'AUSSEHEN', wo: key, msg: m }));
+  const w = Math.floor(visit / 25); if (!shot.has(w + key)) { shot.add(w + key); fs.mkdirSync(OUT + '/bilder', { recursive: true });
+    await pg.evaluate(() => scrollTo(0, 0)); await pg.screenshot({ path: OUT + '/bilder/' + visit + '_' + key + '.jpg', fullPage: true, quality: 55, type: 'jpeg' }).catch(() => {}); }
 }
 // sichtbare Meldungstexte (für vorher/nachher-Vergleich)
 const MSEL = '.notice,.kz-near,[class*="msg"],.schnorr-result,.kz-toast';
@@ -42,7 +61,7 @@ const mark = () => pg.evaluate(S => document.querySelectorAll(S).forEach(n => n.
 const fresh = () => pg.evaluate(S => [...document.querySelectorAll(S)].filter(n => n.offsetParent && n.innerText.trim() && n.dataset.kzseen !== n.innerText.replace(/\s+/g, ' ').trim() && !n.querySelector('.notice,[class*="msg"]')).map(n => n.innerText.replace(/\s+/g, ' ').trim()), MSEL);
 // Knopf klicken wie ein Spieler, neue Meldung abwarten und protokollieren. pick: 'first' | 'last' | Funktion als String (el => Zahl, höchste gewinnt)
 async function click(label, sel, { within, pick = 'first', fill, wait = 5000, quiet } = {}) {
-  await mark(); const t0 = Date.now(); const y0 = await pg.evaluate(() => scrollY);
+  await mark(); const t0 = Date.now(); let y0 = 0;
   if (fill) for (const [s, v] of fill) await pg.fill(s, String(v)).catch(() => {});
   const r = await pg.evaluate(([sel, within, pick, D]) => {
     let els = [...document.querySelectorAll('section.panel.active-view ' + sel + ', #kiezmodalbody ' + sel)].filter(e => e.offsetParent && !e.disabled && !e.classList.contains('hide'));
@@ -51,9 +70,10 @@ async function click(label, sel, { within, pick = 'first', fill, wait = 5000, qu
     if (!els.length) return null;
     let el = els[0]; if (pick === 'last') el = els[els.length - 1];
     else if (pick !== 'first') { const f = eval(pick); el = els.map(e => [f(e), e]).filter(x => x[0] != null && !isNaN(x[0])).sort((a, b) => b[0] - a[0])[0]?.[1]; if (!el) return null; }
-    el.scrollIntoView({ block: 'center' }); const txt = el.textContent.replace(/\s+/g, ' ').trim(); el.click(); return txt;
+    el.scrollIntoView({ block: 'center' }); const txt = el.textContent.replace(/\s+/g, ' ').trim(); const y = scrollY; el.click(); return [txt, y];
   }, [sel, within || null, pick, DANGER.source]);
   if (r == null) { if (!quiet) log({ v: visit, typ: 'KEIN-KNOPF', label }); return null; }
+  y0 = r[1]; const knopf = r[0];
   let neu = [];
   while (Date.now() - t0 < wait) { await pg.waitForTimeout(250); neu = await fresh(); if (neu.length) { await pg.waitForTimeout(300); neu = [...new Set(await fresh())]; break; } }
   // Aussehen: verdrängt die Meldung den Karteninhalt? springt die Seite?
@@ -64,7 +84,7 @@ async function click(label, sel, { within, pick = 'first', fill, wait = 5000, qu
   await popups(label);
   const msg = neu.join(' | ').slice(0, 300);
   const typ = !msg ? 'KEINE-RÜCKMELDUNG' : SUSPECT.test(msg) ? 'VERDÄCHTIG' : 'OK';
-  log({ v: visit, typ, label, knopf: r.slice(0, 50), msg, ms: Date.now() - t0 });
+  log({ v: visit, typ, label, knopf: knopf.slice(0, 50), msg, ms: Date.now() - t0 });
   return msg || '';
 }
 const eurOf = (s) => { const m = String(s).match(/(\d[\d.]*,\d\d) ?€/); return m ? +m[1].replace(/\./g, '').replace(',', '.') : null; };
@@ -132,7 +152,9 @@ async function besuch(skip) {
   if (p.bank > 1 && p.money < p.cap - 1) { await go('schliessfach'); await click('Abheben', '.bwd', { fill: [['section.panel.active-view .bout', Math.floor(Math.min(p.bank, p.cap - p.money))]] }); p = await prof(); }
   await go('store', 'Zubehör'); await click('Geldbehälter ausbauen', '.buycontainertier', { quiet: true }); p = await prof();
   for (const tab of ['Waffen', 'Kleidung', 'Zubehör']) { await go('store', tab); await click('Kaufen ' + tab, '.buyitem', { pick: priceFn(p.money, 0.6), quiet: true }); p = await prof(); }
-  await go('ausruestung', 'Übersicht'); for (let i = 0; i < 3; i++) if (await click('Anlegen', 'button', { within: '', pick: `e=>/^anlegen/i.test(e.textContent.trim())?1:null`, quiet: true }) == null) break;
+  for (const t of ['Waffen', 'Kleidung & Schutz', 'Zubehör']) { await go('ausruestung', t);
+    // stärkstes Stück anlegen (ATT + DEF aus der Karte)
+    await click('Anlegen ' + t, 'button', { pick: `e=>{if(!/^anlegen/i.test(e.textContent.trim()))return null;const t=e.closest('.card').innerText;const a=t.match(/(?:ATT|Angriff)\\s*\\+?(\\d+)/i),d=t.match(/(?:DEF|Verteidigung)\\s*\\+?(\\d+)/i);const v=x=>{const t=x.closest('.card').innerText;const a=t.match(/(?:ATT|Angriff)\\s*\\+?(\\d+)/i),d=t.match(/(?:DEF|Verteidigung)\\s*\\+?(\\d+)/i);return (a?+a[1]:0)+(d?+d[1]:0)};const cur=Math.max(0,...[...document.querySelectorAll('section.panel.active-view button')].filter(b=>/^ablegen/i.test(b.textContent.trim())).map(v));return v(e)>cur?v(e):null}`, quiet: true }); }
   await go('income', 'Sammelgebiete'); await click('Sammelgebiet', '.area-unlock', { pick: priceFn(p.money, 0.8), quiet: true });
   await go('income', 'Instrumente'); await click('Instrument', '.buyinstrument', { pick: priceFn(p.money, 0.3), quiet: true }); await click('Hut ausleeren', '#musiccollect', { quiet: true });
   p = await prof(); await go('pets', 'Tierhandlung'); await click('Begleiter kaufen', '.buypet', { pick: priceFn(p.money, 0.5), quiet: true });
