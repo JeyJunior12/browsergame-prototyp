@@ -54,6 +54,10 @@ async function look(view, tab) {
     // Stadt-Leiste/Reiter unter dem Spielerkasten (Nutzer: „Musikladen“ halb verdeckt)
     const slip = document.querySelector('.player-slip'); if (slip && slip.offsetParent) { const r = slip.getBoundingClientRect();
       document.querySelectorAll('.kiez-quickbar button, section.panel.active-view > .section-tools span').forEach(b => { const q = b.getBoundingClientRect(); if (b.offsetParent && q.right > r.left + 2 && q.left < r.right - 2 && q.bottom > r.top + 2 && q.top < r.bottom - 2) out.push('Unter dem Spielerkasten: ' + b.textContent.trim()); }); }
+    // Knopf liegt über Text in derselben Karte (Nutzer: „Mitnehmen“ über „Benötigt Level 9“)
+    s.querySelectorAll('.card').forEach(c => { if (!c.offsetParent) return; const leaves = [...c.querySelectorAll('em,small,p,span,b,i,div')].filter(e => e.offsetParent && e.childElementCount === 0 && e.textContent.trim().length > 2);
+      c.querySelectorAll('button').forEach(bt => { if (!bt.offsetParent) return; const q = bt.getBoundingClientRect();
+        leaves.forEach(e => { if (bt.contains(e) || e.contains(bt)) return; const r = e.getBoundingClientRect(); if (q.left < r.right - 3 && r.left < q.right - 3 && q.top < r.bottom - 3 && r.top < q.bottom - 3) out.push('Knopf über Text: „' + bt.textContent.trim().slice(0, 20) + '“ über „' + e.textContent.trim().slice(0, 30) + '“ (' + (c.querySelector('b,h3')?.textContent || '').trim().slice(0, 20) + ')'); }); }); });
     // leere Kästen (nur Überschrift, kein Inhalt) – Nutzer: Übersicht › Haustier
     s.querySelectorAll('.card, .kf-box, .lead-card, .profile-wide-row').forEach(c => { if (c.offsetParent && c.getBoundingClientRect().height > 30 && c.innerText.trim().length < 25 && !c.querySelector('img,button,input,select,.generated-item-thumb')) out.push('Leerer Kasten: ' + (c.innerText.trim() || '(ohne Text)')); });
     return [...new Set(out)].slice(0, 12); });
