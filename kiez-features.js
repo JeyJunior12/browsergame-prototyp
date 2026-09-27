@@ -3425,7 +3425,7 @@ document.addEventListener('click', e => {
 
 // Zu teuer? Knopf ausgrauen und beim Klick sofort sagen, was fehlt (Durchspiel-Test 166: erst der Server meldete „reicht nicht“)
 {
-  const SEL = '.trainbtn, .trainpet, .buycontainertier, .buyitem, .buypet, .buyinstrument, .kz-wh-buy, .kz-wh-go, .kz-veh-buy, .area-unlock, .craft-go, .kz-k-up, .buydefense';
+  const SEL = '.trainbtn, .trainpet, .buycontainertier, .buyitem, .buypet, .buyinstrument, .kz-wh-buy, .kz-wh-go, .kz-veh-buy, .area-unlock, .craft-go, .kz-k-up, .buydefense, #buyscratch, .lbuy';
   const priceOf = b => { const m = (b.textContent || '').match(/(\d[\d.]*,\d\d) ?€/); return m ? +m[1].replace(/\./g, '').replace(',', '.') : null; };
   const mark = () => { const money = +(window.kiezProfile?.money ?? 0);
     document.querySelectorAll(SEL).forEach(b => { const pr = priceOf(b), poor = pr != null && !b.disabled && pr > money + 0.001;
@@ -3435,7 +3435,8 @@ document.addEventListener('click', e => {
     e.preventDefault(); e.stopImmediatePropagation();
     const bank = +(window.kiezProfile?.bank_balance || 0), miss = +b.dataset.kzmiss;
     const card = b.closest(NEAR_CARD.replace(', li', '')) || b.parentElement;
-    putNotice(card, '<div class="notice bad">Dir fehlen ' + eur(miss) + '. ' + (bank >= miss ? 'Im Schließfach liegen ' + eur(bank) + ' – erst abheben.' : 'Geh Pfand sammeln oder such dir einen Nebenjob.') + '</div>');
+    const html = '<div class="notice bad">Dir fehlen ' + eur(miss) + '. ' + (bank >= miss ? 'Im Schließfach liegen ' + eur(bank) + ' – erst abheben.' : 'Geh Pfand sammeln oder such dir einen Nebenjob.') + '</div>';
+    putNotice(card, html); shown = { key: keyOf(card), html, t: Date.now() };  // nach dem Neuzeichnen (z. B. Waschhaus) wieder einsetzen
   }, true);
   const st = document.createElement('style'); st.textContent = 'html body:not(#kz1):not(#kz2) .kz-poor{opacity:.55;filter:grayscale(.6);cursor:not-allowed}'; document.head.appendChild(st);
 }
