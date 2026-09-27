@@ -55,3 +55,66 @@ GitHub push ──▶ Action: Tests (Postgres) ──▶ Migration live in Supab
 6. ✅ Langzeitmotivation (0005)
 7. ✅ Go-Live: Rechte-Check (0006), Admin (0007), Mobile geprüft, live auf Vercel
 8. ✅ Runde 2: Klick-Tests aller Seiten/Knöpfe, leere Reiter repariert, Verbrechen repariert (0009), restliche Pennergame-Funktionen (0008/0009)
+
+## Ideen-Speicher (Stand 27.09.2026 – noch NICHT gebaut, Nutzer will alle)
+
+Ziel: Es gibt fast immer etwas zu tun – auch mit wenigen Spielern. Empfohlener Start: 1, 2, 3, 5.
+
+### Offener Fehler
+- Seite scrollt nach 10–15 s ohne Eingabe nach oben (trotz Fix in PR #27; Ursache noch nicht gefunden, Nutzer hat Suche vertagt). Vermutung: Neuzeichnen einer Seite macht sie kurz kürzer. Test-Skizze: alle Seiten 20 s warten, `scrollTo`/`scrollIntoView`/`focus` mitprotokollieren.
+
+### A. Immer etwas zu tun
+1. Computer-Gegner in jedem Level-Bereich + wöchentlicher Kiezboss (alle prügeln gemeinsam, Beute für alle)
+2. Täglich 3 wechselnde Aufgaben + Wochenaufgaben
+3. Ereignisse auf der Pfandtour mit Entscheidung (Hund, Polizei, voller Container …)
+4. Nebenjobs mit Laufzeit parallel zur Pfandtour
+5. Browser-Hinweis, wenn Tour/Weiterbildung/Energie fertig (Push, als App installierbar)
+
+### B. Langfristige Ziele
+6. Sammelalbum: Plunder-Sets mit Dauerbonus
+7. Kiez-Saison: kostenlose Belohnungsleiter über 4 Wochen
+8. Saison-Events (Advent, Silvester, Ostern, Halloween) mit eigenem Plunder
+9. Nach Level 150: Neustart mit Dauerbonus („Kiez-Legende“)
+
+### C. Aus Pennergame, fehlt noch
+10. Mehrere Städte als eigene Spielwelten
+11. Bandenhaus mit mehr Ausbauten + Bandenaufgaben (Wochenziele)
+12. Forum / Bandenforum mit Themen
+13. Waffen und Ausrüstung im Basar handeln
+14. Mehr Ranglisten (Tiere, Geld, Flaschen, Kampfquote)
+
+### D. Wirtschaft
+15. Pfand-Lager & Spekulation: Flaschen horten, bei hohem Kurs verkaufen (Lager ausbaubar, Flaschen können „verschwinden“)
+16. Auktionshaus für seltenen Plunder (Gebote, Laufzeit)
+17. Eigener Kiosk-Stand: passive Einnahmen, ausbaubar, kann überfallen werden
+18. Kredithai: Geld leihen mit Zinsen, bei Verzug kommen Schläger
+
+### E. Kämpfe
+19. Revanche: nach Niederlage einmal sofort zurückschlagen
+20. Kopfgeld auf Spieler aussetzen, wer ihn besiegt, kassiert
+21. Wöchentliches Kampfturnier (K.-o.-Baum, automatisch ausgetragen)
+22. Wetten auf Tierkämpfe und Bandenkriege
+
+### F. Charakter
+23. Kosmetik: Kleidung, Avatar-Rahmen, Titel-Farben
+24. Hunger/Durst: regelmäßig essen, sonst weniger Energie
+25. Sucht & Entzug beim Alkohol (Nachteil bei zu viel Promille über Tage)
+26. Ruf bei Kiez-Gruppen (Polizei, Unterwelt, Nachbarn) mit Freischaltungen
+
+### G. Sozial
+27. Mentor-System: Erfahrene nehmen Neulinge auf, beide bekommen Bonus
+28. Geschenke an Freunde (Plunder, Getränke, Kronkorken)
+29. Tägliches Glücksrad („Mülltonnen-Lotterie“, 1 Dreh am Tag)
+30. Freundes-Aktionen: zu zweit auf Pfandtour mit Bonus
+
+### H. Welt
+31. Tag und Nacht: nachts andere Aktionen, Chancen und Preise
+32. Live-Stadtereignisse: z. B. „Konzert im Stadtpark – 1 Std. doppelt Pfand dort“
+33. Razzien und Viertel-Ereignisse in den Stadtteilen
+34. Nebenquests von Kiez-Figuren (mehrteilig, neben der Kiez-Geschichte)
+
+### I. Komfort
+35. Einsteiger-Tutorial Schritt für Schritt
+36. Statistikseite mit Verlaufskurven (Punkte, Geld, Flaschen)
+37. Schnellaktionen: „Alles verkaufen & neue Tour starten“ mit einem Klick
+

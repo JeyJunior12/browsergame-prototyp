@@ -67,3 +67,4 @@ Testkonten wurden nach Runde 3 gelöscht (0014) – bei Bedarf neu anlegen. Neue
 - **Stadtplan** (`#citymap`): gezeichnete Karte mit 6 Stadtteilen (Besitzer farbig) und 17 Orten (`PLACES`: Name, Seite, Reiter, Foto, x, y in 1000×620). Handy: Karte wischbar + Liste „Alle Orte“.
 - Tests: `supabase/test/test_0015.sh`, `test/browser/runde6.js` (Klicks), `crawl.js` nutzt das neue Menü und die Kartenorte (177 Wege, LEER 0).
 - **Meldungen beim Knopf** (Nutzerwunsch: IMMER beim Fenster der Aktion): `kiez-features.js` merkt den zuletzt gedrückten sichtbaren Knopf; erscheint danach (≤ 9 s) eine `.notice` weiter weg, wird sie in dessen Karte gespiegelt (`.kz-near`), Original `.kz-moved` ausgeblendet. Neu gezeichnete Karten werden über Seite + Titel wiedergefunden. Test: `test/browser/meldungen.js` (Abstand < 200 px).
+- **Ideen-Speicher:** `ROADMAP.md` → „Ideen-Speicher“ (37 Ideen A–I + offener Scroll-Fehler). Nutzer will alle umgesetzt haben; vor dem Bauen dort abhaken.
