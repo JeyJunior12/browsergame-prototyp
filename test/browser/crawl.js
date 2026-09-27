@@ -17,7 +17,7 @@ const MAIL=process.argv[3]||process.env.KIEZ_MAIL;
    const clone=[...s.querySelectorAll(':scope > *')].filter(x=>!x.matches('h2,.section-tools,.profile-paper-tabs,.section-scene'));
    const txt=clone.map(x=>x.innerText||'').join(' ').replace(/\s+/g,' ').trim();
    const r=s.getBoundingClientRect();return {id:s.id,len:txt.length,txt:txt.slice(0,110),h:Math.round(r.height)}});
- const check=async label=>{await pg.waitForTimeout(1200);const t0=Date.now();await pg.waitForFunction(()=>{const s=document.querySelector('section.panel.active-view');return s&&!s.innerText.includes('Lade …')},null,{timeout:10000}).catch(()=>{});const wt=Date.now()-t0;if(wt>2500)report.push('LANGSAM '+label+' '+wt+' ms');const v=await visibleText();n++;
+ const check=async label=>{await pg.waitForTimeout(1200);const t0=Date.now();await pg.waitForFunction(()=>{const s=document.querySelector('section.panel.active-view');return s&&!s.innerText.includes('Lade …')&&!s.querySelector('.kz-skeleton')},null,{timeout:10000}).catch(()=>{});const wt=Date.now()-t0;if(wt>2500)report.push('LANGSAM '+label+' '+wt+' ms');const v=await visibleText();n++;
    const empty=v.len<60;report.push((empty?'LEER ':'ok   ')+label+' → #'+v.id+' ('+v.len+' Zeichen) '+(empty?'“'+v.txt+'”':''));
    if(empty)await pg.screenshot({path:require('os').tmpdir()+'/kiez-leer_'+n+'.png'});
    // Reiter innerhalb der Seite

@@ -75,4 +75,4 @@ Testkonten wurden nach Runde 3 gelöscht (0014) – bei Bedarf neu anlegen. Neue
 - Migrationen dürfen **ohne Rückfrage** eingespielt werden, sobald alle Tests grün sind (gilt für diese Runde).
 - Nach jeweils ~10 erledigten ROADMAP-Punkten: PR + Merge (live) + kurzer Schnelltest (crawl/Klicktests). Erledigte Punkte in der ROADMAP mit ✅ markieren.
 - Reihenfolge: Platz 1 Chat-Leiste → Meldungs-Fehler (69b/e/f/g) → R Waffen/Besitz → M/N Links + Seitenwechsel + Scroll-Fehler → L/U → V/T → S → O → Q → A/J → B–I → K → P → Schlussprüfung.
-
+- S3: Kopfleiste → `HEAD_LINKS` in kiez-features.js (`window.kiezJumpTo(view, tab, sel)` springt zur Karte + `.kz-flash`), Prüfskript `test/browser/kopfleiste.js`. Hintergrund pro Hauptbereich = Bild der NAV-Kategorie in `#kz-bg` (zwei Ebenen, Überblenden). `load()` scrollt nie (3. Parameter von `showView`). Energie-Karten „Abendblätter/Pfand sortieren/…“ liegen unsichtbar in der Übersicht → in S10 wieder einbauen.
