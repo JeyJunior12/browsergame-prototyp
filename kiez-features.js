@@ -831,6 +831,8 @@ loaders.kampfprotokoll = async () => {
 // ---------- Seite öffnen, optional mit Reiter ----------
 function go(view, tab) {
   window.kiezCloseNav?.();
+  // Menüklick auf die schon offene Seite: trotzdem nach oben (automatisches Neuladen scrollt nicht mehr)
+  if (document.getElementById(view)?.classList.contains('active-view')) window.scrollTo({ top: 0, behavior: 'smooth' });
   show(view);
   if (!tab) return;
   let n = 0;
