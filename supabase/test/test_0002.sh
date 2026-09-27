@@ -7,8 +7,8 @@ A=$(newuser 'Punkte_A'); B=$(newuser 'Punkte_B'); C=$(newuser 'Punkte_C')
 $P -tAc "update profiles set money=500, cash_capacity=100000 where id in ('$A','$B','$C')"
 
 # Punkte / Level
-ok  "Level aus Punkten" "$(as_user $A "update profiles set xp=760 where id=auth.uid() returning level")" "4"
-ok  "Level sinkt nie" "$(as_user $A "update profiles set xp=10 where id=auth.uid() returning level")" "4"
+ok  "Level aus Punkten (Kurve 0016: 15×(L−1)²)" "$(as_user $A "update profiles set xp=760 where id=auth.uid() returning level")" "8"
+ok  "Level sinkt nie" "$(as_user $A "update profiles set xp=10 where id=auth.uid() returning level")" "8"
 ok  "Level max 150" "$(as_user $A "update profiles set xp=999999 where id=auth.uid() returning level")" "150"
 $P -tAc "update profiles set xp=0, level=1 where id='$A'"
 as_user $A "select start_training('defense')" >/dev/null
@@ -27,9 +27,9 @@ has "Unbekannter Platz" "$(as_user $C "select beg_at_spot('mond')")" "gibt es ni
 ok  "Alte Bettelfunktion geht" "$(as_user $C "select (beg_for_money())->>'spot'")" "strasse"
 
 # Kampf: Levelbereich, Knast, Sperre, Versicherung
-$P -tAc "update profiles set xp=2250, energy=100, attack_skill=100 where id='$A'"   # Level 10 -> 8..15
-$P -tAc "update profiles set xp=250 where id='$B'"                                   # Level 2
-$P -tAc "update profiles set xp=3000, money=1000, insurance_active=true where id='$C'" # Level 13
+$P -tAc "update profiles set xp=1215, energy=100, attack_skill=100 where id='$A'"   # Level 10 -> 8..15
+$P -tAc "update profiles set xp=15 where id='$B'"                                   # Level 2
+$P -tAc "update profiles set xp=2160, money=1000, insurance_active=true where id='$C'" # Level 13
 has "Zu schwacher Gegner" "$(as_user $A "select attack_player('$B')")" "Level 8 bis 15"
 $P -tAc "update profiles set jail_until=now()+interval '1 hour' where id='$C'"
 has "Kein Angriff auf Knacki" "$(as_user $A "select attack_player('$C')")" "im Knast"
