@@ -2942,9 +2942,9 @@ async function drawCosmetics() {
   const [{ data: all }, { data: mine }] = await Promise.all([sb.from('cosmetics').select('*').order('sort_order'), sb.from('user_cosmetics').select('cosmetic_id').eq('user_id', me)]);
   const have = new Set((mine || []).map(x => x.cosmetic_id)), p = window.kiezProfile || {};
   const box = document.createElement('div'); box.className = 'kf-box kz-cos';
-  box.innerHTML = '<h3>Rahmen & Titelfarbe</h3><p class="kf-muted">Für Kronkorken: ein Rahmen ums Profilbild und eine Farbe für deinen Titel – sehen alle in deinem Profil.</p><div class="kf-grid">'
+  box.innerHTML = '<h3>Rahmen & Titelfarbe</h3><p class="kf-muted">Ein Rahmen ums Profilbild und eine Farbe für deinen Titel – sehen alle in deinem Profil. Die einfachen gibt es für Kronkorken, die Protz-Varianten für richtig viel Kohle (Tasche + Schließfach). Bringt nix außer Neid.</p><div class="kf-grid">'
     + (all || []).map(c => { const on = (c.kind === 'frame' ? p.avatar_frame : p.title_color) === c.id; return '<div class="card kz-cos-c" data-id="' + c.id + '" data-k="' + c.kind + '"><b style="color:' + esc(c.value) + '">' + esc(c.name) + '</b><div class="kz-cos-prev" style="' + (c.kind === 'frame' ? 'border:5px solid ' + esc(c.value) : 'color:' + esc(c.value)) + '">' + (c.kind === 'frame' ? '' : '„Titel“') + '</div>'
-      + '<div class="kf-row">' + (have.has(c.id) ? '<button class="ghost kz-cos-use">' + (on ? 'Ablegen' : 'Benutzen') + '</button>' : '<button class="ghost kz-cos-buy">Kaufen – ' + c.price_caps + ' Kronkorken</button>') + '</div><div class="kz-cos-msg"></div></div>'; }).join('') + '</div>';
+      + '<div class="kf-row">' + (have.has(c.id) ? '<button class="ghost kz-cos-use">' + (on ? 'Ablegen' : 'Benutzen') + '</button>' : '<button class="ghost kz-cos-buy">Kaufen – ' + (+c.price_money > 0 ? eur(c.price_money) : c.price_caps + ' Kronkorken') + '</button>') + '</div><div class="kz-cos-msg"></div></div>'; }).join('') + '</div>';
   body.appendChild(box);
   box.querySelectorAll('.kz-cos-c').forEach(c => {
     const b = c.querySelector('.kz-cos-buy'), u = c.querySelector('.kz-cos-use'), m = c.querySelector('.kz-cos-msg'), again = () => setTimeout(() => { box.remove(); drawCosmetics(); applyFrame(); }, 1500);
