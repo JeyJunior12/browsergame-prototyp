@@ -6,7 +6,7 @@ const fs=require('fs');const lib=require('./lib');
  let fails=0;
  const cases=[['training','Fähigkeiten','.trainbtn'],['training','Konzentrieren','.concentration-start'],['store','Zubehör','.buyitem'],['store','Waffen','.buyitem'],
   ['store','Verteidigung','.buydefense'],['pfand','','#sellallbtn, #sellbottlesbtn'],['pfand','Verbrechen begehen','.crime-pick'],['pets','','.buypet'],
-  ['apotheke','','#apobuyinsurance, #buyinsurance, .pharmacy-card button'],['begging','Körperpflege','.washbuy, .washuse'],['income','Instrumente','#buymusic'],
+  ['apotheke','','#apobuyinsurance, #buyinsurance, .pharmacy-card button'],['waschhaus','','.kz-wh-go, .kz-wh-buy'],['income','Instrumente','#buymusic'],
   ['gear','','.haeuser-move-btn'],['missions','Glücksspiel','#buyscratch'],['kronkorken','','.kkbuy'],['schliessfach','','.bdep'],['zockerbude','','.dnew']];
  for(const [v,tab,sel] of cases){
   await pg.evaluate(v=>window.kiezGo(v),v);await pg.waitForTimeout(1800);

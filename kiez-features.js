@@ -19,6 +19,9 @@ async function rpc(fn, args) {
 // Button-Klick mit Fehlermeldung; fn liefert Erfolgstext (HTML, bereits escaped)
 // Letzte Meldung merken: Seiten laden nach einer Aktion neu, die Meldung soll danach sichtbar bleiben
 let flash = null;
+// Pfandlager-Größe je Stufe (0038)
+const STORE_CAP = [250, 1000, 5000, 20000, 80000], STORE_PRICE = [15, 150, 1200, 8000];
+const fmtN = n => Number(n).toLocaleString('de-DE');
 function restoreFlash() {
   if (!flash || Date.now() - flash.t > 8000) return;
   const el = document.querySelector('section.panel.active-view .' + flash.cls.split(' ')[0]);
@@ -26,7 +29,7 @@ function restoreFlash() {
 }
 function act(btn, box, fn) {
   btn.onclick = async () => {
-    btn.disabled = true;
+    btn.disabled = true; flash = null;  // alte Meldung nicht nach dem Neuzeichnen wieder hervorholen (Nutzer: „Gekauft“ tauchte beim Einstellen auf)
     try { const t = await fn(); if (t) { say(box, t, true); if (box?.className) flash = { cls: box.className, text: t, good: true, t: Date.now() }; } }
     catch (e) { say(box, esc(e.message), false); }
     btn.disabled = false;
@@ -993,9 +996,9 @@ loaders.kampfprotokoll = async () => {
 function go(view, tab) {
   window.kiezCloseNav?.();
   // Menüklick auf die schon offene Seite: trotzdem nach oben (automatisches Neuladen scrollt nicht mehr)
-  if (document.getElementById(view)?.classList.contains('active-view')) window.scrollTo({ top: 0, behavior: 'smooth' });
+  window.scrollTo(0, 0);  // jede Seite beginnt oben (Nutzerwunsch)
   show(view);
-  if (!tab) return;
+  if (!tab) { setTimeout(() => { const f = document.querySelector('#' + view + ' > .section-tools span'); if (f && !f.classList.contains('subtab-active') && f.offsetParent) f.click(); }, 120); return; }
   let n = 0;
   const pick = () => {
     const s = [...document.querySelectorAll('#' + view + ' .section-tools span, #' + view + ' .section-tools button')].find(x => x.textContent.trim() === tab);
@@ -1008,12 +1011,12 @@ window.kiezGoTab = go;
 // ---------- Hauptmenü nach Pennergame-Aufbau: 7 Bereiche, Unterpunkte klappen auf ----------
 const NAV = [
   ['Mein Kiez', 'szene-uebersicht', [['Übersicht', 'overview'], ['Mein Profil', 'profil'], ['Ausrüstung', 'ausruestung'], ['Plunderkiste & Inventar', 'plunder'], ['Kronkorken', 'kronkorken'],
-    ['Begleiter', 'pets'], ['Unterkunft', 'gear'], ['Karriere', 'career'], ['Erfolge', 'achievements'], ['Kiez-Saison', 'saison'], ['Statistik', 'statistik'], ['Einstellungen', 'einstellungen']]],
+    ['Begleiter', 'pets', 'Meine Begleiter'], ['Unterkunft', 'gear'], ['Karriere', 'career'], ['Erfolge', 'achievements'], ['Kiez-Saison', 'saison'], ['Statistik', 'statistik'], ['Einstellungen', 'einstellungen']]],
   ['Aktionen', 'szene-pfand', [['Pfand sammeln', 'pfand', 'Pfand sammeln'], ['Verbrechen', 'pfand', 'Verbrechen'], ['Schnorren', 'begging'], ['Weiterbildung', 'training'],
     ['Kiez-Geschichte', 'geschichte'], ['Tagesauftrag', 'missions'], ['Nebenjobs', 'nebenjobs'], ['Kiez-Figuren', 'kiezfiguren']]],
   ['Stadt', 'szene-stadt', [['Stadtplan', 'citymap'], ['Stadtteile', 'stadtteile'], ['Kiezladen', 'store'], ['Apotheke', 'apotheke'], ['Schnorrplätze & Musik', 'income'],
-    ['Plunder-Basar', 'basar'], ['Zockerbude', 'zockerbude'], ['Glücksspiel & Lotto', 'missions', 'Glücksspiel'], ['Schließfach', 'schliessfach'], ['Auktionshaus', 'auktion'], ['Kiosk', 'kiosk'], ['Kredithai', 'kredithai'], ['Garage', 'garage']]],
-  ['Kampf', 'szene-pruegelei', [['Gegner suchen', 'pvp'], ['Kampfprotokoll', 'kampfprotokoll'], ['Begleiter trainieren', 'pets']]],
+    ['Waschhaus', 'waschhaus'], ['Plunder-Basar', 'basar'], ['Zockerbude', 'zockerbude'], ['Glücksspiel & Lotto', 'missions', 'Glücksspiel'], ['Schließfach', 'schliessfach'], ['Auktionshaus', 'auktion'], ['Kiosk', 'kiosk'], ['Kredithai', 'kredithai'], ['Garage', 'garage']]],
+  ['Kampf', 'szene-pruegelei', [['Gegner suchen', 'pvp'], ['Kampfprotokoll', 'kampfprotokoll'], ['Begleiter trainieren', 'pets', 'Meine Begleiter']]],
   ['Bande', 'szene-bande', [['Meine Bande', 'gangs'], ['Bandenhaus', 'bandenhaus'], ['Stadtteile erobern', 'stadtteile'], ['Banden-Highscore', 'wettbewerb']]],
   ['Kommunikation', 'szene-post', [['Kiezpost', 'messages'], ['Kiez-Chat', 'chat'], ['Kiez-Brett', 'brett'], ['Freunde', 'freunde']]],
   ['Highscore', 'szene-rangliste', [['Rangliste', 'leaderboard'], ['Wettbewerb & Events', 'wettbewerb'], ['Erfolge', 'achievements']]]
@@ -1070,7 +1073,7 @@ const PLACES = [
   ['Pfandannahme', 'pfand', '', 'szene-pfand', 90, 138], ['Schnorrplätze', 'income', 'Schnorrplätze', 'stadt-schnorrplaetze', 250, 188],
   ['Kiezladen', 'store', 'Zubehör', 'stadt-zubehoer', 400, 128], ['Waffenladen', 'store', 'Waffen', 'stadt-waffenladen', 610, 128], ['Volkshochschule', 'training', 'Fähigkeiten', 'szene-training', 505, 212],
   ['Schließfach', 'schliessfach', '', 'laden-geldversteck', 770, 132], ['Apotheke', 'apotheke', '', 'stadt-apotheke', 915, 200],
-  ['Tierhandlung', 'pets', '', 'stadt-tierhandlung', 90, 370], ['Hinterhof', 'pvp', '', 'szene-pruegelei', 240, 440], ['Waschhaus', 'begging', 'Körperpflege', 'stadt-waschhaus', 110, 540],
+  ['Tierhandlung', 'pets', 'Tierhandlung', 'stadt-tierhandlung', 90, 370], ['Hinterhof', 'pvp', '', 'szene-pruegelei', 240, 440], ['Waschhaus', 'waschhaus', '', 'stadt-waschhaus', 110, 540],
   ['Supermarkt', 'store', 'Verbrauchbares', 'stadt-supermarkt', 420, 370], ['Plunder-Basar', 'basar', '', 'lager-inventar', 580, 370], ['Musikladen', 'income', 'Instrumente', 'stadt-musikladen', 430, 530],
   ['Zockerbude', 'zockerbude', '', 'stadt-gluecksspiel', 570, 520],
   ['Eigenheime', 'gear', '', 'stadt-eigenheime', 720, 400], ['Bandenversteck', 'gangs', '', 'szene-bande', 890, 425], ['Lottobude', 'missions', 'Glücksspiel', 'rubbellose', 735, 535]
@@ -1574,6 +1577,8 @@ function lockAreas() {
     if (lock) { btn.disabled = true; btn.dataset.kzlock = '1'; setLabel(btn, '🔒 ab Sammelgebiet ' + need); if (!card.classList.contains('kz-locked')) card.classList.add('kz-locked'); }
     else if (card.classList.contains('kz-locked')) { btn.disabled = false; delete btn.dataset.kzlock; setLabel(btn, 'Hingehen'); card.classList.remove('kz-locked'); }
   });
+  // Aktuelles Instrument ist kein gesperrtes – nicht ausgrauen (Nutzer-Screenshot)
+  document.querySelectorAll('#income .instrument-card').forEach(c => { const cur = /Aktuelles Instrument/.test(c.textContent); if (c.classList.contains('kz-current') !== cur) c.classList.toggle('kz-current', cur); });
   // Andere Skripte schalten Knöpfe wieder frei – gesperrte bleiben trotzdem gesperrt
   document.querySelectorAll('[data-kzlock]').forEach(b => { if (!b.disabled) b.disabled = true; });
 }
@@ -1712,7 +1717,7 @@ const HEAD_LINKS = [
   ['.top-training-stat', 'training', 'Lernwarteschlange', '#training .kz-queue'],
   ['.price-stat', 'pfand', null, '.pfand-pricehistory-card'],
   ['#bottles', 'pfand', null, '#kz-pfandsell'],
-  ['.clean-stat', 'begging', 'Körperpflege', '#begging .wash-list, #begging .card'],
+  ['.clean-stat', 'waschhaus', null, '#waschhaus .kz-wh-state'],
   ['#energy', 'pfand', null, '#pfand .section-tools'],
   ['#level', 'training', 'Fähigkeiten', '#training .skill-grid'],
   ['.kronkorken-stat', 'kronkorken', null, '#kronkorken .kf-box, #kronkorken h2'],
@@ -1722,7 +1727,7 @@ function pfandSellCard() {
   const top = document.getElementById('pfanduebersicht');
   if (!top || document.getElementById('kz-pfandsell')) return;
   const c = document.createElement('div'); c.id = 'kz-pfandsell'; c.className = 'card kz-sell-card';
-  c.innerHTML = '<b>🍾 Flaschen verkaufen</b><p>Im Pfandlager: <b class="kz-ps-n">0</b> Flaschen · Kurs <b class="kz-ps-p">–</b> pro Flasche</p>' +
+  c.innerHTML = '<b>🍾 Flaschen verkaufen</b><p>Im Pfandlager: <b class="kz-ps-n">0</b> / <span class="kz-ps-cap">250</span> Flaschen · Kurs <b class="kz-ps-p">–</b> pro Flasche</p>' +
     '<div class="kf-row"><input type="number" class="kz-ps-qty" min="1" step="1" placeholder="Anzahl"><button class="ghost kz-ps-some">Verkaufen</button><button class="ghost kz-ps-all">Alle verkaufen</button></div><div class="kz-ps-msg"></div>';
   top.after(c);
   const sell = qty => async () => {
@@ -1741,6 +1746,7 @@ function pfandSellCard() {
 function syncPfandSell() {
   const c = document.getElementById('kz-pfandsell'); if (!c) return;
   c.querySelector('.kz-ps-n').textContent = document.getElementById('bottles')?.textContent || '0';
+  { const cap = STORE_CAP[window.kiezProfile?.bottle_storage || 0], cs = c.querySelector('.kz-ps-cap'); if (cs && cs.textContent !== fmtN(cap)) cs.textContent = fmtN(cap); }
   c.querySelector('.kz-ps-p').textContent = document.getElementById('topprice')?.textContent || '–';
 }
 setInterval(() => { pfandSellCard(); syncPfandSell(); }, 1500);
@@ -2265,10 +2271,10 @@ async function nextLoad() {
 }
 function nextDraw() {
   const d = NX.d; if (!d) { nextBar.hidden = true; return; }
-  nextBar.hidden = document.getElementById('game')?.classList.contains('hide');
-  // direkt unter „Dein Kiezbewohner“ (die Übersicht ist ein Raster – oben im Panel landete die Karte ganz unten)
-  const core = document.querySelector('#overview .classic-profile-core'), ov = document.getElementById('overview');
-  if (core) { if (core.nextElementSibling !== nextBar) core.after(nextBar); } else if (ov && ov.firstElementChild !== nextBar) ov.prepend(nextBar);
+  // Klein und unaufdringlich: Zeile „Als Nächstes“ im Spielerkasten oben, die Liste klappt nur auf Klick auf
+  if (!nextBar.isConnected) document.body.appendChild(nextBar);
+  nextSlip();
+  nextBar.hidden = !NX.open || document.getElementById('game')?.classList.contains('hide');
   const left = t => t ? new Date(t).getTime() + NX.off - Date.now() : 0;
   // Jede Zeile führt nur zur passenden Seite/Karte – ausgelöst wird dort (Nutzerwunsch: nichts automatisch tun)
   const item = (label, state, to, cls) => '<li class="kz-nx' + (cls ? ' ' + cls : '') + '"' + (to ? ' role="link" tabindex="0" data-go="' + to[0] + '"' + (to[1] ? ' data-tab="' + to[1] + '"' : '') + (to[2] ? ' data-sel="' + to[2] + '"' : '') : '') + '><small>' + label + '</small><b>' + state + '</b>' + (to ? '<span class="kz-nx-arrow" aria-hidden="true">›</span>' : '<span></span>') + '</li>';
@@ -2285,6 +2291,9 @@ function nextDraw() {
   const boss = left(d.boss_ready_at) > 0 ? item('Kiezboss', 'wieder in ' + mmss(left(d.boss_ready_at)), BO) : item('Kiezboss', 'bereit', BO, 'kz-ready');
   const tasks = Number(d.tasks_open) ? item('Tagesaufgaben', d.tasks_open + ' zum Abholen', TA, 'kz-ready') : '';
   const html = '<h3>Als Nächstes</h3><ul class="kz-nx-row">' + tour + train + bin + flash + sort + boss + streak + tasks + '</ul>';
+  const ready = (html.match(/kz-ready/g) || []).length;
+  if (NX.slipTxt) { const t = (ready ? ready + ' ' : '') + '›'; NX.slip.title = ready ? ready + ' Aktionen bereit' : 'Gerade nichts bereit'; if (NX.slipTxt.textContent !== t) NX.slipTxt.textContent = t; NX.slip.classList.toggle('kz-has-ready', ready > 0); }
+  if (!NX.open) return;
   if (html === NX.html) return;
   // Nur die Uhrzeiten geändert → Texte direkt tauschen (weckt keine DOM-Beobachter, kein Ruckeln)
   const shape = x => x.replace(/\d+:\d{2}/g, '#');
@@ -2295,10 +2304,22 @@ function nextDraw() {
   }
   NX.html = html;
   nextBar.innerHTML = html;
-  nextBar.querySelectorAll('.kz-nx[data-go]').forEach(li => { const open = () => li.dataset.sel ? window.kiezJumpTo(li.dataset.go, li.dataset.tab || null, li.dataset.sel) : go(li.dataset.go, li.dataset.tab);
+  nextBar.querySelectorAll('.kz-nx[data-go]').forEach(li => { const open = () => go(li.dataset.go, li.dataset.tab);  // nur zur Seite, ganz oben (Nutzerwunsch – nicht zur Karte runterspringen)
     li.onclick = open; li.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } }; });
 }
-setInterval(() => { if (!document.hidden && document.getElementById('overview')?.classList.contains('active-view')) nextDraw(); }, 1000);  // nur sichtbar sekündlich
+setInterval(() => { if (!document.hidden) nextDraw(); }, 1000);  // zählt „bereit“; die Liste selbst wird nur gezeichnet, wenn sie offen ist
+// Zeile im Spielerkasten + Aufklapp-Liste
+function nextSlip() {
+  const slip = document.querySelector('.player-slip'); if (!slip || slip.querySelector('.slip-next')) return;
+  const row = document.createElement('span'); row.className = 'slip-next'; row.setAttribute('role', 'button'); row.tabIndex = 0;
+  row.innerHTML = '<b>Als Nächstes</b><i>…</i>';
+  (slip.querySelector('.slip-messages') || slip.lastElementChild)?.after(row);
+  NX.slip = row; NX.slipTxt = row.querySelector('i');
+  const toggle = e => { e?.stopPropagation(); NX.open = !NX.open; NX.html = ''; if (NX.open) { const r = row.getBoundingClientRect(); nextBar.style.top = (r.bottom + window.scrollY + 6) + 'px'; nextBar.style.right = Math.max(8, document.documentElement.clientWidth - r.right) + 'px'; } nextDraw(); };
+  row.onclick = toggle; row.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(e); } };
+  document.addEventListener('click', e => { if (NX.open && !nextBar.contains(e.target) && !row.contains(e.target)) { NX.open = false; nextBar.hidden = true; } });
+  nextBar.addEventListener('click', e => { if (e.target.closest('.kz-nx[data-go]')) { NX.open = false; nextBar.hidden = true; } });
+}
 setInterval(() => { if (!document.hidden) nextLoad(); }, 30000);
 setTimeout(nextLoad, 2000);
 window.kiezNextLoad = nextLoad;
@@ -2421,8 +2442,13 @@ async function drawDaily() {
 
 const style18 = document.createElement('style');
 style18.textContent = `html body:not(#kz1):not(#kz2) #kz-next[hidden]{display:none !important}
-html body:not(#kz1):not(#kz2) .kz-nx-row{list-style:none;margin:6px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));column-gap:24px}
-html body:not(#kz1):not(#kz2) .kz-nx{display:grid;grid-template-columns:130px 1fr auto;align-items:center;gap:10px;min-height:48px;padding:4px 0;border-top:1px solid rgba(255,255,255,.07)}
+html body:not(#kz1):not(#kz2) #kz-next{position:absolute;z-index:2000;width:min(360px,calc(100vw - 16px));margin:0 !important;padding:10px 12px !important;background:linear-gradient(rgba(34,26,19,.98),rgba(28,21,15,.99)),var(--paper-tex,none) center/cover !important;border:1px solid var(--paper-edge,#8a7350) !important;border-radius:8px !important;box-shadow:0 14px 34px rgba(0,0,0,.7) !important}
+html body:not(#kz1):not(#kz2) #kz-next h3{font-size:16px !important;margin:0 0 4px !important}
+html body:not(#kz1):not(#kz2) .slip-next{display:flex !important;justify-content:space-between;align-items:center;gap:8px;cursor:pointer;padding:4px 3px;border-bottom:1px solid #a18e69;white-space:nowrap}
+html body:not(#kz1):not(#kz2) .slip-next b{font-size:12px !important;white-space:nowrap}html body:not(#kz1):not(#kz2) .slip-next i{font-style:normal;font-size:12px !important;color:#e0b25a !important;white-space:nowrap}
+html body:not(#kz1):not(#kz2) .slip-next.kz-has-ready i{font-weight:700}
+html body:not(#kz1):not(#kz2) .kz-nx-row{list-style:none;margin:4px 0 0;padding:0;display:grid;grid-template-columns:1fr}
+html body:not(#kz1):not(#kz2) .kz-nx{display:grid;grid-template-columns:110px 1fr auto;align-items:center;gap:8px;min-height:40px;padding:4px 0;border-top:1px solid rgba(255,255,255,.07)}
 html body:not(#kz1):not(#kz2) .kz-nx small{font-size:15px;font-weight:600;color:var(--text,#efe3c3);text-transform:none;letter-spacing:0}
 html body:not(#kz1):not(#kz2) .kz-nx b{font-size:15px;font-weight:400;color:var(--muted,#bdb19d)}
 html body:not(#kz1):not(#kz2) .kz-nx.kz-ready b{color:var(--brass,#d1a94f);font-weight:600}
@@ -2736,15 +2762,39 @@ async function basarItems() {
 }
 { const prevB = loaders.basar; loaders.basar = async () => { await prevB?.(); basarItems(); }; }
 
-// ---------- 15: Pfandlager ausbauen ----------
+// ---------- 15: Pfandlager – Größe je Stufe (0038), Ausbau auf der Unterkunft-Seite ----------
 setInterval(() => {
   const c = document.getElementById('kz-pfandsell'), p = window.kiezProfile; if (!c || !p) return;
   let s = c.querySelector('.kz-store-lv'); if (!s) { s = document.createElement('div'); s.className = 'kz-store-lv'; c.querySelector('.kz-ps-msg').before(s); }
-  const lv = p.bottle_storage || 0, key = lv + '';
+  const lv = p.bottle_storage || 0, full = Number(p.bottles) >= STORE_CAP[lv], key = lv + '|' + full;
   if (s.dataset.k === key) return; s.dataset.k = key;
-  s.innerHTML = '<p class="kf-muted">Lager Stufe ' + lv + '/4: liegengelassene Flaschen verschwinden mit ' + (10 - 2 * lv) + ' % pro Tag.</p>' + (lv < 4 ? '<div class="kf-row"><button class="ghost kz-store-up">Lager ausbauen – ' + eur([10, 40, 120, 300][lv]) + '</button></div>' : '');
-  const b = s.querySelector('.kz-store-up'); if (b) act(b, c.querySelector('.kz-ps-msg'), async () => { const r = await rpc('buy_bottle_storage'); window.kiezRenderProfile?.(r.profile); return 'Lager ausgebaut: nur noch ' + r.theft + ' % Klau pro Tag.'; });
+  s.innerHTML = (full ? '<p class="notice bad">Lager voll – neue Flaschen bleiben liegen. Verkaufen oder ausbauen!</p>' : '')
+    + (lv < 4 ? '<p class="kf-muted"><a href="#" class="kz-store-go">Pfandlager ausbauen ›</a></p>' : '');
+  s.querySelector('.kz-store-go')?.addEventListener('click', e => { e.preventDefault(); go('gear', 'Pfandlager'); });
 }, 2000);
+// Reiter „Pfandlager“ auf der Unterkunft-Seite
+{
+  const gear = document.getElementById('gear');
+  const drawStore = () => {
+    const p = window.kiezProfile; if (!gear || !p) return;
+    let box = gear.querySelector('.kz-storebox'); if (!box) { box = document.createElement('div'); box.className = 'kf-box kz-storebox'; (gear.querySelector(':scope > .haeuser-gallery') || gear.querySelector(':scope > .inside'))?.before(box); }
+    const lv = p.bottle_storage || 0;
+    box.innerHTML = '<h3>Pfandlager</h3><p>Hier bunkerst du deine Flaschen zwischen Tour und Verkauf. Ist es voll, bleiben neue Flaschen einfach liegen – und liegengelassenes Pfand verschwindet mit ' + (10 - 2 * lv) + ' % pro Tag (Nachbarn, Ratten, Kollegen).</p>'
+      + '<p>Belegt: <b>' + fmtN(p.bottles) + ' / ' + fmtN(STORE_CAP[lv]) + '</b> Flaschen · Stufe ' + lv + ' von 4</p>'
+      + '<div class="progress"><span style="width:' + Math.min(100, Math.round(p.bottles / STORE_CAP[lv] * 100)) + '%"></span></div>'
+      + '<table class="kf-table"><tr><th>Stufe</th><th>Platz</th><th>Klau pro Tag</th><th>Preis</th></tr>' + STORE_CAP.map((cap, i) => '<tr' + (i === lv ? ' class="kz-now"' : '') + '><td>' + (['Plastiktüte', 'Kellerabteil', 'Garage', 'Lagerhalle', 'Pfand-Imperium'])[i] + '</td><td>' + fmtN(cap) + '</td><td>' + (10 - 2 * i) + ' %</td><td>' + (i === 0 ? '–' : eur(STORE_PRICE[i - 1])) + '</td></tr>').join('') + '</table>'
+      + (lv < 4 ? '<div class="kf-row"><button class="big kz-store-up">Ausbauen auf ' + fmtN(STORE_CAP[lv + 1]) + ' Flaschen – ' + eur(STORE_PRICE[lv]) + '</button></div>' : '<p class="kf-muted">Voll ausgebaut.</p>') + '<div class="kz-store-msg"></div>';
+    const b = box.querySelector('.kz-store-up'); if (b) act(b, box.querySelector('.kz-store-msg'), async () => { const r = await rpc('buy_bottle_storage'); window.kiezRenderProfile?.(r.profile); setTimeout(drawStore, 1500); return 'Ausgebaut: jetzt Platz für ' + fmtN(r.cap) + ' Flaschen.'; });
+  };
+  const tabsG = () => { const t = gear?.querySelector(':scope > .section-tools'); if (!t) return;
+    if (![...t.children].some(x => x.textContent.trim() === 'Pfandlager')) { const sp = document.createElement('span'); sp.textContent = 'Pfandlager'; t.appendChild(sp); }
+    const tab = t.querySelector('.subtab-active')?.textContent.trim() || 'Unterkünfte'; gear.dataset.kztab = tab; if (tab === 'Pfandlager') drawStore(); };
+  gear?.addEventListener('click', e => { const sp = e.target.closest(':scope > .section-tools span'); if (!sp) return; e.stopPropagation(); gear.querySelectorAll(':scope > .section-tools span').forEach(x => x.classList.toggle('subtab-active', x === sp)); tabsG(); });
+  const st = document.createElement('style'); st.textContent = `html body:not(#kz1):not(#kz2) #gear[data-kztab="Pfandlager"] > .haeuser-gallery, html body:not(#kz1):not(#kz2) #gear[data-kztab="Pfandlager"] > .inside, html body:not(#kz1):not(#kz2) #gear[data-kztab="Pfandlager"] > #shopmsg{display:none !important}
+html body:not(#kz1):not(#kz2) #gear:not([data-kztab="Pfandlager"]) .kz-storebox{display:none !important}
+html body:not(#kz1):not(#kz2) .kz-storebox tr.kz-now td{color:var(--brass,#d1a94f);font-weight:700}`; document.head.appendChild(st);
+  tabsG(); const prevG3 = loaders.gear; loaders.gear = () => { prevG3?.(); setTimeout(tabsG, 250); };
+}
 
 // ---------- 19/20/21: Revanche, Kopfgeld, Turnier in der Prügelei ----------
 async function drawFightExtras() {
@@ -2820,7 +2870,8 @@ function drawWheel() {
     const r = await rpc('spin_wheel'); const d = box.querySelector('.kz-wheel-disc');
     d.style.transition = 'none'; d.style.transform = 'rotate(0deg)'; void d.offsetWidth;
     d.style.transition = 'transform 2.2s cubic-bezier(.2,.8,.2,1)'; d.style.transform = 'rotate(' + (1440 - r.slot * 45) + 'deg)';
-    await new Promise(x => setTimeout(x, 2300)); window.kiezRenderProfile?.(r.profile); return 'Gewonnen: ' + esc(r.label);
+    await new Promise(x => setTimeout(x, 2300)); window.kiezRenderProfile?.(r.profile); if (/Niete/i.test(r.label)) throw new Error('Pech gehabt: ' + r.label.replace(/^Niete\s*[–-]\s*/, '').replace(/\.$/, '') + '. Morgen wieder!');  // Niete = kein Gewinn (rot)
+    return 'Gewonnen: ' + esc(r.label);
   });
 }
 { const prevM = loaders.missions; loaders.missions = () => { prevM?.(); setTimeout(drawWheel, 300); }; }
@@ -3158,6 +3209,119 @@ async function craftLocks() {
     b.after(p); p.querySelector('a').onclick = e => { e.preventDefault(); go('income', 'Schnorrplätze'); }; };
   addHint(); const prevB2 = loaders.begging; loaders.begging = () => { prevB2?.(); setTimeout(addHint, 300); };
 }
+
+
+// Jede Seite und jeder Reiter beginnt oben: Klick auf Reiter/Menü/Stadt-Leiste → nach ganz oben.
+// Dazu Scroll-Verankerung aus (Chrome „hielt“ sonst ein Element fest und die Seite rutschte beim Wechsel).
+document.addEventListener('click', e => {
+  if (e.target.closest('.section-tools span, .section-tools button, .kz-drop button, .kiez-quickbar button, .side [data-view]')) requestAnimationFrame(() => window.scrollTo(0, 0));
+}, true);
+{ const st = document.createElement('style'); st.textContent = 'html,body{overflow-anchor:none !important}'; document.head.appendChild(st); }
+
+
+// ================= Waschhaus als eigene Seite (Nutzer: „Schnorren und Waschhaus ist die gleiche Seite“, „unübersichtlich“) =================
+const washBody = addPanel('waschhaus', 'Waschhaus', 'Waschhaus');
+const WASH = [
+  ['brunnen', 'Brunnen', 0, 15, 0, 'Kopf in den Stadtbrunnen, die Tauben gucken zu. Gratis – aber nur alle 30 Minuten, dann kommt der Hausmeister.'],
+  ['katzenwaesche', 'Katzenwäsche', 0.5, 35, 0, 'Achseln am Wasserhahn vom Friedhof. Schnell, billig, reicht fürs Erste.'],
+  ['schwamm', 'Schwamm & Seife', 1.5, 60, 1, 'Mit echter Seife und eigenem Schwamm. Fast schon Körperpflege.'],
+  ['schwimmbad', 'Schwimmbad', 2.5, 80, 0, 'Einmal durch die Hallenbad-Duschen, der Bademeister guckt böse. Danach riechst du nach Chlor statt nach Kiez.'],
+  ['waschanlage', 'Waschanlage', 3, 100, 2, 'Eimer, Schlauch und Wurzelbürste im Hinterhof. Danach bist du wie neu.'],
+  ['friseur', 'Friseur', 8, 100, 0, 'Waschen, schneiden, föhnen. 24 Stunden lang verdreckst du nur halb so schnell.']];
+const WASH_GEAR = [null, ['Schwamm', 6], ['Zugang zur Waschanlage', 25]];
+let washSeq = 0;
+loaders.waschhaus = async () => {
+  const t = ++washSeq; let b; try { b = await rpc('body_status'); } catch (e) { return; } if (t !== washSeq) return;
+  window.kiezRenderProfile?.(b.profile);
+  const p = b.profile, c = b.cleanliness, lvl = p.wash_level || 0, now = Date.now();
+  const until = d => new Date(d).toLocaleString('de-DE', { weekday: 'short', hour: '2-digit', minute: '2-digit' });
+  const fountainMin = b.fountain_ready_at ? Math.ceil((new Date(b.fountain_ready_at) - now) / 60000) : 0;
+  const card = ([id, name, price, gain, need, desc]) => {
+    let btn;
+    if (need > lvl) btn = need === lvl + 1 ? '<button class="ghost kz-wh-buy">' + WASH_GEAR[need][0] + ' kaufen – ' + eur(WASH_GEAR[need][1]) + '</button>' : '<button class="ghost" disabled>erst ' + WASH_GEAR[lvl + 1][0] + ' kaufen</button>';
+    else if (id === 'brunnen' && fountainMin > 0) btn = '<button class="ghost" disabled>wieder in ' + fountainMin + ' Min.</button>';
+    else if (id !== 'friseur' && c >= 100) btn = '<button class="ghost" disabled>Schon blitzsauber</button>';
+    else btn = '<button class="big kz-wh-go">' + (price ? 'Waschen – ' + eur(price) : 'Waschen – gratis') + '</button>';
+    return '<div class="card kz-wash" data-t="' + id + '"><b>' + name + '</b><p>' + desc + '</p><p class="kz-wash-fx">' + (gain >= 100 ? 'auf 100 %' : '+' + gain + ' %') + ' Sauberkeit' + (id === 'friseur' ? ' · 24 Std. halber Dreck' : '') + '</p>'
+      + '<div class="kf-row">' + btn + '</div><div class="kz-wash-msg"></div></div>';
+  };
+  washBody.innerHTML = '<div class="kf-box kz-wh-state"><h3>Dein Zustand: ' + TIER_DE[b.tier] + '</h3>'
+    + '<div class="kz-wh-big"><b>' + c + ' %</b><span>sauber</span></div><div class="progress kz-wh-bar"><span style="width:' + c + '%"></span></div>'
+    + '<p class="kf-muted">Sinkt um 1 % pro Stunde' + (b.barber_until ? ' – dank Friseur bis ' + until(b.barber_until) + ' nur halb so schnell' : '') + '. Kämpfe und Verbrechen kosten je 3 %, Pfandtouren je nach Dauer mehr.</p>'
+    + '<div class="kz-wh-mini"><span>Hunger <b>' + b.hunger + ' %</b></span><span>Sucht <b>' + b.addiction + ' %</b></span><span>Energie-Tempo <b>' + Math.round(b.energy_rate * 100) + ' %</b></span></div>'
+    + (b.sick_until ? '<p class="notice bad">Du bist krank bis ' + until(b.sick_until) + ' – <a href="#" class="kz-wh-apo">ab in die Apotheke</a>.</p>' : '')
+    + '<details class="kz-wh-why"><summary>Was bringt Sauberkeit?</summary><table class="kf-table">' + TIER_ROWS.map(r => '<tr class="' + (r[0] === b.tier ? 'kz-now' : '') + '"><td>' + TIER_DE[r[0]] + '</td><td>' + r[1] + '</td><td>' + r[2] + '</td></tr>').join('') + '</table></details></div>'
+    + '<div class="kf-grid kz-wh-grid">' + WASH.map(card).join('') + '</div>';
+  washBody.querySelectorAll('.kz-wash').forEach(cd => {
+    const m = cd.querySelector('.kz-wash-msg'), go2 = cd.querySelector('.kz-wh-go'), buy = cd.querySelector('.kz-wh-buy');
+    if (go2) act(go2, m, async () => { const r = await rpc('wash_up', { tier: cd.dataset.t }); window.kiezRenderProfile?.(r.profile); setTimeout(loaders.waschhaus, 1400); return r.label + ': jetzt ' + r.profile.cleanliness + ' % sauber' + (r.barber ? ', frisch frisiert' : '') + '.'; });
+    if (buy) act(buy, m, async () => { const r = await rpc('buy_progress', { progress_type: 'wash' }); window.kiezRenderProfile?.(r.profile); setTimeout(loaders.waschhaus, 1400); return esc(r.label) + ' gekauft.'; });
+  });
+  washBody.querySelector('.kz-wh-apo')?.addEventListener('click', e => { e.preventDefault(); go('apotheke'); });
+};
+// Schnorren zeigt nur noch das Schnorren (Körperpflege ist jetzt das Waschhaus)
+{
+  const fixBeg = () => { document.querySelectorAll('#begging > .section-tools span, #begging .scene-copy .section-tools span, #begging span').forEach(sp => { if (sp.textContent.trim() === 'Körperpflege' && sp.closest('.section-tools, .scene-copy')) sp.remove(); });
+    // ein einzelner Reiter „Schnorrplatz“ ohne Gegenstück ist sinnlos → ausblenden
+    document.querySelectorAll('#begging .section-tools').forEach(t => { if (t.querySelectorAll('span').length <= 1) t.style.setProperty('display', 'none', 'important'); }); };
+  fixBeg(); const prevBg = loaders.begging; loaders.begging = () => { prevBg?.(); setTimeout(fixBeg, 200); };
+}
+// Stadt-Leiste „Waschhaus“ → neue Seite
+document.addEventListener('click', e => { const b = e.target.closest('.kiez-quickbar button'); if (b && b.textContent.trim() === 'Waschhaus') { e.preventDefault(); e.stopImmediatePropagation(); go('waschhaus'); } }, true);
+{ const st = document.createElement('style'); st.textContent = `html body:not(#kz1):not(#kz2) .kz-wh-big{display:flex;align-items:baseline;gap:8px;margin:4px 0}
+html body:not(#kz1):not(#kz2) .kz-wh-big b{font:800 34px var(--font-head,serif);color:var(--brass,#d1a94f)}html body:not(#kz1):not(#kz2) .kz-wh-big span{font-size:15px;color:var(--muted,#bdb19d)}
+html body:not(#kz1):not(#kz2) .kz-wh-bar{height:12px !important}
+html body:not(#kz1):not(#kz2) .kz-wh-mini{display:flex;flex-wrap:wrap;gap:8px 18px;margin:8px 0;font-size:15px}
+html body:not(#kz1):not(#kz2) .kz-wh-why summary{cursor:pointer;color:var(--brass,#d1a94f);font-weight:600;margin-top:6px}
+html body:not(#kz1):not(#kz2) .kz-wh-why tr.kz-now td{color:var(--brass,#d1a94f);font-weight:700}
+html body:not(#kz1):not(#kz2) .kz-wh-grid{grid-template-columns:repeat(auto-fill,minmax(250px,1fr)) !important;margin-top:12px}
+html body:not(#kz1):not(#kz2) .kz-wash{display:flex;flex-direction:column}html body:not(#kz1):not(#kz2) .kz-wash .kf-row{margin-top:auto}
+html body:not(#kz1):not(#kz2) .kz-wash-fx{font-weight:700;color:var(--brass,#d1a94f)}`; document.head.appendChild(st); }
+
+
+// Begleiter: zwei klare Reiter – „Meine Begleiter“ (eigene Tiere, Training) und „Tierhandlung“ (Laden)
+{
+  const pets = document.getElementById('pets');
+  const ensure = () => {
+    if (!pets) return; let tools = pets.querySelector(':scope > .section-tools');
+    if (!tools || tools.dataset.kz !== '1') {
+      if (!tools) { tools = document.createElement('div'); tools.className = 'section-tools'; (pets.querySelector(':scope > .section-scene') || pets.querySelector(':scope > h2'))?.after(tools); }
+      tools.dataset.kz = '1'; tools.innerHTML = '<span class="subtab-active">Meine Begleiter</span><span>Tierhandlung</span>';
+      tools.addEventListener('click', e => { const sp = e.target.closest('span'); if (sp) { e.stopPropagation(); applyPets(sp.textContent); } });
+    }
+    // Liste der eigenen Tiere (mit Training) hat ein altes Übersicht-Skript in die Übersicht verschoben → zurückholen
+    const ins = pets.querySelector(':scope > .inside'), mine = document.getElementById('mypets');
+    if (ins && mine && !ins.contains(mine)) {
+      let h = ins.querySelector(':scope > .kz-mine-head'); if (!h) { h = document.createElement('h3'); h.className = 'kz-mine-head'; h.textContent = 'Deine Begleiter'; ins.prepend(h); }
+      h.after(mine); mine.style.removeProperty('display');
+    }
+    // Meldungsfeld der Tier-Knöpfe gehört direkt unter die Liste (lag sonst unsichtbar in der Übersicht)
+    const pm2 = document.getElementById('petmsg2'); if (pm2 && mine && mine.nextElementSibling !== pm2 && pets.contains(mine)) mine.after(pm2);
+    applyPets(tools.querySelector('.subtab-active')?.textContent || 'Meine Begleiter');
+  };
+  const applyPets = tab => {
+    pets.querySelectorAll(':scope > .section-tools span').forEach(x => x.classList.toggle('subtab-active', x.textContent === tab));
+    pets.dataset.kztab = tab;
+    // alte Reiter-Logik setzt „display:none !important“ direkt an die Elemente – wegräumen, die Sichtbarkeit regelt das Stylesheet
+    pets.querySelectorAll(':scope > .inside > #petshop, :scope > .inside > #petmsg, :scope > .inside > .section-lead, :scope > .inside > #mypets, :scope > .inside > .kz-mine-head, :scope > .inside > #petmsg2').forEach(c => { if (c.style.display) c.style.removeProperty('display'); });
+  };
+  if (pets) new MutationObserver(ms => { if (ms.some(m => m.target.style?.display === 'none')) applyPets(pets.dataset.kztab || 'Meine Begleiter'); })
+    .observe(pets, { subtree: true, attributes: true, attributeFilter: ['style'] });
+  const st = document.createElement('style');
+  st.textContent = `html body:not(#kz1):not(#kz2) #pets[data-kztab="Meine Begleiter"] #petshop{display:none !important}
+html body:not(#kz1):not(#kz2) #pets[data-kztab="Meine Begleiter"] .inside > .section-lead{display:block !important}
+html body:not(#kz1):not(#kz2) #pets[data-kztab="Tierhandlung"] .inside > .section-lead{display:none !important}
+html body:not(#kz1):not(#kz2) #pets[data-kztab="Tierhandlung"] #mypets, html body:not(#kz1):not(#kz2) #pets[data-kztab="Tierhandlung"] .kz-mine-head{display:none !important}
+html body:not(#kz1):not(#kz2) #pets[data-kztab="Meine Begleiter"] #mypets{display:grid !important}
+html body:not(#kz1):not(#kz2) #pets[data-kztab="Tierhandlung"] #petmsg2{display:none !important}
+html body:not(#kz1):not(#kz2) #pets[data-kztab="Tierhandlung"] #petshop{display:grid !important}`;
+  document.head.appendChild(st);
+  ensure(); const prevP2 = loaders.pets; loaders.pets = () => { prevP2?.(); setTimeout(ensure, 150); };
+}
+// Stadt-Leiste „Tierhandlung“ → Laden-Reiter
+document.addEventListener('click', e => { const b = e.target.closest('.kiez-quickbar button'); if (b && b.textContent.trim() === 'Tierhandlung') { e.preventDefault(); e.stopImmediatePropagation(); go('pets', 'Tierhandlung'); } }, true);
+// Schnorren: Körperpflege-Teile (jetzt im Waschhaus) hier nie mehr zeigen
+{ const st = document.createElement('style'); st.textContent = 'html body:not(#kz1):not(#kz2) #begging .wash-list, html body:not(#kz1):not(#kz2) #begging .action-block:has(#wash){display:none !important}'; document.head.appendChild(st); }
 
 // Zuletzt geöffnete neue Seite wiederherstellen
 try { const last = localStorage.getItem('kiez_last_view'); if (loaders[last]) setTimeout(() => show(last), 1500); } catch (e) { }

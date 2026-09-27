@@ -292,8 +292,11 @@ html body:not(#kz1):not(#kz2) #auth .auth-features .road .kz-pic { display: bloc
 
 /* Reiter: Spalte ohne eigenen Hintergrund, die Knöpfe selbst im Papier der Kopfzeile (Nutzerwunsch) */
 html body:not(#kz1):not(#kz2) main section.panel > .section-tools { background: transparent !important; border: 0 !important; box-shadow: none !important; }
-html body:not(#kz1):not(#kz2) .panel .section-tools span, html body:not(#kz1):not(#kz2) .panel .section-tools button {
+html body:not(#kz1):not(#kz2) .panel .section-tools span, html body:not(#kz1):not(#kz2) .panel .section-tools button, html body:not(#kz1):not(#kz2) .kiez-quickbar button {
   background: linear-gradient(180deg, rgba(255,245,220,.25), rgba(120,90,50,.18)), var(--paper-tex) center / 1400px auto !important;
+}
+html body:not(#kz1):not(#kz2) .kiez-quickbar button.active {
+  background: linear-gradient(180deg, rgba(255,250,235,.45), rgba(150,115,65,.12)), var(--paper-tex) center / 1400px auto !important;
 }
 html body:not(#kz1):not(#kz2) .panel .section-tools span.subtab-active {
   background: linear-gradient(180deg, rgba(255,250,235,.45), rgba(150,115,65,.12)), var(--paper-tex) center / 1400px auto !important;
@@ -313,3 +316,7 @@ html body:not(#kz1):not(#kz2) main section.panel.active-view > .inside { align-s
 
 /* Vor der Anmeldung kein Spielmenü in der Kopfzeile (Nutzer-Screenshot Anmeldeseite) */
 html body:not(#kz1):not(#kz2):has(#game.hide) .kz-nav, html body:not(#kz1):not(#kz2):has(#game.hide) .kz-drop { display: none !important; }
+
+/* Das, was man gerade nutzt, nie ausgrauen (aktuelles Instrument, aktuelles Sammelgebiet) */
+html body:not(#kz1):not(#kz2) #income .instrument-card.kz-current, html body:not(#kz1):not(#kz2) #income .area-card.kz-cur { opacity: 1 !important; filter: none !important; }
+html body:not(#kz1):not(#kz2) #income .instrument-card.kz-current { border-color: var(--brass, #d1a94f) !important; }
