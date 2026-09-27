@@ -31,10 +31,17 @@ function act(btn, box, fn) {
   btn.onclick = async () => {
     btn.disabled = true; flash = null;  // alte Meldung nicht nach dem Neuzeichnen wieder hervorholen (Nutzer: „Gekauft“ tauchte beim Einstellen auf)
     try { const t = await fn(); if (t) { say(box, t, true); if (box?.className) flash = { cls: box.className, text: t, good: true, t: Date.now() }; } }
-    catch (e) { say(box, esc(e.message), false); }
+    catch (e) { say(box, esc(e.message) + hintFor(e.message), false); }
     btn.disabled = false;
   };
 }
+// Fehlermeldung → passender Weg (Durchspiel-Test 169: „Wasch dich erst“ ohne Hinweis, wohin)
+function hintFor(m) {
+  const H = [[/wasch dich|sauberkeit/i, 'waschhaus', '', 'Zum Waschhaus'], [/energie/i, 'kronkorken', '', 'Energydrink für Kronkorken'],
+    [/kohle|geld|€ in der tasche|so viel hast du nicht/i, 'pfand', 'Pfand sammeln', 'Pfand sammeln'], [/knast/i, 'pfand', 'Verbrechen', 'Zur Kaution'], [/hunger|essen/i, 'store', 'Verbrauchbares', 'Zum Supermarkt']];
+  const h = H.find(x => x[0].test(m || '')); return h ? ' <a href="#" class="kz-hint" data-v="' + h[1] + '" data-t="' + h[2] + '">' + h[3] + ' ›</a>' : '';
+}
+document.addEventListener('click', e => { const a = e.target.closest('a.kz-hint'); if (!a) return; e.preventDefault(); go(a.dataset.v, a.dataset.t || undefined); });
 // Eigene Kennung aus dem geladenen Profil (kein zusätzlicher Server-Aufruf, der direkt nach dem Login scheitern kann)
 async function myId() { return window.kiezProfile?.id || (await sb.auth.getUser()).data.user?.id || null; }
 async function names(ids) {
@@ -3477,4 +3484,15 @@ function crimeLocks() {
       if (m) say(m, 'Rubbel die drei Felder frei!', true);
     };
   }
+}
+
+// Stadt-Leiste darf nie unter dem Spielerkasten liegen (ROADMAP 157): Platz rechts freihalten, Knöpfe brechen vorher um
+{
+  const st = document.createElement('style'); st.textContent = 'html body:not(#kz1):not(#kz2) .kiez-quickbar{padding-right:var(--kz-qb-pad,0px) !important;box-sizing:border-box}'; document.head.appendChild(st);
+  const fixQB = () => { document.querySelectorAll('.kiez-quickbar').forEach(bar => {
+    const slip = document.querySelector('.player-slip'); if (!slip || !slip.offsetParent || !bar.offsetParent) return;
+    bar.style.setProperty('--kz-qb-pad', '0px'); const s = slip.getBoundingClientRect(), b = bar.getBoundingClientRect();
+    const overlapY = b.top < s.bottom + 4 && b.bottom > s.top, pad = overlapY && b.right > s.left - 8 ? Math.ceil(b.right - s.left + 12) : 0;
+    if (pad > 0 && pad < b.width - 200) bar.style.setProperty('--kz-qb-pad', pad + 'px'); }); };
+  addEventListener('resize', fixQB); setInterval(fixQB, 2000); const prev = window.kiezShowView; window.kiezShowView = (...a) => { const r = prev?.(...a); setTimeout(fixQB, 60); setTimeout(fixQB, 500); return r; }; setTimeout(fixQB, 800);
 }
