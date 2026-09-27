@@ -1982,6 +1982,7 @@ async function opponentTiers() {
 if (document.getElementById('opponents')) new MutationObserver(() => opponentTiers()).observe(document.getElementById('opponents'), { childList: true });
 const style15 = document.createElement('style');
 style15.textContent = `html body:not(#kz1):not(#kz2) .wash-list .kz-body{grid-column:1/-1}
+html body:not(#kz1):not(#kz2) .wash-list{align-items:start !important}html body:not(#kz1):not(#kz2) .wash-card{display:flex !important;flex-direction:column}html body:not(#kz1):not(#kz2) .wash-card .wash-status{order:20}html body:not(#kz1):not(#kz2) .wash-card .kz-near{order:21}
 html body:not(#kz1):not(#kz2) .kz-tiers td{padding:6px 8px;font-size:14px}
 html body:not(#kz1):not(#kz2) .kz-tiers tr.kz-now td{background:rgba(209,169,79,.18);font-weight:700}
 html body:not(#kz1):not(#kz2) .kz-meters{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:10px 0}
@@ -2093,7 +2094,7 @@ loaders.bandenhaus = async () => {
   rpc('gang_war_ranking').then(rk => { const el = houseBody.querySelector('.kz-warrank'); if (el) el.innerHTML = rk.length ? '<table class="kf-table"><tr><th>#</th><th>Bande</th><th>Siege</th><th>Niederlagen</th><th>Beute</th></tr>' + rk.map((x, i) => '<tr><td>' + (i + 1) + '</td><td><a href="#" class="kiez-gang" data-id="' + x.id + '">' + esc(x.name) + '</a></td><td>' + x.wins + '</td><td>' + x.losses + '</td><td>' + eur(x.loot) + '</td></tr>').join('') + '</table>' : 'Noch keine Kriege.'; }).catch(() => {});
 };
 // Laufender Überfall: Bandenhaus alle 30 s auffrischen
-setInterval(() => { if (!document.hidden && document.getElementById('bandenhaus')?.classList.contains('active-view') && HOUSE.data?.raids?.some(r => !r.resolved)) loaders.bandenhaus(); }, 30000);
+setInterval(() => { if (!document.hidden && HOUSE.tab === 'Krieg & Überfall' && document.getElementById('bandenhaus')?.classList.contains('active-view') && HOUSE.data?.raids?.some(r => !r.resolved)) loaders.bandenhaus(); }, 30000);
 const style16 = document.createElement('style');
 style16.textContent = `html body:not(#kz1):not(#kz2) .kz-task{margin:10px 0}html body:not(#kz1):not(#kz2) .kz-task small{font-size:13px;color:var(--muted,#bdb19d)}
 html body:not(#kz1):not(#kz2) .kz-task.kz-done b{color:#9bd17a}

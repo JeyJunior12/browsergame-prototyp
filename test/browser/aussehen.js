@@ -25,7 +25,7 @@ const audit=()=>{const s=document.querySelector('section.panel.active-view:not(#
  await lib.login(pg,process.env.KIEZ_MAIL,fs.readFileSync(process.env.KIEZ_PW_FILE,'utf8').trim());
  if(process.env.MOBIL)await pg.setViewportSize({width:390,height:844});await pg.waitForTimeout(2000);
  const seen=new Set(),sum={bild:0,emoji:0,reihe:0,klein:0,ueberlapp:0},stile={};
- const record=async label=>{await pg.waitForTimeout(1300);const r=await pg.evaluate(audit);if(!r)return;
+ const record=async label=>{await pg.waitForTimeout(2600);const r=await pg.evaluate(audit);if(!r)return;
   for(const x of r.out.titel){const st=x.split(' ← ')[0];(stile[st]=stile[st]||[]).push(r.id+': '+x.split(' ← ')[1]);}delete r.out.titel;
   for(const k in r.out)for(const x of r.out[k]){const key=r.id+'|'+k+'|'+x;if(seen.has(key))continue;seen.add(key);sum[k]++;console.log(k.toUpperCase().padEnd(9)+' '+label.padEnd(34)+' '+x);}};
  const views=await pg.evaluate(()=>{const out=[];document.querySelectorAll('.kz-drop button, .kz-nav .kz-top').forEach(()=>{});return (window.kiezNavList||[]).map(x=>x)});

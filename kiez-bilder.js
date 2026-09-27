@@ -62,6 +62,8 @@
     ['#bandenhaus', /^Kein Bandenhaus/, 'bande-gruenden'], ['#bandenhaus', /^Krieg:|^Euer Überfall|^Überfall von/, 'bande-krieg'],
     ['#begging', /^Dein Zustand/, 'pflege-katzenwaesche'], ['#apotheke', /^Krankheit/, 'stadt-apotheke'],
     ['#plunder', /^Angelegt/, 'lager-inventar'], ['#plunder', /^Sammlung/, 'kk-plunderkiste'],
+    ['#plunder', /^Bauarbeiter/, 'plunder-bauhelm'], ['#plunder', /^Kiezadel/, 'plunder-kiezzepter'], ['#plunder', /^Taubenkönig/, 'plunder-taubenpfeife'],
+    ['#plunder', /^Pfandjäger/, 'plunder-goldene_dose'], ['#plunder', /^Straßenkämpfer/, 'plunder-fahrradkette'],
     ['#stadtteile', /^Bahnhofsviertel/, 'gebiet-bahnhof'], ['#stadtteile', /^Altstadt/, 'gebiet-touristen'], ['#stadtteile', /^Hafen/, 'heim-kran'],
     ['#stadtteile', /^Stadtpark/, 'gebiet-park'], ['#stadtteile', /^Marktplatz/, 'schnorr-fussgaengerzone'], ['#stadtteile', /^Villenviertel/, 'gebiet-luxus'],
     ['#basar', /^Plunder anbieten/, 'lager-inventar'], ['#basar', /^Deine Angebote/, 'kk-plunderkiste'],
