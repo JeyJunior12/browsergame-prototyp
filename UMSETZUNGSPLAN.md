@@ -72,7 +72,7 @@ Innerhalb eines Sprints wird nach Nummer gearbeitet.
 | **S16** ✅ live | Fahrzeuge II: Wohnmobil, Fahrer-Jobs (spät), Rennen, Diebstahl, Bandenfahrzeug | 58–62 | Game Designer, Backend, Frontend |
 | **S17** ✅ live | Städte-Grundlage (gesperrt bis genug Spieler) | 10, 123, 124 | Backend Architect |
 | **S18** ✅ live | Balancing aller Gegenstände und Preise (0032, supabase/schema/data/BALANCING.md) | 86–92 | Economy Designer |
-| **S19** | Schlussprüfung + Durchspiel-Test Level 1–150 | 141–146 | Reality Checker, Evidence, Economy |
+| **S19** ✅ live | Schlussprüfung + Durchspiel-Test Level 1–150 | 141–146 | Reality Checker, Evidence, Economy |
 
 Bilder: Neue Seiten nutzen vorhandene Fotos; fehlende Motive kommen in `bilder-neu/BILDERLISTE.md` für die PC-Sitzung (Forge).
 

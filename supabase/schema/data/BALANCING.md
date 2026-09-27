@@ -26,6 +26,20 @@ Flaschen pro 10 Min. = (5 + 4 × √Straßenkenntnis + (Sack − 1) × 2) × Sam
 
 Dazu kommen Schnorren, Nebenjobs, Kämpfe und Bande – das nächste kleine Ziel liegt damit bei Stunden bis wenigen Tagen, die großen (Fahrzeuge, Begleiter ab Level 80) bei Wochen.
 
+## Durchspiel-Test (S19, `supabase/test/durchspiel.sh`)
+Echte Spielfunktionen, Zeit per Zeitstempel-Verschiebung. Strategie: Tour → verkaufen → essen/waschen → lernen (3 in der Warteschlange) → bestes bezahlbares Stück pro Platz, bestes Tier.
+
+| Tag | Aktiv (4 Besuche/Tag): Level · Geld | Gelegenheit (1 Besuch/Tag): Level · Geld |
+|---|---|---|
+| 30 | 33 · 1.017 € | 21 · 4 € |
+| 90 | 66 · 1.066 € | 39 · 1.991 € |
+| 180 | 101 · 7.577 € | 59 · 26.619 € |
+| 365 | ~129 · ~15.000 € | 92 · 124.759 € |
+| 558 | **150** (Kiezkönig-Zepter + Panzermantel gekauft) | – |
+
+Befunde und Folgen: lineare Straßenkenntnis ließ das Geld ab Level ~40 explodieren → 0034; Nebenjobs lohnten nicht → 0036; Tiere über Sozialkontakte 45 unkaufbar → 0033.
+Offen: Gelegenheitsspieler sammeln Geld an (Simulator kauft keine Fahrzeuge/Bande) – im Live-Betrieb beobachten, ggf. späte Geldsenke.
+
 ## Kampf
 Angriff = Angriffstraining × 3 + Straßenkenntnis + Ausrüstung + Begleiter + Bande + Plunder + 3 × Legende.
 Mit Leitwerten macht Ausrüstung (Waffe + Zubehör ≈ 1,85 × Level) rund 30 % des Angriffs aus (Training ≈ 4 × Level) – Ausrüstung zählt, Level bleibt wichtiger.

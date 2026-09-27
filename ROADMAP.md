@@ -277,12 +277,12 @@ Nutzer: Die Seite ist noch nicht toll. Zurzeit stehen zwei ähnliche Dinge unter
 
 ### 🏁 ZUM SCHLUSS – Gesamtprüfung und Durchspiel-Test Level 1 bis 150 (27.09.2026) ⭐
 Nutzerwunsch: Ganz am Ende, wenn alles andere gebaut ist, noch einmal alles durchgehen.
-141. Gesamtdurchgang: jede Seite, jeder Reiter, jeder Knopf auf PC und Handy – alle Punkte dieser Liste abhaken, prüfen ob die gemeldeten Fehler wirklich weg sind und ob alles zum Spiel passt (Texte, Bilder, Stil) ⭐
-142. Testmodus nur für Testkonten wieder anlegen (wie 0010/0011): Wartezeiten überspringen, übersprungene Zeit mitzählen ⭐
-143. Durchspiel-Test von Level 1 bis Level 150 mit realistischem Spielverhalten (z. B. „aktiver Spieler 3–5× am Tag“ und „Gelegenheitsspieler 1× am Tag“), jede Aktion echt über die Spielfunktionen ⭐
-144. Dabei mitschreiben: Punkte, Geld, Werte, Level, Käufe, Wartezeiten pro Spieltag → Kurven für Geld, Punkte und Stärke über die Zeit (inkl. übersprungener Zeit = echte Spielzeit) ⭐
-145. Auswertung: Wo wird es zu zäh, wo zu leicht, wo fehlt Geld, wo ist Geld nutzlos, welche Gegenstände/Tiere sind zu stark oder nie sinnvoll → Balancing anpassen (verbindet mit P 86–92) und Test wiederholen ⭐
-146. Danach Testmodus und Testkonten wieder entfernen (wie 0014) und Ergebnis in ROADMAP/CLAUDE.md festhalten ⭐
+141. ✅ Gesamtdurchgang: jede Seite, jeder Reiter, jeder Knopf auf PC und Handy – alle Punkte dieser Liste abhaken, prüfen ob die gemeldeten Fehler wirklich weg sind und ob alles zum Spiel passt (Texte, Bilder, Stil) ⭐ → Gesamtdurchsicht aller 79 Seiten/Reiter per Screenshot (PC + Handy), 19 Befunde behoben (siehe 155)
+142. ✅ Testmodus nur für Testkonten wieder anlegen (wie 0010/0011): Wartezeiten überspringen, übersprungene Zeit mitzählen ⭐ → statt Live-Testmodus: lokaler Simulator mit Zeitsprung (`supabase/test/durchspiel.sh`, übersprungene Zeit = echte Spieltage), keine Testkonten im Live-Spiel nötig
+143. ✅ Durchspiel-Test von Level 1 bis Level 150 mit realistischem Spielverhalten (z. B. „aktiver Spieler 3–5× am Tag“ und „Gelegenheitsspieler 1× am Tag“), jede Aktion echt über die Spielfunktionen ⭐ → aktiver Spieler (4 Besuche/Tag) und Gelegenheitsspieler (1 Besuch/Tag) über die echten Spielfunktionen
+144. ✅ Dabei mitschreiben: Punkte, Geld, Werte, Level, Käufe, Wartezeiten pro Spieltag → Kurven für Geld, Punkte und Stärke über die Zeit (inkl. übersprungener Zeit = echte Spielzeit) ⭐ → Tabelle `sim_log` (Level, Punkte, Geld, Angriff, Verteidigung, Käufe, Fehler pro Tag)
+145. ✅ Auswertung: Wo wird es zu zäh, wo zu leicht, wo fehlt Geld, wo ist Geld nutzlos, welche Gegenstände/Tiere sind zu stark oder nie sinnvoll → Balancing anpassen (verbindet mit P 86–92) und Test wiederholen ⭐ → Befunde: Geld explodierte ab Level ~40 → 0034 (√-Kurve); Nebenjobs sinnlos → 0036; Tiere nicht kaufbar über Sozial 45 → 0033. Ergebnis: aktiv Level 150 an Tag 558 (~1,5 Jahre), Geld bis Level ~140 knapp. Offen: Gelegenheitsspieler sammelt ~120.000 € im 1. Jahr an (Simulator kauft keine Fahrzeuge/Bande) – beobachten, ggf. späte Geldsenke
+146. ✅ Danach Testmodus und Testkonten wieder entfernen (wie 0014) und Ergebnis in ROADMAP/CLAUDE.md festhalten ⭐ → nichts zu entfernen (kein Live-Testmodus, keine Testkonten angelegt); Ergebnis in BALANCING.md, ROADMAP und CLAUDE.md
 
 ### W. Ausrüstung verwalten (Nutzer, 27.09.2026) ⭐
 147. ✅ Eigener Reiter „Ausrüstung“ (Mein Kiez): alle gekauften Waffen, Kleidung, Zubehör und Verteidigung mit Bild und Werten; Anlegen/Ablegen dort statt nur im Laden; angelegte Stücke je Platz oben, Kampfwerte daneben ⭐
