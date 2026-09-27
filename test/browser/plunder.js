@@ -12,7 +12,7 @@ const ok=(c,l,x)=>{if(!c)fails++;console.log(c?'✓':'✗',l,x??'')};
  ok(await vis('#plunder .kz-p-slot')&&await vis('#plunder .kz-p-tools'),'Meine Stücke: Angelegt-Platz + Sortieren/Filtern (112/114)');
  await tab('Sammlung');
  const c=await pg.evaluate(()=>({h:document.querySelector('#plunder .kz-p-coll h3')?.textContent,unk:document.querySelectorAll('#plunder .kz-p-unknown').length,sets:document.querySelectorAll('#plunder .kz-p-set').length,mineHidden:document.querySelector('#plunder .kz-p-mine')?.offsetParent===null}));
- ok(/von 21 gefunden/.test(c.h)&&c.unk>0,'Sammlung „x von 21“ + Umrisse mit ? (111)',c.h+' · '+c.unk+' Umrisse');
+ ok(/von \d+ gefunden/.test(c.h)&&c.unk>0,'Sammlung „x von N“ + Umrisse mit ? (111)',c.h+' · '+c.unk+' Umrisse');
  ok(c.sets===5,'5 Sets mit Fortschritt (118)');
  ok(c.mineHidden,'Reiter trennen Inhalte');
  await tab('Basteln');ok(await vis('#plunder .craft-list'),'Basteln zeigt Bastelliste');

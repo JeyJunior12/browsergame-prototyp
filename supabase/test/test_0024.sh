@@ -28,6 +28,7 @@ ok  "Aufgabe zählt mit" "$(Q "select progress from daily_tasks where user_id='$
 has "Aufgabe abholen" "$(as_user $A "select claim_daily_task(1)")" '"caps": 2'
 has "Nicht doppelt" "$(as_user $A "select claim_daily_task(1)")" "Schon abgeholt"
 # Blitzauftrag
+Q "delete from flash_tasks where user_id='$A'" >/dev/null
 K=$(Q "select kiez_flash_kind('$A',kiez_flash_slot())")
 C0=$(Q "select bottlecaps from profiles where id='$A'")
 Q "select kiez_act('$A','$K')" >/dev/null

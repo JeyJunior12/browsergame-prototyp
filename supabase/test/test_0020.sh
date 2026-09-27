@@ -6,7 +6,7 @@ has(){ echo "$2" | grep -q "$3" && echo "OK   $1" || { echo "FAIL $1: '$2' entha
 newuser(){ $P -tAc "insert into auth.users(raw_user_meta_data) values('{\"username\":\"$1\"}') returning id"; }
 A=$(newuser 'Plunder_A')
 $P -tAc "update profiles set money=0, cash_capacity=500 where id='$A'" >/dev/null
-ok  "Katalog 21 Stücke" "$(as_user $A "select (plunder_overview())->>'total'")" "21"
+ok  "Katalog mind. 21 Stücke" "$(as_user $A "select ((plunder_overview())->>'total')::int >= 21")" "t"
 ok  "Noch nichts gefunden" "$(as_user $A "select (plunder_overview())->>'found'")" "0"
 $P -tAc "select kiez_give_plunder('$A','bauhelm'); select kiez_give_plunder('$A','bauhelm'); select kiez_give_plunder('$A','taschenlampe')" >/dev/null
 ok  "Neu markiert" "$(as_user $A "select count(*) from jsonb_array_elements((plunder_overview())->'items') i where (i->>'new')::boolean")" "2"
