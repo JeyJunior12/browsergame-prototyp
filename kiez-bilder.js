@@ -13,6 +13,13 @@
     // Plunderkiste, Inventar, Basteln
     ['#plunder', /^Kronkorkenkette/, 'plunder-kronkorkenkette'],
     ['#plunder', /^Krone aus Alufolie/, 'plunder-alufolienkrone'],
+    // Plunder ohne eigenes Foto (Durchspiel-Test 175) – Ersatzbild, bis das neue erzeugt ist
+    ['#plunder', /^Abgebrannte Wunderkerze/, 'plunder-wunderkerze|plunder-taschenlampe'], ['#plunder', /^Arbeitshandschuhe/, 'plunder-arbeitshandschuhe|plunder-ein_handschuh'],
+    ['#plunder', /^Goldkette/, 'plunder-goldkette|plunder-kronkorkenkette'], ['#plunder', /^Kaputte Sonnenbrille/, 'plunder-sonnenbrille|plunder-rostiger_schluessel'],
+    ['#plunder', /^Kürbislaterne/, 'plunder-kuerbislaterne|plunder-plastikblume'], ['#plunder', /^Lebkuchenherz/, 'plunder-lebkuchenherz|plunder-plastikblume'],
+    ['#plunder', /^Leeres Feuerzeug/, 'plunder-feuerzeug|plunder-taschenlampe'], ['#plunder', /^Megafon/, 'plunder-megafon|plunder-taschenlampe'],
+    ['#plunder', /^Schoko-Osterhase/, 'plunder-osterhase|plunder-goldene_dose'], ['#plunder', /^Tüte Taubenfutter/, 'plunder-taubenfutter|plunder-taubenpfeife'],
+    ['#plunder', /^Wasserpistole/, 'plunder-wasserpistole|waffe-wasserbomben'], ['#plunder', /^Weihnachtsmütze/, 'plunder-weihnachtsmuetze|plunder-alufolienkrone'],
     ['#plunder', /^Einzelner Handschuh/, 'plunder-ein_handschuh'],
     ['#plunder', /^Rostiger Schlüssel/, 'plunder-rostiger_schluessel'],
     ['#plunder', /^Plastikblume/, 'plunder-plastikblume'],

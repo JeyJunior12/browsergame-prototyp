@@ -337,3 +337,5 @@ html body:not(#kz1):not(#kz2) #leaders .kz-rank th { text-align: left; font-size
 html body:not(#kz1):not(#kz2) #leaders .kz-rank td { padding: 9px 10px; border-bottom: 1px solid rgba(255,255,255,.06); }
 html body:not(#kz1):not(#kz2) #leaders .kz-rank tr.kz-me td { background: rgba(201,165,90,.14); font-weight: 700; }
 html body:not(#kz1):not(#kz2) #leaders .kz-rank tbody tr:nth-child(-n+3) td:first-child { color: var(--brass, #c9a55a); font-weight: 700; }
+/* Stadtplan-Knöpfe: Grundschrift nicht unter 12 px (Innenleben hat eigene Größen) */
+html body:not(#kz1):not(#kz2) .kz-dlabel, html body:not(#kz1):not(#kz2) .kz-place { font-size: 12px; }
