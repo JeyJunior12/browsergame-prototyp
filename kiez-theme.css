@@ -320,3 +320,27 @@ html body:not(#kz1):not(#kz2):has(#game.hide) .kz-nav, html body:not(#kz1):not(#
 /* Das, was man gerade nutzt, nie ausgrauen (aktuelles Instrument, aktuelles Sammelgebiet) */
 html body:not(#kz1):not(#kz2) #income .instrument-card.kz-current, html body:not(#kz1):not(#kz2) #income .area-card.kz-cur { opacity: 1 !important; filter: none !important; }
 html body:not(#kz1):not(#kz2) #income .instrument-card.kz-current { border-color: var(--brass, #d1a94f) !important; }
+
+/* Übersicht: Profilbild-Kasten nicht schwarz, Beschriftung lesbar (Durchspiel-Test) */
+html body:not(#kz1):not(#kz2) #overview .profile-main-avatar { background-color: #2a2620; background-image: url('/bilder/profil-standard.webp'); background-size: cover; background-position: center; }
+html body:not(#kz1):not(#kz2) #overview .profile-main-avatar:after { font: 600 12px/1.3 'Source Sans 3', sans-serif; top: auto; position: absolute; bottom: 0; left: 0; right: 0; }
+html body:not(#kz1):not(#kz2) #overview .profile-main-avatar { position: relative; }
+html body:not(#kz1):not(#kz2) #overview .profile-warning { font-size: 14px; color: #e6d9bd !important; opacity: 1 !important; }
+/* Spielerkasten: Standardbild statt schwarzer Fläche, solange kein eigenes Profilbild da ist */
+html body:not(#kz1):not(#kz2) .player-slip .profile-avatar { background-color: #2a2620; background-image: url('/bilder/profil-standard.webp'); background-size: cover; background-position: center; }
+html body:not(#kz1):not(#kz2) .kz-hide-lock { display: none !important; }
+html body:not(#kz1):not(#kz2) details.kz-hist > summary { cursor: pointer; font-weight: 700; padding: 6px 0; font-size: 15px; }
+html body:not(#kz1):not(#kz2) details.kz-hist .pfand-pricehistory-card { margin-top: 8px; }
+/* Rangliste als Tabelle, eigener Platz hervorgehoben (ROADMAP 174) */
+html body:not(#kz1):not(#kz2) #leaders .kz-rank { width: 100%; border-collapse: collapse; font-size: 15px; }
+html body:not(#kz1):not(#kz2) #leaders .kz-rank th { text-align: left; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--brass, #c9a55a); padding: 8px 10px; border-bottom: 1px solid rgba(201,165,90,.35); }
+html body:not(#kz1):not(#kz2) #leaders .kz-rank td { padding: 9px 10px; border-bottom: 1px solid rgba(255,255,255,.06); }
+html body:not(#kz1):not(#kz2) #leaders .kz-rank tr.kz-me td { background: rgba(201,165,90,.14); font-weight: 700; }
+html body:not(#kz1):not(#kz2) #leaders .kz-rank tbody tr:nth-child(-n+3) td:first-child { color: var(--brass, #c9a55a); font-weight: 700; }
+/* Stadtplan-Knöpfe: Grundschrift nicht unter 12 px (Innenleben hat eigene Größen) */
+html body:not(#kz1):not(#kz2) .kz-dlabel, html body:not(#kz1):not(#kz2) .kz-place { font-size: 12px; }
+html body:not(#kz1):not(#kz2) .kz-inst-done { opacity: .8; }
+html body:not(#kz1):not(#kz2) .kz-inst-done::after { content: '✓ gekauft'; display: block; font: 700 13px var(--font-body); color: #9fbf6a; margin-top: 6px; }
+/* Verbrechen: breitere Karten, Risiko/Beute nicht umgebrochen (ROADMAP 173) */
+html body:not(#kz1):not(#kz2) #pfand .crime-list { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important; }
+html body:not(#kz1):not(#kz2) #pfand .crime-item b, html body:not(#kz1):not(#kz2) #pfand .crime-item strong { white-space: nowrap; }

@@ -294,3 +294,49 @@ Nutzerwunsch: Ganz am Ende, wenn alles andere gebaut ist, noch einmal alles durc
 153. ✅ ROADMAP gegen alle Absprachen im Chat prüfen: fehlt etwas, das besprochen wurde? (Nutzer: „ich glaub du hast gar nicht alles rein gemacht“)
 154. ✅ Alle Beschreibungen (Gegenstände, Tiere, Plunder, Jobs, Fahrzeuge, Orte, Aktionen, Meldungen) neu schreiben: assi, pennermäßig, lustig – eigener Stil, nichts von Pennergame kopieren → 0035 (≈190 Texte: Laden, Tiere, Plunder, Fahrzeuge, Sets, Stadtteile, Städte, Erfolge) + 0036 (Nebenjobs) + 20 Unterkünfte/Schnorrplätze in index.html
 155. ✅ Alle Seiten durchgehen: Preise prüfen, Seiten ohne Sinn/schwache Seiten verbessern oder zusammenlegen, Aktionen die zu schnell/zu oft gleich wiederholbar sind begrenzen, falsche Knöpfe reparieren (verbindet mit 141/145) → 19 Befunde behoben (Pfand-Reiter echt statt Sprunglinks, Reiter „Sammelgebiete“ zeigte Instrumente, Laden-Reiter, doppelter Tagesauftrag, falscher Unterkunft-Titel + abgeschriebene Haustexte neu, Nebenjob-Lohn, Punkte-Anzeige, Tier-Sperre, Bilder, Lücken, Leistung)
+
+## Runde „Durchspiel-Test“ (ab 27.09.2026) – wird nach dem Test vervollständigt
+156. ✅ Kampfbereich neu (Nutzerwunsch): nach oben darf man **jeden** angreifen (auch viel höhere Level), nach unten nur bis **5 Level** unter dem eigenen – gilt für Spieler-Kampf, Tierkampf, Kiosk-Überfall und Kopfgeld
+157. ✅ Stadt-Leiste (Zubehör, Supermarkt … Glücksspiel) läuft unter den Spielerkasten oben rechts – „Musikladen“ ist halb verdeckt (Nutzer-Screenshot). Leiste darf nie unter dem Kasten liegen: Platz rechts freihalten oder Leiste unter den Kasten umbrechen, am PC und Handy prüfen
+158. ✅ Übersicht › Reiter „Haustier“ zeigt nur einen leeren Kasten „Dein Begleiter“ (Nutzer-Screenshot) – aktiven Begleiter mit Bild, Werten, Training anzeigen oder Reiter direkt zur Begleiter-Seite führen. Dazu im Ticker „Gerade im Kiez“: erster Eintrag ist anders eingerückt als die übrigen
+159. ✅ Tierhandlung-Karten (Nutzer-Screenshot): gekauftes Tier, dessen Level-Grenze noch nicht erreicht ist, zeigt „Im Besitz“ + „Mitnehmen“ über dem Text „Benötigt Level 9“ und ist grau; Trainings-Meldung verdrängt Status/Knopf der Karte. Eindeutiger Zustand pro Karte (Besitz > Sperre), nichts übereinander
+
+### Aus dem Durchspiel-Test (Bot über die echte Oberfläche, KiezTester, Befunde bis Level 32)
+**D1 Fehler**
+160. ✅ Tagesbelohnung: Meldung war unsichtbar, Serie zeigte immer 0 → Meldung am Knopf, Login-Serie, Knopf gesperrt wenn abgeholt
+161. ✅ Stadt-Leiste „Glücksspiel“ öffnete Reiter Tagesauftrag
+162. ✅ Unterkunft: Meldung „Eingezogen!“ verdrängte den Karteninhalt (alle Karten mit Meldung beim Knopf)
+163. ✅ „Mein Profil“ (Mein Kiez) ist komplett leer
+164. ✅ Übersicht: alter Profilblock zeigt falsche Werte (ATT 12/DEF 10 statt Kampfwerte, „Platzierung 20“ statt Rang, Helm als „Deine Waffe“, schwarzer Kasten statt Bild, unerklärter roter Laune-Balken)
+165. ✅ Gekaufte Ausrüstung wird nicht angelegt; „Anlegen“ nur in Unterreitern → nach dem Kauf automatisch anlegen, wenn besser; Übersicht zeigt Knopf „Bestes anlegen“; „Anlegen“ bei Kleidung ohne Meldung
+166. ✅ Knöpfe aktiv, obwohl es nicht geht (Weiterbildung/Tiertraining/Geldbehälter ohne Geld, Computer-Gegner und Kiezboss in der Pause) → gesperrt mit Grund + Restzeit; Kiezboss meldete in der Pause gar nichts
+167. ✅ Bande gründen: keine Meldung, keine Bande
+168. ✅ Rubbellos: „Gewonnen 5 €“ bei 10 € Einsatz, drei Felder zeigen „WIN“ → Gewinne erst ab Einsatz, Rest heißt Niete/Trostpreis; Gewinn über dem Geldbehälter ins Schließfach
+169. ✅ Essen unter 20 % Sauberkeit verweigert ohne Hinweis → Meldung mit Link zum Waschhaus
+
+**D2 Übersicht & Aussehen**
+170. ✅ Laden „Zubehör“ zeigt zusätzlich alle Waffen (Seite ~11.000 px) → nur Zubehör
+171. ✅ Lange Listen (Waffenladen, Kleidung, Tierhandlung, Karriere-Ränge) gruppieren: „Jetzt kaufbar“, „Als Nächstes“, Rest eingeklappt
+172. ✅ Pfand-Seite neu ordnen: Aktionen (Tour, Verkaufen, Mülltonne, Sortieren) oben, Kurs-Tabelle klein/aufklappbar; doppelte Ausladen-Knöpfe zusammenlegen; „Gesch.: 7 (+14 %)“ verständlich; Seite springt nach „Ausladen & verkaufen“ um ~1.600 px
+173. ✅ Verbrechen-Seite: eigener Titel (nicht „Pfandtour: Hinterhof“), nach Schwierigkeit sortiert, Level-Sperren sichtbar, Karten nicht so eng
+174. ✅ Rangliste: Hauptliste als richtige Tabelle (Rang, Bild, Bande, Level, Punkte), eigener Platz hervorgehoben
+175. ✅ Instrumente kompakt (gekaufte abgehakt statt großer grauer Knöpfe); Stadtplan-Ortsnamen ≥ 12 px; fehlende Plunder-Fotos (Arbeitshandschuhe)
+176. ✅ Prüfung jeder Laden-Seite in gezielt eingestellten Zuständen (gekauft + Level zu niedrig, gesperrt, aktiv, im Training) – Fehler wie 159 fallen sonst nur zufällig auf
+
+**D3 Balancing (Migration)**
+177. ✅ Verbrechen mit Level-Grenzen (Bankraub ging ab Level 1: 450–900 €) und Bestechung/Kaution passend zur Tat (Knast war mit 8 Kronkorken egal)
+178. ✅ Computer-Gegner wachsen schneller als der Spieler (Level 24: nur der schwächste schlagbar, 1 € + 4 Punkte) → Stärke relativ zum Spieler (z. B. 70–160 %), Beute/Punkte mit dem Level
+179. ✅ Straßenmusik bringt ohne Aufwand mehr als eine 4-Std.-Pfandtour (Level 20: 150–250 € pro Hut) → Einnahmen/Obergrenze senken
+180. ✅ Kiosk Stufe 1: 0,25 €/Std. (6 €/Tag) bei 120 € Ausbau → lohnend machen
+181. ✅ Weiterbildungspreise der Nebenfähigkeiten viel zu hoch (Level 32: Sozialkontakte 1.178 €, Musik 750 € gegenüber Geschick 180 €) → angleichen; ab Level ~25 bremst sonst nur Geldmangel
+182. ✅ Geldbehälter 1→2 kostet genau den vollen Behälter (20 €); Start fühlt sich zäh an
+183. ✅ „Passanten anschnorren“ lohnt kaum (0,10–0,50 €, meist „Warte kurz“)
+184. Gelegenheitsspieler häufen Geld an (Level 92 mit 124.000 € nach 1 Jahr) → Geldsenken (Fahrzeuge, Bande, Kosmetik, Unterhalt)
+
+**D4 Minispiele statt nur Klicken (Nutzerwunsch)**
+185. ✅ Verbrechen: „Schloss knacken“ – Zeiger im grünen Bereich stoppen, ändert die Erfolgschance
+186. ✅ Rubbellos: Felder wirklich freirubbeln
+187. ✅ Schnorren am Platz: Passant kommt vorbei, passenden Spruch wählen (Tourist, Oma, Anzugträger …)
+188. ✅ Kampf: kurzer Reaktionsmoment („Ausweichen!“) gibt Bonus
+189. ✅ Mülltonne: 3 von 9 Feldern aufdecken
+190. ✅ Straßenmusik: Takt-Tippen für den Hut-Bonus

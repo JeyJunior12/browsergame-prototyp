@@ -8,7 +8,7 @@ A=$(newuser 'Schnorr_A'); ADM=$(newuser 'Schnorr_Admin')
 $P -tAc "update profiles set money=0, cash_capacity=500, energy=100, cleanliness=100, speech_skill=10, area_level=2 where id='$A'" >/dev/null
 $P -tAc "update profiles set is_admin=true where id='$ADM'" >/dev/null
 # Bonus: Sauberkeit 100 = gepflegt → 1,2 (seit 0021); Rhetorik 10 → 1,1; ohne Begleiter 1,0
-ok  "Bonus-Faktor sichtbar" "$(as_user $A "select (beg_overview())->'bonus'->>'total'")" "1.320"
+has "Bonus-Faktor sichtbar (nachts ×0,7)" "$(as_user $A "select (beg_overview())->'bonus'->>'total'")" "^1.320$\|^0.924$"
 R=$(as_user $A "select (beg_at_spot('bahnhof'))->>'total'")
 ok  "Protokoll heute pro Platz" "$(as_user $A "select (beg_overview())->'spots'->'bahnhof'->>'today'")" "$R"
 ok  "Heute gesamt" "$(as_user $A "select (beg_overview())->>'today'")" "$R"
