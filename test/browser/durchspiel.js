@@ -62,7 +62,7 @@ const mark = () => pg.evaluate(S => document.querySelectorAll(S).forEach(n => n.
 const fresh = () => pg.evaluate(S => [...document.querySelectorAll(S)].filter(n => n.offsetParent && n.innerText.trim() && n.dataset.kzseen !== n.innerText.replace(/\s+/g, ' ').trim() && !n.querySelector('.notice,[class*="msg"]')).map(n => n.innerText.replace(/\s+/g, ' ').trim()), MSEL);
 // Knopf klicken wie ein Spieler, neue Meldung abwarten und protokollieren. pick: 'first' | 'last' | Funktion als String (el => Zahl, höchste gewinnt)
 async function click(label, sel, { within, pick = 'first', fill, wait = 5000, quiet } = {}) {
-  await mark(); const t0 = Date.now(); let y0 = 0;
+  await mark(); const t0 = Date.now(); let y0 = 0; const m0 = await pg.evaluate(() => +(window.kiezProfile?.money || 0) + +(window.kiezProfile?.bank_balance || 0));
   if (fill) for (const [s, v] of fill) await pg.fill(s, String(v)).catch(() => {});
   const r = await pg.evaluate(([sel, within, pick, D]) => {
     let els = [...document.querySelectorAll('section.panel.active-view ' + sel + ', #kiezmodalbody ' + sel)].filter(e => e.offsetParent && !e.disabled && !e.classList.contains('hide'));
@@ -84,6 +84,10 @@ async function click(label, sel, { within, pick = 'first', fill, wait = 5000, qu
   lay.forEach(m => log({ v: visit, typ: 'LAYOUT', label, msg: m }));
   await popups(label);
   const msg = neu.join(' | ').slice(0, 300);
+  // Widerspruch: Meldung sagt Gewinn, aber Tasche + Schließfach sind weniger geworden (Lehre: Rubbellos „Gewonnen 5 €“ bei 10 € Einsatz)
+  await pg.waitForTimeout(400); const m1 = await pg.evaluate(() => +(window.kiezProfile?.money || 0) + +(window.kiezProfile?.bank_balance || 0));
+  if (/gewonnen|gewinn|geklappt|treffer!|\+\d/i.test(msg) && !/verloren|niete|daneben|erwischt/i.test(msg) && m1 < m0 - 0.001 && !/gekauft|kosten|eingezahlt|gebühr|training/i.test(msg))
+    log({ v: visit, typ: 'WIDERSPRUCH', label, msg: msg.slice(0, 160) + ' | Geld vorher ' + m0.toFixed(2) + ' nachher ' + m1.toFixed(2) });
   const typ = !msg ? 'KEINE-RÜCKMELDUNG' : SUSPECT.test(msg) ? 'VERDÄCHTIG' : 'OK';
   log({ v: visit, typ, label, knopf: knopf.slice(0, 50), msg, ms: Date.now() - t0 });
   return msg || '';
