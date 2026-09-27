@@ -294,3 +294,6 @@ Nutzerwunsch: Ganz am Ende, wenn alles andere gebaut ist, noch einmal alles durc
 153. ✅ ROADMAP gegen alle Absprachen im Chat prüfen: fehlt etwas, das besprochen wurde? (Nutzer: „ich glaub du hast gar nicht alles rein gemacht“)
 154. ✅ Alle Beschreibungen (Gegenstände, Tiere, Plunder, Jobs, Fahrzeuge, Orte, Aktionen, Meldungen) neu schreiben: assi, pennermäßig, lustig – eigener Stil, nichts von Pennergame kopieren → 0035 (≈190 Texte: Laden, Tiere, Plunder, Fahrzeuge, Sets, Stadtteile, Städte, Erfolge) + 0036 (Nebenjobs) + 20 Unterkünfte/Schnorrplätze in index.html
 155. ✅ Alle Seiten durchgehen: Preise prüfen, Seiten ohne Sinn/schwache Seiten verbessern oder zusammenlegen, Aktionen die zu schnell/zu oft gleich wiederholbar sind begrenzen, falsche Knöpfe reparieren (verbindet mit 141/145) → 19 Befunde behoben (Pfand-Reiter echt statt Sprunglinks, Reiter „Sammelgebiete“ zeigte Instrumente, Laden-Reiter, doppelter Tagesauftrag, falscher Unterkunft-Titel + abgeschriebene Haustexte neu, Nebenjob-Lohn, Punkte-Anzeige, Tier-Sperre, Bilder, Lücken, Leistung)
+
+## Runde „Durchspiel-Test“ (ab 27.09.2026) – wird nach dem Test vervollständigt
+156. Kampfbereich neu (Nutzerwunsch): nach oben darf man **jeden** angreifen (auch viel höhere Level), nach unten nur bis **5 Level** unter dem eigenen – gilt für Spieler-Kampf, Tierkampf, Kiosk-Überfall und Kopfgeld
