@@ -14,5 +14,7 @@ ok "Tester entfernt" "$($P -tAc "select count(*) from profiles where id='$T'")" 
 ok "Tester-Login entfernt" "$($P -tAc "select count(*) from auth.users where id='$T'")" "0"
 ok "Tester-Bande entfernt" "$($P -tAc "select count(*) from gangs where name='Wegbande'")" "0"
 ok "Echter Spieler bleibt" "$($P -tAc "select count(*) from profiles where id='$R'")" "1"
-ok "Testmodus weg" "$($P -tAc "select count(*) from pg_proc where proname like 'tester_%'")" "0"
+ok "Alter Testmodus weg" "$($P -tAc "select count(*) from pg_proc where proname like 'tester_%' and proname <> 'tester_skip_time'")" "0"
+# 0039 legt die Spalte für den Durchspiel-Test bewusst wieder an – für die folgenden Tests wiederherstellen
+$P -tAc "alter table profiles add column if not exists is_tester boolean not null default false" >/dev/null
 exit ${FAILED:-0}
