@@ -1196,8 +1196,9 @@ const ORIGIN = {
   begatspot: () => document.querySelector('.card[data-spot="' + (document.getElementById('begspotid')?.value || '') + '"]')
 };
 const titleOfCard = c => (c?.querySelector('h3, b, h4')?.textContent || '').trim();
-const keyOf = c => ({ panel: c?.closest('section.panel')?.id, title: titleOfCard(c) });
-const findCard = k => (k?.panel && k.title && [...document.querySelectorAll('#' + k.panel + ' :is(' + NEAR_CARD + ')')]
+const tabOf = sec => sec ? (sec.dataset.kztab || sec.querySelector(':scope > .section-tools span.subtab-active')?.textContent.trim() || '') : '';
+const keyOf = c => { const sec = c?.closest('section.panel'); return { panel: sec?.id, title: titleOfCard(c), tab: tabOf(sec) }; };
+const findCard = k => (k?.panel && k.title && tabOf(document.getElementById(k.panel)) === (k.tab || '') && [...document.querySelectorAll('#' + k.panel + ' :is(' + NEAR_CARD + ')')]
   .find(c => c.offsetParent && titleOfCard(c) === k.title)) || null;
 let lastHit = null, shown = null;
 document.addEventListener('click', e => {
@@ -1555,6 +1556,9 @@ function ownDecorate() {
     const m = mine[pet.id];
     if (m) {
       btn.style.setProperty('display', 'none', 'important'); card.classList.add('kz-is-owned');
+      // gekauft schlägt gesperrt: kein grauer Kasten, kein „Benötigt Level …“ unter „Im Besitz“ (ROADMAP 159)
+      card.classList.remove('kz-locked'); card.style.removeProperty('opacity');
+      card.querySelectorAll(':scope > :not(.kz-own)').forEach(e => { if (e.childElementCount === 0 && /Benötigt|Noch gesperrt|Sozialkontakte Stufe|^🔒/.test(e.textContent.trim())) e.classList.add('kz-hide-lock'); });
       const state = m.active ? 'on' : 'own', s = ownSlot(card);
       if (s.dataset.state === state) return; s.dataset.state = state;
       s.innerHTML = (state === 'on' ? ownLabel('DABEI') : ownLabel('IM BESITZ', ' <button type="button" class="big kz-petgo">Mitnehmen</button>')) + '<div class="kz-own-msg"></div>';

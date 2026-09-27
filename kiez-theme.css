@@ -328,3 +328,4 @@ html body:not(#kz1):not(#kz2) #overview .profile-main-avatar { position: relativ
 html body:not(#kz1):not(#kz2) #overview .profile-warning { font-size: 14px; color: #e6d9bd !important; opacity: 1 !important; }
 /* Spielerkasten: Standardbild statt schwarzer Fläche, solange kein eigenes Profilbild da ist */
 html body:not(#kz1):not(#kz2) .player-slip .profile-avatar { background-color: #2a2620; background-image: url('/bilder/profil-standard.webp'); background-size: cover; background-position: center; }
+html body:not(#kz1):not(#kz2) .kz-hide-lock { display: none !important; }
