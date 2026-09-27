@@ -60,7 +60,7 @@ GitHub push ──▶ Action: Tests (Postgres) ──▶ Migration live in Supab
 
 Ziel: Es gibt fast immer etwas zu tun – auch mit wenigen Spielern. Empfohlener Start: 1, 2, 3, 5.
 
-**⭐ Vom Nutzer ausgewählt für später (27.09.2026):** 17, 19, 20, 22, 23, 24, 25, 26, 29, 30, 31, 32, 34, 37 – Kiosk-Stand, Revanche, Kopfgeld, Wetten, Kosmetik, Hunger, Sucht/Entzug, Ruf, Glücksrad, Pfandtour zu zweit, Tag/Nacht, Live-Stadtereignisse, Nebenquests, Ein-Klick-Verkaufen. Dazu aus J: 38, 39, 40 (eher selten), 43, 44, 47, 48, 49. Dazu aus K (Fahrzeuge): 53, 54 (erst später), 55, 56, 57, 59 (erst später), 60, 61, 63, 64. Dazu L (einheitliches Aussehen): 65–69. Dazu M (Wegweiser): 70–73. Dazu N (flüssiger Seitenwechsel): 74–77. Dazu O (Körperpflege): 78–85. Dazu P (Balancing Gegenstände & Preise): 86–92. Alle übrigen Ideen bleiben ebenfalls im Plan.
+**⭐ Vom Nutzer ausgewählt für später (27.09.2026):** 17, 19, 20, 22, 23, 24, 25, 26, 29, 30, 31, 32, 34, 37 – Kiosk-Stand, Revanche, Kopfgeld, Wetten, Kosmetik, Hunger, Sucht/Entzug, Ruf, Glücksrad, Pfandtour zu zweit, Tag/Nacht, Live-Stadtereignisse, Nebenquests, Ein-Klick-Verkaufen. Dazu aus J: 38, 39, 40 (eher selten), 43, 44, 47, 48, 49. Dazu aus K (Fahrzeuge): 53, 54 (erst später), 55, 56, 57, 59 (erst später), 60, 61, 63, 64. Dazu L (einheitliches Aussehen): 65–69. Dazu M (Wegweiser): 70–73. Dazu N (flüssiger Seitenwechsel): 74–77. Dazu O (Körperpflege): 78–85. Dazu P (Balancing Gegenstände & Preise): 86–92. Dazu Q (Bandensystem): 93–104. Alle übrigen Ideen bleiben ebenfalls im Plan.
 
 ### Offener Fehler
 - Seite scrollt nach 10–15 s ohne Eingabe nach oben (trotz Fix in PR #27; Ursache noch nicht gefunden, Nutzer hat Suche vertagt). Vermutung: Neuzeichnen einer Seite macht sie kurz kürzer. Test-Skizze: alle Seiten 20 s warten, `scrollTo`/`scrollIntoView`/`focus` mitprotokollieren.
@@ -199,4 +199,19 @@ Nutzerwunsch: Alles, was Werte gibt, und alle Preise im Spiel einmal durchgehen 
 90. Einnahmen gegen Ausgaben rechnen: Wie lange spart ein normaler Spieler auf das nächste sinnvolle Ziel? Ziel: immer ein erreichbares nächstes Ziel in Stunden bis wenigen Tagen, große Ziele in Wochen ⭐
 91. Kampfbalance: Level-Bereich 80–150 %, Beute, Versicherung, Tierkämpfe und Bandenboni zusammen prüfen, damit Ausrüstung zählt, aber Level nicht egal ist ⭐
 92. Ergebnis als Tabelle festhalten (supabase/schema/data + Balancing-Notiz) und per Migration umsetzen, mit Test, der Ausreißer erkennt ⭐
+
+### Q. Bandensystem komplett und umfangreich (27.09.2026) ⭐
+Ist-Stand: gründen, Ränge (Chef/Vize/Offizier/Mitglied), Einladungen/Bewerbungen, Chat, Protokoll, Kasse, Ausbau Angriff/Verteidigung, Bandenkriege, Highscore, Stadtteile (0015). Soll Spaß machen und viel Tiefe haben:
+93. Bandenlevel mit Erfahrung: Mitglieder-Aktionen (Flaschen, Siege, Einzahlungen, Kriege, Stadtteile) bringen Banden-Punkte; höheres Level = mehr Plätze und neue Ausbauten ⭐
+94. Bandenhaus mit Räumen zum Ausbauen: Lager (Plunder teilen), Trainingsraum (schnellere Weiterbildung), Zwinger (Tier-Bonus), Werkstatt (Basteln), Tresor (Kasse sicher), Kneipe (Energie) ⭐
+95. Bandenaufgaben pro Woche: gemeinsame Ziele (z. B. 50.000 Flaschen, 200 Siege), Belohnung für alle; Anzeige, wer wie viel beigetragen hat ⭐
+96. Bandenkriege ausbauen: Kriegsziele und Einsatz, Kriegsverlauf mit Punkten pro Tag, Waffenruhe/Kapitulation, Kriegsbeute, Kriegs-Rangliste ⭐
+97. Überfall aufs Bandenhaus: gegnerische Bande kann die Kasse angreifen, Verteidiger werden benachrichtigt und können helfen ⭐
+98. Bündnisse und Feinde: Allianzen mit anderen Banden (kein Angriff untereinander, gemeinsame Kriege), Feindesliste ⭐
+99. Bandenforum mit Themen, Ankündigungen vom Chef, Umfragen ⭐
+100. Bandenprofil: Wappen/Farbe, Motto, Beitrittsbedingungen (Mindestlevel, offen/Bewerbung), öffentliche Erfolge ⭐
+101. Feinere Rechte: wer darf einladen, auszahlen, ausbauen, Krieg erklären; Mitgliedsbeiträge und Auszahlungen aus der Kasse mit Protokoll ⭐
+102. Mitgliederübersicht: aktiv/inaktiv, Beitrag diese Woche, anstupsen, Inaktive automatisch markieren ⭐
+103. Bandenboss-Kampf: wöchentlicher Computer-Boss, den die ganze Bande gemeinsam schlägt ⭐
+104. Banden-Saison mit Rangliste und Preisen (Kronkorken, Titel, Wappen-Rahmen) ⭐
 
