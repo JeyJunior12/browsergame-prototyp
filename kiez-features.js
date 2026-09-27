@@ -153,7 +153,7 @@ loaders.profil = async () => {
     if (!f) btn('➕ Freund hinzufügen', async () => { const r = await rpc('friend_request', { target_id: id }); setTimeout(loaders.profil, 500); return r.status === 'accepted' ? 'Ihr seid jetzt befreundet.' : 'Freundschaftsanfrage verschickt.'; });
     else if (f.status === 'pending' && f.friend_id === me) btn('✅ Anfrage annehmen', async () => { await rpc('friend_respond', { requester_id: id, accept: true }); setTimeout(loaders.profil, 500); return 'Ihr seid jetzt befreundet.'; });
     else btn(f.status === 'accepted' ? '➖ Freundschaft beenden' : '✖ Anfrage zurückziehen', async () => { await rpc('friend_remove', { other_id: id }); setTimeout(loaders.profil, 500); return 'Erledigt.'; });
-    btn('✉ Nachricht', async () => { show('messages'); setTimeout(() => { const s = $('#msgto'); if (s) s.value = id; $('#msgbody')?.focus(); }, 300); });
+    btn('✉ Nachricht', async () => { window.kiezDM?.(id, p.username); return 'Das Gespräch ist unten rechts im Kiez-Chat geöffnet.'; });
     btn('👊 Angreifen', async () => { const r = await rpc('attack_player', { target_id: id }); window.kiezRenderProfile?.(r.profile); return r.result === 'win' ? 'Gewonnen (' + r.attacker_power + ':' + r.defender_power + ') – Beute ' + eur(r.loot) : 'Verloren (' + r.attacker_power + ':' + r.defender_power + ').'; });
     btn('🐾 Tierkampf', async () => petFight(id));
     btn('👥 In Bande einladen', async () => { const r = await rpc('gang_invite', { target_id: id }); return r.status === 'joined' ? 'Aufgenommen.' : 'Einladung verschickt.'; });
@@ -1007,44 +1007,64 @@ html body:not(#kz1):not(#kz2) .kf-chat li { padding: 6px 0; border-bottom: 1px s
 document.head.appendChild(style6);
 
 
-// ---------- Meldungen direkt beim gedrückten Knopf (wie bei Pennergame, nicht irgendwo unten auf der Seite) ----------
-// Merkt sich den zuletzt gedrückten Knopf. Erscheint danach eine Meldung weit weg davon, wird sie in die Karte des Knopfs
-// gespiegelt und das Original ausgeblendet. Wird die Karte neu gezeichnet, findet sie sich über Seite + Kartentitel wieder.
+// ---------- Meldungen direkt beim Fenster der Aktion (wie bei Pennergame) ----------
+// Merkt sich die Karte des zuletzt gedrückten Knopfs. Neue Meldungen werden in diese Karte gespiegelt (volle Breite),
+// das Original ausgeblendet. Die Meldung bleibt stehen, auch wenn die Karte neu gezeichnet wird (Seite + Titel),
+// bis eine neue Meldung kommt. Versteckte Knöpfe, die alte Skripte selbst drücken (z. B. nach einem Timer),
+// gehören über ORIGIN zu ihrer sichtbaren Karte – so landet ein Timer-Ergebnis nie bei einem anderen Knopf.
 const NEAR_CARD = '.card, .kf-box, .activity-card, .drink, .lead-card, .action-block, .status-detail, .profile-wide-row, li';
-let lastHit = null;
+const ORIGIN = {
+  begatspot: () => document.querySelector('.card[data-spot="' + (document.getElementById('begspotid')?.value || '') + '"]')
+};
+const titleOfCard = c => (c?.querySelector('h3, b, h4')?.textContent || '').trim();
+const keyOf = c => ({ panel: c?.closest('section.panel')?.id, title: titleOfCard(c) });
+const findCard = k => (k?.panel && k.title && [...document.querySelectorAll('#' + k.panel + ' :is(' + NEAR_CARD + ')')]
+  .find(c => c.offsetParent && titleOfCard(c) === k.title)) || null;
+let lastHit = null, shown = null;
 document.addEventListener('click', e => {
   const b = e.target.closest('button, .crime-pick, [role="button"]');
-  // Unsichtbare Knöpfe werden von alten Skripten intern angeklickt – die zählen nicht
-  if (!b || !b.offsetParent || b.classList.contains('hide') || b.closest('.kz-nav, .kz-drop, .kz-map, .section-tools, .kiez-quickbar, nav')) return;
-  const card = b.closest(NEAR_CARD);
-  lastHit = { btn: b, card, t: Date.now(), panel: b.closest('section.panel')?.id,
-    title: (card?.querySelector('h3, b, h4')?.textContent || '').trim(), label: b.textContent.trim() };
+  if (!b || b.closest('.kz-nav, .kz-drop, .kz-map, .section-tools, .kiez-quickbar, nav, .kz-dock')) return;
+  let card;
+  if (!b.offsetParent || b.classList.contains('hide')) { const r = ORIGIN[b.id]; card = r && r(); if (!card) return; }
+  // Listenzeilen verschwinden oft beim Neuzeichnen – dann lieber der umgebende Kasten
+  else card = b.closest(NEAR_CARD.replace(', li', '')) || b.closest('li');
+  lastHit = { btn: b.offsetParent ? b : null, card, t: Date.now(), key: keyOf(card) };
 }, true);
 function nearCard() {
   if (!lastHit || Date.now() - lastHit.t > 9000) return null;
-  if (lastHit.card?.isConnected) return lastHit.card;
-  if (!lastHit.title || !lastHit.panel) return null;
-  // Karte wurde neu gezeichnet: gleiche Seite, gleicher Titel
-  return [...document.querySelectorAll('#' + lastHit.panel + ' ' + NEAR_CARD.split(', ').join(', #' + lastHit.panel + ' '))]
-    .find(c => c.offsetParent && (c.querySelector('h3, b, h4')?.textContent || '').trim() === lastHit.title) || null;
+  return lastHit.card?.isConnected ? lastHit.card : findCard(lastHit.key);
+}
+function putNotice(card, html) {
+  document.querySelectorAll('.kz-near').forEach(s => { if (s.parentElement !== card) s.remove(); });
+  let slot = card.querySelector(':scope > .kz-near');
+  if (!slot) { slot = document.createElement('div'); slot.className = 'kz-near'; card.appendChild(slot); }
+  if (slot.innerHTML !== html) slot.innerHTML = html;
+  return slot;
 }
 function placeNotice(n) {
   if (!n.isConnected || n.closest('.kz-near') || n.classList.contains('kz-moved') || !n.offsetParent) return;
-  if (n.closest('#kiezmodal, .kf-modal, #loginmodal, #signupmodal, #auth')) return;
+  if (n.closest('#kiezmodal, .kf-modal, #loginmodal, #signupmodal, #auth, .kz-dock')) return;
+  // Meldung gehört schon zu ihrer eigenen Karte (eigener Ergebniskasten ohne ID, z. B. Schnorrplatz nach dem Timer)? Dann bleibt sie dort.
+  // Verschoben werden nur geteilte Meldungskästen (#…msg) und Meldungen außerhalb von Karten.
+  const home = n.closest(NEAR_CARD.replace(', li', '')), shared = n.parentElement?.id && /msg$/.test(n.parentElement.id);
+  if (home && !shared) return;
   const card = nearCard(); if (!card || card.contains(n)) return;
-  const btn = lastHit.btn?.isConnected ? lastHit.btn : null;
-  // Schon nah genug am Knopf (gleicher Bildschirmbereich)? Dann bleibt sie, wo sie ist
-  const a = (btn || card).getBoundingClientRect(), r = n.getBoundingClientRect();
-  if (Math.abs(r.top - a.bottom) < 140) return;
-  let slot = card.querySelector(':scope > .kz-near');
-  if (!slot) { slot = document.createElement('div'); slot.className = 'kz-near'; card.appendChild(slot); }
-  slot.innerHTML = '';
-  const c = n.cloneNode(true); c.removeAttribute('id'); slot.appendChild(c);
+  const c = n.cloneNode(true); c.removeAttribute('id');
+  const slot = putNotice(card, c.outerHTML);
   n.classList.add('kz-moved');
+  shown = { key: keyOf(card), html: c.outerHTML, t: Date.now() };
   const box = slot.getBoundingClientRect();
   if (box.bottom > innerHeight || box.top < 0) slot.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
 }
+// Karte neu gezeichnet? Meldung wieder einsetzen (bis zu 1 Minute bzw. bis zur nächsten Meldung)
+function keepShown() {
+  if (!shown || Date.now() - shown.t > 60000) return;
+  const c = findCard(shown.key);
+  if (c && !c.querySelector(':scope > .kz-near')) putNotice(c, shown.html);
+}
+let keepQueued = false;
 new MutationObserver(ms => {
+  if (shown && !keepQueued) { keepQueued = true; requestAnimationFrame(() => { keepQueued = false; keepShown(); }); }
   if (!lastHit || Date.now() - lastHit.t > 9000) return;
   const found = new Set();
   ms.forEach(m => {
@@ -1056,10 +1076,247 @@ new MutationObserver(ms => {
 }).observe(document.body, { childList: true, subtree: true, characterData: true });
 const style7 = document.createElement('style');
 style7.textContent = `html body:not(#kz1):not(#kz2) .notice.kz-moved { display: none !important; }
-html body:not(#kz1):not(#kz2) .kz-near { clear: both; margin-top: 10px; }
-html body:not(#kz1):not(#kz2) .kz-near .notice { margin: 0; animation: kzpop .25s ease-out; }
+html body:not(#kz1):not(#kz2) .kz-near { clear: both; margin-top: 12px; grid-column: 1 / -1; flex: 1 0 100%; width: 100%; max-width: none; box-sizing: border-box; }
+html body:not(#kz1):not(#kz2) .kz-near .notice { margin: 0; width: 100%; box-sizing: border-box; font-size: 15px !important; line-height: 1.45; animation: kzpop .25s ease-out; }
 @keyframes kzpop { from { transform: translateY(-4px); opacity: 0; } to { transform: none; opacity: 1; } }`;
 document.head.appendChild(style7);
+
+// ================= Chat-Leiste unten rechts (ROADMAP Platz 1): ALL-Chat + Privatgespräche =================
+// Eingeklappt: Balken „Kiez-Chat“ mit Zähler; aufgeklappt: Reiter „Alle“ / „Privat“, Gespräch mit einem Spieler.
+// Live über Supabase Realtime (Tabellen chat_messages, messages), zusätzlich ruhiges Abfragen als Rückfall.
+const DOCK = { open: false, view: 'all', partner: null, partnerName: '', lastAll: 0, blocked: new Set(), me: null, timer: null, suggestT: 0 };
+const dockGet = (k, d) => { try { const v = localStorage.getItem('kz_dock_' + k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } };
+const dockSet = (k, v) => { try { localStorage.setItem('kz_dock_' + k, JSON.stringify(v)); } catch (e) { } };
+const dockTime = d => { const x = new Date(d), now = new Date(); return x.toDateString() === now.toDateString() ? x.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) : x.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' }); };
+function buildDock() {
+  if (document.getElementById('kz-dock') || !window.kiezProfile) return;
+  DOCK.me = window.kiezProfile.id;
+  const d = document.createElement('div');
+  d.id = 'kz-dock'; d.className = 'kz-dock';
+  d.innerHTML = '<button type="button" class="kz-dock-bar" aria-expanded="false" aria-controls="kz-dock-panel"><span class="kz-dock-dot" aria-hidden="true"></span><b>Kiez-Chat</b><span class="kz-dock-badge hide" aria-label="ungelesen"></span><span class="kz-dock-arrow" aria-hidden="true">▴</span></button>'
+    + '<div class="kz-dock-panel" id="kz-dock-panel" role="dialog" aria-label="Kiez-Chat">'
+    + '<div class="kz-dock-head"><button type="button" class="kz-dock-tab" data-v="all">Alle</button><button type="button" class="kz-dock-tab" data-v="dm">Privat <span class="kz-dock-badge kz-dm-badge hide"></span></button>'
+    + '<button type="button" class="kz-dock-min" aria-label="Chat einklappen">▾</button></div>'
+    + '<div class="kz-dock-sub"></div><div class="kz-dock-body" aria-live="polite"></div>'
+    + '<div class="kz-dock-msg" role="status"></div>'
+    + '<form class="kz-dock-form"><input class="kz-dock-in" maxlength="300" autocomplete="off" placeholder="Nachricht an alle …" aria-label="Nachricht"><button class="big" type="submit">Senden</button></form></div>';
+  document.body.appendChild(d);
+  const q = s => d.querySelector(s);
+  q('.kz-dock-bar').onclick = () => dockToggle(true);
+  q('.kz-dock-min').onclick = () => dockToggle(false);
+  d.querySelectorAll('.kz-dock-tab').forEach(b => b.onclick = () => { DOCK.partner = null; dockView(b.dataset.v); });
+  q('.kz-dock-form').onsubmit = async e => {
+    e.preventDefault();
+    const inp = q('.kz-dock-in'), txt = inp.value.trim(); if (!txt) return;
+    const btn = q('.kz-dock-form button'); btn.disabled = true;
+    try {
+      if (DOCK.view === 'thread') await rpc('send_player_message', { target_id: DOCK.partner, message_body: txt });
+      else await rpc('post_chat', { message_body: txt });
+      inp.value = ''; dockMsg('');
+      await dockRender();
+    } catch (err) { dockMsg(esc(err.message)); }
+    btn.disabled = false; inp.focus();
+  };
+  DOCK.lastAll = dockGet('lastall', 0);
+  sb.from('blocks').select('blocked_id').then(r => { (r.data || []).forEach(x => DOCK.blocked.add(x.blocked_id)); });
+  dockLive();
+  const v = dockGet('view', 'all'), pr = dockGet('partner', null);
+  if (v === 'thread' && pr) { DOCK.partner = pr.id; DOCK.partnerName = pr.name; }
+  DOCK.view = v === 'thread' && !pr ? 'dm' : v;
+  dockToggle(dockGet('open', false), true);
+  dockBadges();
+}
+function dockMsg(html) { const m = document.querySelector('#kz-dock .kz-dock-msg'); if (m) m.innerHTML = html ? '<div class="notice bad">' + html + '</div>' : ''; }
+function dockToggle(open, silent) {
+  const d = document.getElementById('kz-dock'); if (!d) return;
+  DOCK.open = !!open; dockSet('open', DOCK.open);
+  d.classList.toggle('open', DOCK.open);
+  d.querySelector('.kz-dock-bar').setAttribute('aria-expanded', DOCK.open ? 'true' : 'false');
+  document.body.classList.toggle('kz-dock-full', DOCK.open && matchMedia('(max-width: 640px)').matches);
+  if (DOCK.open) dockView(DOCK.view); else if (!silent) dockBadges();
+}
+function dockView(v) {
+  DOCK.view = v; dockSet('view', v); dockSet('partner', v === 'thread' ? { id: DOCK.partner, name: DOCK.partnerName } : null);
+  const d = document.getElementById('kz-dock'); if (!d) return;
+  d.querySelectorAll('.kz-dock-tab').forEach(b => b.classList.toggle('on', b.dataset.v === (v === 'thread' ? 'dm' : v)));
+  const form = d.querySelector('.kz-dock-form'), inp = d.querySelector('.kz-dock-in');
+  form.classList.toggle('hide', v === 'dm');
+  inp.maxLength = v === 'thread' ? 500 : 300;
+  inp.placeholder = v === 'thread' ? 'Nachricht an ' + DOCK.partnerName + ' …' : 'Nachricht an alle …';
+  dockMsg('');
+  dockRender();
+}
+async function dockRender() {
+  const d = document.getElementById('kz-dock'); if (!d || !DOCK.open) return;
+  const body = d.querySelector('.kz-dock-body'), sub = d.querySelector('.kz-dock-sub');
+  const nearBottom = body.scrollHeight - body.scrollTop - body.clientHeight < 60;
+  if (DOCK.view === 'all') {
+    sub.innerHTML = '';
+    const { data } = await sb.from('chat_messages').select('*').order('created_at', { ascending: false }).limit(60);
+    const list = (data || []).filter(m => !DOCK.blocked.has(m.user_id)).reverse();
+    const nm = await names(list.map(m => m.user_id)), admin = !!window.kiezProfile?.is_admin;
+    body.innerHTML = list.map(m => '<div class="kz-cm' + (m.user_id === DOCK.me ? ' mine' : '') + '"><button type="button" class="kz-cname" data-id="' + esc(m.user_id) + '" data-n="' + esc(nm[m.user_id] || '?') + '" title="Privat schreiben">' + esc(nm[m.user_id] || '?') + '</button>'
+      + '<span class="kz-ct">' + dockTime(m.created_at) + '</span>'
+      + (m.user_id === DOCK.me || admin ? '<button type="button" class="kz-cx" data-del="' + m.id + '" aria-label="Löschen" title="Löschen">✕</button>' : '<button type="button" class="kz-cx" data-rep="' + m.id + '" aria-label="Melden" title="Melden">⚑</button>')
+      + '<div class="kz-cb">' + esc(m.body) + '</div></div>').join('') || '<p class="kf-muted kz-empty">Noch still hier. Sag Hallo!</p>';
+    if (list.length) { DOCK.lastAll = list[list.length - 1].id; dockSet('lastall', DOCK.lastAll); }
+    body.querySelectorAll('.kz-cname').forEach(b => b.onclick = () => { if (b.dataset.id !== DOCK.me) window.kiezDM(b.dataset.id, b.dataset.n); });
+    body.querySelectorAll('[data-del]').forEach(b => b.onclick = async () => { try { await rpc('delete_chat', { message_id: +b.dataset.del }); dockRender(); } catch (e) { dockMsg(esc(e.message)); } });
+    body.querySelectorAll('[data-rep]').forEach(b => b.onclick = async () => { if (!confirm('Diese Nachricht der Kiezaufsicht melden?')) return; try { await rpc('report_chat', { message_id: +b.dataset.rep }); dockMsg(''); b.replaceWith(Object.assign(document.createElement('span'), { className: 'kz-ct', textContent: 'gemeldet' })); } catch (e) { dockMsg(esc(e.message)); } });
+    if (nearBottom || !body.dataset.v || body.dataset.v !== 'all') body.scrollTop = body.scrollHeight;
+  } else if (DOCK.view === 'dm') {
+    sub.innerHTML = '<div class="kz-newdm"><input class="kz-dm-find" placeholder="Spielername eintippen …" aria-label="Empfänger suchen" autocomplete="off"><div class="kz-dm-sugg" role="listbox"></div></div>';
+    const conv = await rpc('chat_conversations');
+    body.innerHTML = (conv || []).map(c => '<button type="button" class="kz-conv" data-id="' + esc(c.partner) + '" data-n="' + esc(c.name) + '"><b>' + esc(c.name) + '</b>'
+      + (c.unread > 0 ? '<span class="kz-dock-badge">' + c.unread + '</span>' : '') + '<span class="kz-ct">' + dockTime(c.last_at) + '</span>'
+      + '<span class="kz-cprev">' + (c.last_mine ? 'Du: ' : '') + esc(c.last_body) + '</span></button>').join('') || '<p class="kf-muted kz-empty">Noch keine Gespräche. Tipp oben einen Namen ein oder klick im Chat auf einen Spieler.</p>';
+    body.querySelectorAll('.kz-conv').forEach(b => b.onclick = () => window.kiezDM(b.dataset.id, b.dataset.n));
+    const f = sub.querySelector('.kz-dm-find'), sg = sub.querySelector('.kz-dm-sugg');
+    const suggest = async () => {
+      const r = await rpc('find_players', { q: f.value });
+      sg.innerHTML = (r || []).map(x => '<button type="button" role="option" data-id="' + esc(x.id) + '" data-n="' + esc(x.username) + '">' + esc(x.username) + ' <span class="kf-muted">Lvl ' + x.level + (x.friend ? ' · Freund' : '') + (x.gang ? ' · Bande' : '') + '</span></button>').join('')
+        || (f.value.trim() ? '<p class="kf-muted">Kein Spieler mit diesem Namen.</p>' : '');
+      sg.querySelectorAll('button').forEach(b => b.onclick = () => window.kiezDM(b.dataset.id, b.dataset.n));
+    };
+    f.oninput = () => { clearTimeout(DOCK.suggestT); DOCK.suggestT = setTimeout(suggest, 250); };
+    f.onfocus = suggest;
+    body.dataset.v = 'dm';
+  } else {
+    sub.innerHTML = '<div class="kz-thread-head"><button type="button" class="kz-back" aria-label="Zurück zu den Gesprächen">←</button><b>' + esc(DOCK.partnerName) + '</b><a href="#" class="kiez-player" data-id="' + esc(DOCK.partner) + '">Profil</a></div>';
+    sub.querySelector('.kz-back').onclick = () => dockView('dm');
+    const t = await rpc('chat_thread', { partner: DOCK.partner });
+    body.innerHTML = (t.messages || []).map(m => '<div class="kz-bubble' + (m.mine ? ' mine' : '') + '"><div>' + esc(m.body) + '</div><span class="kz-ct">' + dockTime(m.created_at) + (m.mine && m.read_at ? ' · gelesen' : '') + '</span></div>').join('')
+      || '<p class="kf-muted kz-empty">Schreib die erste Nachricht an ' + esc(DOCK.partnerName) + '.</p>';
+    if (t.blocked) dockMsg('Ihr habt euch gegenseitig blockiert – Nachrichten gehen nicht.');
+    body.scrollTop = body.scrollHeight;
+  }
+  body.dataset.v = DOCK.view;
+  dockBadges();
+}
+async function dockBadges() {
+  const d = document.getElementById('kz-dock'); if (!d) return;
+  let all = 0, dm = 0;
+  try {
+    const u = await rpc('unread_counts'); dm = u?.messages || 0;
+    if (!(DOCK.open && DOCK.view === 'all')) {
+      const { count } = await sb.from('chat_messages').select('id', { count: 'exact', head: true }).gt('id', DOCK.lastAll || 0).neq('user_id', DOCK.me);
+      all = DOCK.lastAll ? Math.min(99, count || 0) : 0;
+    }
+  } catch (e) { return; }
+  const total = all + dm, bar = d.querySelector('.kz-dock-bar .kz-dock-badge'), dmb = d.querySelector('.kz-dm-badge');
+  bar.textContent = total > 99 ? '99+' : total; bar.classList.toggle('hide', !total);
+  dmb.textContent = dm; dmb.classList.toggle('hide', !dm);
+}
+function dockLive() {
+  try {
+    sb.channel('kz-dock')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages' }, () => { if (DOCK.open && DOCK.view === 'all') dockRender(); else dockBadges(); })
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: 'recipient_id=eq.' + DOCK.me }, p => {
+        const from = p.new?.sender_id;
+        if (DOCK.open && ((DOCK.view === 'thread' && DOCK.partner === from) || DOCK.view === 'dm')) dockRender(); else dockBadges();
+      })
+      .subscribe();
+  } catch (e) { /* ohne Realtime bleibt das Abfragen */ }
+  clearInterval(DOCK.timer);
+  DOCK.timer = setInterval(() => { if (document.hidden) return; if (DOCK.open) dockRender(); else dockBadges(); }, 20000);
+}
+// Von überall ein Privatgespräch öffnen (Profil, Chat, Listen)
+window.kiezDM = (id, name) => {
+  if (!id || id === DOCK.me) return;
+  DOCK.partner = id; DOCK.partnerName = name || 'Spieler';
+  if (!document.getElementById('kz-dock')) buildDock();
+  dockToggle(true, true); dockView('thread');
+  setTimeout(() => document.querySelector('#kz-dock .kz-dock-in')?.focus(), 200);
+};
+buildDock();
+{ const prev = window.kiezOnProfile; window.kiezOnProfile = p => { prev?.(p); buildDock(); }; }
+
+// Kiezpost-Seite: Empfänger per Name statt Liste aller Spieler (Vorschläge: Freunde und Bande zuerst)
+function upgradeMailForm() {
+  const sel = document.getElementById('msgto'); if (!sel || document.getElementById('kz-msgname')) return;
+  sel.classList.add('hide');
+  const wrap = document.createElement('div'); wrap.className = 'kz-newdm';
+  wrap.innerHTML = '<input id="kz-msgname" placeholder="Empfänger: Spielername eintippen …" aria-label="Empfänger" autocomplete="off"><div class="kz-dm-sugg" role="listbox"></div>';
+  sel.after(wrap);
+  const inp = wrap.querySelector('input'), sg = wrap.querySelector('.kz-dm-sugg');
+  // Das alte Skript füllt die Liste bei jedem Neuladen mit allen Spielern – danach wieder auf die gewählte Person setzen
+  let chosen = null;
+  const want = () => chosen ? '<option value="' + esc(chosen.id) + '">' + esc(chosen.n) + '</option>' : '<option value="">–</option>';
+  const apply = () => { if (sel.innerHTML !== want()) sel.innerHTML = want(); sel.value = chosen ? chosen.id : ''; };
+  new MutationObserver(apply).observe(sel, { childList: true });
+  const choose = (id, n) => { chosen = id ? { id, n } : null; apply(); if (n) inp.value = n; sg.innerHTML = ''; };
+  const suggest = async () => {
+    const r = await rpc('find_players', { q: inp.value });
+    const exact = (r || []).find(x => x.username.toLowerCase() === inp.value.trim().toLowerCase());
+    chosen = exact ? { id: exact.id, n: exact.username } : null; apply();
+    sg.innerHTML = (r || []).map(x => '<button type="button" data-id="' + esc(x.id) + '" data-n="' + esc(x.username) + '">' + esc(x.username) + ' <span class="kf-muted">Lvl ' + x.level + (x.friend ? ' · Freund' : '') + (x.gang ? ' · Bande' : '') + '</span></button>').join('');
+    sg.querySelectorAll('button').forEach(b => b.onclick = () => choose(b.dataset.id, b.dataset.n));
+  };
+  let t = 0; inp.oninput = () => { clearTimeout(t); t = setTimeout(suggest, 250); };
+  inp.onfocus = () => { if (!inp.value) suggest(); };
+  apply();
+}
+upgradeMailForm(); setTimeout(upgradeMailForm, 1500);
+
+const style8 = document.createElement('style');
+style8.textContent = `
+html body:not(#kz1):not(#kz2) .kz-dock { position: fixed; right: 18px; bottom: 0; z-index: 9000; width: 340px; font-family: var(--font-body); }
+html body:not(#kz1):not(#kz2) .kz-dock-bar { width: 100%; display: flex; align-items: center; gap: 10px; padding: 11px 14px !important; min-height: 46px; border-radius: 10px 10px 0 0 !important; background: var(--leather) !important; color: var(--text) !important; border: 2px solid var(--brass-dark) !important; border-bottom: 0 !important; box-shadow: 0 -4px 16px rgba(0,0,0,.4) !important; font: 700 15px var(--font-head) !important; cursor: pointer; }
+html body:not(#kz1):not(#kz2) .kz-dock-bar b { flex: 1; text-align: left; }
+html body:not(#kz1):not(#kz2) .kz-dock-dot { width: 10px; height: 10px; border-radius: 50%; background: #6dbb4f; box-shadow: 0 0 0 3px rgba(109,187,79,.25); }
+html body:not(#kz1):not(#kz2) .kz-dock-badge { min-width: 22px; height: 22px; padding: 0 6px; border-radius: 11px; background: var(--rust); color: #fff; font: 700 12px/22px var(--font-body); text-align: center; }
+html body:not(#kz1):not(#kz2) .kz-dock-badge.hide { display: none; }
+html body:not(#kz1):not(#kz2) .kz-dock-panel { display: none; }
+html body:not(#kz1):not(#kz2) .kz-dock.open .kz-dock-bar { display: none; }
+html body:not(#kz1):not(#kz2) .kz-dock.open .kz-dock-panel { display: flex; flex-direction: column; height: 460px; max-height: calc(100vh - 90px); background: var(--leather); border: 2px solid var(--brass-dark); border-bottom: 0; border-radius: 10px 10px 0 0; box-shadow: 0 -6px 24px rgba(0,0,0,.5); overflow: hidden; }
+html body:not(#kz1):not(#kz2) .kz-dock-head { display: flex; gap: 4px; padding: 6px; background: var(--leather-2); border-bottom: 1px solid var(--line); }
+html body:not(#kz1):not(#kz2) .kz-dock-tab, html body:not(#kz1):not(#kz2) .kz-dock-min { min-height: 38px; padding: 6px 12px !important; background: transparent !important; color: var(--muted) !important; border: 0 !important; border-radius: 6px !important; box-shadow: none !important; font: 700 14px var(--font-head) !important; }
+html body:not(#kz1):not(#kz2) .kz-dock-tab.on { background: rgba(209,169,79,.18) !important; color: var(--brass) !important; }
+html body:not(#kz1):not(#kz2) .kz-dock-min { margin-left: auto; font-size: 18px !important; }
+html body:not(#kz1):not(#kz2) .kz-dock-sub:empty { display: none; }
+html body:not(#kz1):not(#kz2) .kz-dock-sub { padding: 8px 10px; border-bottom: 1px solid var(--line); }
+html body:not(#kz1):not(#kz2) .kz-dock-body { flex: 1; overflow-y: auto; padding: 8px 10px; display: flex; flex-direction: column; gap: 6px; color: var(--text); }
+html body:not(#kz1):not(#kz2) .kz-cm { position: relative; padding: 6px 8px; border-radius: 6px; background: rgba(255,240,210,.04); }
+html body:not(#kz1):not(#kz2) .kz-cm.mine { background: rgba(209,169,79,.10); }
+html body:not(#kz1):not(#kz2) .kz-cname { background: none !important; border: 0 !important; padding: 0 !important; min-height: 0 !important; box-shadow: none !important; color: var(--brass) !important; font: 700 14px var(--font-body) !important; cursor: pointer; }
+html body:not(#kz1):not(#kz2) .kz-ct { margin-left: 6px; color: var(--muted); font-size: 12px; }
+html body:not(#kz1):not(#kz2) .kz-cx { position: absolute; right: 4px; top: 4px; background: none !important; border: 0 !important; padding: 2px 6px !important; min-height: 0 !important; box-shadow: none !important; color: var(--muted) !important; font-size: 13px !important; opacity: .6; }
+html body:not(#kz1):not(#kz2) .kz-cx:hover { opacity: 1; color: var(--rust) !important; }
+html body:not(#kz1):not(#kz2) .kz-cb { font-size: 15px; line-height: 1.4; word-wrap: break-word; }
+html body:not(#kz1):not(#kz2) .kz-conv { display: grid; grid-template-columns: 1fr auto auto; gap: 2px 8px; align-items: center; text-align: left; width: 100%; padding: 9px 10px !important; min-height: 0 !important; background: rgba(255,240,210,.04) !important; border: 1px solid var(--line) !important; border-radius: 6px !important; box-shadow: none !important; color: var(--text) !important; font: 15px var(--font-body) !important; }
+html body:not(#kz1):not(#kz2) .kz-conv b { color: var(--paper-light); }
+html body:not(#kz1):not(#kz2) .kz-cprev { grid-column: 1 / -1; color: var(--muted); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+html body:not(#kz1):not(#kz2) .kz-bubble { max-width: 82%; align-self: flex-start; padding: 7px 10px; border-radius: 10px 10px 10px 2px; background: rgba(255,240,210,.07); font-size: 15px; line-height: 1.4; word-wrap: break-word; }
+html body:not(#kz1):not(#kz2) .kz-bubble.mine { align-self: flex-end; border-radius: 10px 10px 2px 10px; background: rgba(155,60,31,.45); }
+html body:not(#kz1):not(#kz2) .kz-bubble .kz-ct { display: block; margin: 2px 0 0; text-align: right; font-size: 11.5px; }
+html body:not(#kz1):not(#kz2) .kz-thread-head { display: flex; align-items: center; gap: 10px; color: var(--paper-light); }
+html body:not(#kz1):not(#kz2) .kz-thread-head b { flex: 1; font-family: var(--font-head); font-size: 16px; }
+html body:not(#kz1):not(#kz2) .kz-back { min-height: 34px; padding: 2px 10px !important; }
+html body:not(#kz1):not(#kz2) .kz-dock-msg:empty { display: none; }
+html body:not(#kz1):not(#kz2) .kz-dock-msg { padding: 0 10px 6px; }
+html body:not(#kz1):not(#kz2) .kz-dock-form { display: flex; gap: 6px; padding: 8px; border-top: 1px solid var(--line); background: var(--leather-2); }
+html body:not(#kz1):not(#kz2) .kz-dock-form.hide { display: none; }
+html body:not(#kz1):not(#kz2) .kz-dock-in { flex: 1; min-width: 0; min-height: 42px; padding: 8px 10px; }
+html body:not(#kz1):not(#kz2) .kz-dock-form .big { min-height: 42px; padding: 6px 14px !important; }
+html body:not(#kz1):not(#kz2) .kz-newdm { position: relative; }
+html body:not(#kz1):not(#kz2) .kz-newdm input { width: 100%; box-sizing: border-box; min-height: 42px; padding: 8px 10px; }
+html body:not(#kz1):not(#kz2) .kz-dm-sugg { display: flex; flex-direction: column; gap: 2px; margin-top: 4px; max-height: 180px; overflow-y: auto; }
+html body:not(#kz1):not(#kz2) .kz-dm-sugg button { text-align: left; min-height: 38px; padding: 6px 10px !important; background: rgba(255,240,210,.05) !important; color: var(--text) !important; border: 0 !important; box-shadow: none !important; font: 15px var(--font-body) !important; }
+html body:not(#kz1):not(#kz2) .kz-dm-sugg button:hover { background: rgba(209,169,79,.16) !important; }
+html body:not(#kz1):not(#kz2) .kz-empty { text-align: center; margin: 20px 8px; }
+html body:not(#kz1):not(#kz2) .main { padding-bottom: 64px; }
+@media (max-width: 640px) {
+  html body:not(#kz1):not(#kz2) .kz-dock { right: 14px; bottom: 14px; width: auto; }
+  html body:not(#kz1):not(#kz2) .kz-dock-bar { width: 58px; height: 58px; padding: 0 !important; justify-content: center; border-radius: 50% !important; border: 2px solid var(--brass-dark) !important; position: relative; }
+  html body:not(#kz1):not(#kz2) .kz-dock-bar b, html body:not(#kz1):not(#kz2) .kz-dock-arrow { display: none; }
+  html body:not(#kz1):not(#kz2) .kz-dock-bar::before { content: ''; width: 26px; height: 22px; border-radius: 6px; background: var(--brass); clip-path: polygon(0 0, 100% 0, 100% 75%, 35% 75%, 12% 100%, 15% 75%, 0 75%); }
+  html body:not(#kz1):not(#kz2) .kz-dock-dot { display: none; }
+  html body:not(#kz1):not(#kz2) .kz-dock-bar .kz-dock-badge { position: absolute; top: -4px; right: -4px; }
+  html body:not(#kz1):not(#kz2) .kz-dock.open { inset: 0; width: auto; }
+  html body:not(#kz1):not(#kz2) .kz-dock.open .kz-dock-panel { height: 100%; max-height: none; border-radius: 0; border: 0; }
+  html body.kz-dock-full { overflow: hidden; }
+}`;
+document.head.appendChild(style8);
 
 // Zuletzt geöffnete neue Seite wiederherstellen
 try { const last = localStorage.getItem('kiez_last_view'); if (loaders[last]) setTimeout(() => show(last), 1500); } catch (e) { }

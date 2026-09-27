@@ -59,7 +59,7 @@ html body:not(#kz1):not(#kz2) .player-slip #slipname { font-family: var(--font-h
 html body:not(#kz1):not(#kz2) .player-slip > span, html body:not(#kz1):not(#kz2) .player-slip > span * { font-size: 13px !important; line-height: 1.35 !important; }
 html body:not(#kz1):not(#kz2) .player-slip > span b { font-size: 11px !important; letter-spacing: .08em; color: var(--muted) !important; }
 html body:not(#kz1):not(#kz2) .player-slip .slip-messages b { font-size: 13px !important; color: var(--brass) !important; letter-spacing: 0; }
-html body:not(#kz1):not(#kz2) .player-slip #logout { font-size: 13px !important; padding: 4px 10px !important; min-height: 30px !important; position: static !important; margin-top: 4px; }
+html body:not(#kz1):not(#kz2) .player-slip #logout { font-size: 13px !important; padding: 4px 10px !important; min-height: 30px !important; position: static !important; display: block !important; width: auto !important; margin: 8px auto 0 !important; left: auto !important; }
 html body:not(#kz1):not(#kz2) .player-slip .profile-avatar { width: 62px !important; height: 62px !important; border-radius: 4px !important; border: 2px solid var(--brass-dark) !important; }
 
 /* ---------- Statusleiste ---------- */
