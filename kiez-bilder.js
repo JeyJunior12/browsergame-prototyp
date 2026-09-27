@@ -69,8 +69,8 @@
     ['#stadtteile', /^Bahnhofsviertel/, 'gebiet-bahnhof'], ['#stadtteile', /^Altstadt/, 'gebiet-touristen'], ['#stadtteile', /^Hafen/, 'heim-kran'],
     ['#stadtteile', /^Stadtpark/, 'gebiet-park'], ['#stadtteile', /^Marktplatz/, 'schnorr-fussgaengerzone'], ['#stadtteile', /^Villenviertel/, 'gebiet-luxus'],
     ['#basar', /^Plunder anbieten/, 'lager-inventar'], ['#basar', /^Deine Angebote/, 'kk-plunderkiste'],
-    ['#zockerbude', /^Hütchenspiel/, 'stadt-gluecksspiel'], ['#zockerbude', /^Würfelduell/, 'lotto'],
-    ['#schliessfach', /^Dein Schließfach/, 'laden-geldversteck'], ['#schliessfach', /^Bargeld in der Tasche/, 'musik-kasse'],
+    ['#zockerbude', /^Hütchenspiel/, 'zocker-huetchen|stadt-gluecksspiel'], ['#zockerbude', /^Würfelduell/, 'zocker-wuerfel|stadt-gluecksspiel'],
+    ['#schliessfach', /^Dein Schließfach/, 'laden-geldversteck'], ['#schliessfach', /^Bargeld in der Tasche/, 'ausbau-2'],
     ['#schliessfach', /^Einzahlen/, 'profil-spende'], ['#schliessfach', /^Abheben/, 'bande-kasse'],
     ...['erfolg-01', 'skill-sprechen', 'skill-angriff', 'erfolg-27', 'erfolg-11', 'erfolg-04', 'erfolg-19', 'erfolg-32', 'erfolg-31', 'erfolg-29',
       'erfolg-24', 'erfolg-12', 'uebersicht-aufstieg', 'verbrechen-einbruch', 'erfolg-22', 'erfolg-02', 'erfolg-10'].map((f, i) => ['#geschichte', new RegExp('^Kapitel ' + (i + 1) + ':'), f]),
@@ -134,7 +134,7 @@
       ['Ausgeblichene Warnweste', 'laden-warnweste'], ['Mehrlagige Kartonrüstung', 'laden-kartonruestung'], ['Zerkratzter Bauhelm', 'laden-bauhelm'],
       ['Veteranen-Wintermantel', 'laden-wintermantel'], ['Mofamotor für den Wagen', 'laden-mofamotor'], ['Unheimliche Glücksflasche', 'laden-gluecksflasche'],
       ['Kettenhandschuhe', 'laden-kettenhandschuhe'], ['Trillerpfeife', 'laden-trillerpfeife'], ['Klappspaten', 'laden-klappspaten'],
-      ['Taschenlampe', 'laden-taschenlampe'], ['Survival-Rucksack', 'laden-rucksack'], ['Funkgeraet', 'laden-funkgeraet'],
+      ['Taschenlampe', 'laden-taschenlampe'], ['Survival-Rucksack', 'laden-rucksack'], ['Funkgerät', 'laden-funkgeraet'],
       ['Solarpanel-Set', 'laden-solarpanel'], ['Gepanzerte Handkarre', 'laden-handkarre'], ['Zubehör: Geldversteck', 'laden-geldversteck'],
       ['Krummes Zahnstocher-Bündel', 'waffe-zahnstocher'], ['Abgebrochene Limo-Flasche', 'waffe-limoflasche'], ['Wasserbomben', 'waffe-wasserbomben'],
       ['Kettenschloss', 'waffe-kettenschloss'], ['Schlagring', 'waffe-schlagring'], ['Schwert', 'waffe-schwert'],
@@ -154,9 +154,9 @@
       ['Wellensittich', 'tier-wellensittich'], ['Taube', 'tier-taube'], ['Ratte', 'tier-ratte'], ['Hase', 'tier-hase'],
       ['Frettchen', 'tier-frettchen'], ['Katze', 'tier-katze'], ['Falke', 'tier-falke'], ['Schlange', 'tier-schlange'],
       ['Hausziege', 'tier-ziege'], ['Pudel', 'tier-pudel'], ['Dressierte Maus', 'tier-dressierte-maus'], ['Adler', 'tier-adler'],
-      ['Schaeferhund', 'tier-schaeferhund'], ['Pitbull', 'tier-pitbull'], ['Cocker Spaniel', 'tier-cocker'], ['Chihuahua', 'tier-chihuahua'],
+      ['Schäferhund', 'tier-schaeferhund'], ['Pitbull', 'tier-pitbull'], ['Cocker Spaniel', 'tier-cocker'], ['Chihuahua', 'tier-chihuahua'],
       ['Pferd', 'tier-pferd'], ['Giraffe', 'tier-giraffe'], ['Krokodil', 'tier-krokodil'], ['Tiger', 'tier-tiger'],
-      ['Aeffchen', 'tier-affe'], ['Nashorn', 'tier-nashorn'],
+      ['Äffchen', 'tier-affe'], ['Nashorn', 'tier-nashorn'],
       // S18: neue Stücke bis Level 150 (Fotos in bilder2.py, bis dahin Ersatzbild)
       ...[['Brechstange', 'waffe-brechstange'], ['Baseballschläger', 'waffe-baseballschlaeger'], ['Vorschlaghammer', 'waffe-vorschlaghammer'],
         ['Kettensäge ohne Kette', 'waffe-kettensaege'], ['Stuhlbein-Nunchakus', 'waffe-nunchakus'], ['Eishockeyschläger', 'waffe-hockeyschlaeger'],
@@ -206,13 +206,36 @@
     ['#pvp', /^Verteidigung$/, 'kampf-verteidigung'],
     ['#pvp', /^(?!Kampfstärke$|Verteidigung$).+/, 'kampf-gegner']
   ];
+  // Schlussdurchsicht: nicht überall dasselbe Foto (Pfand-Seite, Prügelei)
+  R.push(['#pfand', /^Flaschen verkaufen$/, 'pfand-kurs'], ['#pfand', /^Mülltonne durchwühlen$/, 'klein-container'],
+    ['#pfand', /^Flaschen sortieren$/, 'lager-inventar'], ['#pfand', /^Pfandflaschen sammeln$/, 'start-pfand'],
+    ['#pvp', /^Deine Kampfwerte$/, 'kampf-staerke'], ['#pvp', /^Kiezboss/, 'npc-boss|start-kampf'], ['#pvp', /^Computer-Gegner$/, 'kampf-verteidigung'],
+    ['#pvp', /^Suff-Kopp/, 'npc-suffkopp|essen-feuerwasser'], ['#pvp', /^Pfandneider/, 'npc-pfandneider|gebiet-altglas'],
+    ['#pvp', /^Türsteher/, 'npc-tuersteher|szene-pruegelei'], ['#pvp', /^Hafenboxer/, 'npc-hafenboxer|start-kampf'],
+    ['#pvp', /^Kiezlegende/, 'npc-kiezlegende|rang-15'], ['#pvp', /^Revanche$/, 'kampf-staerke'],
+    ['#pvp', /^Kopfgelder$/, 'profil-spende'], ['#pvp', /^Kampfturnier/, 'wettbewerb-pokal']);
+  // Neue Seiten (S12–S17): Fotos statt reiner Textkarten – 'eigenes|ersatz' bis die eigenen Motive erzeugt sind
+  R.push(
+    ['#nebenjobs', /^Flyer/, 'job-flyer|brett'], ['#nebenjobs', /^Teller/, 'job-spuelen|essen-eintopf'], ['#nebenjobs', /^Umzugshelfer/, 'job-umzug|ausbau-3'],
+    ['#nebenjobs', /^Nachtwache/, 'job-nachtwache|heim-kran'], ['#nebenjobs', /^Messehelfer/, 'job-messe|events'], ['#nebenjobs', /^Kurier/, 'job-kurier|laden-handkarre'],
+    ['#nebenjobs', /^Umzugsfahrer/, 'job-umzugsfahrer|heim-wohnwagen'], ['#nebenjobs', /^Sperrmüll/, 'job-sperrmuell|klein-container'], ['#nebenjobs', /^Gerade:/, 'mission-heute'],
+    ['#kiosk', /Kiosk/, 'kiosk|stadt-supermarkt'], ['#kiosk', /^Kioske in deiner Gegend/, 'stadt-eigenheime'],
+    ['#kredithai', /^Der Kredithai/, 'kredithai|bande-kasse'],
+    ['#auktion', /^Laufende Auktionen/, 'szene-laden'], ['#auktion', /^Selbst versteigern/, 'kk-plunderkiste'],
+    ['#saison', /^Saison/, 'wettbewerb-pokal'],
+    ['#kiezfiguren', /^Kiosk-Kemal/, 'figur-kemal|stadt-supermarkt'], ['#kiezfiguren', /^Oma Hilde/, 'figur-hilde|essen-broetchen'], ['#kiezfiguren', /^Ratten-Rudi/, 'figur-rudi|tier-ratte'],
+    ['#garage', /^Unterwegs mit/, 'laden-wagen'], ['#garage', /^Einkaufswagen$/, 'laden-wagen'], ['#garage', /^Bollerwagen$/, 'fahrzeug-bollerwagen|ausbau-3'],
+    ['#garage', /^Fahrrad/, 'fahrzeug-fahrrad|laden-handkarre'], ['#garage', /^Lastenrad$/, 'fahrzeug-lastenrad|laden-handkarre'], ['#garage', /^Mofa$/, 'fahrzeug-mofa|laden-mofamotor'],
+    ['#garage', /^Rostiger Kombi$/, 'fahrzeug-kombi|verbrechen-auto'], ['#garage', /^Transporter$/, 'fahrzeug-transporter|verbrechen-auto'], ['#garage', /^Wohnmobil$/, 'fahrzeug-wohnmobil|heim-wohnwagen'],
+    ['#garage', /^Schrottplatz$/, 'schrottplatz|klein-container'], ['#garage', /^(Straßenrennen|Rennen)/, 'rennen|verbrechen-auto'], ['#garage', /^Autoklau/, 'verbrechen-auto'],
+    ['#garage', /^(Werkstatt|Tuning|Wartung)/, 'werkstatt|laden-klappspaten'], ['#garage', /^Führerschein/, 'training-anforderungen']);
   // Basar: dieselben Plunder-Fotos wie in der Plunderkiste
   R.push(...R.filter(r => r[0] === '#plunder' && r[2].startsWith('plunder-')).map(r => ['#basar', r[1], r[2]]));
   R.push(...R.filter(r => r[0] === '#store').map(r => ['#ausruestung', r[1], r[2]]));
   // Vorschaubilder, die das Foto über --kzbild bekommen (Rest wird als .kz-pic ergänzt)
   const THUMB = ':scope>.generated-item-thumb, :scope>.asset-thumb, :scope .skill-portrait, :scope .city-hub-img, :scope>.pharmacy-thumb';
   // Seitenköpfe je Bereich
-  const SZENE = { stadtteile: 'szene-bande', bandenhaus: 'szene-bande', ausruestung: 'szene-laden', basar: 'szene-laden', zockerbude: 'szene-stadt', schliessfach: 'szene-unterkunft', geschichte: 'szene-auftrag',
+  const SZENE = { nebenjobs: 'szene-stadt', auktion: 'szene-laden', kiosk: 'szene-stadt', kredithai: 'szene-post', kiezfiguren: 'szene-auftrag', saison: 'szene-erfolge', statistik: 'szene-rangliste', garage: 'szene-pfand', stadtteile: 'szene-bande', bandenhaus: 'szene-bande', ausruestung: 'szene-laden', basar: 'szene-laden', zockerbude: 'szene-stadt', schliessfach: 'szene-unterkunft', geschichte: 'szene-auftrag',
     chat: 'szene-post', kampfprotokoll: 'szene-pruegelei', pfand: 'szene-pfand', begging: 'szene-schnorren', income: 'szene-stadt', gear: 'szene-unterkunft', training: 'szene-training',
     messages: 'szene-post', gangs: 'szene-bande', missions: 'szene-auftrag', pets: 'szene-tiere', achievements: 'szene-erfolge',
     pvp: 'szene-pruegelei', store: 'szene-laden', leaderboard: 'szene-rangliste', career: 'szene-karriere' };
@@ -265,16 +288,34 @@
     }
   }
 
-  function run() {
+  // Leistung: früher 350 × querySelectorAll über das ganze Dokument bei jeder DOM-Änderung (≈40 % Rechenzeit).
+  // Jetzt: alle Karten einmal holen, pro Karte Titel + Bereich merken und nur neu zuordnen, wenn sich der Titel ändert.
+  const SIMPLE = /^#[\w-]+$/;
+  const EQ = R.filter(r => r[0][0] === '=');                         // Regeln mit eigenem Selektor
+  const memo = new WeakMap();                                        // Karte → { key, file }
+  const pick = file => { const parts = file.split('|'); const f = parts.find(exists); return { f, done: parts.every(p => ok[p] !== null && p in ok) || !!f }; };
+  function fileFor(card, tx) {
+    const ids = new Set(); for (let e = card.parentElement; e; e = e.parentElement) if (e.id) ids.add('#' + e.id);
+    let res = null, done = true;
     for (const [scope, re, file] of R) {
-      document.querySelectorAll(scope === 'body' ? CARD : scope[0] === '=' ? scope.slice(1) : CARD.split(',').map(c => scope + ' ' + c.trim()).join(',')).forEach(card => {
-        const t = titleOf(card);
-        if (!re.test(text(t))) return;
-        // 'neu|ersatz': neues Foto, solange es noch fehlt das Ersatzbild
-        const f = file.split('|').find(exists);
-        if (f) apply(card, f, t);
-      });
+      if (scope[0] === '=') continue;
+      if (scope !== 'body' && !(SIMPLE.test(scope) ? ids.has(scope) : card.closest(scope))) continue;
+      if (!re.test(tx)) continue;
+      // 'neu|ersatz': neues Foto, solange es noch fehlt das Ersatzbild
+      const r = pick(file); if (!r.done) done = false; if (r.f) res = r.f;
     }
+    return { file: res, done };
+  }
+  function run() {
+    document.querySelectorAll(CARD).forEach(card => {
+      const t = titleOf(card), tx = text(t);
+      let m = memo.get(card);
+      if (!m || m.key !== tx) { const r = fileFor(card, tx); m = { key: tx, file: r.file }; if (r.done) memo.set(card, m); else memo.delete(card); }
+      if (m.file) apply(card, m.file, t);
+    });
+    for (const [scope, re, file] of EQ) document.querySelectorAll(scope.slice(1)).forEach(card => {
+      const t = titleOf(card); if (!re.test(text(t))) return; const f = file.split('|').find(exists); if (f) apply(card, f, t);
+    });
     // Sammelgebiete (Stadt & Einkommen → Schnorrplätze)
     document.querySelectorAll('.area-card[data-idx]').forEach(card => {
       const file = 'gebiet-' + ['bahnhof', 'altglas', 'park', 'touristen', 'luxus'][card.dataset.idx];
