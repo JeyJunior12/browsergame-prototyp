@@ -2411,6 +2411,7 @@ async function chancePoll() {
 setInterval(chancePoll, 120000); setTimeout(chancePoll, 20000);
 
 // ---------- 1: Computer-Gegner + Kiezboss in der Prügelei ----------
+let npcLast = null;
 async function drawNpc() {
   const pvp = document.querySelector('#pvp .inside'); if (!pvp || !window.kiezProfile) return;
   let box = document.getElementById('kz-npcs'); if (!box) { box = document.createElement('div'); box.id = 'kz-npcs'; pvp.prepend(box); }
@@ -2423,8 +2424,10 @@ async function drawNpc() {
     + (boss.top.length ? '<p class="kf-muted">Beste Schläger: ' + boss.top.slice(0, 5).map(t => playerLink(t.user_id, t.name) + ' (' + t.damage + ')').join(' · ') + '</p>' : '') + '</div>'
     + '<div class="kf-box"><h3>Computer-Gegner</h3><p class="kf-muted">Immer jemand zum Prügeln da – die Gegner wachsen mit dir. 10 Energie, jeder Gegner alle 10 Minuten.</p><div class="kf-grid">'
     + npcs.map(n => { const wait = n.ready_at && new Date(n.ready_at).getTime() > now; return '<div class="card kz-npc" data-npc="' + n.id + '"><b>' + esc(n.name) + '</b><p class="kf-muted">' + esc(n.description) + '</p><p>Stärke ca. ' + n.power + ' · Beute bis ' + eur(n.loot * 1.2) + ' · ' + n.xp + ' Punkte</p><div class="kf-row"><button class="big kz-npc-go"' + (wait ? ' disabled' : '') + '>' + (wait ? 'Erholt sich bis ' + new Date(n.ready_at).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) : 'Angreifen') + '</button></div><div class="kz-npc-msg"></div></div>'; }).join('') + '</div></div>';
-  const hit = box.querySelector('.kz-wb-hit'); if (!hit.disabled) act(hit, box.querySelector('.kz-wb-msg'), async () => { const r = await rpc('world_boss_hit'); window.kiezRenderProfile?.(r.profile); setTimeout(drawNpc, 600); nextLoad(); return r.defeated ? 'Volltreffer – der Kiezboss ist erledigt!' : 'Treffer: ' + r.damage + ' Schaden.'; });
-  box.querySelectorAll('.kz-npc').forEach(c => { const b = c.querySelector('.kz-npc-go'); if (!b.disabled) act(b, c.querySelector('.kz-npc-msg'), async () => { const r = await rpc('fight_npc', { npc_id: c.dataset.npc }); window.kiezRenderProfile?.(r.profile); setTimeout(drawNpc, 4000); nextLoad(); if (!r.won) throw new Error('Verloren gegen ' + r.npc + ' (' + r.mine + ' zu ' + r.theirs + '). Trainier Angriff und komm wieder.'); return 'Gewonnen gegen ' + esc(r.npc) + ' (' + r.mine + ' zu ' + r.theirs + '): +' + eur(r.loot) + ', +' + r.xp + ' Punkte.'; }); });
+  const hit = box.querySelector('.kz-wb-hit'); if (!hit.disabled) act(hit, box.querySelector('.kz-wb-msg'), async () => { const r = await rpc('world_boss_hit'); window.kiezRenderProfile?.(r.profile); setTimeout(drawNpc, 600); nextLoad(); const t = r.defeated ? 'Volltreffer – der Kiezboss ist erledigt!' : 'Treffer: ' + r.damage + ' Schaden. Nächster Schlag in einer Stunde.'; npcLast = { sel: '.kz-wb-msg', txt: t, good: true, t: Date.now() }; return t; });
+  box.querySelectorAll('.kz-npc').forEach(c => { const b = c.querySelector('.kz-npc-go'); if (!b.disabled) act(b, c.querySelector('.kz-npc-msg'), async () => { const r = await rpc('fight_npc', { npc_id: c.dataset.npc }); window.kiezRenderProfile?.(r.profile); setTimeout(drawNpc, 4000); nextLoad(); const sel = '.kz-npc[data-npc="' + c.dataset.npc + '"] .kz-npc-msg'; if (!r.won) { const t = 'Verloren gegen ' + r.npc + ' (' + r.mine + ' zu ' + r.theirs + '). Trainier Angriff und komm wieder.'; npcLast = { sel, txt: esc(t), good: false, t: Date.now() }; throw new Error(t); } const t = 'Gewonnen gegen ' + esc(r.npc) + ' (' + r.mine + ' zu ' + r.theirs + '): +' + eur(r.loot) + ', +' + r.xp + ' Punkte.'; npcLast = { sel, txt: t, good: true, t: Date.now() }; return t; }); });
+  // Meldung nach dem Neuzeichnen wieder einsetzen (Durchspiel-Test: Kiezboss-Treffer verschwand ohne Meldung)
+  if (npcLast && Date.now() - npcLast.t < 10000) { const m = box.querySelector(npcLast.sel); if (m) say(m, npcLast.txt, npcLast.good); }
 }
 { const prevPvp = loaders.pvp; loaders.pvp = () => { prevPvp?.(); setTimeout(drawNpc, 300); }; }
 
@@ -3393,3 +3396,20 @@ document.addEventListener('click', e => {
     if (n && !n.textContent.includes('angelegt')) n.textContent = n.textContent.replace(/\.?\s*$/, '') + ' – und gleich angelegt' + (cur ? ' (statt ' + cur.name + ')' : '') + '.';
   } catch { } }, 1200);
 }, true);
+
+// Zu teuer? Knopf ausgrauen und beim Klick sofort sagen, was fehlt (Durchspiel-Test 166: erst der Server meldete „reicht nicht“)
+{
+  const SEL = '.trainbtn, .trainpet, .buycontainertier, .buyitem, .buypet, .buyinstrument, .kz-wh-buy, .kz-wh-go, .kz-veh-buy, .area-unlock, .craft-go, .kz-k-up, .buydefense';
+  const priceOf = b => { const m = (b.textContent || '').match(/(\d[\d.]*,\d\d) ?€/); return m ? +m[1].replace(/\./g, '').replace(',', '.') : null; };
+  const mark = () => { const money = +(window.kiezProfile?.money ?? 0);
+    document.querySelectorAll(SEL).forEach(b => { const pr = priceOf(b), poor = pr != null && !b.disabled && pr > money + 0.001;
+      b.classList.toggle('kz-poor', poor); if (poor) b.dataset.kzmiss = (pr - money).toFixed(2); }); };
+  setInterval(mark, 1500); const prev = window.kiezOnProfile; window.kiezOnProfile = p => { prev?.(p); setTimeout(mark, 50); };
+  document.addEventListener('click', e => { const b = e.target.closest('.kz-poor'); if (!b) return; mark(); if (!b.classList.contains('kz-poor')) return;
+    e.preventDefault(); e.stopImmediatePropagation();
+    const bank = +(window.kiezProfile?.bank_balance || 0), miss = +b.dataset.kzmiss;
+    const card = b.closest(NEAR_CARD.replace(', li', '')) || b.parentElement;
+    putNotice(card, '<div class="notice bad">Dir fehlen ' + eur(miss) + '. ' + (bank >= miss ? 'Im Schließfach liegen ' + eur(bank) + ' – erst abheben.' : 'Geh Pfand sammeln oder such dir einen Nebenjob.') + '</div>');
+  }, true);
+  const st = document.createElement('style'); st.textContent = 'html body:not(#kz1):not(#kz2) .kz-poor{opacity:.55;filter:grayscale(.6);cursor:not-allowed}'; document.head.appendChild(st);
+}
