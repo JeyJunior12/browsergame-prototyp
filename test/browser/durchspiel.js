@@ -13,6 +13,7 @@ const DANGER = /abmelden|löschen|entfernen|auflösen|verlassen|kündigen|melden
 // beim Erkunden unbekannter Seiten zusätzlich nichts gegen andere Spieler auslösen
 const DANGER_X = new RegExp(DANGER.source + '|überfall|klauen|angreifen|herausfordern|ausrauben|stehlen|zuschlagen|krieg', 'i');
 let visit = START, pg, b, errs = [];
+const full = () => visit % 5 === 0;  // alle 5 Besuche: jede Seite, Extras, Aussehen
 
 async function boot() {
   ({ b, pg } = await lib.open(process.env.URL));
@@ -33,7 +34,7 @@ async function go(view, tab) {
   await pg.waitForTimeout(700);
   await pg.waitForFunction(v => !/Lade[^\n]{0,20}…/.test(document.getElementById(v)?.innerText || ''), view, { timeout: 12000 }).catch(() => log({ v: visit, typ: 'LÄDT-EWIG', wo: view + '/' + (tab || '') }));
   await pg.waitForTimeout(400); await popups(view);
-  await look(view, tab);
+  if (full()) await look(view, tab);
   const leer = await pg.evaluate(v => { const s = document.getElementById(v); return !s || s.innerText.trim().length < 40; }, view);
   if (leer) log({ v: visit, typ: 'LEER', wo: view + '/' + (tab || '') });
 }
@@ -52,7 +53,7 @@ async function look(view, tab) {
     if (document.documentElement.scrollWidth > innerWidth + 2) out.push('Seite scrollt quer');
     return [...new Set(out)].slice(0, 12); });
   r.forEach(m => log({ v: visit, typ: 'AUSSEHEN', wo: key, msg: m }));
-  const w = Math.floor(visit / 25); if (!shot.has(w + key)) { shot.add(w + key); fs.mkdirSync(OUT + '/bilder', { recursive: true });
+  const w = Math.floor(visit / 50); if (!shot.has(w + key)) { shot.add(w + key); fs.mkdirSync(OUT + '/bilder', { recursive: true });
     await pg.evaluate(() => scrollTo(0, 0)); await pg.screenshot({ path: OUT + '/bilder/' + visit + '_' + key + '.jpg', fullPage: true, quality: 55, type: 'jpeg' }).catch(() => {}); }
 }
 // sichtbare Meldungstexte (für vorher/nachher-Vergleich)
@@ -92,7 +93,7 @@ const eurOf = (s) => { const m = String(s).match(/(\d[\d.]*,\d\d) ?€/); return
 const priceFn = (money, share) => `e=>{const m=e.textContent.match(/(\\d[\\d.]*,\\d\\d) ?€/);if(!m)return null;const p=+m[1].replace(/\\./g,'').replace(',','.');return p<=${money * share}?p:null}`;
 
 // ---------- ein Besuch ----------
-async function besuch(skip) {
+async function besuch() {
   let p = await prof();
   // 1) Pfand: ausladen + verkaufen, Mülltonne, Sortierspiel, Tagesbelohnung
   await go('missions', 'Belohnungsserie'); await click('Tagesbelohnung', '#claimdaily', { quiet: true });
@@ -110,7 +111,7 @@ async function besuch(skip) {
   }
   // 2) Verbrechen: zwei Versuche mit dem besten Verbrechen, das Energie/Chance erlauben
   p = await prof();
-  if (!p.jail && visit % 2 === 0) {
+  if (!p.jail && visit % 3 === 0) {
     await go('pfand', 'Verbrechen');
     if (visit < 6) log({ v: visit, typ: 'INFO', label: 'Verbrechen-Karten', msg: await pg.evaluate(() => [...document.querySelectorAll('section.panel.active-view .crime-pick')].map(b => b.closest('.card,li,div').innerText.replace(/\s+/g, ' ').slice(0, 140)).join(' || ')) });
     for (let i = 0; i < 2; i++) {
@@ -121,7 +122,7 @@ async function besuch(skip) {
     if (p.jail) { await click('Kaution', '.crime-paybail', { quiet: true }) ?? await (async () => { await go('kronkorken'); await click('Wärter bestechen', '.kkbuy[data-id="knast"]', { quiet: true }); })(); }
   }
   // 3) Schnorren (Passanten)
-  await go('begging'); for (let i = 0; i < 2; i++) if (await click('Passanten anschnorren', '#beg', { quiet: i > 0 }) == null) break;
+  if (full()) await go('begging'); if (full()) for (let i = 0; i < 2; i++) if (await click('Passanten anschnorren', '#beg', { quiet: i > 0 }) == null) break;
   // 4) Körper: essen / waschen
   p = await prof();
   if (p.hunger != null && p.hunger < 45 || p.energy < 30 || p.promille > 1.5) {
@@ -146,7 +147,7 @@ async function besuch(skip) {
   await go('training', 'Lernwarteschlange');
   for (const s of order.slice(1, 3)) { await pg.selectOption('section.panel.active-view .kz-q-skill', { index: prio.indexOf(s) }).catch(() => {}); if (await click('Einplanen ' + s, '.kz-q-add', { quiet: true }) == null) break; }
   // 7) Einkaufen: Ausrüstung, Sammelgebiet, Instrument, Begleiter, Unterkunft, Lager
-  if (visit % 2 === 0) {
+  if (visit % 4 === 0 || full()) {
   p = await prof();
   // Geld aus dem Schließfach holen, bis die Tasche voll ist (wie ein Spieler vor dem Einkauf)
   if (p.bank > 1 && p.money < p.cap - 1) { await go('schliessfach'); await click('Abheben', '.bwd', { fill: [['section.panel.active-view .bout', Math.floor(Math.min(p.bank, p.cap - p.money))]] }); p = await prof(); }
@@ -161,24 +162,29 @@ async function besuch(skip) {
   await go('pets', 'Meine Begleiter'); await click('Tiertraining abschließen', '.finishpet', { quiet: true }); await click('Tiertraining', '.trainpet', { quiet: true });
   p = await prof(); await go('gear', 'Unterkünfte'); await click('Umziehen', 'button', { pick: `e=>/einziehen|umziehen|mieten|kaufen/i.test(e.textContent)?(${priceFn(p.money, 0.5)})(e):null`, quiet: true });
   }
-  if (visit % 3 === 0) {
+  if (full()) {
   await go('gear', 'Pfandlager'); await click('Pfandlager ausbauen', 'button', { pick: `e=>/ausbauen|kaufen/i.test(e.textContent)?(${priceFn(p.money, 0.4)})(e):null`, quiet: true });
+  }
   // 8) Nebenjob (bester freier)
   await go('nebenjobs'); await click('Nebenjob fertig', 'button', { pick: `e=>/abholen|kassieren|fertig/i.test(e.textContent)?1:null`, quiet: true });
   if (visit % 3 === 1) await click('Nebenjob', '.kz-job-go', { pick: 'last', quiet: true });
   // 9) Aufgaben, Geschichte, Figuren, Erfolge
-  await go('missions', 'Tagesauftrag'); for (let i = 0; i < 3; i++) if (await click('Tagesaufgabe', '.kz-dt-go', { quiet: true }) == null) break;
+  if (visit % 3 === 0) { await go('missions', 'Tagesauftrag'); for (let i = 0; i < 3; i++) if (await click('Tagesaufgabe', '.kz-dt-go', { quiet: true }) == null) break;
   await go('geschichte'); await click('Kapitel', 'button', { pick: `e=>/abholen|belohnung/i.test(e.textContent)?1:null`, quiet: true });
   await go('kiezfiguren'); await click('Kiez-Figur', '.kz-fig-go', { quiet: true });
   }
-  if (visit % 5 === 0) { await go('achievements', 'Erfolge'); await click('Erfolge prüfen', '#checkachievements'); }
+  if (full()) { await go('achievements', 'Erfolge'); await click('Erfolge prüfen', '#checkachievements'); }
   // 10) Seltenere Dinge im Wechsel
-  await extras(visit % 12);
+  if (full()) for (let k = 0; k < 12; k++) await extras(k);
   // 11) neue Tour: längste, die in den Zeitsprung passt
+  // Turbo: nächster Besuch, sobald die Weiterbildung fertig ist (10 Min. bis 12 Std.)
+  await refresh(); const tr = await pg.evaluate(() => window.kiezProfile?.training_ends_at).catch(() => null);
+  const skip = Math.min(720, Math.max(10, tr ? Math.ceil((new Date(tr) - Date.now()) / 60000) + 1 : 60));
   await go('pfand', 'Pfand sammeln');
   const dur = await pg.evaluate(s => { const o = [...document.querySelectorAll('#durationselect option')].map(o => +o.value).filter(v => v <= s); return o.length ? Math.max(...o) : null; }, skip);
   if (dur) await pg.selectOption('#durationselect', String(dur)).catch(() => {});
   await click('Pfandtour ' + dur + ' Min.', '#collect');
+  return skip;
 }
 
 async function extras(k) {
@@ -214,11 +220,11 @@ async function explore(view, money) {
 (async () => {
   await boot();
   for (; visit < START + BESUCHE; visit++) {
-    const skip = visit % 4 === 3 ? 720 : 240; const t0 = Date.now();
-    try { await besuch(skip); } catch (e) { log({ v: visit, typ: 'BOT-FEHLER', msg: e.message.slice(0, 300) }); try { await b.close(); } catch {} await boot(); }
+    let skip = 60; const t0 = Date.now();
+    try { skip = await besuch(); } catch (e) { log({ v: visit, typ: 'BOT-FEHLER', msg: e.message.slice(0, 300) }); try { await b.close(); } catch {} await boot(); }
     let p = await prof(); if (p.level == null) { log({ v: visit, typ: 'BOT-FEHLER', msg: 'Profil fehlt – neu starten' }); try { await b.close(); } catch {} await boot(); p = await prof(); }
-    snap({ v: visit, t: new Date().toISOString(), sek: Math.round((Date.now() - t0) / 1000), ...p });
-    console.log('Besuch', visit, 'Level', p.level, 'Punkte', p.xp, 'Geld', p.money, 'Bank', p.bank, (Date.now() - t0) / 1000 + 's');
+    snap({ v: visit, skip, t: new Date().toISOString(), sek: Math.round((Date.now() - t0) / 1000), ...p });
+    console.log('Besuch', visit, 'Sprung', skip, 'Level', p.level, 'Punkte', p.xp, 'Geld', p.money, 'Bank', p.bank, (Date.now() - t0) / 1000 + 's');
     const r = await rpc('tester_skip_time', { minutes: skip }); if (r.err) log({ v: visit, typ: 'BOT-FEHLER', msg: 'skip ' + r.err });
     if (visit % 20 === 19) { await b.close(); await boot(); } else { await refresh(); }
   }
