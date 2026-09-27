@@ -72,7 +72,7 @@ function addPanel(id, title, label) {
     sec.id = id; sec.className = 'panel';
     $('.main')?.appendChild(sec);
   }
-  sec.innerHTML = '<h2>' + title + '</h2><div class="inside"><div class="kf-body">Lade …</div></div>';
+  sec.innerHTML = '<h2>' + title + '</h2><div class="inside"><div class="kf-body"><div class="kz-skeleton" aria-label="Lade …"></div></div></div>';
   const side = $('.side');
   let b = side?.querySelector('[data-view="' + id + '"]');
   if (side && !b) { b = document.createElement('button'); b.dataset.view = id; b.textContent = label; side.insertBefore(b, $('#adminnav')); }
@@ -634,7 +634,7 @@ Object.keys(loaders).forEach(k => {
     try {
       await f(...x);
       // Noch kein Profil geladen (z. B. direkt nach dem Login): gleich nochmal versuchen statt „Lade …“ stehen zu lassen
-      if (body && window.kiezProfile && body.textContent.trim() === 'Lade …') setTimeout(() => loaders[k](), 1500);
+      if (body && window.kiezProfile && body.querySelector(':scope > .kz-skeleton')) setTimeout(() => loaders[k](), 1500);
     } catch (e) {
       if (body) { body.innerHTML = '<div class="notice bad">Konnte nicht geladen werden: ' + esc(e.message) + '</div><button class="ghost kf-retry">Nochmal versuchen</button>'; body.querySelector('.kf-retry').onclick = () => loaders[k](); }
     }
@@ -1539,6 +1539,118 @@ html body:not(#kz1):not(#kz2) .kz-q-list li { display: flex; align-items: center
 html body:not(#kz1):not(#kz2) .kz-q-skill { min-height: 42px; padding: 6px 10px; }
 @media (max-width: 640px) { html body:not(#kz1):not(#kz2) .kz-combat { grid-template-columns: 1fr; } }`;
 document.head.appendChild(style9);
+
+// ================= S3: Kopfleiste führt genau zur passenden Karte (70–73) =================
+// Ziel: [Seite, Reiter, Selektor der Karte]; die Karte wird nach dem Wechsel oben gezeigt und kurz hervorgehoben
+const HEAD_LINKS = [
+  ['#money', 'schliessfach', null, '#schliessfach .card, #schliessfach h2'],
+  ['.alcohol-stat', 'store', 'Verbrauchbares', '#store .supermarket-inline'],
+  ['.top-training-stat', 'training', 'Lernwarteschlange', '#training .kz-queue'],
+  ['.price-stat', 'pfand', null, '.pfand-pricehistory-card'],
+  ['#bottles', 'pfand', null, '#kz-pfandsell'],
+  ['.clean-stat', 'begging', 'Körperpflege', '#begging .wash-list, #begging .card'],
+  ['#energy', 'pfand', null, '#pfand .section-tools'],
+  ['#level', 'training', 'Fähigkeiten', '#training .skill-grid'],
+  ['.kronkorken-stat', 'kronkorken', null, '#kronkorken .kf-box, #kronkorken h2'],
+];
+// Pfandlager direkt auf der Pfand-Seite verkaufen (70) – Meldung erscheint in der Karte
+function pfandSellCard() {
+  const top = document.getElementById('pfanduebersicht');
+  if (!top || document.getElementById('kz-pfandsell')) return;
+  const c = document.createElement('div'); c.id = 'kz-pfandsell'; c.className = 'card kz-sell-card';
+  c.innerHTML = '<b>🍾 Flaschen verkaufen</b><p>Im Pfandlager: <b class="kz-ps-n">0</b> Flaschen · Kurs <b class="kz-ps-p">–</b> pro Flasche</p>' +
+    '<div class="kf-row"><input type="number" class="kz-ps-qty" min="1" step="1" placeholder="Anzahl"><button class="ghost kz-ps-some">Verkaufen</button><button class="ghost kz-ps-all">Alle verkaufen</button></div><div class="kz-ps-msg"></div>';
+  top.after(c);
+  const sell = qty => async () => {
+    const box = c.querySelector('.kz-ps-msg');
+    const { data, error } = await sb.rpc('sell_bottles', qty ? { qty } : {});
+    if (error) { box.innerHTML = '<div class="notice bad">' + esc(error.message) + '</div>'; return; }
+    window.kiezRenderProfile?.(data.profile);
+    let t = 'Verkauft: ' + data.sold + ' Flaschen zu ' + eur(data.price) + ' – du bekommst ' + eur(data.paid) + '.';
+    if (Number(data.lost) > 0) t += ' ' + eur(data.lost) + ' gingen verloren, weil dein Behälter voll war!';
+    box.innerHTML = '<div class="notice good">' + esc(t) + '</div>'; syncPfandSell();
+  };
+  c.querySelector('.kz-ps-some').onclick = () => { const q = Math.floor(Number(c.querySelector('.kz-ps-qty').value)); if (!(q > 0)) { c.querySelector('.kz-ps-msg').innerHTML = '<div class="notice bad">Gib eine Anzahl ein</div>'; return; } sell(q)(); };
+  c.querySelector('.kz-ps-all').onclick = () => sell(0)();
+  syncPfandSell();
+}
+function syncPfandSell() {
+  const c = document.getElementById('kz-pfandsell'); if (!c) return;
+  c.querySelector('.kz-ps-n').textContent = document.getElementById('bottles')?.textContent || '0';
+  c.querySelector('.kz-ps-p').textContent = document.getElementById('topprice')?.textContent || '–';
+}
+setInterval(() => { pfandSellCard(); syncPfandSell(); }, 1500);
+const isShown = el => !!el && el.offsetParent !== null && el.getBoundingClientRect().height > 0;
+function jumpTo(view, tab, sel) {
+  go(view, tab);
+  let n = 0;
+  const find = () => {
+    const el = sel.split(',').map(x => [...document.querySelectorAll(x)].find(isShown)).find(Boolean); // Reihenfolge = Vorrang
+    if (!el) { if (++n < 25) setTimeout(find, 120); return; }
+    const card = el.matches('input,button,select,label') ? (el.closest('.card,.kf-box') || el) : el;
+    const toCard = smooth => window.scrollTo({ top: Math.max(0, card.getBoundingClientRect().top + window.scrollY - 16), behavior: smooth ? 'smooth' : 'auto' });
+    toCard(true);
+    // Nachladende Bilder oder ein spätes Hochscrollen der Reiter verschieben die Karte – nachkorrigieren
+    [700, 1400].forEach(t => setTimeout(() => { const y = card.getBoundingClientRect().top; if (y < 0 || y > 150) toCard(false); }, t));
+    card.classList.remove('kz-flash'); void card.offsetWidth; card.classList.add('kz-flash');
+    setTimeout(() => card.classList.remove('kz-flash'), 1800);
+  };
+  setTimeout(find, tab ? 650 : 300);
+}
+window.kiezJumpTo = jumpTo;
+document.addEventListener('click', e => {
+  const stat = e.target.closest?.('.stats .stat'); if (!stat) return;
+  const hit = HEAD_LINKS.find(([m]) => stat.matches(m) || stat.querySelector(m)); if (!hit) return;
+  e.preventDefault(); e.stopImmediatePropagation();
+  stat.dataset.kzGo = hit[1];
+  jumpTo(hit[1], hit[2], hit[3]);
+}, true);
+const style10 = document.createElement('style');
+style10.textContent = `@keyframes kzflash{0%,100%{box-shadow:0 0 0 0 transparent}25%,70%{box-shadow:0 0 0 4px var(--brass,#c9a45c),0 0 22px 4px rgba(201,164,92,.55)}}
+html body:not(#kz1):not(#kz2) .kz-flash{animation:kzflash 1.7s ease-in-out;border-radius:var(--radius,8px)}
+html body:not(#kz1):not(#kz2) #kz-pfandsell .kf-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:center;margin-top:8px}
+html body:not(#kz1):not(#kz2) #kz-pfandsell .kz-ps-qty{width:110px;min-height:40px;font-size:15px}`;
+document.head.appendChild(style10);
+
+// ================= S3: Hintergrund pro Hauptbereich, weich überblendet und vorgeladen (74–77) =================
+const bgFile = view => (NAV.find(c => c[2].some(x => x[1] === view)) || NAV[0])[1];
+const bgLayer = document.createElement('div'); bgLayer.id = 'kz-bg'; bgLayer.innerHTML = '<i></i><i></i>'; document.body.prepend(bgLayer);
+let bgNow = '', bgFront = 0;
+function setBg(view) {
+  const file = bgFile(view); if (file === bgNow) return; bgNow = file;
+  const url = '/bilder/' + file + '.webp', img = new Image();
+  img.onload = img.onerror = () => {
+    if (bgNow !== file) return; // inzwischen schon weitergeklickt
+    const next = bgLayer.children[1 - bgFront];
+    next.style.backgroundImage = 'url("' + url + '")';
+    next.classList.add('on'); bgLayer.children[bgFront].classList.remove('on'); bgFront = 1 - bgFront;
+  };
+  img.src = url;
+}
+const bgSync = () => {
+  const inGame = !document.getElementById('game')?.classList.contains('hide');
+  document.documentElement.classList.toggle('kz-bg-on', inGame);
+  if (inGame) setBg(document.querySelector('section.panel.active-view:not(#rumors)')?.id || 'overview');
+};
+new MutationObserver(bgSync).observe(document.querySelector('.main') || document.body, { subtree: true, attributes: true, attributeFilter: ['class'] });
+bgSync(); setTimeout(bgSync, 800);
+// Alle Bereichsbilder im Leerlauf vorladen, damit beim Wechsel nichts nachlädt (77)
+setTimeout(() => (window.requestIdleCallback || setTimeout)(() => NAV.forEach(c => { new Image().src = '/bilder/' + c[1] + '.webp'; })), 2500);
+const style11 = document.createElement('style');
+style11.textContent = `html.kz-bg-on{background:#0d0c0a !important}
+html.kz-bg-on body:not(#kz1):not(#kz2){background:transparent none !important}
+html.kz-bg-on body:not(#kz1):not(#kz2) .main:before{background-image:none !important}
+#kz-bg{position:fixed;inset:0;z-index:-1;pointer-events:none;display:none;background:#0d0c0a}
+html.kz-bg-on #kz-bg{display:block}
+#kz-bg i{position:absolute;inset:0;background:center 40% / cover no-repeat;opacity:0;transition:opacity .7s ease}
+#kz-bg i.on{opacity:1}
+#kz-bg:after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,#050505b0,transparent 30%,transparent 70%,#050505b0),linear-gradient(0deg,#0d0c0af0,#0d0c0a73 55%,#0d0c0a59)}
+@keyframes kzin{from{opacity:.35;transform:translateY(4px)}to{opacity:1;transform:none}}
+html body:not(#kz1):not(#kz2) section.panel.active-view{animation:kzin .22s ease-out}
+html body:not(#kz1):not(#kz2) .kz-skeleton{min-height:360px;border-radius:var(--radius,8px);background:linear-gradient(100deg,#ffffff08 30%,#ffffff14 50%,#ffffff08 70%) 0 0/300% 100%;animation:kzsk 1.4s linear infinite}
+@keyframes kzsk{to{background-position:-300% 0}}
+@media (prefers-reduced-motion:reduce){#kz-bg i{transition:none}html body:not(#kz1):not(#kz2) section.panel.active-view,html body:not(#kz1):not(#kz2) .kz-skeleton{animation:none}}`;
+document.head.appendChild(style11);
 
 // Zuletzt geöffnete neue Seite wiederherstellen
 try { const last = localStorage.getItem('kiez_last_view'); if (loaders[last]) setTimeout(() => show(last), 1500); } catch (e) { }

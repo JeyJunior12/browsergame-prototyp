@@ -74,7 +74,7 @@ Nutzerwunsch, höchste Priorität: ein ALL-Chat als kleine Leiste unten rechts, 
 **⭐ Vom Nutzer ausgewählt für später (27.09.2026):** 17, 19, 20, 22, 23, 24, 25, 26, 29, 30, 31, 32, 34, 37 – Kiosk-Stand, Revanche, Kopfgeld, Wetten, Kosmetik, Hunger, Sucht/Entzug, Ruf, Glücksrad, Pfandtour zu zweit, Tag/Nacht, Live-Stadtereignisse, Nebenquests, Ein-Klick-Verkaufen. Dazu aus J: 38, 39, 40 (eher selten), 43, 44, 47, 48, 49. Dazu aus K (Fahrzeuge): 53, 54 (erst später), 55, 56, 57, 59 (erst später), 60, 61, 63, 64. Dazu L (einheitliches Aussehen): 65–69. Dazu M (Wegweiser): 70–73. Dazu N (flüssiger Seitenwechsel): 74–77. Dazu O (Körperpflege): 78–85. Dazu P (Balancing Gegenstände & Preise): 86–92. Dazu Q (Bandensystem): 93–104. Dazu R (Fehler Waffen kaufen/anlegen, hohe Priorität): 105–109. Dazu S (Plunderkiste): 111–120. Dazu T (Stadtteile sperren, später Städte): 121–124. Dazu U (Kiezpost-Empfänger): 125–127. Dazu V (Schnorrplätze-Seite): 135–140. Alle übrigen Ideen bleiben ebenfalls im Plan. **Zum Schluss:** Gesamtprüfung + Durchspiel-Test Level 1–150 (141–146).
 
 ### Offener Fehler
-- Seite scrollt nach 10–15 s ohne Eingabe nach oben (trotz Fix in PR #27; Ursache noch nicht gefunden, Nutzer hat Suche vertagt). Vermutung: Neuzeichnen einer Seite macht sie kurz kürzer. Test-Skizze: alle Seiten 20 s warten, `scrollTo`/`scrollIntoView`/`focus` mitprotokollieren.
+- ✅ Seite scrollt nach 10–15 s ohne Eingabe nach oben – Ursache: `load()` (alle 60 s und nach Aktionen) rief `showView(currentView)` auf; passte die offene Seite nicht genau zu `currentView`, scrollte sie hoch. Behoben in S3 (Neuladen scrollt nie), Test `test/browser/leerlauf.js`.
 
 ### A. Immer etwas zu tun
 1. Computer-Gegner in jedem Level-Bereich + wöchentlicher Kiezboss (alle prügeln gemeinsam, Beute für alle)
@@ -180,18 +180,18 @@ Nutzerwunsch: Ungleichheiten auf allen Seiten richtig machen. Beispiel: Karte �
 
 ### M. Wegweiser: Klick führt genau dorthin (27.09.2026) ⭐
 Nutzerwunsch: Wer oben auf einen Wert klickt, muss direkt bei der passenden Stelle landen. Beispiel: Klick auf „Pfandlager“ in der Kopfleiste öffnet die Plunderkiste, der Pfand-Bereich (Flaschen verkaufen) kommt erst weiter unten – komplett falsch.
-70. „Pfandlager“ oben führt direkt zum Flaschen-Verkaufen (Pfand-Seite, Bereich sichtbar ganz oben) ⭐
-71. Alle Werte in der Kopfleiste prüfen und richtig verlinken (Bargeld → Schließfach/Einnahmen, Alkoholpegel → Apotheke/Supermarkt, Weiterbildung → Weiterbildung, Pfandpreis → Pfandkurs, Energie → Aktionen, Kronkorken → Kronkorken-Tausch) ⭐
-72. Nach dem Sprung zur Stelle scrollen und sie kurz hervorheben, damit man sofort sieht, wo man ist ⭐
-73. Prüfskript: jeden Link/Wert anklicken und prüfen, ob die passende Karte oben im Bild steht ⭐
+70. ✅ „Pfandlager“ oben führt direkt zum Flaschen-Verkaufen (Pfand-Seite, Bereich sichtbar ganz oben) ⭐
+71. ✅ Alle Werte in der Kopfleiste prüfen und richtig verlinken (Bargeld → Schließfach/Einnahmen, Alkoholpegel → Apotheke/Supermarkt, Weiterbildung → Weiterbildung, Pfandpreis → Pfandkurs, Energie → Aktionen, Kronkorken → Kronkorken-Tausch) ⭐
+72. ✅ Nach dem Sprung zur Stelle scrollen und sie kurz hervorheben, damit man sofort sieht, wo man ist ⭐
+73. ✅ Prüfskript: jeden Link/Wert anklicken und prüfen, ob die passende Karte oben im Bild steht ⭐
 73a. ✅ Klick auf den Spielnamen „KIEZKÖNIG“ oben links führt immer zur Startseite (eingeloggt: Übersicht, ausgeloggt: Startseite), auf PC und Handy ⭐
 
 ### N. Flüssiger Seitenwechsel (27.09.2026) ⭐
 Nutzerwunsch: Der Wechsel zwischen Seiten wirkt ruckelig, und das große Hintergrundbild wechselt bei jedem Klick zu stark – das stört.
-74. Hintergrundbild nur pro Hauptbereich des Menüs wechseln (Mein Kiez, Aktionen, Stadt, Kampf, Bande, Kommunikation, Highscore), nicht bei jeder Unterseite/jedem Reiter ⭐
-75. Weicher Übergang: Hintergrund sanft überblenden statt hart tauschen, Inhalt kurz einblenden (ohne Springen/Flackern) ⭐
-76. Beim Wechsel kein „Lade …“-Aufblitzen und kein Zusammenfallen der Seite: alter Inhalt bleibt stehen, bis der neue da ist, Platz wird freigehalten ⭐
-77. Bilder der Hintergründe vorladen, damit beim Wechsel nichts nachlädt ⭐
+74. ✅ Hintergrundbild nur pro Hauptbereich des Menüs wechseln (Mein Kiez, Aktionen, Stadt, Kampf, Bande, Kommunikation, Highscore), nicht bei jeder Unterseite/jedem Reiter ⭐
+75. ✅ Weicher Übergang: Hintergrund sanft überblenden statt hart tauschen, Inhalt kurz einblenden (ohne Springen/Flackern) ⭐
+76. ✅ Beim Wechsel kein „Lade …“-Aufblitzen und kein Zusammenfallen der Seite: alter Inhalt bleibt stehen, bis der neue da ist, Platz wird freigehalten ⭐
+77. ✅ Bilder der Hintergründe vorladen, damit beim Wechsel nichts nachlädt ⭐
 
 ### O. Körperpflege mit echtem Sinn (27.09.2026) ⭐
 Ist-Stand: Sauberkeit sinkt nur durch Pfandtouren, wirkt nur aufs Schnorren (Faktor Sauberkeit/200) und sperrt Touren unter 20 %. Waschen (Katzenwäsche/Schwamm/Waschanlage) lohnt sich dadurch kaum. Soll überall spürbar werden:
