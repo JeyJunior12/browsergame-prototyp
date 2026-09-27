@@ -121,7 +121,6 @@ Ziel: Es gibt fast immer etwas zu tun – auch mit wenigen Spielern. Empfohlener
 37. Schnellaktionen: „Alles verkaufen & neue Tour starten“ mit einem Klick ⭐
 
 ### J. Alle 3–5 Minuten etwas tun & wiederkommen (27.09.2026)
-Entwurf der Server-Seite für 38–45 (ungetestet): `supabase/entwuerfe/0017_alle_paar_minuten.sql` (Mülltonne, 3/5-Min.-Touren fair skaliert, Chancen, Glückssträhne, Blitzaufträge, Sortierspiel, Ticker).
 38. Mülltonne durchwühlen alle 3 Min. (Flaschen, Kronkorken, Kleingeld, selten Plunder, manchmal Rattenbiss) ⭐
 39. Kurze Pfandtouren 3 und 5 Min. (pro Minute so ergiebig wie 10 Min.) ⭐
 40. Plötzliche Chancen auf der Seite („Tourist verliert 2 € – 15 Sek. zum Aufheben“) – **eher selten** ⭐
