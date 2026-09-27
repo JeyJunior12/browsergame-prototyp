@@ -60,7 +60,7 @@ GitHub push ──▶ Action: Tests (Postgres) ──▶ Migration live in Supab
 
 Ziel: Es gibt fast immer etwas zu tun – auch mit wenigen Spielern. Empfohlener Start: 1, 2, 3, 5.
 
-**⭐ Vom Nutzer ausgewählt für später (27.09.2026):** 17, 19, 20, 22, 23, 24, 25, 26, 29, 30, 31, 32, 34, 37 – Kiosk-Stand, Revanche, Kopfgeld, Wetten, Kosmetik, Hunger, Sucht/Entzug, Ruf, Glücksrad, Pfandtour zu zweit, Tag/Nacht, Live-Stadtereignisse, Nebenquests, Ein-Klick-Verkaufen. Dazu aus J: 38, 39, 40 (eher selten), 43, 44, 47, 48, 49. Dazu aus K (Fahrzeuge): 53, 54 (erst später), 55, 56, 57, 59 (erst später), 60, 61, 63, 64. Dazu L (einheitliches Aussehen): 65–69. Dazu M (Wegweiser): 70–73. Dazu N (flüssiger Seitenwechsel): 74–77. Dazu O (Körperpflege): 78–85. Dazu P (Balancing Gegenstände & Preise): 86–92. Dazu Q (Bandensystem): 93–104. Alle übrigen Ideen bleiben ebenfalls im Plan.
+**⭐ Vom Nutzer ausgewählt für später (27.09.2026):** 17, 19, 20, 22, 23, 24, 25, 26, 29, 30, 31, 32, 34, 37 – Kiosk-Stand, Revanche, Kopfgeld, Wetten, Kosmetik, Hunger, Sucht/Entzug, Ruf, Glücksrad, Pfandtour zu zweit, Tag/Nacht, Live-Stadtereignisse, Nebenquests, Ein-Klick-Verkaufen. Dazu aus J: 38, 39, 40 (eher selten), 43, 44, 47, 48, 49. Dazu aus K (Fahrzeuge): 53, 54 (erst später), 55, 56, 57, 59 (erst später), 60, 61, 63, 64. Dazu L (einheitliches Aussehen): 65–69. Dazu M (Wegweiser): 70–73. Dazu N (flüssiger Seitenwechsel): 74–77. Dazu O (Körperpflege): 78–85. Dazu P (Balancing Gegenstände & Preise): 86–92. Dazu Q (Bandensystem): 93–104. Dazu R (Fehler Waffen kaufen/anlegen, hohe Priorität): 105–109. Alle übrigen Ideen bleiben ebenfalls im Plan.
 
 ### Offener Fehler
 - Seite scrollt nach 10–15 s ohne Eingabe nach oben (trotz Fix in PR #27; Ursache noch nicht gefunden, Nutzer hat Suche vertagt). Vermutung: Neuzeichnen einer Seite macht sie kurz kürzer. Test-Skizze: alle Seiten 20 s warten, `scrollTo`/`scrollIntoView`/`focus` mitprotokollieren.
@@ -215,4 +215,12 @@ Ist-Stand: gründen, Ränge (Chef/Vize/Offizier/Mitglied), Einladungen/Bewerbung
 102. Mitgliederübersicht: aktiv/inaktiv, Beitrag diese Woche, anstupsen, Inaktive automatisch markieren ⭐
 103. Bandenboss-Kampf: wöchentlicher Computer-Boss, den die ganze Bande gemeinsam schlägt ⭐
 104. Banden-Saison mit Rangliste und Preisen (Kronkorken, Titel, Wappen-Rahmen) ⭐
+
+### R. Fehler: Waffen/Ausrüstung kaufen und anlegen (27.09.2026) ⭐ – hohe Priorität
+Gemeldet: Waffen lassen sich mehrfach kaufen; Anziehen/Ausrüsten für Werte funktioniert gar nicht.
+105. Jede Waffe/jedes Ausrüstungsstück nur einmal kaufbar; danach zeigt die Karte „Im Besitz“ statt „Kaufen“ (Server prüft, nicht nur die Oberfläche) ⭐
+106. Anlegen/Ablegen reparieren: ein Platz pro Art (Waffe, Kleidung/Schutz, Zubehör), angelegtes Stück sichtbar markiert, Werte wirken sofort in Kampf und Profil ⭐
+107. Profil und Kampfanzeige zeigen Grundwert + Bonus durch Ausrüstung getrennt, damit man sieht, dass es wirkt ⭐
+108. Bereits doppelt gekaufte Stücke: Duplikate automatisch zum Kaufpreis erstatten ⭐
+109. Test per Klick: kaufen → zweiter Kauf gesperrt → anlegen → Angriffswert steigt → ablegen → Wert sinkt ⭐
 
