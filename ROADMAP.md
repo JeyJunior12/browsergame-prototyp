@@ -60,6 +60,8 @@ GitHub push ──▶ Action: Tests (Postgres) ──▶ Migration live in Supab
 
 Ziel: Es gibt fast immer etwas zu tun – auch mit wenigen Spielern. Empfohlener Start: 1, 2, 3, 5.
 
+**⭐ Vom Nutzer ausgewählt für später (27.09.2026):** 17, 19, 20, 22, 23, 24, 25, 26, 29, 30, 31, 32, 34, 37 – Kiosk-Stand, Revanche, Kopfgeld, Wetten, Kosmetik, Hunger, Sucht/Entzug, Ruf, Glücksrad, Pfandtour zu zweit, Tag/Nacht, Live-Stadtereignisse, Nebenquests, Ein-Klick-Verkaufen. Alle übrigen Ideen bleiben ebenfalls im Plan.
+
 ### Offener Fehler
 - Seite scrollt nach 10–15 s ohne Eingabe nach oben (trotz Fix in PR #27; Ursache noch nicht gefunden, Nutzer hat Suche vertagt). Vermutung: Neuzeichnen einer Seite macht sie kurz kürzer. Test-Skizze: alle Seiten 20 s warten, `scrollTo`/`scrollIntoView`/`focus` mitprotokollieren.
 
@@ -86,35 +88,35 @@ Ziel: Es gibt fast immer etwas zu tun – auch mit wenigen Spielern. Empfohlener
 ### D. Wirtschaft
 15. Pfand-Lager & Spekulation: Flaschen horten, bei hohem Kurs verkaufen (Lager ausbaubar, Flaschen können „verschwinden“)
 16. Auktionshaus für seltenen Plunder (Gebote, Laufzeit)
-17. Eigener Kiosk-Stand: passive Einnahmen, ausbaubar, kann überfallen werden
+17. Eigener Kiosk-Stand: passive Einnahmen, ausbaubar, kann überfallen werden ⭐
 18. Kredithai: Geld leihen mit Zinsen, bei Verzug kommen Schläger
 
 ### E. Kämpfe
-19. Revanche: nach Niederlage einmal sofort zurückschlagen
-20. Kopfgeld auf Spieler aussetzen, wer ihn besiegt, kassiert
+19. Revanche: nach Niederlage einmal sofort zurückschlagen ⭐
+20. Kopfgeld auf Spieler aussetzen, wer ihn besiegt, kassiert ⭐
 21. Wöchentliches Kampfturnier (K.-o.-Baum, automatisch ausgetragen)
-22. Wetten auf Tierkämpfe und Bandenkriege
+22. Wetten auf Tierkämpfe und Bandenkriege ⭐
 
 ### F. Charakter
-23. Kosmetik: Kleidung, Avatar-Rahmen, Titel-Farben
-24. Hunger/Durst: regelmäßig essen, sonst weniger Energie
-25. Sucht & Entzug beim Alkohol (Nachteil bei zu viel Promille über Tage)
-26. Ruf bei Kiez-Gruppen (Polizei, Unterwelt, Nachbarn) mit Freischaltungen
+23. Kosmetik: Kleidung, Avatar-Rahmen, Titel-Farben ⭐
+24. Hunger/Durst: regelmäßig essen, sonst weniger Energie ⭐
+25. Sucht & Entzug beim Alkohol (Nachteil bei zu viel Promille über Tage) ⭐
+26. Ruf bei Kiez-Gruppen (Polizei, Unterwelt, Nachbarn) mit Freischaltungen ⭐
 
 ### G. Sozial
 27. Mentor-System: Erfahrene nehmen Neulinge auf, beide bekommen Bonus
 28. Geschenke an Freunde (Plunder, Getränke, Kronkorken)
-29. Tägliches Glücksrad („Mülltonnen-Lotterie“, 1 Dreh am Tag)
-30. Freundes-Aktionen: zu zweit auf Pfandtour mit Bonus
+29. Tägliches Glücksrad („Mülltonnen-Lotterie“, 1 Dreh am Tag) ⭐
+30. Freundes-Aktionen: zu zweit auf Pfandtour mit Bonus ⭐
 
 ### H. Welt
-31. Tag und Nacht: nachts andere Aktionen, Chancen und Preise
-32. Live-Stadtereignisse: z. B. „Konzert im Stadtpark – 1 Std. doppelt Pfand dort“
+31. Tag und Nacht: nachts andere Aktionen, Chancen und Preise ⭐
+32. Live-Stadtereignisse: z. B. „Konzert im Stadtpark – 1 Std. doppelt Pfand dort“ ⭐
 33. Razzien und Viertel-Ereignisse in den Stadtteilen
-34. Nebenquests von Kiez-Figuren (mehrteilig, neben der Kiez-Geschichte)
+34. Nebenquests von Kiez-Figuren (mehrteilig, neben der Kiez-Geschichte) ⭐
 
 ### I. Komfort
 35. Einsteiger-Tutorial Schritt für Schritt
 36. Statistikseite mit Verlaufskurven (Punkte, Geld, Flaschen)
-37. Schnellaktionen: „Alles verkaufen & neue Tour starten“ mit einem Klick
+37. Schnellaktionen: „Alles verkaufen & neue Tour starten“ mit einem Klick ⭐
 
