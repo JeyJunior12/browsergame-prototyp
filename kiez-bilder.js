@@ -33,6 +33,9 @@
     ['#plunder', /^Feiner Anzug/, 'basteln-anzug-fein'],
     ['#plunder', /^Kaputter Regenschirm/, 'basteln-schirm-kaputt'],
     ['#plunder', /^Regenschirm/, 'basteln-schirm'],
+    // S4: Infokästen ohne Bild
+    ['#training', /^Lernwarteschlange/, 'training-parallel'],
+    ['body', /^Deine Kampfwerte/, 'kampf-staerke'],
     // Kronkorken
     ['#kronkorken', /^Dein Vorrat/, 'kk-vorrat'],
     ['#kronkorken', /^Energydrink/, 'kk-energie'],

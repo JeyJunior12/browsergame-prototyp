@@ -34,7 +34,7 @@ const fs=require('fs');const lib=require('./lib');
  // Begleiter
  await go('pets','Begleiter');
  ok(await pg.evaluate(()=>[...document.querySelectorAll('#pets .card.kz-is-owned')].some(c=>c.offsetParent&&/IM BESITZ|DABEI/.test(c.innerText))),'Eigener Begleiter als „✔ DABEI/IM BESITZ“ markiert');
- ok(await pg.evaluate(()=>[...document.querySelectorAll('#pets .card')].some(c=>c.offsetParent&&/🔒/.test(c.innerText)&&!c.querySelector('.buypet:not([disabled])')?.offsetParent)),'Gesperrte Begleiter vorab markiert (🔒, kein Kaufknopf)');
+ ok(await pg.evaluate(()=>[...document.querySelectorAll('#pets .card')].some(c=>c.offsetParent&&c.querySelector('.kz-ico-lock')&&!c.querySelector('.buypet:not([disabled])')?.offsetParent)),'Gesperrte Begleiter vorab markiert (🔒, kein Kaufknopf)');
  // Gegner
  await go('pvp');
  const ov=await pg.evaluate(()=>{const c=[...document.querySelectorAll('#opponents .card')].find(c=>c.offsetParent);if(!c)return 'keine Gegner';const row=c.querySelector('.kz-actions');if(!row)return 'keine Knopfreihe';

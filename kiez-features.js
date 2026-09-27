@@ -653,6 +653,22 @@ loaders.stadtteile = async () => {
   const t = ++distSeq;
   const o = await rpc('district_overview'); if (t !== distSeq) return;
   const p = window.kiezProfile || {};
+  // Vorerst gesperrt (121/122): zeigen, was kommt, und ab wann – keine Revierwahl
+  if (o.enabled === false) {
+    const pct = o.needed ? Math.min(100, Math.round(o.active_players / o.needed * 100)) : 0;
+    distBody.innerHTML = '<div class="kf-box kz-soon"><h3>Stadtteile – bald verfügbar</h3>'
+      + '<p>Hier kämpfen Banden bald um die Viertel der Stadt: Jede Flasche und jeder gewonnene Kampf bringt deiner Bande Einfluss, '
+      + 'die stärkste Bande besitzt das Viertel eine Woche lang und kassiert 250 € für die Bandenkasse.</p>'
+      + '<p>Die Stadtteile öffnen, sobald <b>' + (o.needed || '?') + ' aktive Spieler</b> im Kiez sind. Gerade sind es <b>' + o.active_players + '</b>.</p>'
+      + '<div class="progress"><span style="width:' + pct + '%"></span></div>'
+      + (o.is_admin ? '<div class="kf-row"><button class="ghost kz-feat-on">Jetzt freischalten (Kiezaufsicht)</button></div>' : '')
+      + '<div class="dmsg"></div></div>'
+      + '<div class="kf-grid">' + o.districts.map(d => '<div class="card kf-district kz-locked"><b>' + esc(d.name) + '</b><p>' + esc(d.description) + '</p><p class="kf-muted">Bald verfügbar</p></div>').join('') + '</div>';
+    const on = distBody.querySelector('.kz-feat-on');
+    if (on) act(on, distBody.querySelector('.dmsg'), async () => { await rpc('admin_set_feature', { k: 'districts', on_off: true }); setTimeout(loaders.stadtteile, 300); return 'Stadtteile sind freigeschaltet.'; });
+    restoreFlash();
+    return;
+  }
   distBody.innerHTML = '<div class="kf-box"><h3>Dein Revier</h3><p>'
     + (o.my_district ? 'Du bist im <b>' + esc((o.districts.find(d => d.id === o.my_district) || {}).name) + '</b> unterwegs.' : 'Du hast noch kein Revier gewählt.')
     + (o.my_gang ? '' : ' <span class="kf-muted">Ohne Bande sammelst du keinen Einfluss – <a href="#" class="kf-go" data-v="gangs">zur Bande</a>.</span>')
@@ -665,8 +681,11 @@ loaders.stadtteile = async () => {
       + '<p class="kf-muted">Diese Woche: ' + (d.top.length ? d.top.map((g, i) => (i + 1) + '. ' + esc(g.gang) + ' (' + g.points + ')').join(' · ') : 'noch kein Einfluss') + '</p>'
       + (o.my_gang ? '<p>Deine Bande: <b>' + d.mine + '</b> Punkte</p>' : '')
       + (d.id === o.my_district ? '<p><b>✔ Dein Revier</b></p>' : '<button class="big dpick" data-id="' + d.id + '">Hier Revier wählen</button>') + '</div>').join('')
-    + '</div><div class="dmsg"></div>';
+    + '</div><div class="dmsg"></div>'
+    + (o.is_admin ? '<div class="kf-row"><button class="ghost kz-feat-off">Stadtteile wieder sperren (Kiezaufsicht)</button></div>' : '');
   const box = distBody.querySelector('.dmsg');
+  const off = distBody.querySelector('.kz-feat-off');
+  if (off) act(off, box, async () => { await rpc('admin_set_feature', { k: 'districts', on_off: false }); setTimeout(loaders.stadtteile, 300); return 'Stadtteile sind wieder gesperrt.'; });
   distBody.querySelectorAll('.dpick').forEach(b => act(b, box, async () => { const r = await rpc('choose_district', { wanted: b.dataset.id }); window.kiezRenderProfile?.(r.profile); setTimeout(loaders.stadtteile, 300); return 'Dein Revier ist jetzt ' + esc(r.district) + '.'; }));
   distBody.querySelectorAll('.kf-go').forEach(a => a.onclick = e => { e.preventDefault(); show(a.dataset.v); });
   restoreFlash();
@@ -904,15 +923,15 @@ const DIST_SHAPES = {
   stadtpark: '0,280 330,250 360,620 0,620', markt: '330,250 650,260 640,620 360,620', hafen: '650,260 1000,300 1000,620 640,620'
 };
 const DIST_TINT = { bahnhof: 'rgba(96,90,84,.22)', altstadt: 'rgba(160,92,52,.18)', villen: 'rgba(214,190,120,.28)', stadtpark: 'rgba(110,140,80,.18)', markt: 'rgba(196,146,82,.20)', hafen: 'rgba(80,104,124,.22)' };
-const DIST_LABEL = { bahnhof: [170, 40], altstadt: [510, 40], villen: [840, 40], stadtpark: [170, 300], markt: [500, 300], hafen: [860, 300] };
+const DIST_LABEL = { bahnhof: [180, 24], altstadt: [540, 24], villen: [880, 24], stadtpark: [180, 286], markt: [500, 286], hafen: [880, 286] };
 const PLACES = [
-  ['Pfandannahme', 'pfand', '', 'szene-pfand', 90, 120], ['Schnorrplätze', 'income', 'Schnorrplätze', 'stadt-schnorrplaetze', 250, 175],
-  ['Kiezladen', 'store', 'Zubehör', 'stadt-zubehoer', 420, 110], ['Waffenladen', 'store', 'Waffen', 'stadt-waffenladen', 590, 115], ['Volkshochschule', 'training', 'Fähigkeiten', 'szene-training', 480, 200],
-  ['Schließfach', 'schliessfach', '', 'laden-geldversteck', 770, 110], ['Apotheke', 'apotheke', '', 'stadt-apotheke', 910, 190],
+  ['Pfandannahme', 'pfand', '', 'szene-pfand', 90, 138], ['Schnorrplätze', 'income', 'Schnorrplätze', 'stadt-schnorrplaetze', 250, 188],
+  ['Kiezladen', 'store', 'Zubehör', 'stadt-zubehoer', 400, 128], ['Waffenladen', 'store', 'Waffen', 'stadt-waffenladen', 610, 128], ['Volkshochschule', 'training', 'Fähigkeiten', 'szene-training', 505, 212],
+  ['Schließfach', 'schliessfach', '', 'laden-geldversteck', 770, 132], ['Apotheke', 'apotheke', '', 'stadt-apotheke', 915, 200],
   ['Tierhandlung', 'pets', '', 'stadt-tierhandlung', 90, 370], ['Hinterhof', 'pvp', '', 'szene-pruegelei', 240, 440], ['Waschhaus', 'begging', 'Körperpflege', 'stadt-waschhaus', 110, 540],
   ['Supermarkt', 'store', 'Verbrauchbares', 'stadt-supermarkt', 420, 370], ['Plunder-Basar', 'basar', '', 'lager-inventar', 580, 370], ['Musikladen', 'income', 'Instrumente', 'stadt-musikladen', 430, 530],
   ['Zockerbude', 'zockerbude', '', 'stadt-gluecksspiel', 570, 520],
-  ['Eigenheime', 'gear', '', 'stadt-eigenheime', 720, 400], ['Bandenversteck', 'gangs', '', 'szene-bande', 890, 425], ['Lottobude', 'missions', 'Glücksspiel', 'rubbellose', 720, 500]
+  ['Eigenheime', 'gear', '', 'stadt-eigenheime', 720, 400], ['Bandenversteck', 'gangs', '', 'szene-bande', 890, 425], ['Lottobude', 'missions', 'Glücksspiel', 'rubbellose', 735, 535]
 ];
 async function buildCityMap() {
   const inside = document.querySelector('#citymap .inside'); if (!inside) return;
@@ -945,7 +964,7 @@ async function buildCityMap() {
     o.districts.forEach(d => {
       const poly = inside.querySelector('.kz-dist[data-d="' + d.id + '"]'), lab = inside.querySelector('.kz-dlabel[data-d="' + d.id + '"]');
       if (poly) poly.setAttribute('class', 'kz-dist' + (d.owner_id ? (d.owner_id === o.my_gang ? ' kz-own-mine' : ' kz-own') : '') + (d.id === o.my_district ? ' kz-here' : ''));
-      if (lab) { lab.querySelector('b').textContent = d.name; lab.querySelector('small').textContent = d.owner ? '🏴 ' + d.owner : 'frei'; }
+      if (lab) { lab.querySelector('b').textContent = d.name; lab.querySelector('small').textContent = o.enabled === false ? 'bald' : d.owner ? d.owner : 'frei'; }
     });
   } catch (e) { /* Karte bleibt auch ohne Stadtteil-Daten benutzbar */ }
 }
@@ -1651,6 +1670,103 @@ html body:not(#kz1):not(#kz2) .kz-skeleton{min-height:360px;border-radius:var(--
 @keyframes kzsk{to{background-position:-300% 0}}
 @media (prefers-reduced-motion:reduce){#kz-bg i{transition:none}html body:not(#kz1):not(#kz2) section.panel.active-view,html body:not(#kz1):not(#kz2) .kz-skeleton{animation:none}}`;
 document.head.appendChild(style11);
+
+// ================= S4: Keine Emojis als Symbole in Karten, Werten und Knöpfen (66) =================
+// Schloss/Haken werden zu einheitlichen Icons, Einheiten zu Wörtern, alle anderen Deko-Emojis fallen weg.
+// Spielertexte (Chat, Post, Gästebuch, Profiltext) bleiben unangetastet – nur Titel/Werte/Knöpfe der Oberfläche.
+const EMO = /(?:\p{Extended_Pictographic}|\p{Regional_Indicator})(?:️|‍(?:\p{Extended_Pictographic})|[\u{1F3FB}-\u{1F3FF}])*️?/gu;
+const EMO_ICON = { '🔒': 'lock', '✔': 'ok', '✔️': 'ok', '✅': 'ok' };
+const EMO_WORD = { '🧢': 'Kronkorken', '⚡': 'Energie', '🛡': 'Schutz', '🛡️': 'Schutz', '⚔': 'Angriff', '⚔️': 'Angriff' };
+const EMO_TAGS = 'h1,h2,h3,h4,b,strong,button,small,label,th,em,.cost,.kz-owned,summary,legend,option';
+const EMO_SKIP = '#kz-dock,.kf-chat,.kz-chat,.chat-list,#chatlist,.guestbook,.kf-guestbook,.msg-body,.kz-usertext,textarea,input,[contenteditable]';
+function deEmojiText(t) {
+  const el = t.parentElement; if (!el || !el.matches(EMO_TAGS) || el.closest(EMO_SKIP)) return;
+  const v = t.nodeValue; EMO.lastIndex = 0; if (!EMO.test(v)) return; EMO.lastIndex = 0;
+  let icon = null;
+  // Einheit als Wort nur direkt neben einer Zahl („5 🧢“ → „5 Kronkorken“) und nur, wenn das Wort nicht schon dasteht
+  const txt = v.replace(EMO, (e, at) => {
+    const k = EMO_ICON[e] || EMO_ICON[e.replace(/️/g, '')]; if (k) { icon = icon || k; return ''; }
+    const w = EMO_WORD[e] ?? EMO_WORD[e.replace(/️/g, '')];
+    const nearNum = /\d\s*$/.test(v.slice(0, at)) || /^\s*[+-]?\d/.test(v.slice(at + e.length));
+    return w && nearNum && !v.includes(w) ? w : '';
+  })
+    .replace(/\s{2,}/g, ' ');
+  const lead = !t.previousSibling || icon ? '' : (/^\s/.test(v) ? ' ' : '');
+  const out = lead + txt.replace(/^\s+/, '');
+  if (out === v) return;
+  if (icon && !(t.previousSibling?.classList?.contains('kz-ico'))) { const i = document.createElement('i'); i.className = 'kz-ico kz-ico-' + icon; i.setAttribute('aria-hidden', 'true'); t.before(i); }
+  t.nodeValue = out;
+}
+function deEmoji(root) {
+  if (!root) return;
+  if (root.nodeType === 3) return deEmojiText(root);
+  if (root.nodeType !== 1) return;
+  const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT); let n; const list = [];
+  while ((n = w.nextNode())) list.push(n);
+  list.forEach(deEmojiText);
+}
+const emoRoots = ['.main', '.stats'].map(x => document.querySelector(x)).filter(Boolean);
+const emoObs = new MutationObserver(ms => { for (const m of ms) { if (m.type === 'characterData') deEmojiText(m.target); else m.addedNodes.forEach(deEmoji); } });
+emoRoots.forEach(r => { deEmoji(r); emoObs.observe(r, { childList: true, subtree: true, characterData: true }); });
+const ICO = {
+  lock: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 7V5a4 4 0 0 1 8 0v2h1v8H3V7zm2 0h4V5a2 2 0 0 0-4 0z'/%3E%3C/svg%3E\")",
+  ok: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M6.2 13.4 1.5 8.7l1.8-1.8 2.9 2.9 6.5-6.5 1.8 1.8z'/%3E%3C/svg%3E\")",
+};
+const style12 = document.createElement('style');
+style12.textContent = `html body:not(#kz1):not(#kz2) .kz-ico{display:inline-block;width:.95em;height:.95em;margin-right:.35em;vertical-align:-.1em;background:currentColor;font-style:normal;flex:none}
+html body:not(#kz1):not(#kz2) .kz-ico-lock{-webkit-mask:${ICO.lock} center/contain no-repeat;mask:${ICO.lock} center/contain no-repeat}
+html body:not(#kz1):not(#kz2) .kz-ico-ok{-webkit-mask:${ICO.ok} center/contain no-repeat;mask:${ICO.ok} center/contain no-repeat;color:var(--moss,#6f8a3c)}
+html body:not(#kz1):not(#kz2) .kiez-inventory-card div[style*="flex"]{align-items:flex-end !important}
+html body:not(#kz1):not(#kz2) .stats .stat:before{filter:grayscale(1) sepia(.9) saturate(1.6) brightness(.62) contrast(1.1)}`;
+document.head.appendChild(style12);
+
+// ================= S5: Schnorrplätze – Bonus, Statistik, Leiter (135–140) =================
+const pct = f => { const v = Math.round((Number(f) - 1) * 100); return (v >= 0 ? '+' : '−') + Math.abs(v) + ' %'; };
+let begSeq = 0;
+async function begRefresh() {
+  const wrap = document.querySelector('#income .schnorr-spots'); if (!wrap || !window.kiezProfile) return;
+  const t = ++begSeq; let o;
+  try { o = await rpc('beg_overview'); } catch (e) { return; }
+  if (t !== begSeq) return;
+  const bx = wrap.querySelector('.kz-beg-bonus');
+  if (bx) bx.innerHTML = '<div class="kz-bonus"><div><small>Dein Bonus</small><b>' + pct(o.bonus.total) + '</b></div>'
+    + '<div><small>Begleiter</small><b>' + pct(o.bonus.pet) + '</b></div>'
+    + '<div><small>Sauberkeit ' + o.cleanliness + ' %</small><b>' + pct(o.bonus.clean) + '</b></div>'
+    + '<div><small>Rhetorik Stufe ' + o.speech + '</small><b>' + pct(o.bonus.speech) + '</b></div>'
+    + '<div><small>Heute erschnorrt</small><b>' + eur(o.today) + '</b></div></div>';
+  let nextMarked = false;
+  wrap.querySelectorAll('.card[data-spot]').forEach(card => {
+    const st = o.spots[card.dataset.spot], el = card.querySelector('.kz-sp-stat'), need = Number(card.dataset.area || 1);
+    const open = o.area_level >= need;
+    card.classList.toggle('kz-locked', !open);
+    card.classList.toggle('kz-best', !!o.best_spot && o.best_spot === card.dataset.spot);
+    const isNext = !open && !nextMarked && need === o.area_level + 1; if (isNext) nextMarked = true;
+    card.classList.toggle('kz-next', isNext);
+    if (el) el.textContent = !open ? (isNext ? 'Als Nächstes: mit Sammelgebiet ' + need + ' frei' : 'Ab Sammelgebiet ' + need)
+      : st ? 'Heute: ' + eur(st.today) + ' in ' + st.times + '× · beste Runde ' + eur(st.best) : 'Heute noch nicht hier gewesen';
+  });
+}
+window.kiezBegRefresh = begRefresh;
+const prevIncome = loaders.income;
+loaders.income = () => { prevIncome?.(); setTimeout(begRefresh, 200); };
+setTimeout(begRefresh, 1500);
+const style13 = document.createElement('style');
+style13.textContent = `html body:not(#kz1):not(#kz2) #income .kz-lead{margin:0 0 10px;color:var(--muted,#bdb19d);font-size:15px}
+html body:not(#kz1):not(#kz2) #income .kz-bonus{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:12px}
+html body:not(#kz1):not(#kz2) #income .kz-bonus>div{background:rgba(0,0,0,.25);border:1px solid var(--line,#5a4a36);border-radius:var(--radius,8px);padding:8px 10px}
+html body:not(#kz1):not(#kz2) #income .kz-bonus small{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted,#bdb19d)}
+html body:not(#kz1):not(#kz2) #income .kz-bonus b{font-size:18px;color:var(--brass,#d1a94f)}
+html body:not(#kz1):not(#kz2) #income .kz-sp-desc{color:var(--muted,#bdb19d);font-size:15px}
+html body:not(#kz1):not(#kz2) #income .kz-sp-facts{font-weight:700}
+html body:not(#kz1):not(#kz2) #income .kz-sp-stat{font-size:14px;color:var(--muted,#bdb19d)}
+html body:not(#kz1):not(#kz2) #income .kz-sp-bar{margin-top:8px}
+html body:not(#kz1):not(#kz2) #income .kz-sp-bar[hidden]{display:none !important}
+html body:not(#kz1):not(#kz2) #income .card.kz-locked,html body:not(#kz1):not(#kz2) #income .area-card.locked:not(.kz-cur){filter:grayscale(.85);opacity:.6}
+html body:not(#kz1):not(#kz2) #income .card.kz-next{filter:none;opacity:1;box-shadow:0 0 0 2px var(--brass,#d1a94f) !important}
+html body:not(#kz1):not(#kz2) #income .area-card.kz-cur{box-shadow:0 0 0 2px var(--moss,#6f8a3c) !important}
+html body:not(#kz1):not(#kz2) #income .card.kz-best>b:after{content:'Bester Platz';margin-left:8px;padding:1px 8px;border-radius:10px;background:var(--brass,#d1a94f);color:#241b10;font-size:12px;vertical-align:2px}
+html body:not(#kz1):not(#kz2) .kz-soon .progress{margin:6px 0 10px}`;
+document.head.appendChild(style13);
 
 // Zuletzt geöffnete neue Seite wiederherstellen
 try { const last = localStorage.getItem('kiez_last_view'); if (loaders[last]) setTimeout(() => show(last), 1500); } catch (e) { }
