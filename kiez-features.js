@@ -907,7 +907,7 @@ const DIST_TINT = { bahnhof: 'rgba(96,90,84,.22)', altstadt: 'rgba(160,92,52,.18
 const DIST_LABEL = { bahnhof: [170, 40], altstadt: [510, 40], villen: [840, 40], stadtpark: [170, 300], markt: [500, 300], hafen: [860, 300] };
 const PLACES = [
   ['Pfandannahme', 'pfand', '', 'szene-pfand', 90, 120], ['Schnorrplätze', 'income', 'Schnorrplätze', 'stadt-schnorrplaetze', 250, 175],
-  ['Kiezladen', 'store', 'Zubehör', 'stadt-zubehoer', 420, 110], ['Waffenladen', 'store', 'Waffen', 'stadt-waffenladen', 590, 115], ['Volkshochschule', 'training', '', 'szene-training', 480, 200],
+  ['Kiezladen', 'store', 'Zubehör', 'stadt-zubehoer', 420, 110], ['Waffenladen', 'store', 'Waffen', 'stadt-waffenladen', 590, 115], ['Volkshochschule', 'training', 'Fähigkeiten', 'szene-training', 480, 200],
   ['Schließfach', 'schliessfach', '', 'laden-geldversteck', 770, 110], ['Apotheke', 'apotheke', '', 'stadt-apotheke', 910, 190],
   ['Tierhandlung', 'pets', '', 'stadt-tierhandlung', 90, 370], ['Hinterhof', 'pvp', '', 'szene-pruegelei', 240, 440], ['Waschhaus', 'begging', 'Körperpflege', 'stadt-waschhaus', 110, 540],
   ['Supermarkt', 'store', 'Verbrauchbares', 'stadt-supermarkt', 420, 370], ['Plunder-Basar', 'basar', '', 'lager-inventar', 580, 370], ['Musikladen', 'income', 'Instrumente', 'stadt-musikladen', 430, 530],
@@ -1317,6 +1317,228 @@ html body:not(#kz1):not(#kz2) .main { padding-bottom: 64px; }
   html body.kz-dock-full { overflow: hidden; }
 }`;
 document.head.appendChild(style8);
+
+// ================= S2: Besitz sichtbar, Anlegen/Ablegen, Kampfwerte, Lernwarteschlange (ROADMAP 105–110, 69a/c/d, 73a) =================
+const OWN = { cat: null, pets: null, combat: null, myPets: [], busy: false };
+const SKILL_DE = { attack: 'Angriff', defense: 'Verteidigung', streetwise: 'Geschick', stamina: 'Ausdauer', speech: 'Sprechen', music: 'Musik', social: 'Sozialkontakte', pickpocket: 'Taschentricks' };
+async function ownLoad() {
+  if (!window.kiezProfile) return;
+  if (!OWN.cat) {
+    const [a, b] = await Promise.all([sb.from('shop_items').select('id,name,price,attack,defense,required_level,category'), sb.from('pet_catalog').select('id,name,price,required_level')]);
+    OWN.cat = Object.fromEntries((a.data || []).map(x => [x.id, x])); OWN.pets = Object.fromEntries((b.data || []).map(x => [x.id, x]));
+  }
+  const [c, up] = await Promise.all([rpc('combat_overview'), sb.from('user_pets').select('pet_id,active').eq('user_id', window.kiezProfile.id)]);
+  OWN.combat = c; OWN.myPets = up.data || [];
+  ownDecorate(); combatBoxes();
+}
+const ownLabel = (txt, extra) => '<span class="kz-owned">✔ ' + txt + '</span>' + (extra || '');
+function ownSlot(card) {
+  let s = card.querySelector(':scope > .kz-own');
+  if (!s) { s = document.createElement('div'); s.className = 'kz-own'; card.appendChild(s); }
+  return s;
+}
+function ownDecorate() {
+  const p = window.kiezProfile, c = OWN.combat; if (!p || !c || !OWN.cat) return;
+  const owned = new Set(c.owned || []), on = new Set((c.equipped || []).map(x => x.id));
+  document.querySelectorAll('.buyitem[data-id]').forEach(btn => {
+    const it = OWN.cat[btn.dataset.id], card = btn.closest('.card'); if (!it || !card) return;
+    if (!btn.dataset.orig) btn.dataset.orig = btn.textContent;
+    if (owned.has(it.id)) {
+      btn.style.setProperty('display', 'none', 'important'); card.classList.add('kz-is-owned');
+      const state = on.has(it.id) ? 'on' : 'own', s = ownSlot(card);
+      if (s.dataset.state === state) return; s.dataset.state = state;
+      s.innerHTML = state === 'on' ? ownLabel('ANGELEGT', ' <button type="button" class="ghost kz-unequip">Ablegen</button>') : ownLabel('IM BESITZ', ' <button type="button" class="big kz-equip">Anlegen</button>');
+      s.insertAdjacentHTML('beforeend', '<div class="kz-own-msg"></div>');
+      const b = s.querySelector('button');
+      // Die Meldung kommt in den neu gezeichneten Besitz-Bereich (der alte wird beim Neuzeichnen ersetzt)
+      b.onclick = async () => {
+        b.disabled = true;
+        try {
+          const r = await rpc(state === 'on' ? 'unequip_item' : 'equip_item', { wanted_item: it.id });
+          OWN.combat = r.combat; ownDecorate(); combatBoxes();
+          say(card.querySelector(':scope > .kz-own .kz-own-msg'), (state === 'on' ? esc(r.name) + ' abgelegt.' : esc(r.name) + ' angelegt.') + ' Angriff jetzt ' + r.combat.attack.total + ', Verteidigung ' + r.combat.defense.total + '.', true);
+        } catch (e) { say(s.querySelector('.kz-own-msg'), esc(e.message), false); b.disabled = false; }
+      };
+      return;
+    }
+    card.classList.remove('kz-is-owned'); btn.style.removeProperty('display'); card.querySelector(':scope > .kz-own')?.remove();
+    const lvl = p.level < it.required_level, poor = Number(p.money) < Number(it.price);
+    btn.disabled = lvl || poor;
+    btn.textContent = lvl ? '🔒 ab Level ' + it.required_level : poor ? btn.dataset.orig + ' · zu wenig Geld' : btn.dataset.orig;
+    card.classList.toggle('kz-locked', lvl);
+  });
+  const mine = Object.fromEntries(OWN.myPets.map(x => [x.pet_id, x]));
+  document.querySelectorAll('.buypet[data-id]').forEach(btn => {
+    const pet = OWN.pets?.[btn.dataset.id], card = btn.closest('.card'); if (!pet || !card) return;
+    if (!btn.dataset.orig) btn.dataset.orig = btn.textContent;
+    const m = mine[pet.id];
+    if (m) {
+      btn.style.setProperty('display', 'none', 'important'); card.classList.add('kz-is-owned');
+      const state = m.active ? 'on' : 'own', s = ownSlot(card);
+      if (s.dataset.state === state) return; s.dataset.state = state;
+      s.innerHTML = (state === 'on' ? ownLabel('DABEI') : ownLabel('IM BESITZ', ' <button type="button" class="big kz-petgo">Mitnehmen</button>')) + '<div class="kz-own-msg"></div>';
+      const b = s.querySelector('.kz-petgo');
+      if (b) b.onclick = async () => {
+        b.disabled = true;
+        try { await rpc('activate_pet', { wanted_pet: pet.id }); await ownLoad(); window.kiezLoadPets?.(); say(card.querySelector(':scope > .kz-own') && (card.querySelector(':scope > .kz-own .kz-own-msg') || card.querySelector(':scope > .kz-own').appendChild(Object.assign(document.createElement('div'), { className: 'kz-own-msg' }))), esc(pet.name) + ' kommt jetzt mit.', true); }
+        catch (e) { say(s.querySelector('.kz-own-msg'), esc(e.message), false); b.disabled = false; }
+      };
+      return;
+    }
+    card.classList.remove('kz-is-owned'); btn.style.removeProperty('display'); card.querySelector(':scope > .kz-own')?.remove();
+    const lock = p.social_skill < pet.required_level, poor = Number(p.money) < Number(pet.price);
+    btn.disabled = lock || poor;
+    btn.textContent = lock ? '🔒 Sozialkontakte Stufe ' + pet.required_level : poor ? btn.dataset.orig + ' · zu wenig Geld' : btn.dataset.orig;
+    card.classList.toggle('kz-locked', lock);
+  });
+}
+// Sammelgebiete und Schnorrplätze: Voraussetzungen vorab zeigen statt Fehlermeldung nach dem Klick (110)
+function lockAreas() {
+  const p = window.kiezProfile; if (!p) return;
+  document.querySelectorAll('#income .area-unlock').forEach(btn => {
+    const card = btn.closest('.card'); if (!card) return;
+    if (!btn.dataset.orig) btn.dataset.orig = btn.textContent;
+    const m = card.innerText.match(/Geschick Stufe (\d+)/), need = m ? +m[1] : 0, price = Number((btn.dataset.orig.match(/([\d.]+,\d{2})/) || [])[1]?.replace('.', '').replace(',', '.') || 0);
+    const lock = need && p.streetwise < need, poor = price && Number(p.money) < price;
+    btn.disabled = !!(lock || poor); if (lock || poor) btn.dataset.kzlock = '1'; else delete btn.dataset.kzlock;
+    btn.textContent = lock ? '🔒 Geschick Stufe ' + need + ' nötig' : poor ? btn.dataset.orig + ' · zu wenig Geld' : btn.dataset.orig;
+    card.classList.toggle('kz-locked', !!lock);
+  });
+  document.querySelectorAll('#income .card[data-spot]').forEach(card => {
+    const m = card.innerText.match(/ab Sammelgebiet (\d+)/), need = m ? +m[1] : 1, btn = card.querySelector('.schnorr-go'); if (!btn) return;
+    const lock = (p.area_level || 1) < need;
+    if (lock) { btn.disabled = true; btn.dataset.kzlock = '1'; btn.textContent = '🔒 ab Sammelgebiet ' + need; card.classList.add('kz-locked'); }
+    else if (card.classList.contains('kz-locked')) { btn.disabled = false; delete btn.dataset.kzlock; btn.textContent = 'Hingehen'; card.classList.remove('kz-locked'); }
+  });
+  // Andere Skripte schalten Knöpfe wieder frei – gesperrte bleiben trotzdem gesperrt
+  document.querySelectorAll('[data-kzlock]').forEach(b => { if (!b.disabled) b.disabled = true; });
+}
+document.addEventListener('click', e => { if (e.target.closest('[data-kzlock]')) { e.preventDefault(); e.stopImmediatePropagation(); } }, true);
+{ const inc = document.getElementById('income'); if (inc) new MutationObserver(() => { clearTimeout(lockAreas.t); lockAreas.t = setTimeout(lockAreas, 120); }).observe(inc, { childList: true, subtree: true }); }
+{ const prev = window.kiezOnProfile; window.kiezOnProfile = p => { prev?.(p); lockAreas(); }; }
+lockAreas();
+// Ausblenden muss wirken: Viele alte Skripte setzen style.display='none', das Design überstimmt das mit !important.
+// Jedes schwache „none“ im Spielbereich wird zu einem starken – Einblenden (display='' oder ein Wert) funktioniert wie gehabt.
+function hardenHide(el) { if (el.style && el.style.display === 'none' && !el.style.getPropertyPriority('display')) el.style.setProperty('display', 'none', 'important'); }
+{ const main = document.querySelector('.main') || document.body;
+  main.querySelectorAll('[style*="display"]').forEach(hardenHide);
+  new MutationObserver(ms => ms.forEach(m => { if (m.type === 'attributes') hardenHide(m.target); })).observe(main, { attributes: true, attributeFilter: ['style'], subtree: true }); }
+// Kampfwerte aufgeschlüsselt: Grundwert + Boni (Laden, Prügelei)
+function combatBoxes() {
+  const c = OWN.combat; if (!c) return;
+  const a = c.attack, d = c.defense, part = (v, l) => v ? ' + ' + v + ' ' + l : '';
+  const html = '<h3>Deine Kampfwerte</h3><div class="kz-combat"><div><span>Angriff</span><b>' + a.total + '</b><small>Grundwert ' + a.base + part(a.items, 'Ausrüstung') + part(a.pets, 'Begleiter') + part(a.gang, 'Bande') + part(a.plunder, 'Plunder') + '</small></div>'
+    + '<div><span>Verteidigung</span><b>' + d.total + '</b><small>Grundwert ' + d.base + part(d.shelter, 'Unterkunft') + part(d.items, 'Ausrüstung') + part(d.pets, 'Begleiter') + part(d.gang, 'Bande') + part(d.plunder, 'Plunder') + part(d.traps, 'Fallen') + '</small></div></div>'
+    + '<p class="kf-muted">Angelegt: ' + ((c.equipped || []).map(x => esc(x.name)).join(' · ') || 'nichts – kauf etwas und leg es an') + '</p>';
+  ['#store .inside', '#pvp .inside'].forEach(sel => {
+    const host = document.querySelector(sel); if (!host) return;
+    let box = host.querySelector(':scope > .kz-combat-box');
+    if (!box) { box = document.createElement('div'); box.className = 'kf-box kz-combat-box'; host.prepend(box); }
+    if (box.innerHTML !== html) box.innerHTML = html;
+  });
+}
+let ownT = 0;
+const ownSoon = () => { clearTimeout(ownT); ownT = setTimeout(ownDecorate, 150); };
+['store', 'pets'].forEach(id => { const el = document.getElementById(id); if (el) new MutationObserver(ms => { if (ms.some(m => [...m.addedNodes].some(n => n.nodeType === 1 && !n.closest?.('.kz-own')))) ownSoon(); }).observe(el, { childList: true, subtree: true }); });
+{ const prev = window.kiezOnProfile; window.kiezOnProfile = p => { prev?.(p); ownSoon(); }; }
+['store', 'pets', 'pvp'].forEach(id => { const prev = loaders[id]; loaders[id] = async () => { await prev?.(); ownLoad(); }; });
+// Nach Käufen im alten Skript neu laden (Kauf-Knopf wird angeklickt → kurz danach Stand holen)
+document.addEventListener('click', e => { if (e.target.closest('.buyitem, .buypet, .activatepet, .equipitem, .craft-go')) setTimeout(ownLoad, 1500); });
+ownLoad();
+
+// ---------- Prügelei: Knöpfe sauber in einer Reihe (69a) + Nachricht (127) ----------
+function tidyOpponents() {
+  document.querySelectorAll('#opponents .card').forEach(card => {
+    if (card.querySelector(':scope > .kz-actions')) return;
+    const atk = card.querySelector('.attackplayer'); if (!atk) return;
+    const row = document.createElement('div'); row.className = 'kz-actions';
+    card.querySelectorAll(':scope > button').forEach(b => row.appendChild(b));
+    const m = document.createElement('button'); m.type = 'button'; m.className = 'ghost'; m.textContent = 'Nachricht';
+    m.onclick = () => window.kiezDM?.(atk.dataset.id, card.querySelector('b')?.textContent.trim());
+    row.appendChild(m);
+    card.appendChild(row);
+  });
+}
+if (document.getElementById('opponents')) new MutationObserver(() => setTimeout(tidyOpponents, 50)).observe(document.getElementById('opponents'), { childList: true, subtree: true });
+tidyOpponents();
+
+// ---------- Weiterbildung: Stufenanzeige immer aktuell (69c) ----------
+function syncSkillCards() {
+  document.querySelectorAll('#training .skill-grid .card').forEach(card => {
+    const lvl = Number(card.querySelector('b span')?.textContent || card.querySelector('.skill-info b span')?.textContent || 0); if (!lvl) return;
+    const req = card.querySelector('.skill-requirements'), lab = card.querySelector('.skill-progress-label span:last-child'), bar = card.querySelector('.skill-progress span');
+    const t = 'Aktuelle Stufe: ' + lvl + ' · Nächste Stufe erhöht die Wirkung dieser Fähigkeit.';
+    if (req && req.textContent !== t) req.textContent = t;
+    if (lab && lab.textContent !== 'Stufe ' + lvl) lab.textContent = 'Stufe ' + lvl;
+    if (bar) bar.style.width = Math.max(3, Math.min(100, lvl / 1.5)) + '%';
+  });
+}
+setInterval(() => { if (document.getElementById('training')?.classList.contains('active-view')) syncSkillCards(); }, 1000);
+
+// ---------- Lernwarteschlange als eigener Reiter (69d) ----------
+let queueTimer = 0;
+async function drawQueue(msg) {
+  const host = document.querySelector('#training .inside'); if (!host) return;
+  let box = host.querySelector(':scope > .kz-queue');
+  if (!box) { box = document.createElement('div'); box.className = 'kf-box kz-queue section-lead'; host.prepend(box); }
+  let s;
+  try { s = await rpc('training_queue_status'); } catch (e) { box.innerHTML = '<h3>Lernwarteschlange</h3><div class="notice bad">' + esc(e.message) + '</div>'; return; }
+  if (s.profile) window.kiezRenderProfile?.(s.profile);
+  const cur = s.current, left = cur ? Math.max(0, Math.round((new Date(cur.ends_at) - Date.now()) / 1000)) : 0;
+  const fmt = sec => sec >= 3600 ? Math.floor(sec / 3600) + ' Std. ' + Math.floor(sec % 3600 / 60) + ' Min.' : Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0') + ' Min.';
+  let note = msg || '';
+  if (s.finished) note += (note ? ' ' : '') + SKILL_DE[s.finished.finished] + ' abgeschlossen (+' + s.finished.points + ' Punkte).';
+  if (s.started) note += (note ? ' ' : '') + 'Aus der Warteschlange gestartet: ' + SKILL_DE[s.started] + '.';
+  box.innerHTML = '<h3>Lernwarteschlange</h3><p class="kf-muted">Plane bis zu 3 Weiterbildungen im Voraus. Ist eine fertig, startet die nächste automatisch – bezahlt wird erst beim Start.</p>'
+    + '<div class="kz-q-now">' + (cur ? '<b>Läuft: ' + SKILL_DE[cur.skill] + ' → Stufe ' + cur.next_level + '</b><span class="kz-q-left">' + (left ? 'noch ' + fmt(left) : 'fertig!') + '</span>'
+      + '<div class="kf-row">' + (left ? '<button type="button" class="ghost kz-q-cancel">Abbrechen (Hälfte zurück)</button>' : '<button type="button" class="big kz-q-done">Abschließen</button>') + '</div>'
+      : '<b>Gerade lernst du nichts.</b>') + '</div>'
+    + '<ol class="kz-q-list">' + (s.queue || []).map(q => '<li><span>' + SKILL_DE[q.skill] + ' → Stufe ' + q.next_level + ' · ' + eur(q.price) + ' · ' + q.minutes + ' Min.</span><button type="button" class="ghost kz-q-del" data-id="' + q.id + '">Entfernen</button></li>').join('') + '</ol>'
+    + ((s.queue || []).length < 3 ? '<div class="kf-row"><select class="kz-q-skill" aria-label="Fähigkeit">' + Object.entries(SKILL_DE).map(([k, v]) => '<option value="' + k + '">' + v + '</option>').join('') + '</select><button type="button" class="big kz-q-add">Einplanen</button></div>' : '<p class="kf-muted">Warteschlange voll.</p>')
+    + (s.problem ? '<div class="notice bad">Nächste Weiterbildung konnte nicht starten: ' + esc(s.problem) + '</div>' : '')
+    + '<div class="kz-q-msg">' + (note ? '<div class="notice good">' + note + '</div>' : '') + '</div>';
+  const q = x => box.querySelector(x), m = q('.kz-q-msg');
+  if (q('.kz-q-add')) act(q('.kz-q-add'), m, async () => { await rpc('queue_training', { skill_type: q('.kz-q-skill').value }); setTimeout(() => drawQueue('Eingeplant.'), 50); return 'Eingeplant.'; });
+  box.querySelectorAll('.kz-q-del').forEach(b => act(b, m, async () => { await rpc('unqueue_training', { entry_id: +b.dataset.id }); setTimeout(() => drawQueue('Entfernt.'), 50); return 'Entfernt.'; }));
+  if (q('.kz-q-cancel')) act(q('.kz-q-cancel'), m, async () => { if (!confirm('Weiterbildung abbrechen? Du bekommst die Hälfte des Preises zurück.')) return ''; const r = await rpc('cancel_training'); window.kiezRenderProfile?.(r.profile); setTimeout(() => drawQueue('Abgebrochen, ' + eur(r.refund) + ' zurück.'), 50); return 'Abgebrochen.'; });
+  if (q('.kz-q-done')) act(q('.kz-q-done'), m, async () => { setTimeout(drawQueue, 50); return ''; });
+  clearTimeout(queueTimer);
+  if (cur && document.getElementById('training')?.classList.contains('active-view')) queueTimer = setTimeout(() => drawQueue(), left > 0 ? Math.min(left * 1000 + 800, 30000) : 30000);
+}
+{ const prev = loaders.training; loaders.training = async () => { await prev?.(); drawQueue(); }; }
+if (document.getElementById('training')?.classList.contains('active-view')) drawQueue();
+
+// ---------- Klick auf „KIEZKÖNIG“ führt zur Startseite (73a) ----------
+document.querySelectorAll('.logo').forEach(l => {
+  l.style.cursor = 'pointer'; l.setAttribute('role', 'link'); l.title = 'Zur Startseite';
+  l.addEventListener('click', () => { if (window.kiezProfile) { go('overview'); window.scrollTo({ top: 0, behavior: 'smooth' }); } else window.scrollTo({ top: 0, behavior: 'smooth' }); });
+});
+
+const style9 = document.createElement('style');
+style9.textContent = `
+html body:not(#kz1):not(#kz2) .kz-own { clear: both; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 10px; }
+html body:not(#kz1):not(#kz2) .kz-owned { font: 700 13px var(--font-body); letter-spacing: .08em; color: #9fcf86; text-transform: uppercase; }
+html body:not(#kz1):not(#kz2) .kz-own-msg { flex: 1 0 100%; }
+html body:not(#kz1):not(#kz2) .kz-own-msg:empty { display: none; }
+html body:not(#kz1):not(#kz2) .card.kz-is-owned { border-color: rgba(159,207,134,.45) !important; }
+html body:not(#kz1):not(#kz2) .card.kz-locked { opacity: .72; }
+html body:not(#kz1):not(#kz2) .card.kz-locked .generated-item-thumb { filter: grayscale(.8); }
+html body:not(#kz1):not(#kz2) .kz-combat { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 6px 0; }
+html body:not(#kz1):not(#kz2) .kz-combat > div { display: flex; flex-direction: column; padding: 10px 12px; border-radius: 6px; background: rgba(255,240,210,.05); border: 1px solid var(--line); }
+html body:not(#kz1):not(#kz2) .kz-combat span { color: var(--muted); font-size: 13px; text-transform: uppercase; letter-spacing: .08em; }
+html body:not(#kz1):not(#kz2) .kz-combat b { font: 700 26px var(--font-head); color: var(--paper-light); }
+html body:not(#kz1):not(#kz2) .kz-combat small { color: var(--muted); font-size: 13px; }
+html body:not(#kz1):not(#kz2) .kz-actions { clear: both; display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; width: 100%; }
+html body:not(#kz1):not(#kz2) .kz-actions button { margin: 0 !important; }
+html body:not(#kz1):not(#kz2) .kf-box.kz-queue { display: block !important; }
+html body:not(#kz1):not(#kz2) .kz-q-now { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 10px; border-radius: 6px; background: rgba(255,240,210,.05); margin: 8px 0; }
+html body:not(#kz1):not(#kz2) .kz-q-left { color: var(--brass); font-weight: 700; }
+html body:not(#kz1):not(#kz2) .kz-q-now .kf-row { flex: 1 0 100%; }
+html body:not(#kz1):not(#kz2) .kz-q-list { padding-left: 22px; margin: 8px 0; }
+html body:not(#kz1):not(#kz2) .kz-q-list li { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--line); }
+html body:not(#kz1):not(#kz2) .kz-q-skill { min-height: 42px; padding: 6px 10px; }
+@media (max-width: 640px) { html body:not(#kz1):not(#kz2) .kz-combat { grid-template-columns: 1fr; } }`;
+document.head.appendChild(style9);
 
 // Zuletzt geöffnete neue Seite wiederherstellen
 try { const last = localStorage.getItem('kiez_last_view'); if (loaders[last]) setTimeout(() => show(last), 1500); } catch (e) { }

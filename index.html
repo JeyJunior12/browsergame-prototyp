@@ -324,7 +324,7 @@ document.addEventListener('click',async e=>{const go=e.target.closest('.modal-go
 const CONTENT_ZONES={
  pets:{sel:':scope > .inside',tabs:{'Begleiter':'#petshop,#petmsg','Deine Begleiter':'.section-lead,#petmsg'}},
  income:{sel:':scope > .inside',tabs:{'Schnorrplätze':'.schnorr-spots,.area-list','Instrumente':'.purchase-card,.instrument-list,:has(#musiccollect)'},view:{'Schnorrplätze':'schnorr','Instrumente':'music'}},
- training:{sel:':scope > .inside',tabs:{'Fähigkeiten':'p,.skill-grid,#trainmsg','Lernwarteschlange':'.timerbox,#finishtraining,#trainmsg,.concentration-card,.section-lead'}},
+ training:{sel:':scope > .inside',tabs:{'Fähigkeiten':'p,.skill-grid,#trainmsg','Lernwarteschlange':'#trainmsg,.concentration-card,.section-lead'}},
  messages:{sel:':scope > .inside',tabs:{'Posteingang':'.cards,#msgstatus','System':'#kf-notifications'}},
  missions:{sel:':scope > .inside',tabs:{'Belohnungsserie':'.section-lead','Tagesauftrag':'h3,b,.progress,#missiontext,#claimmission,#missionmsg,#activitymsg','Glücksspiel':'.scratch-card,#kf-lotto'}},
  achievements:{sel:':scope > .inside',tabs:{'Erfolge':'p,#achievementlist,#checkachievements,#achievementmsg','Kommende Meilensteine':'#kf-milestones'}},
@@ -361,7 +361,7 @@ const runSubtab=s=>{
  const container=panel.querySelector(zone.sel);
  if(!container)return;
  const want=zone.tabs[label];
- [...container.children].forEach(child=>{child.style.display=want&&child.matches(want)?'':'none'});
+ [...container.children].forEach(child=>{if(want&&child.matches(want))child.style.removeProperty('display');else child.style.setProperty('display','none','important')});
 };
 document.addEventListener('click',e=>{
  const s=e.target.closest('.panel .section-tools span');
@@ -1305,16 +1305,17 @@ function splitIncomeView(view){
  if(view)inc.dataset.kiezView=view;
  else if(!inc.dataset.kiezView)inc.dataset.kiezView='schnorr';
  const v=inc.dataset.kiezView;
+ const disp=(el,show)=>{if(show)el.style.removeProperty('display');else el.style.setProperty('display','none','important')};
  const areaCard=document.getElementById('areaname')?.closest('.card');
  const musicCollectCard=document.getElementById('musiccollect')?.closest('.card');
  const instrumentList=inc.querySelector('.instrument-list');
  const schnorrSpots=inc.querySelector('.schnorr-spots');
  const roadmap=inc.querySelector('.feature-roadmap');
- if(areaCard)areaCard.style.display='none';
- if(musicCollectCard)musicCollectCard.style.display=v==='schnorr'?'none':'';
- if(instrumentList)instrumentList.style.display=v==='schnorr'?'none':'';
- if(schnorrSpots)schnorrSpots.style.display=v==='music'?'none':'';
- if(roadmap)roadmap.style.display=v==='music'?'none':'';
+ if(areaCard)disp(areaCard,false);
+ if(musicCollectCard)disp(musicCollectCard,v!=='schnorr');
+ if(instrumentList)disp(instrumentList,v!=='schnorr');
+ if(schnorrSpots)disp(schnorrSpots,v!=='music');
+ if(roadmap)disp(roadmap,v!=='music');
 }
 function routeQuickbarSpecials(){
  splitIncomeView();

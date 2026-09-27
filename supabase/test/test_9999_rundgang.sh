@@ -97,6 +97,13 @@ call $A "select find_players('Rund')"
 call $A "select find_players('')"
 call $B "select post_chat('Rundgang Chat')"
 call $A "select report_chat((select max(id) from chat_messages))"
+# Ausrüstung + Lernwarteschlange (0018)
+call $A "select combat_overview()"
+call $A "select unequip_item((select item_id from inventory where user_id='$A' and equipped limit 1))"
+call $A "select training_queue_status()"
+call $A "select queue_training('defense')"
+call $A "select unqueue_training((select max(id) from training_queue where user_id='$A'))"
+call $A "select cancel_training()"
 # Anonym
 N=$((N+1)); out=$($P -tAc "set request.headers='{\"cf-connecting-ip\":\"7.7.7.7\"}'; select donate_link('Rundgang_A')" 2>&1)
 echo "$out" | grep -Eiq "$BAD" && { echo "FAIL anonyme Spende → $out"; FAILED=1; } || echo "OK   anonyme Spende"

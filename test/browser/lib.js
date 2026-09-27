@@ -15,7 +15,7 @@ exports.open=async(url='https://kiez.test/')=>{
  });
  const pg=await ctx.newPage();
  pg.on('pageerror',e=>console.log('PAGEERR',e.message));
- await pg.goto(url);await pg.waitForTimeout(4000);
+ await pg.goto(url,{waitUntil:'domcontentloaded',timeout:90000});await pg.waitForTimeout(5000);
  return {b,pg};
 };
 
