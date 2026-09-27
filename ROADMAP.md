@@ -176,6 +176,7 @@ Nutzerwunsch: Ungleichheiten auf allen Seiten richtig machen. Beispiel: Karte �
 69d. Reiter „Lernwarteschlange“ (Weiterbildung) zeigt dieselbe Seite wie „Fähigkeiten“ – eigener Inhalt nötig: laufende Weiterbildung mit Restzeit, geplante Stufen in Reihenfolge, Abbrechen/Abschließen. Allgemein prüfen: jeder Reiter muss etwas anderes zeigen als seine Nachbarn ⭐
 69e. Meldungen verschwinden zu schnell: Beispiel Laden → Angebot „Regenschirm“ kaufen – grünes „Gekauft“ ist nach ~1 Sek. weg (Karte wird neu gezeichnet), nicht lesbar. Meldungen müssen mindestens ~6–8 Sek. stehen bleiben (auch wenn die Karte neu gezeichnet wird) oder bis zum nächsten Klick; überall prüfen ⭐
 69f. Abmelden-Knopf im Spielerkasten oben rechts steht nicht mittig – sauber ausrichten (zentriert bzw. bündig mit dem Kasten), auf PC und Handy ⭐
+69g. Meldung landet bei der falschen Karte: Beispiel Schnorrplätze – „Hingehen“ am Englischen Garten gedrückt, während der Timer läuft woanders geklickt (Altglas-Gasse „Freischalten“) → Ergebnis „+0,71 € von 7 Spenden kassiert“ erscheint bei der Altglas-Gasse. Jede Meldung gehört zu der Aktion, die sie ausgelöst hat (auch bei Timern/zeitversetzten Ergebnissen); Zuordnung pro Aktion statt „zuletzt geklickt“ ⭐
 
 ### M. Wegweiser: Klick führt genau dorthin (27.09.2026) ⭐
 Nutzerwunsch: Wer oben auf einen Wert klickt, muss direkt bei der passenden Stelle landen. Beispiel: Klick auf „Pfandlager“ in der Kopfleiste öffnet die Plunderkiste, der Pfand-Bereich (Flaschen verkaufen) kommt erst weiter unten – komplett falsch.
@@ -236,6 +237,7 @@ Gemeldet: Waffen lassen sich mehrfach kaufen; Anziehen/Ausrüsten für Werte fun
 108. Bereits doppelt gekaufte Stücke: Duplikate automatisch zum Kaufpreis erstatten ⭐
 109. Test per Klick: kaufen → zweiter Kauf gesperrt → anlegen → Angriffswert steigt → ablegen → Wert sinkt ⭐
 110. Überall gilt: Was man schon besitzt, ist sofort sichtbar – Karte ausgegraut bzw. „Im Besitz ✔“ statt „Kaufen“, Knopf gesperrt oder „Mitnehmen/Anlegen“. Beispiel Begleiter „Kakerlake“: erst nach erneutem Kaufversuch kommt „Diesen Begleiter hast du schon“ – das darf nicht sein. Gilt für Begleiter, Waffen, Ausrüstung, Unterkünfte, Instrumente, Sammelgebiete, Waschausstattung, Ausbauten; zu teure/zu hohe Level-Stücke ebenfalls vorab kennzeichnen („ab Level X“, „zu wenig Geld“) ⭐
+   Weiteres Beispiel: Schnorrplätze Hauptbahnhof/Fußgängerzone/Jahrmarkt zeigen „Hingehen“, erst nach Klick kommt „Diesen Platz schaltest du mit Sammelgebiet X frei“ → vorher als gesperrt kennzeichnen („🔒 ab Sammelgebiet 2“).
    Vorbild (Nutzer findet es gut): Unterkünfte „Häuser im Kiez“ – statt Kaufknopf steht unten „✔ AKTUELL BEWOHNT“ (Häkchen + Großbuchstaben, gedämpfte Farbe). Genau diesen Stil übernehmen: „✔ IM BESITZ“, „✔ ANGELEGT“, „✔ DABEI“ (Begleiter), „✔ FREIGESCHALTET“.
 
 ### S. Plunderkiste überarbeiten (27.09.2026) ⭐
