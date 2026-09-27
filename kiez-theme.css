@@ -341,3 +341,6 @@ html body:not(#kz1):not(#kz2) #leaders .kz-rank tbody tr:nth-child(-n+3) td:firs
 html body:not(#kz1):not(#kz2) .kz-dlabel, html body:not(#kz1):not(#kz2) .kz-place { font-size: 12px; }
 html body:not(#kz1):not(#kz2) .kz-inst-done { opacity: .8; }
 html body:not(#kz1):not(#kz2) .kz-inst-done::after { content: '✓ gekauft'; display: block; font: 700 13px var(--font-body); color: #9fbf6a; margin-top: 6px; }
+/* Verbrechen: breitere Karten, Risiko/Beute nicht umgebrochen (ROADMAP 173) */
+html body:not(#kz1):not(#kz2) #pfand .crime-list { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important; }
+html body:not(#kz1):not(#kz2) #pfand .crime-item b, html body:not(#kz1):not(#kz2) #pfand .crime-item strong { white-space: nowrap; }

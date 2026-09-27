@@ -84,6 +84,13 @@ async function click(label, sel, { within, pick = 'first', fill, wait = 5000, qu
   }, [sel, within || null, pick, DANGER.source]);
   if (r == null) { if (!quiet) log({ v: visit, typ: 'KEIN-KNOPF', label }); return null; }
   y0 = r[1]; const knopf = r[0];
+  // Minispiele (0041): Balken drücken (mal gut, mal schlecht), Spruch wählen, Tonnen-Ecke wählen
+  for (let k = 0; k < 40; k++) {
+    const st = await pg.evaluate(() => { const g = document.querySelector('.kz-mg .kz-mg-go:not([disabled])'), o = [...document.querySelectorAll('.kz-mg-opt')], c = [...document.querySelectorAll('.kz-bin-cell:not([disabled])')];
+      if (o.length) { o[Math.floor(Math.random() * o.length)].click(); return 'opt'; } if (c.length) { c[Math.floor(Math.random() * c.length)].click(); return 'cell'; }
+      if (g) { if (Math.random() < 0.08) { g.click(); return 'go'; } return 'wait'; } return document.querySelector('.kz-mg') ? 'wait' : ''; });
+    if (!st) break; await pg.waitForTimeout(st === 'wait' ? 60 : 300);
+  }
   let neu = [];
   while (Date.now() - t0 < wait) { await pg.waitForTimeout(250); neu = await fresh(); if (neu.length) { await pg.waitForTimeout(300); neu = [...new Set(await fresh())]; break; } }
   // Aussehen: verdrängt die Meldung den Karteninhalt? springt die Seite?

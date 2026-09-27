@@ -3557,3 +3557,121 @@ async function ovPet() {
 // Instrumente: gekaufte ohne großen grauen Knopf, nur „✓ gekauft“ (ROADMAP 175)
 setInterval(() => { document.querySelectorAll('#income .buyinstrument').forEach(b => { const done = /Bereits gekauft/i.test(b.textContent), c = b.closest('.card');
   b.classList.toggle('kz-hide-lock', done); c?.classList.toggle('kz-inst-done', done); }); }, 1500);
+
+// ================= Minispiele (ROADMAP 185–190) =================
+// Timing-Balken: Zeiger pendelt, im grünen Bereich stoppen. Ergebnis 0–100 geht an den Server (0041, wirkt begrenzt).
+function timingGame(host, { title, hint, zone = 0.2, speed = 1100, btn = 'Jetzt!' }) {
+  return new Promise(resolve => {
+    host.querySelector(':scope > .kz-mg')?.remove();
+    const w = document.createElement('div'); w.className = 'kz-mg';
+    const z0 = 0.15 + Math.random() * (0.7 - zone);
+    w.innerHTML = '<b>' + esc(title) + '</b><p class="kf-muted">' + esc(hint) + '</p><div class="kz-mg-bar"><span class="kz-mg-zone" style="left:' + (z0 * 100) + '%;width:' + (zone * 100) + '%"></span><span class="kz-mg-ptr"></span></div><div class="kf-row"><button class="big kz-mg-go">' + esc(btn) + '</button></div>';
+    host.appendChild(w); w.scrollIntoView({ block: 'nearest' });
+    const ptr = w.querySelector('.kz-mg-ptr'), t0 = performance.now(); let raf, done = false;
+    const pos = () => { const t = ((performance.now() - t0) % (2 * speed)) / speed; return t < 1 ? t : 2 - t; };
+    const tick = () => { ptr.style.left = (pos() * 100) + '%'; raf = requestAnimationFrame(tick); }; tick();
+    const finish = () => { if (done) return; done = true; cancelAnimationFrame(raf); clearTimeout(to);
+      const x = pos(), c = z0 + zone / 2, d = Math.abs(x - c), score = d <= zone / 2 ? Math.round(100 - (d / (zone / 2)) * 25) : Math.max(0, Math.round(60 - (d - zone / 2) * 200));
+      w.querySelector('.kz-mg-go').disabled = true; w.classList.add(score >= 75 ? 'kz-mg-good' : score >= 40 ? 'kz-mg-ok' : 'kz-mg-bad');
+      w.querySelector('p').textContent = score >= 75 ? 'Sauber getroffen! (' + score + ' %)' : score >= 40 ? 'Geht so. (' + score + ' %)' : 'Daneben … (' + score + ' %)';
+      setTimeout(() => { w.remove(); resolve(score); }, 900); };
+    w.querySelector('.kz-mg-go').onclick = finish; const to = setTimeout(finish, 8000);
+  });
+}
+{ const st = document.createElement('style');
+  st.textContent = 'html body:not(#kz1):not(#kz2) .kz-mg{margin-top:10px;padding:10px 12px;border:1px solid rgba(201,165,90,.45);border-radius:6px;background:rgba(0,0,0,.25);width:100%;box-sizing:border-box}'
+    + 'html body:not(#kz1):not(#kz2) .kz-mg-bar{position:relative;height:22px;margin:8px 0 10px;border-radius:11px;background:#3a2c1f;box-shadow:inset 0 1px 4px rgba(0,0,0,.6)}'
+    + 'html body:not(#kz1):not(#kz2) .kz-mg-zone{position:absolute;top:0;bottom:0;background:#6f8f3a;border-radius:11px}'
+    + 'html body:not(#kz1):not(#kz2) .kz-mg-ptr{position:absolute;top:-4px;bottom:-4px;width:4px;margin-left:-2px;background:#fbf4e2;box-shadow:0 0 6px #000}'
+    + 'html body:not(#kz1):not(#kz2) .kz-mg-good{border-color:#6f8f3a}html body:not(#kz1):not(#kz2) .kz-mg-bad{border-color:#9b3c1f}';
+  document.head.appendChild(st); }
+// 185 Verbrechen: Schloss knacken – je riskanter die Tat, desto schmaler der grüne Bereich
+document.addEventListener('click', async e => {
+  const b = e.target.closest('#pfand .crime-pick'); if (!b || b.disabled || b.dataset.kzbusy) return;
+  e.preventDefault(); e.stopImmediatePropagation();
+  const card = b.closest('.card') || b.parentElement, risk = +((card.textContent.match(/(\d+)\s*%/) || [0, 30])[1]);
+  b.dataset.kzbusy = '1'; b.disabled = true;
+  try {
+    const score = await timingGame(card, { title: 'Schloss knacken', hint: 'Drück, wenn der Zeiger im grünen Bereich ist – je genauer, desto kleiner das Risiko.', zone: Math.max(0.1, 0.3 - risk / 400), speed: 900 + risk * 4, btn: 'Knacken!' });
+    let box = card.querySelector(':scope > .kz-crime-msg'); if (!box) { box = document.createElement('div'); box.className = 'kz-crime-msg'; card.appendChild(box); }
+    try { const r = await rpc('commit_crime', { crime_id: Number(b.dataset.id), pick_score: score }); window.kiezRenderProfile?.(r.profile);
+      say(box, r.caught ? 'Erwischt bei „' + esc(r.name) + '“! Kaution: ' + eur(r.bail) + '.' + hintFor('knast') : '„' + esc(r.name) + '“ geklappt! +' + eur(r.reward) + '.', !r.caught);
+    } catch (err) { say(box, esc(err.message) + hintFor(err.message), false); }
+  } finally { delete b.dataset.kzbusy; b.disabled = false; crimeLocks(); }
+}, true);
+// 188 Computer-Gegner: Ausweichen im richtigen Moment
+document.addEventListener('click', async e => {
+  const b = e.target.closest('#kz-npcs .kz-npc-go'); if (!b || b.disabled || b.dataset.kzbusy) return;
+  e.preventDefault(); e.stopImmediatePropagation();
+  const c = b.closest('.kz-npc'); b.dataset.kzbusy = '1'; b.disabled = true;
+  const score = await timingGame(c, { title: 'Ausweichen!', hint: 'Er holt aus – duck dich im grünen Moment, dann triffst du härter zurück.', zone: 0.22, speed: 800, btn: 'Ducken!' });
+  const box = c.querySelector('.kz-npc-msg');
+  try { const r = await rpc('fight_npc', { npc_id: c.dataset.npc, dodge_score: score }); window.kiezRenderProfile?.(r.profile); nextLoad();
+    const t = r.won ? 'Gewonnen gegen ' + esc(r.npc) + ' (' + r.mine + ' zu ' + r.theirs + '): +' + eur(r.loot) + ', +' + r.xp + ' Punkte.' : 'Verloren gegen ' + esc(r.npc) + ' (' + r.mine + ' zu ' + r.theirs + '). Trainier Angriff und komm wieder.';
+    npcLast = { sel: '.kz-npc[data-npc="' + c.dataset.npc + '"] .kz-npc-msg', txt: t, good: r.won, t: Date.now() }; say(box, t, r.won); setTimeout(drawNpc, 4000);
+  } catch (err) { say(box, esc(err.message) + hintFor(err.message), false); delete b.dataset.kzbusy; b.disabled = false; }
+}, true);
+
+// 187 Schnorren: Wer kommt vorbei? Passenden Spruch wählen (richtig ×1,2, daneben ×0,8 – 0041)
+const PASSANTEN = [
+  ['Tourist mit Stadtplan', 'Sorry, one Euro for Currywurst? Very traditional!'],
+  ['Oma mit Rollator', 'Gott segne Sie, junge Dame – und Ihre Hüfte.'],
+  ['Anzugträger mit Kaffee', 'Ich hab auch mal BWL studiert. Sieht man, oder?'],
+  ['Punk mit Hund', 'Ey Kollege, Solidarität unter Straßenleuten!'],
+  ['Mutti mit Kinderwagen', 'Nur fürs Pausenbrot, großes Indianerehrenwort.'],
+  ['Hipster mit Lastenrad', 'Ich sammle nur für mein nachhaltiges Start-up.'],
+  ['Polizist auf Streife', 'Guten Tag, Herr Wachtmeister, ich übe nur Gitarre … ohne Gitarre.']
+];
+document.addEventListener('click', async e => {
+  const b = e.target.closest('#beg'); if (!b || b.disabled || b.dataset.kzbusy) return;
+  e.preventDefault(); e.stopImmediatePropagation();
+  const host = b.closest('.card, .kf-box, .action-block, .lead-card') || b.parentElement; b.dataset.kzbusy = '1'; b.disabled = true;
+  const who = PASSANTEN[Math.floor(Math.random() * PASSANTEN.length)], others = PASSANTEN.filter(p => p !== who).sort(() => Math.random() - 0.5).slice(0, 2);
+  const opts = [[who[1], 100], [others[0][1], 20], [others[1][1], 20]].sort(() => Math.random() - 0.5);
+  host.querySelector(':scope > .kz-mg')?.remove();
+  const w = document.createElement('div'); w.className = 'kz-mg';
+  w.innerHTML = '<b>Da kommt: ' + esc(who[0]) + '</b><p class="kf-muted">Was sagst du? Der richtige Spruch bringt mehr, der falsche weniger.</p><div class="kz-mg-opts">' + opts.map((o, i) => '<button class="ghost kz-mg-opt" data-i="' + i + '">„' + esc(o[0]) + '“</button>').join('') + '</div>';
+  host.appendChild(w); w.scrollIntoView({ block: 'nearest' });
+  const score = await new Promise(res => { w.querySelectorAll('.kz-mg-opt').forEach(o => o.onclick = () => res(opts[+o.dataset.i][1])); setTimeout(() => res(50), 12000); });
+  w.remove();
+  let box = host.querySelector(':scope > .kz-beg-msg'); if (!box) { box = document.createElement('div'); box.className = 'kz-beg-msg'; host.appendChild(box); }
+  try { const r = await rpc('beg_at_spot', { spot_id: 'strasse', talk_score: score }); window.kiezRenderProfile?.(r.profile);
+    say(box, (score >= 100 ? 'Volltreffer bei „' + esc(who[0]) + '“ – ' : score <= 20 ? 'Falscher Spruch, „' + esc(who[0]) + '“ guckt komisch – ' : '') + 'du kriegst ' + eur(r.paid) + ' in den Becher.', true);
+  } catch (err) { say(box, esc(err.message) + hintFor(err.message), false); }
+  delete b.dataset.kzbusy; b.disabled = false;
+}, true);
+{ const st = document.createElement('style'); st.textContent = 'html body:not(#kz1):not(#kz2) .kz-mg-opts{display:flex;flex-direction:column;gap:8px;margin-top:8px}html body:not(#kz1):not(#kz2) .kz-mg-opt{text-align:left;white-space:normal;min-height:44px}'; document.head.appendChild(st); }
+
+// 190 Straßenmusik: drei Mal im Takt tippen, der Schnitt zählt (±15 % aufs Hutgeld)
+document.addEventListener('click', async e => {
+  const b = e.target.closest('#musiccollect'); if (!b || b.disabled || b.dataset.kzbusy) return;
+  e.preventDefault(); e.stopImmediatePropagation();
+  const host = b.closest('.card') || b.parentElement; b.dataset.kzbusy = '1'; b.disabled = true; let sum = 0;
+  for (let i = 1; i <= 3; i++) sum += await timingGame(host, { title: 'Takt ' + i + ' von 3', hint: 'Hau im grünen Moment in die Saiten – je sauberer, desto voller der Hut.', zone: 0.24, speed: 700, btn: 'Jetzt!' });
+  const score = Math.round(sum / 3);
+  let box = host.querySelector(':scope > .kz-music-msg'); if (!box) { box = document.createElement('div'); box.className = 'kz-music-msg'; host.appendChild(box); }
+  try { const r = await rpc('collect_music_income', { rhythm_score: score }); window.kiezRenderProfile?.(r.profile);
+    say(box, (score >= 75 ? 'Das Publikum tanzt! ' : score < 40 ? 'Schief gespielt – die Leute gehen schneller weiter. ' : '') + 'Du kratzt ' + eur(r.paid) + ' aus dem Hut.', true);
+  } catch (err) { say(box, esc(err.message), false); }
+  delete b.dataset.kzbusy; b.disabled = false;
+}, true);
+
+// 189 Mülltonne: in welcher Ecke wühlst du? Fund erscheint im gewählten Feld
+document.addEventListener('click', async e => {
+  const b = e.target.closest('#kz-bin .kz-bin-go'); if (!b || b.disabled || b.dataset.kzbusy) return;
+  e.preventDefault(); e.stopImmediatePropagation();
+  const bin = document.getElementById('kz-bin'); b.dataset.kzbusy = '1'; b.disabled = true;
+  bin.querySelector(':scope > .kz-mg')?.remove();
+  const w = document.createElement('div'); w.className = 'kz-mg';
+  w.innerHTML = '<b>Wo wühlst du?</b><p class="kf-muted">Such dir eine Ecke der Tonne aus.</p><div class="kz-bin-grid">' + Array.from({ length: 9 }, (_, i) => '<button class="ghost kz-bin-cell" data-i="' + i + '">?</button>').join('') + '</div>';
+  bin.appendChild(w);
+  const cell = await new Promise(res => { w.querySelectorAll('.kz-bin-cell').forEach(c => c.onclick = () => res(c)); setTimeout(() => res(w.querySelector('.kz-bin-cell')), 15000); });
+  w.querySelectorAll('.kz-bin-cell').forEach(c => c.disabled = true);
+  const box = bin.querySelector('.kz-bin-msg');
+  try { const r = await rpc('dig_bin'); window.kiezRenderProfile?.(r.profile);
+    cell.textContent = r.what === 'ratte' ? 'Ratte!' : r.what === 'geld' ? eur(r.amount).replace(',00', '') : r.what === 'plunder' ? 'Fund!' : '+' + r.amount; cell.classList.add(r.what === 'ratte' ? 'kz-bad' : 'kz-good');
+    say(box, BIN_DE[r.what](r.amount, r.plunder_name), r.what !== 'ratte'); nextLoad();
+  } catch (err) { say(box, esc(err.message), false); }
+  setTimeout(() => w.remove(), 2500); delete b.dataset.kzbusy; b.disabled = false;
+}, true);
+{ const st = document.createElement('style'); st.textContent = 'html body:not(#kz1):not(#kz2) .kz-bin-grid{display:grid;grid-template-columns:repeat(3,72px);gap:6px;margin-top:8px}html body:not(#kz1):not(#kz2) .kz-bin-cell{min-height:48px;font-size:15px !important;padding:0 !important}'; document.head.appendChild(st); }
