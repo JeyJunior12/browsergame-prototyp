@@ -780,7 +780,7 @@ function updateInstrumentShop(){
 }
 (()=>{if(document.getElementById('wash-status-style'))return;const st=document.createElement('style');st.id='wash-status-style';st.textContent='.wash-status-good{color:#9bd17a}.wash-status-bad{color:#e08a7d}';document.head.appendChild(st)})();
 // Waschen in drei Stufen: Katzenwäsche immer, Schwamm und Waschanlage einmalig freischalten (buy_progress('wash'))
-const WASH_TIERS=[['katzenwaesche','🚿 Katzenwäsche',0.5,'+35 %',0,0,'Am öffentlichen Wasserhahn. Nicht luxuriös, aber die Tauben beschweren sich weniger.'],['schwamm','🧽 Schwamm & Seife',1.5,'+60 %',1,6,'Echte Seife statt nasser Hand.'],['waschanlage','🛁 Waschanlage',3,'auf 100 %',2,25,'Eine richtige Waschanlage im Hinterhof – danach riechst du wie neu.']];
+const WASH_TIERS=[['brunnen','Brunnen',0,'+15 %',0,0,'Kostenlos am Stadtbrunnen – aber nur alle 30 Minuten, und kalt ist es auch.'],['katzenwaesche','Katzenwäsche',0.5,'+35 %',0,0,'Am öffentlichen Wasserhahn. Nicht luxuriös, aber die Tauben beschweren sich weniger.'],['schwamm','Schwamm & Seife',1.5,'+60 %',1,6,'Echte Seife statt nasser Hand.'],['schwimmbad','Schwimmbad',2.5,'+80 %',0,0,'Einmal durchs Hallenbad – Duschen inklusive.'],['waschanlage','Waschanlage',3,'auf 100 %',2,25,'Eine richtige Waschanlage im Hinterhof – danach riechst du wie neu.'],['friseur','Friseur',8,'auf 100 % + Frisur',0,0,'Waschen, schneiden, föhnen: 24 Stunden sinkt deine Sauberkeit nur halb so schnell.']];
 function addWashUpgrades(){
  const washCard=document.getElementById('wash')?.closest('.action-block');
  if(!washCard||document.querySelector('.wash-list'))return;
@@ -788,7 +788,7 @@ function addWashUpgrades(){
  const wrap=document.createElement('div');
  wrap.className='wash-list cards';
  wrap.style.marginTop='14px';
- wrap.innerHTML=WASH_TIERS.map(([id,name,price,gain,need,unlock,desc])=>'<div class="card wash-card" data-tier="'+id+'" data-need="'+need+'"><b>'+name+'</b><p>'+desc+'</p><p>Waschen: <b>'+eur(price)+'</b> · Sauberkeit '+gain+(unlock?' · einmalig freischalten: '+eur(unlock):'')+'</p><p class="wash-status"></p><button class="ghost washuse" data-tier="'+id+'">Waschen – '+eur(price)+'</button>'+(unlock?' <button class="ghost washbuy">Freischalten – '+eur(unlock)+'</button>':'')+'</div>').join('');
+ wrap.innerHTML=WASH_TIERS.map(([id,name,price,gain,need,unlock,desc])=>'<div class="card wash-card" data-tier="'+id+'" data-need="'+need+'"><b>'+name+'</b><p>'+desc+'</p><p>Waschen: <b>'+(price?eur(price):'kostenlos')+'</b> · Sauberkeit '+gain+(unlock?' · einmalig freischalten: '+eur(unlock):'')+'</p><p class="wash-status"></p><button class="ghost washuse" data-tier="'+id+'">'+(price?'Waschen – '+eur(price):'Kostenlos waschen')+'</button>'+(unlock?' <button class="ghost washbuy">Freischalten – '+eur(unlock)+'</button>':'')+'</div>').join('');
  washCard.insertAdjacentElement('afterend',wrap);
  washCard.style.display='none';
  wrap.addEventListener('click',async e=>{
@@ -799,7 +799,7 @@ function addWashUpgrades(){
   try{
    const {data,error}=use?await window.kiezSupabase.rpc('wash_up',{tier:use.dataset.tier}):await window.kiezSupabase.rpc('buy_progress',{progress_type:'wash'});
    if(error)status.innerHTML='<div class="notice bad">'+esc(error.message)+'</div>';
-   else{window.kiezRenderProfile(data.profile);status.innerHTML='<div class="notice good">'+(use?esc(data.label)+': +'+data.gain+' % Sauberkeit für '+Number(data.price).toFixed(2).replace('.',',')+' €.':esc(data.label)+' freigeschaltet!')+'</div>'}
+   else{window.kiezRenderProfile(data.profile);status.innerHTML='<div class="notice good">'+(use?esc(data.label)+': +'+data.gain+' % Sauberkeit'+(Number(data.price)?' für '+Number(data.price).toFixed(2).replace('.',',')+' €':' – kostenlos')+'.'+(data.barber?' Die Frisur hält 24 Stunden.':''):esc(data.label)+' freigeschaltet!')+'</div>';window.kiezDrawBody?.()}
   }catch(err){status.innerHTML='<div class="notice bad">'+esc(err.message)+'</div>'}
   finally{btn.disabled=false;updateWashUpgrades()}
  });
@@ -810,7 +810,7 @@ function updateWashUpgrades(){
  const clean=Number(document.body.dataset.cleanliness||0),lvl=Number(document.body.dataset.washLevel||0);
  list.querySelectorAll('.wash-card').forEach(card=>{
   const need=Number(card.dataset.need),use=card.querySelector('.washuse'),buy=card.querySelector('.washbuy');
-  if(use){use.disabled=clean>=100||lvl<need;use.title=lvl<need?'Erst freischalten':clean>=100?'Du bist schon sauber':''}
+  if(use){const fr=card.dataset.tier==='friseur';use.disabled=(clean>=100&&!fr)||lvl<need;use.title=lvl<need?'Erst freischalten':clean>=100&&!fr?'Du bist schon sauber':''}
   if(buy){buy.classList.toggle('hide',lvl>=need);buy.disabled=lvl<need-1}
  });
 }

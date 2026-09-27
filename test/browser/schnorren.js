@@ -9,7 +9,7 @@ const ok=(c,l,x)=>{if(!c)fails++;console.log(c?'✓':'✗',l,x??'')};
  const vis=s=>pg.evaluate(s=>{const e=document.querySelector(s);return !!e&&e.offsetParent!==null},s);
  await go('income','Schnorrplätze');
  ok(await vis('#income .schnorr-spots')&&!(await vis('#income .area-list')),'Reiter Schnorrplätze zeigt nur Schnorrplätze (135)');
- ok(await pg.evaluate(()=>/Dein Bonus/.test(document.querySelector('#income .kz-beg-bonus')?.innerText||'')),'Bonus sichtbar (139)',await pg.evaluate(()=>document.querySelector('#income .kz-bonus')?.innerText.replace(/\s+/g,' ')));
+ ok(await pg.evaluate(()=>/dein bonus/i.test(document.querySelector('#income .kz-beg-bonus')?.innerText||'')),'Bonus sichtbar (139)',await pg.evaluate(()=>document.querySelector('#income .kz-bonus')?.innerText.replace(/\s+/g,' ')));
  ok(await pg.evaluate(()=>[...document.querySelectorAll('#income .card[data-spot] .kz-sp-facts')].every(p=>/pro Spende · bis 10× · \d+ s/.test(p.textContent))),'Karten kurz und gleich (137)');
  ok(await pg.evaluate(()=>document.querySelectorAll('#income .card[data-spot].kz-locked').length>0&&document.querySelectorAll('#income .card[data-spot].kz-next').length===1),'Leiter: gesperrte grau, nächster hervorgehoben (136)');
  const spot=await pg.evaluate(()=>{const c=[...document.querySelectorAll('#income .card[data-spot]:not(.kz-locked)')].pop();c.scrollIntoView({block:'center'});c.querySelector('.schnorr-go').click();return c.dataset.spot});

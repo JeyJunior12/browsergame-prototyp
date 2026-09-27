@@ -106,7 +106,7 @@ loaders.profil = async () => {
   const me = await myId(); if (!me) return;
   const id = profileTarget || me, own = id === me;
   const [pr, gm, gb, fr, bl] = await Promise.all([
-    sb.from('profiles').select('id,username,title,level,xp,wins,losses,bio,motto,created_at,equipped_plunder,donations_received,donation_money,pet_wins,is_banned,avatar').eq('id', id).maybeSingle(),
+    sb.from('profiles').select('id,username,title,level,xp,wins,losses,bio,motto,created_at,equipped_plunder,donations_received,donation_money,pet_wins,is_banned,avatar,cleanliness').eq('id', id).maybeSingle(),
     sb.from('gang_members').select('gang_id,role').eq('user_id', id).maybeSingle(),
     sb.from('guestbook_entries').select('id,author_id,body,created_at').eq('owner_id', id).order('created_at', { ascending: false }).limit(30),
     sb.from('friendships').select('*').or('and(user_id.eq.' + me + ',friend_id.eq.' + id + '),and(user_id.eq.' + id + ',friend_id.eq.' + me + ')'),
@@ -125,7 +125,8 @@ loaders.profil = async () => {
     + '<table class="kf-table"><tr><td>Level</td><td>' + p.level + '</td><td>Punkte</td><td>' + p.xp + '</td></tr>'
     + '<tr><td>Siege / Niederlagen</td><td>' + p.wins + ' / ' + p.losses + '</td><td>Tierkampf-Siege</td><td>' + p.pet_wins + '</td></tr>'
     + '<tr><td>Bande</td><td>' + (gm.data ? esc(gm.data.gangs?.name) + ' (' + ROLE[gm.data.role] + ')' : '–') + '</td><td>Plunder</td><td>' + esc(plunderName || '–') + '</td></tr>'
-    + '<tr><td>Im Kiez seit</td><td>' + new Date(p.created_at).toLocaleDateString('de-DE') + '</td><td>Spenden erhalten</td><td>' + p.donations_received + '</td></tr></table>'
+    + '<tr><td>Im Kiez seit</td><td>' + new Date(p.created_at).toLocaleDateString('de-DE') + '</td><td>Spenden erhalten</td><td>' + p.donations_received + '</td></tr>'
+    + '<tr><td>Aussehen</td><td>' + ({ gepflegt: 'Gepflegt', normal: 'Normal', schmuddelig: 'Schmuddelig', verwahrlost: 'Verwahrlost' })[window.kiezTierOf ? window.kiezTierOf(p.cleanliness ?? 100) : 'normal'] + '</td><td></td><td></td></tr></table>'
     + '<p class="kf-bio">' + (p.bio ? esc(p.bio) : '<span class="kf-muted">Noch keine Beschreibung.</span>') + '</p><div class="kf-row pact"></div><div class="pmsg"></div></div>';
   if (own) {
     const link = location.origin + '/?spende=' + encodeURIComponent(p.username);
@@ -206,22 +207,162 @@ const plunderBody = addPanel('plunder', 'Plunderkiste', '🎒 Plunder');
   if (pl && !document.getElementById('plunderlist')) { const anchor = document.createElement('div'); anchor.id = 'plunderlist'; anchor.style.display = 'none'; pl.appendChild(anchor); } }
 loaders.plunder = async () => {
   const me = await myId(); if (!me) return;
-  const [cat, mine] = await Promise.all([sb.from('plunder_catalog').select('*').order('sort_order'), sb.from('user_plunder').select('*').eq('user_id', me)]);
-  const have = Object.fromEntries((mine.data || []).map(x => [x.plunder_id, x.quantity]));
-  const eq = window.kiezProfile?.equipped_plunder;
-  plunderBody.innerHTML = '<p>Auf Pfandtouren findest du Plunder – je länger die Tour, desto öfter. Ein Stück kannst du anlegen: Es wirkt im Kampf und bei der Pfandtour. Doppelte kannst du verkaufen. In der Kronkorken-Kiste gibt es auch welchen.</p>'
-    + '<p class="kf-muted">Gefunden: ' + Object.keys(have).length + ' / ' + (cat.data || []).length + ' Sorten</p><div class="kf-grid">'
-    + (cat.data || []).map(c => {
-      const n = have[c.id] || 0, bonus = [c.attack ? 'ATT +' + c.attack : '', c.defense ? 'DEF +' + c.defense : '', c.bottle_bonus ? 'Pfand +' + c.bottle_bonus + ' %' : ''].filter(Boolean).join(' · ');
-      return '<div class="card' + (n ? '' : ' kf-locked') + '"><b class="kf-rar-' + c.rarity + '">' + esc(c.name) + (eq === c.id ? ' ✅' : '') + '</b><p class="kf-muted">' + RARITY[c.rarity] + (n ? ' · ' + n + '×' : ' · noch nicht gefunden') + '</p><p>' + esc(c.description) + '</p><p>' + bonus + '</p>'
-        + (n ? '<div class="kf-row">' + (eq === c.id ? '<button class="ghost pun">Ablegen</button>' : '<button class="ghost peq" data-id="' + c.id + '">Anlegen</button>')
-          + ' <button class="ghost psell" data-id="' + c.id + '">Verkaufen (' + eur(c.sell_price) + ')</button></div>' : '') + '</div>';
-    }).join('') + '</div><div class="plmsg"></div>';
-  const box = plunderBody.querySelector('.plmsg');
-  plunderBody.querySelectorAll('.peq').forEach(b => act(b, box, async () => { window.kiezRenderProfile?.(await rpc('equip_plunder', { wanted: b.dataset.id })); setTimeout(loaders.plunder, 300); return 'Angelegt – wirkt ab sofort im Kampf und auf Pfandtouren.'; }));
-  plunderBody.querySelectorAll('.pun').forEach(b => act(b, box, async () => { window.kiezRenderProfile?.(await rpc('equip_plunder', { wanted: null })); setTimeout(loaders.plunder, 300); return 'Abgelegt.'; }));
-  plunderBody.querySelectorAll('.psell').forEach(b => act(b, box, async () => { const r = await rpc('sell_plunder', { wanted: b.dataset.id, qty: 1 }); window.kiezRenderProfile?.(r.profile); setTimeout(loaders.plunder, 800); return 'Verkauft für ' + eur(r.paid) + (Number(r.lost) > 0 ? ' (Rest passte nicht in den Geldbehälter)' : '') + '.'; }));
+  let o; try { o = await rpc('plunder_overview'); } catch (e) { plunderBody.innerHTML = '<p class="notice bad">' + esc(e.message) + '</p>'; return; }
+  PL.data = o; drawPlunder();
+  // „Neu“ bleibt bis zum nächsten Öffnen sichtbar, gilt aber jetzt als angesehen
+  if (o.items.some(i => i.new)) setTimeout(() => rpc('plunder_mark_seen').catch(() => {}), 2500);
 };
+function drawPlunder() {
+  const o = PL.data; if (!o) return;
+  const eq = o.items.find(i => i.id === o.equipped);
+  const mine = o.items.filter(i => i.qty > 0);
+  const dup = mine.reduce((a, i) => a + Math.max(0, i.qty - 1), 0), dupEur = mine.reduce((a, i) => a + Math.max(0, i.qty - 1) * Number(i.sell_price), 0);
+  const stats = i => [i.attack ? 'Angriff +' + i.attack : '', i.defense ? 'Verteidigung +' + i.defense : '', i.bottle_bonus ? 'Pfand +' + i.bottle_bonus + ' %' : ''].filter(Boolean).join(' · ') || 'Keine Werte';
+  const RANK = { gewoehnlich: 1, selten: 2, episch: 3, legendaer: 4 };
+  const key = { rar: i => -RANK[i.rarity], att: i => -i.attack, def: i => -i.defense, pfand: i => -i.bottle_bonus }[PL.sort] || (i => -RANK[i.rarity]);
+  const list = mine.filter(i => PL.filter === 'alle' || i.rarity === PL.filter).sort((a, b) => key(a) - key(b) || a.name.localeCompare(b.name));
+  const setOf = id => o.sets.find(s => s.id === id);
+  const b = o.bonus;
+  plunderBody.innerHTML =
+    // ---------- Meine Stücke ----------
+    '<div class="kz-p-mine">'
+    + '<div class="kf-box kz-p-slot"><h3>Angelegt</h3>' + (eq
+      ? '<div class="card kz-rar-' + eq.rarity + '" data-pid="' + eq.id + '"><b>' + esc(eq.name) + '</b><p class="kf-muted">' + RARITY[eq.rarity] + '</p><p>' + stats(eq) + '</p><div class="kf-row"><button class="ghost pun">Ablegen</button><button class="ghost kz-p-swap">Wechseln</button></div></div>'
+      : '<p class="kf-muted">Nichts angelegt. Wähl unten ein Stück – es wirkt im Kampf und auf Pfandtouren.</p>')
+    + '<p class="kz-p-total">Plunder-Bonus gesamt: <b>Angriff +' + b.attack + ' · Verteidigung +' + b.defense + ' · Pfand +' + b.bottle + ' %</b>'
+    + (b.sets.length ? ' <span class="kf-muted">(inkl. Sets: ' + b.sets.map(id => esc(setOf(id)?.name || id)).join(', ') + ')</span>' : '') + '</p></div>'
+    + '<div class="kf-row kz-p-tools"><label>Sortieren <select class="kz-p-sort"><option value="rar">Seltenheit</option><option value="att">Angriff</option><option value="def">Verteidigung</option><option value="pfand">Pfand-Bonus</option></select></label>'
+    + '<label>Zeigen <select class="kz-p-filter"><option value="alle">Alle</option>' + Object.keys(RANK).map(r => '<option value="' + r + '">' + RARITY[r] + '</option>').join('') + '</select></label>'
+    + '<button class="ghost kz-p-dups"' + (dup ? '' : ' disabled') + '>' + (dup ? 'Doppelte verkaufen (' + dup + '× · ' + eur(dupEur) + ')' : 'Keine Doppelten') + '</button></div>'
+    + '<div class="kz-p-msg"></div>'
+    + (list.length ? '<div class="kf-grid kz-p-list">' + list.map(i => '<div class="card kz-rar-' + i.rarity + (i.id === o.equipped ? ' kz-p-on' : '') + '" data-pid="' + i.id + '">'
+        + '<b>' + esc(i.name) + '</b>' + (i.new ? '<span class="kz-new">Neu</span>' : '')
+        + '<p class="kf-muted">' + RARITY[i.rarity] + ' · ' + i.qty + '×' + (i.set_id ? ' · Set ' + esc(setOf(i.set_id)?.name || '') : '') + '</p>'
+        + '<p>' + stats(i) + '</p><p class="kz-p-cmp" hidden></p>'
+        + '<div class="kf-row">' + (i.id === o.equipped ? '<button class="ghost pun">Ablegen</button>' : '<button class="ghost peq" data-id="' + i.id + '">Anlegen</button>')
+        + '<button class="ghost psell" data-id="' + i.id + '"' + (i.id === o.equipped && i.qty < 2 ? ' disabled' : '') + '>Verkaufen · ' + eur(i.sell_price) + '</button>'
+        + (i.qty > 1 ? '<button class="ghost pmarket" data-id="' + i.id + '" data-price="' + (i.market_price || (Number(i.sell_price) * 2).toFixed(2)) + '">Im Basar anbieten</button>' : '') + '</div></div>').join('') + '</div>'
+      : '<p class="kf-muted">' + (mine.length ? 'Kein Stück passt zum Filter.' : 'Noch kein Plunder. Auf Pfandtouren findest du welchen – je länger die Tour, desto öfter.') + '</p>')
+    + '</div>'
+    // ---------- Sammlung ----------
+    + '<div class="kz-p-coll"><div class="kf-box"><h3>Sammlung: ' + o.found + ' von ' + o.total + ' gefunden</h3><div class="progress"><span style="width:' + Math.round(o.found / o.total * 100) + '%"></span></div></div>'
+    + '<div class="kz-p-album">' + o.items.map(i => i.qty > 0
+      ? '<div class="card kz-rar-' + i.rarity + '" data-pid="' + i.id + '"><b>' + esc(i.name) + '</b><p class="kf-muted">' + RARITY[i.rarity] + '</p><p>' + esc(i.description) + '</p></div>'
+      : '<div class="kz-p-unknown kz-rar-' + i.rarity + '" title="Noch nicht gefunden"><span>?</span><small>' + RARITY[i.rarity] + (i.season ? ' · nur ' + ({ winter: 'im Winter', fruehling: 'im Frühling', sommer: 'im Sommer', herbst: 'im Herbst' })[i.season] : '') + '</small></div>').join('') + '</div>'
+    + '<h3 class="kz-p-seth">Sets</h3><div class="kf-grid">' + o.sets.map(s => {
+      const have = s.pieces.filter(x => x.have).length, done = have === s.pieces.length;
+      return '<div class="kf-box kz-p-set' + (done ? ' kz-done' : '') + '"><h3>' + esc(s.name) + ' <small>' + have + '/' + s.pieces.length + '</small></h3><p class="kf-muted">' + esc(s.description) + '</p>'
+        + '<ul>' + s.pieces.map(x => '<li class="' + (x.have ? 'kz-have' : '') + '">' + (x.have ? esc(x.name) : '???') + '</li>').join('') + '</ul>'
+        + '<p>Bonus: ' + [s.attack ? 'Angriff +' + s.attack : '', s.defense ? 'Verteidigung +' + s.defense : '', s.bottle_bonus ? 'Pfand +' + s.bottle_bonus + ' %' : ''].filter(Boolean).join(' · ') + (done ? ' – <b>aktiv</b>' : '') + '</p></div>';
+    }).join('') + '</div></div>';
+  // Werte
+  const sortSel = plunderBody.querySelector('.kz-p-sort'), filtSel = plunderBody.querySelector('.kz-p-filter');
+  sortSel.value = PL.sort; filtSel.value = PL.filter;
+  sortSel.onchange = () => { PL.sort = sortSel.value; drawPlunder(); };
+  filtSel.onchange = () => { PL.filter = filtSel.value; drawPlunder(); };
+  const box = plunderBody.querySelector('.kz-p-msg');
+  const done = (txt, wait) => { setTimeout(loaders.plunder, wait || 300); return txt; };
+  plunderBody.querySelectorAll('.peq').forEach(bt => act(bt, box, async () => { window.kiezRenderProfile?.(await rpc('equip_plunder', { wanted: bt.dataset.id })); return done('Angelegt – wirkt ab sofort im Kampf und auf Pfandtouren.'); }));
+  plunderBody.querySelectorAll('.pun').forEach(bt => act(bt, box, async () => { window.kiezRenderProfile?.(await rpc('equip_plunder', { wanted: null })); return done('Abgelegt.'); }));
+  plunderBody.querySelectorAll('.psell').forEach(bt => act(bt, box, async () => { const r = await rpc('sell_plunder', { wanted: bt.dataset.id, qty: 1 }); window.kiezRenderProfile?.(r.profile); return done('Verkauft für ' + eur(r.paid) + (Number(r.lost) > 0 ? ' (Rest passte nicht in den Geldbehälter)' : '') + '.', 800); }));
+  const dupBtn = plunderBody.querySelector('.kz-p-dups');
+  if (dup) act(dupBtn, box, async () => { const r = await rpc('sell_plunder_duplicates'); window.kiezRenderProfile?.(r.profile); return done(r.sold + ' doppelte Stücke verkauft für ' + eur(r.paid) + (Number(r.lost) > 0 ? ' (Rest passte nicht in den Geldbehälter)' : '') + '.', 800); });
+  plunderBody.querySelector('.kz-p-swap')?.addEventListener('click', () => plunderBody.querySelector('.kz-p-list')?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+  plunderBody.querySelectorAll('.pmarket').forEach(bt => bt.onclick = () => { window.kiezBasarPrefill = { id: bt.dataset.id, price: bt.dataset.price }; show('basar'); });
+  // Vergleich beim Antippen einer Karte (116)
+  plunderBody.querySelectorAll('.kz-p-list .card').forEach(card => card.addEventListener('click', e => {
+    if (e.target.closest('button')) return;
+    const i = o.items.find(x => x.id === card.dataset.pid), cmp = card.querySelector('.kz-p-cmp');
+    if (!i || !cmp) return;
+    if (!cmp.hidden) { cmp.hidden = true; return; }
+    const base = eq || { attack: 0, defense: 0, bottle_bonus: 0 };
+    const d = (v, w, lbl, u) => { const x = v - w; return '<span class="' + (x > 0 ? 'kz-up' : x < 0 ? 'kz-down' : '') + '">' + lbl + ' ' + (x > 0 ? '+' : x < 0 ? '−' : '±') + Math.abs(x) + (u || '') + '</span>'; };
+    cmp.innerHTML = i.id === o.equipped ? 'Das ist dein angelegtes Stück.' : 'Gegen ' + (eq ? esc(eq.name) : 'nichts angelegt') + ': ' + d(i.attack, base.attack, 'Angriff') + ' · ' + d(i.defense, base.defense, 'Verteidigung') + ' · ' + d(i.bottle_bonus, base.bottle_bonus, 'Pfand', ' %');
+    cmp.hidden = false;
+  }));
+  applyPTab();
+}
+const PL = { data: null, sort: 'rar', filter: 'alle', tab: 'Meine Stücke' };
+// Reiter statt einer langen Seite (113)
+{
+  const sec = document.getElementById('plunder');
+  if (sec && !sec.querySelector(':scope > .section-tools')) {
+    const t = document.createElement('div'); t.className = 'section-tools';
+    t.innerHTML = ['Meine Stücke', 'Sammlung', 'Basteln', 'Lager/Material'].map(x => '<span>' + x + '</span>').join('');
+    sec.querySelector(':scope > h2').after(t);
+    t.addEventListener('click', e => { const s = e.target.closest('span'); if (!s) return; PL.tab = s.textContent.trim(); applyPTab(); });
+  }
+}
+function applyPTab() {
+  const sec = document.getElementById('plunder'); if (!sec) return;
+  sec.querySelectorAll(':scope > .section-tools span').forEach(s => s.classList.toggle('subtab-active', s.textContent.trim() === PL.tab));
+  const inside = sec.querySelector('.inside'); if (!inside) return;
+  const vis = (el, on) => on ? el.style.removeProperty('display') : el.style.setProperty('display', 'none', 'important');
+  [...inside.children].forEach(ch => {
+    if (ch.id === 'plunderlist') return;
+    if (ch.classList.contains('kf-body')) vis(ch, PL.tab === 'Meine Stücke' || PL.tab === 'Sammlung');
+    else if (ch.classList.contains('kiez-inventory-card')) vis(ch, PL.tab === 'Lager/Material');
+    else vis(ch, PL.tab === 'Basteln');
+  });
+  const m = plunderBody.querySelector('.kz-p-mine'), c = plunderBody.querySelector('.kz-p-coll');
+  if (m) vis(m, PL.tab === 'Meine Stücke'); if (c) vis(c, PL.tab === 'Sammlung');
+}
+window.kiezPlunderTab = t => { PL.tab = t; applyPTab(); };
+new MutationObserver(() => applyPTab()).observe(document.querySelector('#plunder .inside') || document.body, { childList: true });
+// Basar: Preisvorschlag aus der Plunderkiste übernehmen (117)
+setInterval(() => {
+  const pre = window.kiezBasarPrefill; if (!pre) return;
+  const sel = document.querySelector('#basar select.msel');
+  const price = document.querySelector('#basar .mprice');
+  if (!sel || !price || !document.getElementById('basar')?.classList.contains('active-view')) return;
+  if ([...sel.options].some(o => o.value === pre.id)) sel.value = pre.id;
+  price.value = pre.price; price.scrollIntoView({ block: 'center' }); price.focus();
+  window.kiezBasarPrefill = null;
+}, 400);
+// Öffnen-Moment für die Kronkorken-Plunderkiste (119)
+async function openBoxMoment(pid) {
+  const { data: it } = await sb.from('plunder_catalog').select('name,rarity,description').eq('id', pid).maybeSingle();
+  if (!it) return;
+  const ov = document.createElement('div'); ov.className = 'kz-box-ov';
+  ov.innerHTML = '<div class="kz-box-card"><div class="kz-box-chest"></div><div class="kz-box-item kz-rar-' + it.rarity + '"><small>' + RARITY[it.rarity] + '</small><b>' + esc(it.name) + '</b><p>' + esc(it.description) + '</p></div><button class="big kz-box-ok">Einpacken</button></div>';
+  document.body.appendChild(ov);
+  requestAnimationFrame(() => ov.classList.add('kz-go'));
+  setTimeout(() => ov.classList.add('kz-open'), 1100);
+  const close = () => ov.remove();
+  ov.querySelector('.kz-box-ok').onclick = close; ov.addEventListener('click', e => { if (e.target === ov) close(); });
+}
+window.kiezOpenBox = openBoxMoment;
+const style14 = document.createElement('style');
+style14.textContent = `html body:not(#kz1):not(#kz2) .kz-rar-gewoehnlich{--rar:#8d8a80}html body:not(#kz1):not(#kz2) .kz-rar-selten{--rar:#4f86c6}html body:not(#kz1):not(#kz2) .kz-rar-episch{--rar:#9b59c9}html body:not(#kz1):not(#kz2) .kz-rar-legendaer{--rar:#e0a53a}
+html body:not(#kz1):not(#kz2) #plunder .card[class*="kz-rar-"]{border:2px solid var(--rar) !important}
+html body:not(#kz1):not(#kz2) #plunder .card.kz-p-on{box-shadow:0 0 0 2px var(--moss,#6f8a3c),0 0 14px rgba(111,138,60,.45) !important}
+html body:not(#kz1):not(#kz2) .kz-new{display:inline-block;margin-left:8px;padding:1px 8px;border-radius:10px;background:var(--rust,#9b3c1f);color:#fff;font-size:12px;font-weight:700;vertical-align:2px}
+html body:not(#kz1):not(#kz2) .kz-p-tools{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin:10px 0}
+html body:not(#kz1):not(#kz2) .kz-p-tools label{display:flex;flex-direction:column;gap:3px;font-size:13px}
+html body:not(#kz1):not(#kz2) .kz-p-cmp .kz-up{color:#8fc26a;font-weight:700}html body:not(#kz1):not(#kz2) .kz-p-cmp .kz-down{color:#e0795a;font-weight:700}
+html body:not(#kz1):not(#kz2) #plunder .kz-p-list .card{cursor:pointer}
+html body:not(#kz1):not(#kz2) .kz-p-album{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin:10px 0}
+html body:not(#kz1):not(#kz2) .kz-p-album .card{grid-column:span 2}
+html body:not(#kz1):not(#kz2) .kz-p-unknown{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:120px;border:2px dashed var(--rar);border-radius:var(--radius,8px);background:rgba(0,0,0,.35);color:var(--rar)}
+html body:not(#kz1):not(#kz2) .kz-p-unknown span{font:700 38px var(--font-head,serif);opacity:.8}
+html body:not(#kz1):not(#kz2) .kz-p-unknown small{font-size:12px;text-transform:uppercase;letter-spacing:.04em;text-align:center;padding:0 6px}
+html body:not(#kz1):not(#kz2) .kz-p-set ul{margin:6px 0;padding-left:18px}html body:not(#kz1):not(#kz2) .kz-p-set li{color:var(--muted,#bdb19d)}html body:not(#kz1):not(#kz2) .kz-p-set li.kz-have{color:var(--text,#e8e1c9);font-weight:700}
+html body:not(#kz1):not(#kz2) .kz-p-set.kz-done{box-shadow:0 0 0 2px var(--brass,#d1a94f) !important}
+html body:not(#kz1):not(#kz2) .kz-p-set h3 small{font-size:14px;color:var(--brass,#d1a94f);margin-left:6px}
+.kz-box-ov{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.72);opacity:0;transition:opacity .25s}
+.kz-box-ov.kz-go{opacity:1}
+.kz-box-card{position:relative;width:min(360px,90vw);padding:24px;border-radius:12px;background:#231c14;border:1px solid #6b5536;text-align:center;color:#efe3c3;font-family:var(--font-body,sans-serif)}
+.kz-box-chest{width:150px;height:110px;margin:0 auto 12px;background:center/cover url('/bilder/kk-plunderkiste.webp');border-radius:10px;animation:kzshake .35s ease-in-out 3}
+.kz-box-item{display:none;padding:12px;border-radius:10px;border:2px solid var(--rar,#8d8a80);box-shadow:0 0 28px 6px var(--rar,#8d8a80)}
+.kz-box-item small{display:block;text-transform:uppercase;letter-spacing:.06em;font-size:12px;color:var(--rar)}
+.kz-box-item b{display:block;font:700 22px var(--font-head,serif);margin:4px 0}
+.kz-open .kz-box-chest{display:none}.kz-open .kz-box-item{display:block;animation:kzpop .45s ease-out}
+.kz-box-ok{margin-top:14px}
+@keyframes kzshake{0%,100%{transform:rotate(0)}25%{transform:rotate(-6deg)}75%{transform:rotate(6deg)}}
+@keyframes kzpop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+.kz-rar-gewoehnlich{--rar:#8d8a80}.kz-rar-selten{--rar:#4f86c6}.kz-rar-episch{--rar:#9b59c9}.kz-rar-legendaer{--rar:#e0a53a}
+@media (prefers-reduced-motion:reduce){.kz-box-chest,.kz-open .kz-box-item{animation:none}}`;
+document.head.appendChild(style14);
 
 // ================= Kronkorken =================
 const kkBody = addPanel('kronkorken', 'Kronkorken-Tausch', '🧢 Kronkorken');
@@ -239,6 +380,7 @@ loaders.kronkorken = async () => {
     + OFFERS.map(o => '<div class="card"><b>' + o[2] + '</b><p>' + o[3] + '</p><button class="big kkbuy" data-id="' + o[0] + '">Tauschen – ' + o[1] + ' 🧢</button></div>').join('') + '</div><div class="kkmsg"></div>';
   kkBody.querySelectorAll('.kkbuy').forEach(b => act(b, kkBody.querySelector('.kkmsg'), async () => {
     const r = await rpc('bottlecap_shop', { offer: b.dataset.id }); window.kiezRenderProfile?.(r.profile);
+    if (b.dataset.id === 'plunderkiste' && r.plunder) window.kiezOpenBox?.(r.plunder);
     setTimeout(loaders.kronkorken, 1200); return esc(r.message) + ' (−' + r.cost + ' 🧢)';
   }));
 };
@@ -872,7 +1014,7 @@ const NAV = [
   ['Stadt', 'szene-stadt', [['Stadtplan', 'citymap'], ['Stadtteile', 'stadtteile'], ['Kiezladen', 'store'], ['Apotheke', 'apotheke'], ['Schnorrplätze & Musik', 'income'],
     ['Plunder-Basar', 'basar'], ['Zockerbude', 'zockerbude'], ['Glücksspiel & Lotto', 'missions', 'Glücksspiel'], ['Schließfach', 'schliessfach']]],
   ['Kampf', 'szene-pruegelei', [['Gegner suchen', 'pvp'], ['Kampfprotokoll', 'kampfprotokoll'], ['Begleiter trainieren', 'pets']]],
-  ['Bande', 'szene-bande', [['Meine Bande', 'gangs'], ['Stadtteile erobern', 'stadtteile'], ['Banden-Highscore', 'wettbewerb']]],
+  ['Bande', 'szene-bande', [['Meine Bande', 'gangs'], ['Bandenhaus', 'bandenhaus'], ['Stadtteile erobern', 'stadtteile'], ['Banden-Highscore', 'wettbewerb']]],
   ['Kommunikation', 'szene-post', [['Kiezpost', 'messages'], ['Kiez-Chat', 'chat'], ['Kiez-Brett', 'brett'], ['Freunde', 'freunde']]],
   ['Highscore', 'szene-rangliste', [['Rangliste', 'leaderboard'], ['Wettbewerb & Events', 'wettbewerb'], ['Erfolge', 'achievements']]]
 ];
@@ -1424,7 +1566,7 @@ function lockAreas() {
     card.classList.toggle('kz-locked', !!lock);
   });
   document.querySelectorAll('#income .card[data-spot]').forEach(card => {
-    const m = card.innerText.match(/ab Sammelgebiet (\d+)/), need = m ? +m[1] : 1, btn = card.querySelector('.schnorr-go'); if (!btn) return;
+    const need = Number(card.dataset.area) || 1, btn = card.querySelector('.schnorr-go'); if (!btn) return;
     const lock = (p.area_level || 1) < need;
     if (lock) { btn.disabled = true; btn.dataset.kzlock = '1'; btn.textContent = '🔒 ab Sammelgebiet ' + need; card.classList.add('kz-locked'); }
     else if (card.classList.contains('kz-locked')) { btn.disabled = false; delete btn.dataset.kzlock; btn.textContent = 'Hingehen'; card.classList.remove('kz-locked'); }
@@ -1742,7 +1884,7 @@ async function begRefresh() {
     card.classList.toggle('kz-best', !!o.best_spot && o.best_spot === card.dataset.spot);
     const isNext = !open && !nextMarked && need === o.area_level + 1; if (isNext) nextMarked = true;
     card.classList.toggle('kz-next', isNext);
-    if (el) el.textContent = !open ? (isNext ? 'Als Nächstes: mit Sammelgebiet ' + need + ' frei' : 'Ab Sammelgebiet ' + need)
+    if (el) el.textContent = !open ? (isNext ? 'Als Nächstes: mit Sammelgebiet ' + need + ' frei' : '')
       : st ? 'Heute: ' + eur(st.today) + ' in ' + st.times + '× · beste Runde ' + eur(st.best) : 'Heute noch nicht hier gewesen';
   });
 }
@@ -1764,9 +1906,323 @@ html body:not(#kz1):not(#kz2) #income .kz-sp-bar[hidden]{display:none !important
 html body:not(#kz1):not(#kz2) #income .card.kz-locked,html body:not(#kz1):not(#kz2) #income .area-card.locked:not(.kz-cur){filter:grayscale(.85);opacity:.6}
 html body:not(#kz1):not(#kz2) #income .card.kz-next{filter:none;opacity:1;box-shadow:0 0 0 2px var(--brass,#d1a94f) !important}
 html body:not(#kz1):not(#kz2) #income .area-card.kz-cur{box-shadow:0 0 0 2px var(--moss,#6f8a3c) !important}
-html body:not(#kz1):not(#kz2) #income .card.kz-best>b:after{content:'Bester Platz';margin-left:8px;padding:1px 8px;border-radius:10px;background:var(--brass,#d1a94f);color:#241b10;font-size:12px;vertical-align:2px}
+html body:not(#kz1):not(#kz2) #income .card.kz-best>b:after{content:'Bester Platz';display:inline-block;white-space:nowrap;margin-left:8px;padding:1px 8px;border-radius:10px;background:var(--brass,#d1a94f);color:#241b10;font-size:12px;vertical-align:2px}
 html body:not(#kz1):not(#kz2) .kz-soon .progress{margin:6px 0 10px}`;
 document.head.appendChild(style13);
+
+// ================= S7: Körperpflege mit Sinn, Hunger, Sucht (78–85, 24, 25) =================
+const TIER_DE = { gepflegt: 'Gepflegt', normal: 'Normal', schmuddelig: 'Schmuddelig', verwahrlost: 'Verwahrlost' };
+const tierOf = c => c >= 80 ? 'gepflegt' : c >= 50 ? 'normal' : c >= 20 ? 'schmuddelig' : 'verwahrlost';
+window.kiezTierOf = tierOf;
+const TIER_ROWS = [
+  ['gepflegt', 'ab 80 %', 'Schnorren ×1,2 · Musik ×1,15 · Villenviertel offen'],
+  ['normal', '50–79 %', 'Keine Vor- oder Nachteile'],
+  ['schmuddelig', '20–49 %', 'Schnorren ×0,6 · Musik ×0,7 · Läden 20 % teurer · Gestank: Verteidigung +2'],
+  ['verwahrlost', 'unter 20 %', 'Schnorren ×0,2 · Musik ×0,3 · Supermarkt/Apotheke werfen dich raus · Verteidigung +6 · nach 24 Std. krank'],
+];
+let bodySeq = 0;
+async function drawBody() {
+  if (!window.kiezProfile) return;
+  const t = ++bodySeq; let b;
+  try { b = await rpc('body_status'); } catch (e) { return; }
+  if (t !== bodySeq) return;
+  window.kiezRenderProfile?.(b.profile);
+  const until = d => new Date(d).toLocaleString('de-DE', { weekday: 'short', hour: '2-digit', minute: '2-digit' });
+  // Karte „Dein Zustand“ ganz oben in der Waschliste (Reiter Körperpflege)
+  const list = document.querySelector('#begging .wash-list');
+  if (list) {
+    let c = list.querySelector('.kz-body'); if (!c) { c = document.createElement('div'); c.className = 'card kz-body'; list.prepend(c); }
+    c.innerHTML = '<b>Dein Zustand: ' + TIER_DE[b.tier] + ' (' + b.cleanliness + ' % sauber)</b>'
+      + '<table class="kf-table kz-tiers">' + TIER_ROWS.map(r => '<tr class="' + (r[0] === b.tier ? 'kz-now' : '') + '"><td>' + TIER_DE[r[0]] + '</td><td>' + r[1] + '</td><td>' + r[2] + '</td></tr>').join('') + '</table>'
+      + '<p class="kf-muted">Sauberkeit sinkt um 1 % pro Stunde' + (b.barber_until ? ' (dank Friseur bis ' + until(b.barber_until) + ' nur halb so schnell)' : '') + ', Kämpfe und Verbrechen kosten je 3 %, Pfandtouren je nach Dauer mehr.</p>'
+      + '<div class="kz-meters"><div><small>Hunger</small><div class="progress"><span style="width:' + b.hunger + '%"></span></div><em>' + b.hunger + ' % satt' + (b.hunger < 30 ? ' – Energie kommt nur halb so schnell. Iss was im Supermarkt!' : '') + '</em></div>'
+      + '<div><small>Sucht</small><div class="progress kz-bad"><span style="width:' + b.addiction + '%"></span></div><em>' + b.addiction + ' %' + (b.withdrawal ? ' – Entzug: Energie −25 %. Hilfe gibt es in der Apotheke.' : b.addiction >= 20 ? ' – wer tagelang über 2 ‰ bleibt, wird abhängig' : '') + '</em></div></div>'
+      + (b.sick_until ? '<p class="notice bad">Du bist krank bis ' + until(b.sick_until) + ' – Energie kommt nur halb so schnell. Die Apotheke hilft.</p>' : '')
+      + '<p class="kf-muted">Energie-Tempo gerade: ' + Math.round(b.energy_rate * 100) + ' %</p>';
+  }
+  // Apotheke: Krankheit heilen, Entzugskur
+  const apo = document.querySelector('#apotheke .inside');
+  if (apo) {
+    let c = apo.querySelector('.kz-apo'); if (!c) { c = document.createElement('div'); c.className = 'card kz-apo'; apo.appendChild(c); }
+    const price = (full) => eur(b.insured ? full / 2 : full) + (b.tier === 'schmuddelig' ? ' + 20 %' : '');
+    c.innerHTML = '<b>Krankheit & Sucht</b>'
+      + '<p>' + (b.sick_until ? 'Du bist krank bis ' + until(b.sick_until) + '.' : 'Du bist gesund.') + ' Sucht: ' + b.addiction + ' %' + (b.withdrawal ? ' (Entzug!)' : '') + '</p>'
+      + '<div class="kf-row"><button class="ghost kz-heal"' + (b.sick_until ? '' : ' disabled') + '>Behandeln – ' + price(6) + '</button>'
+      + '<button class="ghost kz-detox"' + (b.addiction >= 20 ? '' : ' disabled') + '>Entzugskur – ' + price(12) + '</button></div><div class="kz-apo-msg"></div>';
+    const m = c.querySelector('.kz-apo-msg');
+    act(c.querySelector('.kz-heal'), m, async () => { const r = await rpc('heal_sickness'); window.kiezRenderProfile?.(r.profile); setTimeout(drawBody, 300); return 'Behandelt für ' + eur(r.price) + ' – du bist wieder gesund.'; });
+    act(c.querySelector('.kz-detox'), m, async () => { const r = await rpc('detox'); window.kiezRenderProfile?.(r.profile); setTimeout(drawBody, 300); return 'Entzugskur für ' + eur(r.price) + ' – der Durst ist weg.'; });
+  }
+  // Supermarkt-Essen: Hunger anzeigen
+  document.querySelectorAll('.kf-food').forEach(f => {
+    let h = f.querySelector('.kz-hunger'); if (!h) { h = document.createElement('p'); h.className = 'kz-hunger'; f.prepend(h); }
+    h.textContent = 'Hunger: ' + b.hunger + ' % satt' + (b.hunger < 30 ? ' – iss was, sonst kommt Energie nur halb so schnell' : '');
+  });
+}
+window.kiezDrawBody = drawBody;
+{ const prevBeg = loaders.begging; loaders.begging = () => { prevBeg?.(); setTimeout(drawBody, 300); }; }
+{ const prevApo = loaders.apotheke; loaders.apotheke = () => { prevApo?.(); setTimeout(drawBody, 300); }; }
+{ const prevStore = loaders.store; loaders.store = () => { prevStore?.(); setTimeout(drawBody, 500); }; }
+setTimeout(drawBody, 2500); setInterval(() => { if (!document.hidden && document.querySelector('#begging.active-view, #apotheke.active-view')) drawBody(); }, 60000);
+// Gegner sehen die Stufe (82)
+async function opponentTiers() {
+  const cards = [...document.querySelectorAll('#opponents .card')].filter(c => c.querySelector('.attackplayer') && !c.dataset.kzTier);
+  if (!cards.length) return;
+  const ids = cards.map(c => c.querySelector('.attackplayer').dataset.id);
+  const { data } = await sb.from('profiles').select('id,cleanliness').in('id', ids);
+  const by = Object.fromEntries((data || []).map(x => [x.id, x.cleanliness]));
+  cards.forEach(c => {
+    const cl = by[c.querySelector('.attackplayer').dataset.id]; if (cl == null) return;
+    c.dataset.kzTier = '1';
+    const p = document.createElement('p'); p.className = 'kz-tiertag kz-t-' + tierOf(cl);
+    p.textContent = 'Aussehen: ' + TIER_DE[tierOf(cl)] + (tierOf(cl) === 'verwahrlost' ? ' – stinkt, schwerer zu verprügeln' : tierOf(cl) === 'schmuddelig' ? ' – riecht streng' : '');
+    (c.querySelector('p') || c.querySelector('b')).after(p);
+  });
+}
+if (document.getElementById('opponents')) new MutationObserver(() => opponentTiers()).observe(document.getElementById('opponents'), { childList: true });
+const style15 = document.createElement('style');
+style15.textContent = `html body:not(#kz1):not(#kz2) .wash-list .kz-body{grid-column:1/-1}
+html body:not(#kz1):not(#kz2) .kz-tiers td{padding:6px 8px;font-size:14px}
+html body:not(#kz1):not(#kz2) .kz-tiers tr.kz-now td{background:rgba(209,169,79,.18);font-weight:700}
+html body:not(#kz1):not(#kz2) .kz-meters{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:10px 0}
+html body:not(#kz1):not(#kz2) .kz-meters small{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted,#bdb19d)}
+html body:not(#kz1):not(#kz2) .kz-meters em{display:block;font-style:normal;font-size:14px;margin-top:4px}
+html body:not(#kz1):not(#kz2) .progress.kz-bad span{background:var(--rust,#9b3c1f) !important}
+html body:not(#kz1):not(#kz2) .kz-tiertag{font-size:14px}
+html body:not(#kz1):not(#kz2) .kz-t-gepflegt{color:#9bd17a}html body:not(#kz1):not(#kz2) .kz-t-schmuddelig{color:#e0b35a}html body:not(#kz1):not(#kz2) .kz-t-verwahrlost{color:#e0795a}`;
+document.head.appendChild(style15);
+
+// ================= S8: Bandenhaus – Level, Räume, Wochenaufgaben, Krieg & Überfall, Bündnisse (93–98, 11) =================
+const houseBody = addPanel('bandenhaus', 'Bandenhaus', 'Bandenhaus');
+const ROOMS = {
+  kneipe: ['Kneipe', 'Einmal am Tag eine Runde: +10 Energie je Stufe.'],
+  training: ['Trainingsraum', 'Weiterbildungen gehen 5 % schneller je Stufe.'],
+  zwinger: ['Zwinger', 'Mit Begleiter: Angriff und Verteidigung +2 je Stufe.'],
+  werkstatt: ['Werkstatt', 'Einmal am Tag Material zum Basteln (mehr je Stufe).'],
+  lager: ['Lager', 'Plunder mit der Bande teilen – 10 Plätze je Stufe.'],
+  tresor: ['Tresor', 'Bei Überfällen wird 15 % weniger je Stufe geraubt, dazu +5 Verteidigung.'],
+};
+const RANKV = { member: 1, officer: 2, co: 3, owner: 4 };
+const HOUSE = { tab: 'Übersicht', data: null };
+{
+  const t = document.createElement('div'); t.className = 'section-tools';
+  t.innerHTML = ['Übersicht', 'Räume', 'Wochenaufgaben', 'Krieg & Überfall', 'Bündnisse'].map(x => '<span>' + x + '</span>').join('');
+  document.querySelector('#bandenhaus > h2')?.after(t);
+  t.addEventListener('click', e => { const s = e.target.closest('span'); if (!s) return; HOUSE.tab = s.textContent.trim(); houseTab(); });
+}
+function houseTab() {
+  document.querySelectorAll('#bandenhaus > .section-tools span').forEach(s => s.classList.toggle('subtab-active', s.textContent.trim() === HOUSE.tab));
+  houseBody.querySelectorAll('[data-htab]').forEach(el => el.dataset.htab === HOUSE.tab ? el.style.removeProperty('display') : el.style.setProperty('display', 'none', 'important'));
+}
+let houseSeq = 0;
+loaders.bandenhaus = async () => {
+  const t = ++houseSeq; let o;
+  try { o = await rpc('gang_house'); } catch (e) { houseBody.innerHTML = '<p class="notice bad">' + esc(e.message) + '</p>'; return; }
+  if (t !== houseSeq) return;
+  HOUSE.data = o;
+  if (!o.gang) { houseBody.innerHTML = '<div class="kf-box"><h3>Kein Bandenhaus</h3><p>Du bist in keiner Bande. Tritt einer bei oder gründe selbst eine – dann gibt es hier Räume, Wochenaufgaben, Kriege und Überfälle.</p><button class="ghost kf-go" data-v="gangs">Zu den Banden</button></div>'; houseBody.querySelector('.kf-go').onclick = () => show('gangs'); return; }
+  const g = o.gang, lead = RANKV[o.role] >= 3, officer = RANKV[o.role] >= 2;
+  const pctXp = Math.min(100, Math.round((g.xp - g.level_xp) / Math.max(1, g.next_xp - g.level_xp) * 100));
+  const when = d => new Date(d).toLocaleString('de-DE', { weekday: 'short', hour: '2-digit', minute: '2-digit' });
+  const others = o.others.map(x => '<option value="' + x.id + '">' + esc(x.name) + ' (Level ' + x.level + ')</option>').join('');
+  const TASK = { bottles: ['Flaschen sammeln', ''], wins: ['Kämpfe gewinnen', ''], donate: ['In die Kasse einzahlen', ' €'] };
+  const activeWar = o.wars.find(w => !w.resolved), activeRaid = o.raids.find(r => !r.resolved);
+  houseBody.innerHTML =
+    // Übersicht
+    '<div data-htab="Übersicht"><div class="kf-box"><h3>' + esc(g.name) + ' – Bandenlevel ' + g.level + '</h3>'
+    + '<div class="progress"><span style="width:' + pctXp + '%"></span></div><p class="kf-muted">' + g.xp + ' Erfahrung' + (g.level < 20 ? ' · ' + (g.next_xp - g.xp) + ' bis Level ' + (g.level + 1) : ' · Höchstlevel') + '</p>'
+    + '<table class="kf-table"><tr><td>Mitglieder</td><td>' + g.members + ' von ' + g.slots + ' Plätzen</td></tr><tr><td>Bandenkasse</td><td>' + eur(g.balance) + '</td></tr>'
+    + '<tr><td>Ausbau Angriff / Verteidigung</td><td>Stufe ' + g.attack_level + ' / ' + g.defense_level + '</td></tr></table>'
+    + '<p class="kf-muted">Erfahrung gibt es für jede gesammelte Flasche (1), jeden Sieg (25), jeden eingezahlten Euro (1), geschaffte Wochenaufgaben (500), gewonnene Kriege (500), Überfälle (200) und eroberte Viertel (1000). Jedes Level bringt 2 Plätze mehr und schaltet größere Räume frei.</p></div></div>'
+    // Räume
+    + '<div data-htab="Räume"><div class="kf-grid">' + Object.entries(ROOMS).map(([id, [name, desc]]) => {
+      const lvl = o.rooms[id] || 0, need = 2 * (lvl + 1) - 1, cost = 100 * (lvl + 1) ** 2;
+      const use = id === 'kneipe' && lvl ? '<button class="big kz-pub"' + (o.pub_ready ? '' : ' disabled') + '>' + (o.pub_ready ? 'Runde trinken' : 'Heute schon getrunken') + '</button>'
+        : id === 'werkstatt' && lvl ? '<button class="big kz-shop"' + (o.workshop_ready ? '' : ' disabled') + '>' + (o.workshop_ready ? 'Werkstatt nutzen' : 'Heute schon genutzt') + '</button>' : '';
+      return '<div class="card kz-room' + (lvl ? '' : ' kz-locked') + '" data-room="' + id + '"><b>' + name + '</b><p class="kf-muted">Stufe ' + lvl + ' von 5</p><p>' + desc + '</p>'
+        + (id === 'lager' && lvl ? '<div class="kz-store">' + (o.storage.length ? o.storage.map(s => '<div class="kf-row"><span>' + esc(s.name) + ' ×' + s.qty + '</span><button class="ghost kz-take" data-id="' + s.id + '">Nehmen</button></div>').join('') : '<p class="kf-muted">Das Lager ist leer.</p>')
+          + '<div class="kf-row"><select class="kz-putsel" aria-label="Plunder einlagern"></select><button class="ghost kz-put">Einlagern</button></div></div>' : '')
+        + '<div class="kf-row">' + use + (lvl < 5 ? '<button class="ghost kz-build" data-room="' + id + '"' + (lead && g.level >= need ? '' : ' disabled') + '>'
+          + (g.level < need ? 'Ausbau ab Bandenlevel ' + need : !lead ? 'Ausbau nur Chef/Vize · ' + eur(cost) : 'Ausbauen – ' + eur(cost)) + '</button>' : '<span class="kf-muted">Voll ausgebaut</span>') + '</div>'
+        + '<div class="kz-room-msg"></div></div>';
+    }).join('') + '</div></div>'
+    // Wochenaufgaben
+    + '<div data-htab="Wochenaufgaben"><div class="kf-box"><h3>Wochenaufgaben (bis ' + new Date(o.week_ends).toLocaleDateString('de-DE') + ')</h3><p class="kf-muted">Schafft ihr ein Ziel, bekommt jedes Mitglied 5 Kronkorken und 100 Punkte, die Bande 500 Erfahrung.</p>'
+    + o.tasks.map(t => '<div class="kz-task' + (t.done ? ' kz-done' : '') + '"><b>' + TASK[t.kind][0] + (t.done ? ' – geschafft' : '') + '</b><div class="progress"><span style="width:' + Math.min(100, Math.round(t.progress / t.target * 100)) + '%"></span></div><small>' + t.progress + TASK[t.kind][1] + ' von ' + t.target + TASK[t.kind][1] + '</small></div>').join('')
+    + '</div><div class="kf-box"><h3>Wer hat wie viel beigetragen?</h3>' + (o.contrib.length ? '<table class="kf-table"><tr><th>Spieler</th><th>Flaschen</th><th>Siege</th><th>Eingezahlt</th></tr>' + o.contrib.map(c => '<tr><td>' + playerLink(c.user_id, c.name) + '</td><td>' + c.bottles + '</td><td>' + c.wins + '</td><td>' + eur(c.donated) + '</td></tr>').join('') + '</table>' : '<p class="kf-muted">Diese Woche noch nichts.</p>') + '</div></div>'
+    // Krieg & Überfall
+    + '<div data-htab="Krieg & Überfall">'
+    + (activeRaid ? (() => { const r = activeRaid, mine = r.attacker === g.id; return '<div class="kf-box kz-raid"><h3>' + (mine ? 'Euer Überfall auf ' + esc(r.defender_name) : 'Überfall von ' + esc(r.attacker_name) + '!') + '</h3><p>Endet ' + when(r.ends_at) + ' · Angreifer: ' + r.attackers + ' · Verteidiger: ' + r.defenders + '</p>'
+      + '<div class="kf-row"><button class="big kz-joinraid" data-id="' + r.id + '"' + (r.joined ? ' disabled' : '') + '>' + (r.joined ? 'Du bist dabei' : mine ? 'Mitmachen (10 Energie)' : 'Verteidigen (10 Energie)') + '</button></div><div class="kz-raid-msg"></div></div>'; })() : '')
+    + (activeWar ? (() => { const w = activeWar, att = w.attacker === g.id; return '<div class="kf-box kz-war"><h3>Krieg: ' + esc(w.attacker_name) + ' ' + w.attacker_score + ' : ' + w.defender_score + ' ' + esc(w.defender_name) + '</h3><p class="kf-muted">Einsatz ' + eur(w.stake) + ' · endet ' + when(w.ends_at) + (w.ceasefire_by && w.ceasefire_by !== g.id ? ' · Die Gegner bieten Waffenruhe an' : w.ceasefire_by === g.id ? ' · Ihr habt Waffenruhe angeboten' : '') + '</p>'
+      + (w.days.length ? '<table class="kf-table"><tr><th>Tag</th><th>' + esc(w.attacker_name) + '</th><th>' + esc(w.defender_name) + '</th></tr>' + w.days.map(d => '<tr><td>' + new Date(d.day).toLocaleDateString('de-DE') + '</td><td>' + d.a + '</td><td>' + d.d + '</td></tr>').join('') + '</table>' : '')
+      + (lead ? '<div class="kf-row"><button class="ghost kz-cease" data-id="' + w.id + '">' + (w.ceasefire_by && w.ceasefire_by !== g.id ? 'Waffenruhe annehmen' : 'Waffenruhe anbieten') + '</button><button class="ghost kz-surr" data-id="' + w.id + '">Kapitulieren</button></div>' : '')
+      + '<div class="kz-war-msg"></div></div>'; })() : '')
+    + '<div class="kf-grid">'
+    + (officer ? '<div class="kf-box"><h3>Bandenhaus überfallen</h3><p class="kf-muted">15 Minuten: Mitglieder beider Banden können mitmachen. Gewinnt ihr, raubt ihr 10 % der gegnerischen Kasse (Tresor schützt). Kostet 10 Energie.</p><div class="kf-row"><select class="kz-raidsel">' + others + '</select><button class="big kz-raid-go">Überfallen</button></div><div class="kz-raid-msg2"></div></div>' : '')
+    + '<div class="kf-box"><h3>Letzte Kriege</h3>' + (o.wars.filter(w => w.resolved).length ? '<table class="kf-table">' + o.wars.filter(w => w.resolved).map(w => '<tr><td>' + esc(w.attacker_name) + ' ' + w.attacker_score + ':' + w.defender_score + ' ' + esc(w.defender_name) + '</td><td>' + (w.winner === g.id ? 'gewonnen' : w.winner ? 'verloren' : 'unentschieden') + ' ' + esc(w.ended_how || '') + (Number(w.loot) ? ' · Beute ' + eur(w.loot) : '') + '</td></tr>').join('') + '</table>' : '<p class="kf-muted">Noch keine.</p>')
+    + '<p class="kf-muted">Den Krieg erklärt der Chef oder Vize auf der Bandenseite.</p></div>'
+    + '<div class="kf-box"><h3>Kriegs-Rangliste</h3><div class="kz-warrank kf-muted">Lade …</div></div></div></div>'
+    // Bündnisse
+    + '<div data-htab="Bündnisse"><div class="kf-box"><h3>Verbündete und Feinde</h3><p class="kf-muted">Verbündete können sich nicht bekriegen oder überfallen, und ihre Siege zählen in euren Kriegen mit (höchstens 3). Gegen Banden auf der Feindesliste dürft ihr ohne Wartezeit wieder Krieg erklären.</p>'
+    + (o.relations.length ? '<table class="kf-table">' + o.relations.map(r => '<tr><td>' + esc(r.name) + '</td><td>' + (r.kind === 'ally' ? (r.status === 'active' ? 'Verbündet' : r.mine ? 'Bündnis angeboten' : 'möchte sich verbünden') : 'Feind') + '</td><td>'
+      + (lead ? (!r.mine && r.status === 'pending' ? '<button class="ghost kz-rel" data-g="' + r.gang + '" data-k="ally">Annehmen</button>' : '<button class="ghost kz-rel" data-g="' + r.gang + '" data-k="none">Beenden</button>') : '') + '</td></tr>').join('') + '</table>' : '<p class="kf-muted">Noch keine.</p>')
+    + (lead ? '<div class="kf-row"><select class="kz-relsel">' + others + '</select><button class="ghost kz-rel-ally">Bündnis anbieten</button><button class="ghost kz-rel-enemy">Als Feind markieren</button></div>' : '')
+    + '<div class="kz-rel-msg"></div></div></div>';
+  houseTab();
+  const again = () => setTimeout(loaders.bandenhaus, 400);
+  houseBody.querySelectorAll('.kz-build').forEach(b => act(b, b.closest('.card').querySelector('.kz-room-msg'), async () => { const r = await rpc('build_gang_room', { r: b.dataset.room }); again(); return ROOMS[r.room][0] + ' auf Stufe ' + r.level + ' ausgebaut (' + eur(r.cost) + ').'; }));
+  const pub = houseBody.querySelector('.kz-pub'); if (pub) act(pub, pub.closest('.card').querySelector('.kz-room-msg'), async () => { const r = await rpc('gang_pub_drink'); window.kiezRenderProfile?.(r.profile); again(); return 'Prost! +' + r.energy + ' Energie.'; });
+  const shop = houseBody.querySelector('.kz-shop'); if (shop) act(shop, shop.closest('.card').querySelector('.kz-room-msg'), async () => { const r = await rpc('gang_workshop'); window.kiezRenderProfile?.(r.profile); again(); return 'Gefunden: ' + r.nails + ' Nägel, ' + r.wood + ' Holz, ' + r.textile + ' Textil.'; });
+  houseBody.querySelectorAll('.kz-take').forEach(b => act(b, b.closest('.card').querySelector('.kz-room-msg'), async () => { await rpc('gang_take_plunder', { wanted: b.dataset.id }); again(); return 'Genommen – liegt jetzt in deiner Plunderkiste.'; }));
+  const putSel = houseBody.querySelector('.kz-putsel');
+  if (putSel) {
+    const me = await myId(); const [{ data: mine }, { data: cat }] = await Promise.all([sb.from('user_plunder').select('plunder_id,quantity').eq('user_id', me).gt('quantity', 0), sb.from('plunder_catalog').select('id,name')]);
+    const nm = Object.fromEntries((cat || []).map(c => [c.id, c.name]));
+    putSel.innerHTML = (mine || []).length ? mine.map(x => '<option value="' + x.plunder_id + '">' + esc(nm[x.plunder_id] || x.plunder_id) + ' (' + x.quantity + '×)</option>').join('') : '<option value="">Kein Plunder</option>';
+    const put = houseBody.querySelector('.kz-put'); act(put, put.closest('.card').querySelector('.kz-room-msg'), async () => { if (!putSel.value) throw new Error('Du hast keinen Plunder'); await rpc('gang_store_plunder', { wanted: putSel.value }); again(); return 'Eingelagert.'; });
+  }
+  const jr = houseBody.querySelector('.kz-joinraid'); if (jr && !jr.disabled) act(jr, houseBody.querySelector('.kz-raid-msg'), async () => { const r = await rpc('join_gang_raid', { raid: Number(jr.dataset.id) }); window.kiezRenderProfile?.(r.profile); again(); return (r.side === 'attack' ? 'Du greifst mit ' : 'Du verteidigst mit ') + r.power + ' Kraft mit.'; });
+  const rg = houseBody.querySelector('.kz-raid-go'); if (rg) act(rg, houseBody.querySelector('.kz-raid-msg2'), async () => { const s = houseBody.querySelector('.kz-raidsel'); if (!s.value) throw new Error('Keine Bande gewählt'); await rpc('start_gang_raid', { target_gang: s.value }); again(); return 'Überfall läuft – 15 Minuten! Deine Bande wurde benachrichtigt.'; });
+  houseBody.querySelectorAll('.kz-cease').forEach(b => act(b, houseBody.querySelector('.kz-war-msg'), async () => { const r = await rpc('gang_war_ceasefire', { war: Number(b.dataset.id) }); again(); return r.status === 'ended' ? 'Waffenruhe – der Krieg ist beendet, Einsatz zurück.' : 'Waffenruhe angeboten.'; }));
+  houseBody.querySelectorAll('.kz-surr').forEach(b => act(b, houseBody.querySelector('.kz-war-msg'), async () => { if (!confirm('Wirklich kapitulieren? Die Gegner gewinnen den Krieg.')) return 'Nicht kapituliert.'; await rpc('gang_war_surrender', { war: Number(b.dataset.id) }); again(); return 'Kapituliert.'; }));
+  const relMsg = houseBody.querySelector('.kz-rel-msg');
+  houseBody.querySelectorAll('.kz-rel').forEach(b => act(b, relMsg, async () => { await rpc('set_gang_relation', { target_gang: b.dataset.g, rel: b.dataset.k }); again(); return b.dataset.k === 'ally' ? 'Bündnis geschlossen.' : 'Beendet.'; }));
+  const ra = houseBody.querySelector('.kz-rel-ally'); if (ra) act(ra, relMsg, async () => { const r = await rpc('set_gang_relation', { target_gang: houseBody.querySelector('.kz-relsel').value, rel: 'ally' }); again(); return r.status === 'active' ? 'Bündnis geschlossen.' : 'Bündnis angeboten – die andere Bande muss annehmen.'; });
+  const re = houseBody.querySelector('.kz-rel-enemy'); if (re) act(re, relMsg, async () => { await rpc('set_gang_relation', { target_gang: houseBody.querySelector('.kz-relsel').value, rel: 'enemy' }); again(); return 'Auf die Feindesliste gesetzt.'; });
+  rpc('gang_war_ranking').then(rk => { const el = houseBody.querySelector('.kz-warrank'); if (el) el.innerHTML = rk.length ? '<table class="kf-table"><tr><th>#</th><th>Bande</th><th>Siege</th><th>Niederlagen</th><th>Beute</th></tr>' + rk.map((x, i) => '<tr><td>' + (i + 1) + '</td><td><a href="#" class="kiez-gang" data-id="' + x.id + '">' + esc(x.name) + '</a></td><td>' + x.wins + '</td><td>' + x.losses + '</td><td>' + eur(x.loot) + '</td></tr>').join('') + '</table>' : 'Noch keine Kriege.'; }).catch(() => {});
+};
+// Laufender Überfall: Bandenhaus alle 30 s auffrischen
+setInterval(() => { if (!document.hidden && document.getElementById('bandenhaus')?.classList.contains('active-view') && HOUSE.data?.raids?.some(r => !r.resolved)) loaders.bandenhaus(); }, 30000);
+const style16 = document.createElement('style');
+style16.textContent = `html body:not(#kz1):not(#kz2) .kz-task{margin:10px 0}html body:not(#kz1):not(#kz2) .kz-task small{font-size:13px;color:var(--muted,#bdb19d)}
+html body:not(#kz1):not(#kz2) .kz-task.kz-done b{color:#9bd17a}
+html body:not(#kz1):not(#kz2) .kz-raid{box-shadow:0 0 0 2px var(--rust,#9b3c1f) !important}
+html body:not(#kz1):not(#kz2) .kz-store .kf-row{justify-content:space-between;gap:8px;margin:4px 0}
+html body:not(#kz1):not(#kz2) .kz-room.kz-locked{opacity:.75}`;
+document.head.appendChild(style16);
+
+// ================= S9: Banden II – Forum, Mitglieder, Boss, Saison, Profil & Rechte (99–104, 12, 51) =================
+const CREST_SVG = {
+  flasche: '<path d="M27 8h10v10l5 8v26H22V26l5-8z"/>',
+  faust: '<path d="M18 26h28v14a12 12 0 0 1-12 12h-4a12 12 0 0 1-12-12z M18 26v-6h7v6 M25 20v-4h7v10 M32 16v-2h7v12 M39 18h7v8"/>',
+  krone: '<path d="M14 44V22l10 9 8-15 8 15 10-9v22z"/>',
+  taube: '<path d="M14 36c6-12 20-16 30-10l8-4-4 8c0 10-10 18-24 16l-8 6 2-8c-2-2-4-4-4-8z"/>',
+  anker: '<path d="M32 12a4 4 0 1 1 0 8 4 4 0 1 1 0-8zM30 20h4v26h-4zM22 26h20v4H22zM14 36c2 10 10 14 18 14s16-4 18-14l-6 2c-2 6-6 8-12 8s-10-2-12-8z"/>',
+  stern: '<path d="M32 10l6 14 15 1-12 10 4 15-13-8-13 8 4-15-12-10 15-1z"/>',
+  ratte: '<path d="M14 40c0-10 10-18 22-18 6 0 10 4 12 8l6 2-6 4c-2 6-8 8-14 8H20zM50 44c6 0 8 4 4 8"/>',
+  schluessel: '<path d="M22 22a10 10 0 1 1 0 20 10 10 0 1 1 0-20zm8 8h24v4h-4v6h-4v-6h-4v6h-4v-6h-8z"/>',
+};
+const FRAME = { gold: '#e0b84a', silber: '#c9ccd1', bronze: '#b8743f' };
+const crest = (g, size) => '<svg class="kz-crest" width="' + (size || 56) + '" height="' + Math.round((size || 56) * 1.15) + '" viewBox="0 0 64 74" aria-label="Wappen"><path d="M4 4h56v34c0 18-14 28-28 32C18 66 4 56 4 38z" fill="' + esc(g.color || '#9b3c1f') + '" stroke="' + (FRAME[g.frame] || '#241b10') + '" stroke-width="' + (g.frame ? 5 : 3) + '"/><g fill="#f3e6c4" transform="translate(0,4)">' + (CREST_SVG[g.crest] || CREST_SVG.flasche) + '</g></svg>';
+window.kiezCrest = crest;
+const ROLE_DE = { owner: 'Chef', co: 'Vize', officer: 'Offizier', member: 'Mitglied' };
+const RIGHT_DE = { invite: 'Einladen', payout: 'Auszahlen', build: 'Ausbauen', war: 'Krieg erklären', raid: 'Überfall starten', announce: 'Ankündigungen' };
+{ const t = document.querySelector('#bandenhaus > .section-tools'); if (t) t.insertAdjacentHTML('beforeend', ['Forum', 'Mitglieder', 'Boss & Saison', 'Einstellungen'].map(x => '<span>' + x + '</span>').join('')); }
+const HX = { topic: null };
+const baseHouse = loaders.bandenhaus;
+loaders.bandenhaus = async () => {
+  await baseHouse();
+  const o = HOUSE.data; if (!o?.gang) return;
+  const g = o.gang, lead = RANKV[o.role] >= 3, owner = o.role === 'owner';
+  const [pub, forum, mem, boss, season, rights] = await Promise.all([rpc('gang_public', { gid: g.id }), rpc('gang_forum'), rpc('gang_members_overview'), rpc('gang_boss_status'), rpc('gang_season_ranking'),
+    sb.from('gang_rights').select('right_name,min_role').eq('gang_id', g.id)]);
+  const rightOf = Object.fromEntries((rights.data || []).map(r => [r.right_name, r.min_role]));
+  const defaultRight = { invite: 'officer', raid: 'officer', payout: 'co', build: 'co', war: 'co', announce: 'co' };
+  const when = d => new Date(d).toLocaleString('de-DE', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+  // Wappen + öffentliche Erfolge in die Übersicht
+  const ov = houseBody.querySelector('[data-htab="Übersicht"] .kf-box');
+  if (ov) ov.insertAdjacentHTML('afterbegin', '<div class="kz-gang-head">' + crest(pub, 64) + '<div><p class="kz-motto">' + (pub.motto ? '„' + esc(pub.motto) + '“' : '<span class="kf-muted">Noch kein Motto</span>') + '</p><p class="kf-muted">Erfolge: ' + pub.war_wins + ' Kriegssiege · ' + pub.bosses + ' Bosse besiegt · ' + pub.tasks_done + ' Wochenaufgaben · ' + pub.districts + ' Viertel erobert'
+    + (pub.frame ? ' · ' + ({ gold: 'Gold', silber: 'Silber', bronze: 'Bronze' })[pub.frame] + '-Rahmen (Saison ' + esc(pub.frame_season) + ')' : '') + '</p><p class="kf-muted">Aufnahme: ' + (pub.is_open ? 'offen' : 'nur mit Einladung/Bewerbung') + ' · ab Level ' + pub.min_level + '</p></div></div>');
+  houseBody.insertAdjacentHTML('beforeend',
+    // Forum
+    '<div data-htab="Forum"><div class="kf-box kz-forum"></div></div>'
+    // Mitglieder
+    + '<div data-htab="Mitglieder"><div class="kf-box"><h3>Mitglieder (' + mem.members.length + ')</h3>' + (Number(mem.dues) > 0 ? '<p class="kf-muted">Wochenbeitrag: ' + eur(mem.dues) + ' (zählt über Einzahlungen in die Kasse)</p>' : '')
+    + '<table class="kf-table kz-members"><tr><th>Name</th><th>Rang</th><th>Level</th><th>Zuletzt</th><th>Woche</th><th></th></tr>' + mem.members.map(m => '<tr class="kz-st-' + m.status + '"><td>' + playerLink(m.user_id, m.name) + '</td><td>' + ROLE_DE[m.role] + '</td><td>' + m.level + '</td><td>' + m.status + '<br><small>' + when(m.last_active) + '</small></td>'
+      + '<td><small>' + m.bottles + ' Fl. · ' + m.wins + ' Siege · ' + eur(m.donated) + (Number(mem.dues) > 0 ? (m.dues_paid ? ' · Beitrag bezahlt' : ' · Beitrag offen') : '') + '</small></td>'
+      + '<td>' + (m.user_id === window.kiezProfile?.id ? '' : '<button class="ghost kz-poke" data-id="' + m.user_id + '"' + (m.poked ? ' disabled' : '') + '>' + (m.poked ? 'Angestupst' : 'Anstupsen') + '</button>') + '</td></tr>').join('') + '</table><div class="kz-mem-msg"></div></div>'
+    + '<div class="kf-box"><h3>Aus der Kasse auszahlen</h3><p class="kf-muted">Kasse: ' + eur(g.balance) + ' · erlaubt ab Rang ' + ROLE_DE[rightOf.payout || defaultRight.payout] + ' · pro Tag höchstens die Hälfte der Kasse. Jede Auszahlung steht mit Grund im Protokoll.</p>'
+    + '<div class="kf-row"><select class="kz-paysel">' + mem.members.map(m => '<option value="' + m.user_id + '">' + esc(m.name) + '</option>').join('') + '</select><input class="kz-payamt" type="number" min="0.01" step="0.01" placeholder="Betrag €" style="width:120px"><input class="kz-paywhy" maxlength="120" placeholder="Grund"><button class="ghost kz-pay">Auszahlen</button></div><div class="kz-pay-msg"></div></div></div>'
+    // Boss & Saison
+    + '<div data-htab="Boss & Saison"><div class="kf-box kz-boss"><h3>Bandenboss der Woche: ' + esc(boss.name) + '</h3><div class="progress kz-bad"><span style="width:' + Math.round(boss.hp / boss.max_hp * 100) + '%"></span></div><p>' + (boss.defeated ? 'Besiegt! Nächste Woche kommt ein neuer.' : boss.hp + ' von ' + boss.max_hp + ' Lebenspunkten') + '</p>'
+    + '<p class="kf-muted">Jedes Mitglied darf einmal pro Stunde zuschlagen (10 Energie, Schaden nach Angriffskraft). Ist der Boss erledigt, bekommt jeder, der mitgemacht hat, 10 Kronkorken und 200 Punkte.</p>'
+    + '<div class="kf-row"><button class="big kz-hit"' + (boss.defeated || boss.next_hit_at ? ' disabled' : '') + '>' + (boss.defeated ? 'Besiegt' : boss.next_hit_at ? 'Wieder ab ' + when(boss.next_hit_at) : 'Zuschlagen') + '</button></div><div class="kz-boss-msg"></div>'
+    + (boss.hits.length ? '<table class="kf-table"><tr><th>Spieler</th><th>Schaden</th><th>Schläge</th></tr>' + boss.hits.map(h => '<tr><td>' + playerLink(h.user_id, h.name) + '</td><td>' + h.damage + '</td><td>' + h.hits + '</td></tr>').join('') + '</table>' : '') + '</div>'
+    + '<div class="kf-box"><h3>Banden-Saison ' + esc(season.season) + '</h3><p class="kf-muted">Jede Erfahrung zählt als Saisonpunkt. Am Monatsende: Platz 1–3 bekommen einen Gold-, Silber- oder Bronze-Rahmen fürs Wappen und jedes Mitglied 50/30/15 Kronkorken. Saison endet am ' + new Date(season.ends).toLocaleDateString('de-DE') + '.</p>'
+    + (season.ranking.length ? '<table class="kf-table"><tr><th>#</th><th></th><th>Bande</th><th>Punkte</th></tr>' + season.ranking.map((x, i) => '<tr' + (x.id === g.id ? ' class="kz-now"' : '') + '><td>' + (i + 1) + '</td><td>' + crest(x, 26) + '</td><td><a href="#" class="kiez-gang" data-id="' + x.id + '">' + esc(x.name) + '</a></td><td>' + x.points + '</td></tr>').join('') + '</table>' : '<p class="kf-muted">Noch keine Punkte diesen Monat.</p>') + '</div></div>'
+    // Einstellungen
+    + '<div data-htab="Einstellungen"><div class="kf-box"><h3>Bandenprofil</h3>' + (lead ? '<div class="kz-look"><label>Motto <input class="kz-motto-in" maxlength="80" value="' + esc(pub.motto || '') + '"></label>'
+      + '<label>Wappen <select class="kz-crest-in">' + Object.keys(CREST_SVG).map(c => '<option value="' + c + '"' + (c === pub.crest ? ' selected' : '') + '>' + ({ flasche: 'Flasche', faust: 'Faust', krone: 'Krone', taube: 'Taube', anker: 'Anker', stern: 'Stern', ratte: 'Ratte', schluessel: 'Schlüssel' })[c] + '</option>').join('') + '</select></label>'
+      + '<label>Farbe <input class="kz-color-in" type="color" value="' + esc(pub.color) + '"></label>'
+      + '<label>Mindestlevel <input class="kz-minlvl-in" type="number" min="1" max="150" value="' + pub.min_level + '"></label>'
+      + '<label>Wochenbeitrag € <input class="kz-dues-in" type="number" min="0" max="1000" step="0.5" value="' + Number(mem.dues) + '"></label>'
+      + '<label class="kz-check"><input class="kz-open-in" type="checkbox"' + (pub.is_open ? ' checked' : '') + '> Jeder darf beitreten</label>'
+      + '<div class="kz-preview">' + crest(pub, 56) + '</div></div><div class="kf-row"><button class="big kz-look-save">Speichern</button></div><div class="kz-look-msg"></div>' : '<p class="kf-muted">Das Profil ändern Chef und Vize.</p>') + '</div>'
+    + '<div class="kf-box"><h3>Rechte</h3><p class="kf-muted">Welcher Rang darf was? ' + (owner ? 'Nur der Chef kann das ändern.' : '') + '</p><table class="kf-table">' + Object.keys(RIGHT_DE).map(r => '<tr><td>' + RIGHT_DE[r] + '</td><td>' + (owner ? '<select class="kz-right" data-r="' + r + '">' + ['member', 'officer', 'co', 'owner'].filter(x => r !== 'payout' || x === 'co' || x === 'owner').map(x => '<option value="' + x + '"' + (x === (rightOf[r] || defaultRight[r]) ? ' selected' : '') + '>ab ' + ROLE_DE[x] + '</option>').join('') + '</select>' : 'ab ' + ROLE_DE[rightOf[r] || defaultRight[r]]) + '</td></tr>').join('') + '</table><div class="kz-right-msg"></div></div></div>');
+  houseTab();
+  const again = () => setTimeout(loaders.bandenhaus, 400);
+  houseBody.querySelectorAll('.kz-poke').forEach(b => act(b, houseBody.querySelector('.kz-mem-msg'), async () => { await rpc('gang_poke', { target_id: b.dataset.id }); again(); return 'Angestupst – er bekommt eine Nachricht.'; }));
+  act(houseBody.querySelector('.kz-pay'), houseBody.querySelector('.kz-pay-msg'), async () => { const r = await rpc('gang_payout', { target_id: houseBody.querySelector('.kz-paysel').value, amount: Number(houseBody.querySelector('.kz-payamt').value), reason: houseBody.querySelector('.kz-paywhy').value }); again(); return eur(r.paid) + ' ausgezahlt.'; });
+  const hit = houseBody.querySelector('.kz-hit'); if (hit && !hit.disabled) act(hit, houseBody.querySelector('.kz-boss-msg'), async () => { const r = await rpc('gang_boss_hit'); window.kiezRenderProfile?.(r.profile); again(); return r.defeated ? 'Volltreffer – der Boss ist erledigt! Belohnung für alle, die mitgemacht haben.' : 'Treffer: ' + r.damage + ' Schaden. Noch ' + r.hp + ' Lebenspunkte.'; });
+  const save = houseBody.querySelector('.kz-look-save');
+  if (save) {
+    const q = s => houseBody.querySelector(s);
+    const prev = () => { q('.kz-preview').innerHTML = crest({ color: q('.kz-color-in').value, crest: q('.kz-crest-in').value, frame: pub.frame }, 56); };
+    q('.kz-crest-in').onchange = prev; q('.kz-color-in').oninput = prev;
+    act(save, q('.kz-look-msg'), async () => { await rpc('update_gang_look', { new_motto: q('.kz-motto-in').value, new_crest: q('.kz-crest-in').value, new_color: q('.kz-color-in').value, new_min_level: Number(q('.kz-minlvl-in').value), open_for_all: q('.kz-open-in').checked, dues: Number(q('.kz-dues-in').value) }); again(); return 'Bandenprofil gespeichert.'; });
+  }
+  houseBody.querySelectorAll('.kz-right').forEach(s => s.onchange = async () => { const box = houseBody.querySelector('.kz-right-msg'); try { await rpc('set_gang_right', { r: s.dataset.r, role_needed: s.value }); say(box, 'Gespeichert: ' + RIGHT_DE[s.dataset.r] + ' ab ' + ROLE_DE[s.value] + '.', true); } catch (e) { say(box, esc(e.message), false); } });
+  drawForum(forum);
+};
+async function drawForum(list) {
+  const box = houseBody.querySelector('.kz-forum'); if (!box) return;
+  const o = HOUSE.data, lead = RANKV[o.role] >= RANKV[(await sb.from('gang_rights').select('min_role').eq('gang_id', o.gang.id).eq('right_name', 'announce').maybeSingle()).data?.min_role || 'co'];
+  if (HX.topic) {
+    let t; try { t = await rpc('gang_topic', { topic: HX.topic }); } catch (e) { HX.topic = null; return drawForum(list); }
+    const total = (t.votes || []).reduce((a, b) => a + b, 0);
+    box.innerHTML = '<p><a href="#" class="kz-back">← Alle Themen</a></p><h3>' + (t.announce ? '<span class="kz-tag">Ankündigung</span> ' : '') + esc(t.title) + '</h3>'
+      + (t.options ? '<div class="kz-poll">' + t.options.map((op, i) => '<div class="kz-opt"><button class="ghost kz-vote" data-i="' + (i + 1) + '"' + (t.my_vote === i + 1 ? ' disabled' : '') + '>' + esc(op) + (t.my_vote === i + 1 ? ' (deine Wahl)' : '') + '</button><div class="progress"><span style="width:' + (total ? Math.round(t.votes[i] / total * 100) : 0) + '%"></span></div><small>' + t.votes[i] + ' Stimmen</small></div>').join('') + '</div>' : '')
+      + t.posts.map(p => '<div class="kz-post"><b>' + playerLink(p.author_id, p.author) + '</b> <small class="kf-muted">' + new Date(p.created_at).toLocaleString('de-DE') + '</small><p>' + esc(p.body).replace(/\n/g, '<br>') + '</p></div>').join('')
+      + '<textarea class="kz-reply" maxlength="2000" placeholder="Antworten …"></textarea><div class="kf-row"><button class="big kz-send">Antworten</button>'
+      + (t.author_id === window.kiezProfile?.id || RANKV[o.role] >= 3 ? '<button class="ghost kz-del">Thema löschen</button>' : '') + '</div><div class="kz-forum-msg"></div>';
+    box.querySelector('.kz-back').onclick = e => { e.preventDefault(); HX.topic = null; rpc('gang_forum').then(drawForum); };
+    const m = box.querySelector('.kz-forum-msg');
+    act(box.querySelector('.kz-send'), m, async () => { await rpc('gang_post', { topic: t.id, body: box.querySelector('.kz-reply').value }); drawForum(list); return 'Gesendet.'; });
+    box.querySelectorAll('.kz-vote').forEach(b => act(b, m, async () => { await rpc('gang_vote', { topic: t.id, choice: Number(b.dataset.i) }); drawForum(list); return 'Abgestimmt.'; }));
+    const del = box.querySelector('.kz-del'); if (del) act(del, m, async () => { if (!confirm('Thema wirklich löschen?')) return; await rpc('gang_topic_delete', { topic: t.id }); HX.topic = null; rpc('gang_forum').then(drawForum); return 'Gelöscht.'; });
+    return;
+  }
+  box.innerHTML = '<h3>Bandenforum</h3>' + (list.length ? '<table class="kf-table kz-topics">' + list.map(t => '<tr><td><a href="#" class="kz-topic" data-id="' + t.id + '">' + (t.announce ? '<span class="kz-tag">Ankündigung</span> ' : '') + (t.poll ? '<span class="kz-tag">Umfrage</span> ' : '') + esc(t.title) + '</a></td><td><small>' + esc(t.author) + ' · ' + t.posts + ' Beiträge · ' + new Date(t.last_post_at).toLocaleDateString('de-DE') + '</small></td></tr>').join('') + '</table>' : '<p class="kf-muted">Noch keine Themen – mach das erste auf.</p>')
+    + '<h3>Neues Thema</h3><input class="kz-ttitle" maxlength="80" placeholder="Titel"><textarea class="kz-tbody" maxlength="2000" placeholder="Text"></textarea>'
+    + (lead ? '<label class="kz-check"><input type="checkbox" class="kz-tann"> Als Ankündigung oben anheften</label>' : '')
+    + '<label class="kz-check"><input type="checkbox" class="kz-tpoll"> Mit Umfrage</label><input class="kz-topts" placeholder="Antworten, mit Komma getrennt (2–6)" hidden>'
+    + '<div class="kf-row"><button class="big kz-tnew">Thema eröffnen</button></div><div class="kz-forum-msg"></div>';
+  box.querySelectorAll('.kz-topic').forEach(a => a.onclick = e => { e.preventDefault(); HX.topic = Number(a.dataset.id); drawForum(list); });
+  box.querySelector('.kz-tpoll').onchange = e => { box.querySelector('.kz-topts').hidden = !e.target.checked; };
+  act(box.querySelector('.kz-tnew'), box.querySelector('.kz-forum-msg'), async () => {
+    const poll = box.querySelector('.kz-tpoll').checked;
+    const r = await rpc('gang_topic_create', { title: box.querySelector('.kz-ttitle').value, body: box.querySelector('.kz-tbody').value, announce: !!box.querySelector('.kz-tann')?.checked, options: poll ? box.querySelector('.kz-topts').value.split(',').map(s => s.trim()).filter(Boolean) : null });
+    HX.topic = r.id; drawForum(list); return 'Thema eröffnet.';
+  });
+}
+const style17 = document.createElement('style');
+style17.textContent = `html body:not(#kz1):not(#kz2) .kz-gang-head{display:flex;gap:14px;align-items:center;margin-bottom:10px}
+html body:not(#kz1):not(#kz2) .kz-crest{flex:none;vertical-align:middle}
+html body:not(#kz1):not(#kz2) .kz-motto{font-family:var(--font-head,serif);font-size:18px;margin:0}
+html body:not(#kz1):not(#kz2) .kz-members tr.kz-st-inaktiv td{opacity:.55}
+html body:not(#kz1):not(#kz2) .kz-members small{font-size:13px}
+html body:not(#kz1):not(#kz2) .kz-tag{display:inline-block;padding:1px 8px;border-radius:10px;background:var(--brass,#d1a94f);color:#241b10;font-size:12px;font-weight:700}
+html body:not(#kz1):not(#kz2) .kz-post{border-top:1px solid var(--line,#5a4a36);padding:8px 0}
+html body:not(#kz1):not(#kz2) .kz-forum textarea,html body:not(#kz1):not(#kz2) .kz-forum input:not([type=checkbox]){width:100%;margin:6px 0}
+html body:not(#kz1):not(#kz2) .kz-check{display:flex;gap:8px;align-items:center;margin:6px 0;font-size:15px}
+html body:not(#kz1):not(#kz2) .kz-check input{width:auto !important;height:auto !important;min-height:0}
+html body:not(#kz1):not(#kz2) .kz-opt{margin:8px 0}
+html body:not(#kz1):not(#kz2) .kz-look{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;align-items:end}
+html body:not(#kz1):not(#kz2) .kz-look label{display:flex;flex-direction:column;gap:4px;font-size:14px}
+html body:not(#kz1):not(#kz2) .kz-look input[type=color]{padding:2px !important;height:44px}
+html body:not(#kz1):not(#kz2) tr.kz-now td{background:rgba(209,169,79,.18)}`;
+document.head.appendChild(style17);
 
 // Zuletzt geöffnete neue Seite wiederherstellen
 try { const last = localStorage.getItem('kiez_last_view'); if (loaders[last]) setTimeout(() => show(last), 1500); } catch (e) { }
