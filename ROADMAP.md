@@ -60,7 +60,7 @@ GitHub push ──▶ Action: Tests (Postgres) ──▶ Migration live in Supab
 
 Ziel: Es gibt fast immer etwas zu tun – auch mit wenigen Spielern. Empfohlener Start: 1, 2, 3, 5.
 
-**⭐ Vom Nutzer ausgewählt für später (27.09.2026):** 17, 19, 20, 22, 23, 24, 25, 26, 29, 30, 31, 32, 34, 37 – Kiosk-Stand, Revanche, Kopfgeld, Wetten, Kosmetik, Hunger, Sucht/Entzug, Ruf, Glücksrad, Pfandtour zu zweit, Tag/Nacht, Live-Stadtereignisse, Nebenquests, Ein-Klick-Verkaufen. Dazu aus J: 38, 39, 40 (eher selten), 43, 44, 47, 48, 49. Dazu aus K (Fahrzeuge): 53, 54 (erst später), 55, 56, 57, 59 (erst später), 60, 61, 63, 64. Dazu L (einheitliches Aussehen): 65–69. Dazu M (Wegweiser): 70–73. Dazu N (flüssiger Seitenwechsel): 74–77. Dazu O (Körperpflege): 78–85. Dazu P (Balancing Gegenstände & Preise): 86–92. Dazu Q (Bandensystem): 93–104. Dazu R (Fehler Waffen kaufen/anlegen, hohe Priorität): 105–109. Alle übrigen Ideen bleiben ebenfalls im Plan.
+**⭐ Vom Nutzer ausgewählt für später (27.09.2026):** 17, 19, 20, 22, 23, 24, 25, 26, 29, 30, 31, 32, 34, 37 – Kiosk-Stand, Revanche, Kopfgeld, Wetten, Kosmetik, Hunger, Sucht/Entzug, Ruf, Glücksrad, Pfandtour zu zweit, Tag/Nacht, Live-Stadtereignisse, Nebenquests, Ein-Klick-Verkaufen. Dazu aus J: 38, 39, 40 (eher selten), 43, 44, 47, 48, 49. Dazu aus K (Fahrzeuge): 53, 54 (erst später), 55, 56, 57, 59 (erst später), 60, 61, 63, 64. Dazu L (einheitliches Aussehen): 65–69. Dazu M (Wegweiser): 70–73. Dazu N (flüssiger Seitenwechsel): 74–77. Dazu O (Körperpflege): 78–85. Dazu P (Balancing Gegenstände & Preise): 86–92. Dazu Q (Bandensystem): 93–104. Dazu R (Fehler Waffen kaufen/anlegen, hohe Priorität): 105–109. Dazu S (Plunderkiste): 111–120. Alle übrigen Ideen bleiben ebenfalls im Plan.
 
 ### Offener Fehler
 - Seite scrollt nach 10–15 s ohne Eingabe nach oben (trotz Fix in PR #27; Ursache noch nicht gefunden, Nutzer hat Suche vertagt). Vermutung: Neuzeichnen einer Seite macht sie kurz kürzer. Test-Skizze: alle Seiten 20 s warten, `scrollTo`/`scrollIntoView`/`focus` mitprotokollieren.
@@ -225,4 +225,17 @@ Gemeldet: Waffen lassen sich mehrfach kaufen; Anziehen/Ausrüsten für Werte fun
 109. Test per Klick: kaufen → zweiter Kauf gesperrt → anlegen → Angriffswert steigt → ablegen → Wert sinkt ⭐
 110. Überall gilt: Was man schon besitzt, ist sofort sichtbar – Karte ausgegraut bzw. „Im Besitz ✔“ statt „Kaufen“, Knopf gesperrt oder „Mitnehmen/Anlegen“. Beispiel Begleiter „Kakerlake“: erst nach erneutem Kaufversuch kommt „Diesen Begleiter hast du schon“ – das darf nicht sein. Gilt für Begleiter, Waffen, Ausrüstung, Unterkünfte, Instrumente, Sammelgebiete, Waschausstattung, Ausbauten; zu teure/zu hohe Level-Stücke ebenfalls vorab kennzeichnen („ab Level X“, „zu wenig Geld“) ⭐
    Vorbild (Nutzer findet es gut): Unterkünfte „Häuser im Kiez“ – statt Kaufknopf steht unten „✔ AKTUELL BEWOHNT“ (Häkchen + Großbuchstaben, gedämpfte Farbe). Genau diesen Stil übernehmen: „✔ IM BESITZ“, „✔ ANGELEGT“, „✔ DABEI“ (Begleiter), „✔ FREIGESCHALTET“.
+
+### S. Plunderkiste überarbeiten (27.09.2026) ⭐
+Ist-Stand: Es werden alle 14 Plunderstücke untereinander gezeigt, auch nicht gefundene, dazu Inventar und Basteln auf derselben Seite – unübersichtlich.
+111. Nur Gefundenes groß zeigen; nicht Gefundenes nur als kleine dunkle Umrisse mit „?“ und Seltenheit (Sammelreiz: „9 von 14 gefunden“) ⭐
+112. Oben ein fester Platz „Angelegt“ mit dem getragenen Plunder und seinen Werten, daneben „Wechseln“ ⭐
+113. Reiter statt einer langen Seite: „Meine Stücke“ · „Sammlung“ · „Basteln“ · „Lager/Material“ ⭐
+114. Sortieren/Filtern: nach Seltenheit, Angriff, Verteidigung, Pfand-Bonus; Rahmenfarbe je Seltenheit ⭐
+115. „Neu“-Markierung für frisch gefundene Stücke (bis man sie einmal angesehen hat) ⭐
+116. Vergleich beim Antippen: Werte des Stücks gegen das angelegte (+/− farbig) ⭐
+117. Doppelte mit einem Klick verkaufen oder direkt im Basar anbieten (Preisvorschlag) ⭐
+118. Sets: zusammengehörige Stücke (z. B. „Bauarbeiter“: Bauhelm + Taschenlampe + Handschuh) geben Set-Bonus, Fortschritt sichtbar (verbindet mit Idee 6 Sammelalbum) ⭐
+119. Öffnen-Moment: Plunderkiste aus dem Kronkorken-Tausch mit kurzer Öffnen-Animation und Seltenheits-Aufleuchten ⭐
+120. Mehr Plunder für Langzeit: weitere Stücke pro Seltenheit, saisonale Stücke (Idee 8) ⭐
 
