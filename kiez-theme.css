@@ -339,3 +339,5 @@ html body:not(#kz1):not(#kz2) #leaders .kz-rank tr.kz-me td { background: rgba(2
 html body:not(#kz1):not(#kz2) #leaders .kz-rank tbody tr:nth-child(-n+3) td:first-child { color: var(--brass, #c9a55a); font-weight: 700; }
 /* Stadtplan-Knöpfe: Grundschrift nicht unter 12 px (Innenleben hat eigene Größen) */
 html body:not(#kz1):not(#kz2) .kz-dlabel, html body:not(#kz1):not(#kz2) .kz-place { font-size: 12px; }
+html body:not(#kz1):not(#kz2) .kz-inst-done { opacity: .8; }
+html body:not(#kz1):not(#kz2) .kz-inst-done::after { content: '✓ gekauft'; display: block; font: 700 13px var(--font-body); color: #9fbf6a; margin-top: 6px; }

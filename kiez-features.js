@@ -3553,3 +3553,7 @@ async function ovPet() {
     setLabel(btn, open ? 'Gesperrte wieder einklappen' : 'Alle ' + locked.length + ' gesperrten zeigen (' + (locked.length - 3) + ' weitere)'); });
   setInterval(fold, 1500); const prev = window.kiezShowView; window.kiezShowView = (...a) => { const r = prev?.(...a); setTimeout(fold, 400); return r; };
 }
+
+// Instrumente: gekaufte ohne großen grauen Knopf, nur „✓ gekauft“ (ROADMAP 175)
+setInterval(() => { document.querySelectorAll('#income .buyinstrument').forEach(b => { const done = /Bereits gekauft/i.test(b.textContent), c = b.closest('.card');
+  b.classList.toggle('kz-hide-lock', done); c?.classList.toggle('kz-inst-done', done); }); }, 1500);
