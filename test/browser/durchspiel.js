@@ -133,7 +133,7 @@ async function besuch(skip) {
   // 5) Kämpfe: Computer-Gegner, Kiezboss, Testpartner
   if (!p.jail) {
     await go('pvp');
-    for (let i = 0; i < 5; i++) { const m = await click('Computer-Gegner', '.kz-npc-go', { pick: 'last', quiet: i > 0 }); if (m == null) break; }
+    for (let k = 1; k <= 5; k++) await click('Computer-Gegner ' + k, `.kz-npc:nth-child(${k}) .kz-npc-go`, { quiet: true });
     await click('Kiezboss', '.kz-wb-hit', { quiet: true });
     await click('Angriff ' + PARTNER, '.attackplayer', { within: PARTNER, quiet: true });
   }
