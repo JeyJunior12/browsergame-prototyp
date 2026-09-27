@@ -160,6 +160,8 @@ Nutzerwunsch: Ungleichheiten auf allen Seiten richtig machen. Beispiel: Karte �
 68. Gleiche Abstände, Schriftgrößen und Farben für Überschriften, Werte und Hinweise auf allen Seiten ⭐
 69. Prüfskript, das alle Seiten durchgeht und Abweichungen meldet (Karte ohne Bild, Emoji im Titel, ungleiche Knopfhöhen) ⭐
 69a. Nichts darf sich überlappen oder schief stehen: Beispiel Gegnerliste (Prügelei) – „Angreifen“ ragt über das Foto, „Tierkampf“/„Melden“ kleben darunter. Knöpfe einer Karte in einer sauberen Reihe mit Abstand, auf PC und Handy; Prüfskript meldet überlappende Elemente ⭐
+69b. Meldungsfenster beim Knopf (grün/rot, seit PR #26) sieht schlecht aus: Beispiel Weiterbildung „Angriff“ – Meldung steckt als schmale Spalte unten links in der Karte, Text bricht Wort für Wort um. Stattdessen volle Kartenbreite (oder direkt unter dem Knopf), gleiches Aussehen wie andere Hinweise, gut lesbar ⭐
+69c. Gleiche Karte prüfen: Titel „Angriff 3“, darunter „Aktuelle Stufe: 1“ – widersprüchliche Stufenangabe klären ⭐
 
 ### M. Wegweiser: Klick führt genau dorthin (27.09.2026) ⭐
 Nutzerwunsch: Wer oben auf einen Wert klickt, muss direkt bei der passenden Stelle landen. Beispiel: Klick auf „Pfandlager“ in der Kopfleiste öffnet die Plunderkiste, der Pfand-Bereich (Flaschen verkaufen) kommt erst weiter unten – komplett falsch.
