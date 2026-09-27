@@ -55,7 +55,7 @@ Innerhalb eines Sprints wird nach Nummer gearbeitet.
 | Sprint | Inhalt | ROADMAP-Punkte | Rollen |
 |---|---|---|---|
 | **S1** ✅ live | Chat-Leiste unten rechts, Kiezpost-Empfänger, Meldungen beim Knopf | 125–134, 69b, 69e, 69f, 69g | Backend, Frontend, Security |
-| **S2** | Fehler Waffen/Ausrüstung, Besitz sichtbar, Überlappungen, Stufenanzeige, Lernwarteschlange, Logo-Link | 105–110, 69a, 69c, 69d, 73a | Backend, Frontend, UI |
+| **S2** ✅ live | Fehler Waffen/Ausrüstung, Besitz sichtbar, Überlappungen, Stufenanzeige, Lernwarteschlange, Logo-Link | 105–110, 69a, 69c, 69d, 73a | Backend, Frontend, UI |
 | **S3** | Kopfleisten-Links führen genau hin, flüssiger Seitenwechsel, offener Scroll-Fehler | 70–77 + Scroll-Fehler | Frontend, UI |
 | **S4** | Einheitliches Aussehen überall + Prüfskript | 65–69 | UI, Frontend, Evidence |
 | **S5** | Seite Schnorrplätze neu, Stadtteile vorerst sperren | 135–140, 121, 122 | Game Designer, Frontend |

@@ -25,9 +25,10 @@ const fs=require('fs');const lib=require('./lib');
  ok(await pg.evaluate(()=>document.getElementById('msgto').classList.contains('hide')&&!!document.getElementById('kz-msgname')?.offsetParent),'Kiezpost: Namensfeld statt Liste aller Spieler');
  // 69e: Meldung im Laden bleibt stehen
  await pg.evaluate(()=>window.kiezGo('store'));await pg.waitForTimeout(2000);
- await pg.evaluate(()=>{const el=[...document.querySelectorAll('.buyitem')].find(e=>e.offsetParent&&!e.disabled);el?.scrollIntoView({block:'center'});el?.click()});
+ await pg.evaluate(l=>[...document.querySelectorAll('.panel.active-view .section-tools span')].find(x=>x.textContent.trim()===l)?.click(),'Waffen');await pg.waitForTimeout(1500);
+ const clicked=await pg.evaluate(()=>{const el=[...document.querySelectorAll('#store .kz-equip, #store .kz-unequip, #store .buyitem:not([disabled])')].find(e=>e.offsetParent);if(!el)return null;el.scrollIntoView({block:'center'});const t=el.closest('.card').querySelector('b').textContent.trim();el.click();return t});
  await pg.waitForTimeout(6500);
- ok(await pg.evaluate(()=>[...document.querySelectorAll('.kz-near .notice')].some(n=>n.offsetParent)),'Meldung nach 6 s noch sichtbar (69e)');
+ ok(clicked&&await pg.evaluate(t=>{const c=[...document.querySelectorAll('#store .card')].find(c=>c.offsetParent&&c.querySelector('b')?.textContent.trim()===t);return !!c&&[...c.querySelectorAll('.notice')].some(n=>n.offsetParent)},clicked),'Meldung nach 6 s noch sichtbar (69e)',clicked);
  // 69g: Schnorren am Englischen Garten, dann woanders klicken – Ergebnis muss beim Garten landen
  await pg.evaluate(()=>window.kiezGo('income'));await pg.waitForTimeout(2000);
  await pg.evaluate(l=>[...document.querySelectorAll('.panel.active-view .section-tools span')].find(x=>x.textContent.trim()===l)?.click(),'Schnorrplätze');await pg.waitForTimeout(1500);
