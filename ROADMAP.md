@@ -60,7 +60,7 @@ GitHub push ──▶ Action: Tests (Postgres) ──▶ Migration live in Supab
 
 Ziel: Es gibt fast immer etwas zu tun – auch mit wenigen Spielern. Empfohlener Start: 1, 2, 3, 5.
 
-**⭐ Vom Nutzer ausgewählt für später (27.09.2026):** 17, 19, 20, 22, 23, 24, 25, 26, 29, 30, 31, 32, 34, 37 – Kiosk-Stand, Revanche, Kopfgeld, Wetten, Kosmetik, Hunger, Sucht/Entzug, Ruf, Glücksrad, Pfandtour zu zweit, Tag/Nacht, Live-Stadtereignisse, Nebenquests, Ein-Klick-Verkaufen. Dazu aus J: 38, 39, 40 (eher selten), 43, 44, 47, 48, 49. Dazu aus K (Fahrzeuge): 53, 54 (erst später), 55, 56, 57, 59 (erst später), 60, 61, 63, 64. Dazu L (einheitliches Aussehen): 65–69. Dazu M (Wegweiser): 70–73. Dazu N (flüssiger Seitenwechsel): 74–77. Alle übrigen Ideen bleiben ebenfalls im Plan.
+**⭐ Vom Nutzer ausgewählt für später (27.09.2026):** 17, 19, 20, 22, 23, 24, 25, 26, 29, 30, 31, 32, 34, 37 – Kiosk-Stand, Revanche, Kopfgeld, Wetten, Kosmetik, Hunger, Sucht/Entzug, Ruf, Glücksrad, Pfandtour zu zweit, Tag/Nacht, Live-Stadtereignisse, Nebenquests, Ein-Klick-Verkaufen. Dazu aus J: 38, 39, 40 (eher selten), 43, 44, 47, 48, 49. Dazu aus K (Fahrzeuge): 53, 54 (erst später), 55, 56, 57, 59 (erst später), 60, 61, 63, 64. Dazu L (einheitliches Aussehen): 65–69. Dazu M (Wegweiser): 70–73. Dazu N (flüssiger Seitenwechsel): 74–77. Dazu O (Körperpflege): 78–85. Alle übrigen Ideen bleiben ebenfalls im Plan.
 
 ### Offener Fehler
 - Seite scrollt nach 10–15 s ohne Eingabe nach oben (trotz Fix in PR #27; Ursache noch nicht gefunden, Nutzer hat Suche vertagt). Vermutung: Neuzeichnen einer Seite macht sie kurz kürzer. Test-Skizze: alle Seiten 20 s warten, `scrollTo`/`scrollIntoView`/`focus` mitprotokollieren.
@@ -177,4 +177,15 @@ Nutzerwunsch: Der Wechsel zwischen Seiten wirkt ruckelig, und das große Hinterg
 75. Weicher Übergang: Hintergrund sanft überblenden statt hart tauschen, Inhalt kurz einblenden (ohne Springen/Flackern) ⭐
 76. Beim Wechsel kein „Lade …“-Aufblitzen und kein Zusammenfallen der Seite: alter Inhalt bleibt stehen, bis der neue da ist, Platz wird freigehalten ⭐
 77. Bilder der Hintergründe vorladen, damit beim Wechsel nichts nachlädt ⭐
+
+### O. Körperpflege mit echtem Sinn (27.09.2026) ⭐
+Ist-Stand: Sauberkeit sinkt nur durch Pfandtouren, wirkt nur aufs Schnorren (Faktor Sauberkeit/200) und sperrt Touren unter 20 %. Waschen (Katzenwäsche/Schwamm/Waschanlage) lohnt sich dadurch kaum. Soll überall spürbar werden:
+78. Sauberkeit sinkt auch mit der Zeit (z. B. −1 % pro Stunde) und durch Kämpfe, Verbrechen, Mülltonne ⭐
+79. Stufen mit klaren Folgen, im Spiel sichtbar erklärt: gepflegt (Bonus), normal, schmuddelig, verwahrlost ⭐
+80. Schnorren und Musik: saubere Spieler bekommen deutlich mehr, verwahrloste kaum etwas ⭐
+81. Läden: Wer verwahrlost ist, wird aus Supermarkt/Apotheke rausgeworfen oder zahlt Aufschlag ⭐
+82. Kämpfe: Gestank schreckt ab (kleiner Verteidigungsbonus) – aber weniger Beute beim Schnorren; Gegner sehen die Stufe ⭐
+83. Gesundheit: dauerhaft verwahrlost → Krankheit (weniger Energie), Heilung in der Apotheke ⭐
+84. Sozial: Freunde/Bande sehen die Stufe im Profil; Stadtteil Villenviertel nur ab „gepflegt“ gut nutzbar ⭐
+85. Waschen sinnvoll staffeln: mehr Möglichkeiten (Brunnen kostenlos aber langsam, Schwimmbad, Friseur für Bonus), Waschausstattung als echte Investition ⭐
 
