@@ -60,7 +60,7 @@ GitHub push ──▶ Action: Tests (Postgres) ──▶ Migration live in Supab
 
 Ziel: Es gibt fast immer etwas zu tun – auch mit wenigen Spielern. Empfohlener Start: 1, 2, 3, 5.
 
-**⭐ Vom Nutzer ausgewählt für später (27.09.2026):** 17, 19, 20, 22, 23, 24, 25, 26, 29, 30, 31, 32, 34, 37 – Kiosk-Stand, Revanche, Kopfgeld, Wetten, Kosmetik, Hunger, Sucht/Entzug, Ruf, Glücksrad, Pfandtour zu zweit, Tag/Nacht, Live-Stadtereignisse, Nebenquests, Ein-Klick-Verkaufen. Dazu aus J: 38, 39, 40 (eher selten), 43, 44, 47, 48, 49. Alle übrigen Ideen bleiben ebenfalls im Plan.
+**⭐ Vom Nutzer ausgewählt für später (27.09.2026):** 17, 19, 20, 22, 23, 24, 25, 26, 29, 30, 31, 32, 34, 37 – Kiosk-Stand, Revanche, Kopfgeld, Wetten, Kosmetik, Hunger, Sucht/Entzug, Ruf, Glücksrad, Pfandtour zu zweit, Tag/Nacht, Live-Stadtereignisse, Nebenquests, Ein-Klick-Verkaufen. Dazu aus J: 38, 39, 40 (eher selten), 43, 44, 47, 48, 49. Dazu aus K (Fahrzeuge): 53, 54 (erst später), 55, 56, 57, 59 (erst später), 60, 61, 63, 64. Alle übrigen Ideen bleiben ebenfalls im Plan.
 
 ### Offener Fehler
 - Seite scrollt nach 10–15 s ohne Eingabe nach oben (trotz Fix in PR #27; Ursache noch nicht gefunden, Nutzer hat Suche vertagt). Vermutung: Neuzeichnen einer Seite macht sie kurz kürzer. Test-Skizze: alle Seiten 20 s warten, `scrollTo`/`scrollIntoView`/`focus` mitprotokollieren.
@@ -136,4 +136,19 @@ Ziel: Es gibt fast immer etwas zu tun – auch mit wenigen Spielern. Empfohlener
 50. Liegengelassenes Pfand verdirbt / wird geklaut
 51. Bande kann dich anstupsen, Bandenziel braucht dich
 52. Optionale E-Mail „Während du weg warst …“
+
+### K. Fahrzeuge (27.09.2026)
+Aufstieg: Einkaufswagen → Bollerwagen → Fahrrad mit Anhänger → Lastenrad → Mofa → rostiger Kombi → Transporter → Wohnmobil. Am Anfang ist man ein echter Penner – Motorfahrzeuge erst deutlich später.
+53. Fahrzeug wirkt auf die Pfandtour: mehr Flaschen, schneller, weiter entfernte Sammelgebiete ⭐
+54. Führerschein als Weiterbildung (Theorie + Praxis), nötig für Mofa/Auto – **erst später erreichbar, nicht früh** ⭐
+55. Sprit und Pannen: Tanken kostet, zufällige Pannen/Polizeikontrolle ohne TÜV ⭐
+56. Tuning aus Plunder/Material: Reifen, Motor, Anhänger, Hupe, Lackierung ⭐
+57. Schrottplatz: Autoteile ausschlachten → Material, Schrott verkaufen ⭐
+58. Wohnmobil als Unterkunft
+59. Fahrer-Jobs mit Laufzeit (Kurier, Umzugshilfe, Sperrmüll) – **erst später, am Anfang ist man ein richtiger Penner** ⭐
+60. Straßenrennen gegen Spieler mit Einsatz, Zuschauer wetten ⭐
+61. Autodiebstahl + Schutz (Lenkradkralle, Garage, Tier im Auto) ⭐
+62. Bandenfahrzeug (Transporter) mit Bonus für Stadtteile/Bandenkriege
+63. Fahrten zwischen Stadtteilen: ohne Auto dauert Revierwechsel länger, mit Auto sofort ⭐
+64. Fahrzeug + Lackierung im Profil und auf dem Stadtplan zeigen ⭐
 
