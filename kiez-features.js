@@ -3505,10 +3505,12 @@ function crimeLocks() {
   const st = document.createElement('style'); st.textContent = 'html body:not(#kz1):not(#kz2) .kiez-quickbar{padding-right:var(--kz-qb-pad,0px) !important;box-sizing:border-box}'; document.head.appendChild(st);
   const fixQB = () => { document.querySelectorAll('.kiez-quickbar').forEach(bar => {
     const slip = document.querySelector('.player-slip'); if (!slip || !slip.offsetParent || !bar.offsetParent) return;
-    bar.style.setProperty('--kz-qb-pad', '0px'); const s = slip.getBoundingClientRect(), b = bar.getBoundingClientRect();
+    // Innenabstand ändert die Außenmaße nicht → ohne Zurücksetzen messen (sonst kurzes Flackern unter den Kasten)
+    const s = slip.getBoundingClientRect(), b = bar.getBoundingClientRect();
     const overlapY = b.top < s.bottom + 4 && b.bottom > s.top, pad = overlapY && b.right > s.left - 8 ? Math.ceil(b.right - s.left + 12) : 0;
-    if (pad > 0 && pad < b.width - 200) bar.style.setProperty('--kz-qb-pad', pad + 'px'); }); };
-  addEventListener('resize', fixQB); setInterval(fixQB, 2000); const prev = window.kiezShowView; window.kiezShowView = (...a) => { const r = prev?.(...a); setTimeout(fixQB, 60); setTimeout(fixQB, 500); return r; }; setTimeout(fixQB, 800);
+    const want = pad > 0 && pad < b.width - 200 ? pad + 'px' : '0px'; if (bar.style.getPropertyValue('--kz-qb-pad') !== want) bar.style.setProperty('--kz-qb-pad', want); }); };
+  new MutationObserver(() => requestAnimationFrame(fixQB)).observe(document.body, { attributes: true, attributeFilter: ['class'], subtree: false });
+  addEventListener('resize', fixQB); setInterval(fixQB, 2000); const prev = window.kiezShowView; window.kiezShowView = (...a) => { const r = prev?.(...a); fixQB(); requestAnimationFrame(fixQB); setTimeout(fixQB, 500); return r; }; setTimeout(fixQB, 800);
 }
 
 // Übersicht › Haustier: war leer, seit die Tierliste wieder auf der Begleiter-Seite steht (ROADMAP 158) → Karte des aktiven Begleiters
