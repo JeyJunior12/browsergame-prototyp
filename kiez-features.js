@@ -2619,7 +2619,7 @@ function gearTab() {
   document.querySelectorAll('#ausruestung > .section-tools span').forEach(s => s.classList.toggle('subtab-active', s.textContent.trim() === GEAR.tab));
   gearBody.querySelectorAll('[data-gtab]').forEach(el => el.dataset.gtab === GEAR.tab ? el.style.removeProperty('display') : el.style.setProperty('display', 'none', 'important'));
 }
-let gearSeq = 0;
+let gearSeq = 0, gearMsg = null;
 loaders.ausruestung = async () => {
   const t = ++gearSeq;
   let c, cat, pl;
@@ -2641,15 +2641,23 @@ loaders.ausruestung = async () => {
     + '<div class="card kz-slot"><b>Plunder</b><p>' + (pl ? esc(pl.name) + '<br><span class="kf-muted">' + vals(pl) + (pl.bottle_bonus ? ' · Pfand +' + pl.bottle_bonus + ' %' : '') + '</span>' : '<span class="kf-muted">nichts angelegt</span>') + '</p><a href="#" class="kz-gplunder">Zur Plunderkiste</a></div></div></div>'
     + '<div class="kf-box"><h3>Deine Kampfwerte</h3><div class="kz-combat"><div><small>Angriff</small><b>' + c.attack.total + '</b><span>Grundwert ' + c.attack.base + ' · Ausrüstung +' + c.attack.items + ' · Begleiter +' + c.attack.pets + ' · Bande +' + c.attack.gang + ' · Plunder +' + c.attack.plunder + '</span></div>'
     + '<div><small>Verteidigung</small><b>' + c.defense.total + '</b><span>Grundwert ' + c.defense.base + ' · Unterkunft +' + c.defense.shelter + ' · Ausrüstung +' + c.defense.items + ' · Begleiter +' + c.defense.pets + ' · Bande +' + c.defense.gang + ' · Plunder +' + c.defense.plunder + (c.defense.traps ? ' · Fallen +' + c.defense.traps : '') + (c.defense.stench ? ' · Gestank +' + c.defense.stench : '') + '</span></div></div>'
-    + '<p class="kf-muted">Pro Platz (Waffe, Kleidung & Schutz, Zubehör) zählt ein Stück. Anlegen tauscht das alte automatisch aus.</p></div></div>'
+    + '<p class="kf-muted">Pro Platz (Waffe, Kleidung & Schutz, Zubehör) zählt ein Stück. Anlegen tauscht das alte automatisch aus.</p><div class="kf-row"><button class="big kz-gbest">Bestes anlegen</button></div><div class="kz-gbest-msg"></div></div></div>'
     + '<div data-gtab="Waffen">' + list('waffe') + '</div><div data-gtab="Kleidung & Schutz">' + list('schutz') + '</div><div data-gtab="Zubehör">' + list('zubehoer') + '</div>';
   gearTab();
   gearBody.querySelectorAll('.kz-gear').forEach(cd => act(cd.querySelector('.kz-geq'), cd.querySelector('.kz-gear-msg'), async () => {
     const wasOn = on.has(cd.dataset.id);
     await rpc(wasOn ? 'unequip_item' : 'equip_item', { wanted_item: cd.dataset.id });
+    const txt = (wasOn ? 'Abgelegt: ' : 'Angelegt: ') + esc(byId[cd.dataset.id].name) + '.';
+    gearMsg = { id: cd.dataset.id, txt, t: Date.now() };  // Karte wird neu gezeichnet – Meldung danach wieder einsetzen (Durchspiel-Test: Kleidung ohne Meldung)
     setTimeout(loaders.ausruestung, 300); window.kiezNextLoad?.();
-    return (wasOn ? 'Abgelegt: ' : 'Angelegt: ') + esc(byId[cd.dataset.id].name) + '.';
+    return txt;
   }));
+  if (gearMsg && Date.now() - gearMsg.t < 8000) { const m = gearMsg.id === '__best' ? gearBody.querySelector('.kz-gbest-msg') : gearBody.querySelector('.kz-gear[data-id="' + gearMsg.id + '"] .kz-gear-msg'); if (m) say(m, gearMsg.txt, true); }
+  // Bestes pro Platz auf einen Klick (Übersicht)
+  const best = ['waffe', 'schutz', 'zubehoer'].map(sl => owned.filter(i => slotOf(i) === sl).sort((a, b) => (b.attack + b.defense) - (a.attack + a.defense))[0]).filter(i => i && !on.has(i.id));
+  const bb = gearBody.querySelector('.kz-gbest');
+  if (bb) { bb.disabled = !best.length; setLabel(bb, best.length ? 'Bestes anlegen (' + best.map(i => i.name).join(', ') + ')' : 'Bestes ist schon angelegt');
+    act(bb, gearBody.querySelector('.kz-gbest-msg'), async () => { for (const i of best) await rpc('equip_item', { wanted_item: i.id }); const txt = 'Angelegt: ' + best.map(i => esc(i.name)).join(', ') + '.'; gearMsg = { id: '__best', txt, t: Date.now() }; setTimeout(loaders.ausruestung, 300); window.kiezNextLoad?.(); return txt; }); }
   gearBody.querySelectorAll('.kz-gshop').forEach(a => a.onclick = e => { e.preventDefault(); go('store', a.dataset.tab); });
   gearBody.querySelector('.kz-gplunder')?.addEventListener('click', e => { e.preventDefault(); go('plunder'); });
 };
@@ -3371,3 +3379,17 @@ if (window.kiezProfile) window.kiezOnProfile(window.kiezProfile);
   const cb = combatBoxes; combatBoxes = (...a) => { cb(...a); ovSync(); };
   const pl = loaders.overview; loaders.overview = (...a) => { pl?.(...a); setTimeout(ovSync, 300); };
 }
+
+// Laden: gekauftes Stück gleich anlegen, wenn der Platz leer oder das neue Stück stärker ist (Durchspiel-Test 165: Käufe blieben ungenutzt)
+document.addEventListener('click', e => {
+  const b = e.target.closest('.buyitem'); if (!b || b.disabled) return; const id = b.dataset.id;
+  setTimeout(async () => { try {
+    const c = await rpc('combat_overview'); if (!(c.owned || []).includes(id)) return;
+    const it = OWN.cat?.[id] || (await sb.from('shop_items').select('id,name,attack,defense,category').eq('id', id).maybeSingle()).data; if (!it) return;
+    const cur = (c.equipped || []).find(x => x.slot === slotOf(it));
+    if (cur && (cur.id === id || cur.attack + cur.defense >= it.attack + it.defense)) return;
+    await rpc('equip_item', { wanted_item: id }); OWN.combat = await rpc('combat_overview'); combatBoxes();
+    const n = [...document.querySelectorAll('.kz-near .notice, #itemmsg .notice')].filter(x => x.offsetParent && x.textContent.includes('gekauft')).pop();
+    if (n && !n.textContent.includes('angelegt')) n.textContent = n.textContent.replace(/\.?\s*$/, '') + ' – und gleich angelegt' + (cur ? ' (statt ' + cur.name + ')' : '') + '.';
+  } catch { } }, 1200);
+}, true);
