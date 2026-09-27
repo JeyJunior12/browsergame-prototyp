@@ -159,6 +159,7 @@ Nutzerwunsch: Ungleichheiten auf allen Seiten richtig machen. Beispiel: Karte �
 67. Eingabefelder und Knöpfe gleich hoch und bündig (Menge + Verkaufen + Alle verkaufen in einer Linie) ⭐
 68. Gleiche Abstände, Schriftgrößen und Farben für Überschriften, Werte und Hinweise auf allen Seiten ⭐
 69. Prüfskript, das alle Seiten durchgeht und Abweichungen meldet (Karte ohne Bild, Emoji im Titel, ungleiche Knopfhöhen) ⭐
+69a. Nichts darf sich überlappen oder schief stehen: Beispiel Gegnerliste (Prügelei) – „Angreifen“ ragt über das Foto, „Tierkampf“/„Melden“ kleben darunter. Knöpfe einer Karte in einer sauberen Reihe mit Abstand, auf PC und Handy; Prüfskript meldet überlappende Elemente ⭐
 
 ### M. Wegweiser: Klick führt genau dorthin (27.09.2026) ⭐
 Nutzerwunsch: Wer oben auf einen Wert klickt, muss direkt bei der passenden Stelle landen. Beispiel: Klick auf „Pfandlager“ in der Kopfleiste öffnet die Plunderkiste, der Pfand-Bereich (Flaschen verkaufen) kommt erst weiter unten – komplett falsch.
