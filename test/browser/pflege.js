@@ -1,0 +1,22 @@
+// S7-Abnahme Körperpflege/Hunger/Sucht (78–85, 24, 25): Zustandskarte mit Stufen, neue Wasch-Stufen, Apotheke, Gegner-Stufe
+const fs=require('fs');const lib=require('./lib.js');let fails=0;
+const ok=(c,l,x)=>{if(!c)fails++;console.log(c?'✓':'✗',l,x??'')};
+(async()=>{const {b,pg}=await lib.open(process.env.URL);const errs=[];pg.on('pageerror',e=>errs.push(e.message));
+ await lib.login(pg,process.env.KIEZ_MAIL,fs.readFileSync(process.env.KIEZ_PW_FILE,'utf8').trim());
+ if(process.env.MOBIL)await pg.setViewportSize({width:390,height:844});
+ await pg.evaluate(()=>window.kiezGoTab('begging','Körperpflege'));await pg.waitForTimeout(3500);
+ const k=await pg.evaluate(()=>{const c=document.querySelector('#begging .kz-body');return c&&c.offsetParent?{t:c.querySelector('b').textContent,rows:c.querySelectorAll('.kz-tiers tr').length,now:c.querySelector('.kz-tiers tr.kz-now td')?.textContent,hunger:/Hunger/i.test(c.innerText),sucht:/Sucht/i.test(c.innerText)}:null});
+ ok(k&&k.rows===4&&k.now,'Zustandskarte mit 4 Stufen, aktuelle markiert (79)',k&&k.t);
+ ok(k&&k.hunger&&k.sucht,'Hunger + Sucht sichtbar (24/25)');
+ const tiers=await pg.evaluate(()=>[...document.querySelectorAll('#begging .wash-card')].map(c=>c.dataset.tier).join(','));
+ ok(tiers==='brunnen,katzenwaesche,schwamm,schwimmbad,waschanlage,friseur','Waschen gestaffelt (85)',tiers);
+ const r=await pg.evaluate(async()=>{const bt=document.querySelector('#begging .wash-card[data-tier="brunnen"] .washuse');if(!bt||bt.disabled)return 'gesperrt: '+(bt?.title||'');bt.click();await new Promise(r=>setTimeout(r,2500));return document.querySelector('#begging .wash-card[data-tier="brunnen"] .wash-status')?.innerText||''});
+ ok(/Brunnen|wieder|sauber/i.test(r),'Brunnen: Meldung in der Karte',r);
+ if(process.env.SHOT)await pg.screenshot({path:process.env.SHOT+'/pflege.png',fullPage:true});
+ await pg.evaluate(()=>window.kiezGo('apotheke'));await pg.waitForTimeout(3000);
+ ok(await pg.evaluate(()=>{const c=document.querySelector('#apotheke .kz-apo');return !!c&&c.offsetParent!==null&&!!c.querySelector('.kz-heal')&&!!c.querySelector('.kz-detox')}),'Apotheke: Behandeln + Entzugskur (83/25)');
+ await pg.evaluate(()=>window.kiezGo('pvp'));await pg.waitForTimeout(3500);
+ const tag=await pg.evaluate(()=>document.querySelector('#opponents .kz-tiertag')?.textContent||(document.querySelector('#opponents .card')?'fehlt':'keine Gegner'));
+ ok(tag!=='fehlt','Gegner zeigen Aussehen (82)',tag);
+ ok(!errs.length,'JS-Fehler',errs.join(' | ')||'keine');
+ console.log(fails?'FEHLER: '+fails:'ALLES OK');await b.close()})();

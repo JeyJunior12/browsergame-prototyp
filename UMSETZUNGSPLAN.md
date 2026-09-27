@@ -57,12 +57,12 @@ Innerhalb eines Sprints wird nach Nummer gearbeitet.
 | **S1** ✅ live | Chat-Leiste unten rechts, Kiezpost-Empfänger, Meldungen beim Knopf | 125–134, 69b, 69e, 69f, 69g | Backend, Frontend, Security |
 | **S2** ✅ live | Fehler Waffen/Ausrüstung, Besitz sichtbar, Überlappungen, Stufenanzeige, Lernwarteschlange, Logo-Link | 105–110, 69a, 69c, 69d, 73a | Backend, Frontend, UI |
 | **S3** ✅ live | Kopfleisten-Links führen genau hin, flüssiger Seitenwechsel, offener Scroll-Fehler | 70–77 + Scroll-Fehler | Frontend, UI |
-| **S4** | Einheitliches Aussehen überall + Prüfskript | 65–69 | UI, Frontend, Evidence |
-| **S5** | Seite Schnorrplätze neu, Stadtteile vorerst sperren | 135–140, 121, 122 | Game Designer, Frontend |
-| **S6** | Plunderkiste überarbeiten | 111–120 | Game Designer, Frontend, Backend |
-| **S7** | Körperpflege mit Sinn, Hunger, Sucht/Entzug | 78–85, 24, 25 | Game Designer, Backend |
-| **S8** | Banden I: Level, Bandenhaus, Wochenaufgaben, Kriege, Überfall, Bündnisse | 93–98, 11 | Game Designer, Backend, Frontend |
-| **S9** | Banden II: Forum, Profil/Wappen, Rechte, Mitglieder, Boss, Saison, Anstupsen | 99–104, 12, 51 | Game Designer, Backend, Frontend |
+| **S4** ✅ live | Einheitliches Aussehen überall + Prüfskript | 65–69 | UI, Frontend, Evidence |
+| **S5** ✅ live | Seite Schnorrplätze neu, Stadtteile vorerst sperren | 135–140, 121, 122 | Game Designer, Frontend |
+| **S6** ✅ live | Plunderkiste überarbeiten | 111–120 | Game Designer, Frontend, Backend |
+| **S7** ✅ live | Körperpflege mit Sinn, Hunger, Sucht/Entzug | 78–85, 24, 25 | Game Designer, Backend |
+| **S8** ✅ live | Banden I: Level, Bandenhaus, Wochenaufgaben, Kriege, Überfall, Bündnisse | 93–98, 11 | Game Designer, Backend, Frontend |
+| **S9** ✅ live | Banden II: Forum, Profil/Wappen, Rechte, Mitglieder, Boss, Saison, Anstupsen | 99–104, 12, 51 | Game Designer, Backend, Frontend |
 | **S10** | Immer etwas zu tun I: Computer-Gegner/Kiezboss, Tagesaufgaben, Tour-Ereignisse, Mülltonne, kurze Touren, Chancen, Strähne, Blitzaufträge, Sortierspiel, Leiste „Als Nächstes“ | 1, 2, 3, 38–44 | Game Designer, Backend, Frontend |
 | **S11** | Wiederkommen: Benachrichtigungen, Ticker, App, Tab-Titel, Login-Serie, Kiez-Zeiten, Pfand verdirbt, E-Mail, Ein-Klick, Tutorial | 5, 35, 37, 45–50, 52 | Frontend, Backend, Security |
 | **S12** | Wirtschaft & Kampf: Pfand-Lager, Auktion, Kiosk, Kredithai, Revanche, Kopfgeld, Turnier, Wetten, Basar Waffen, Nebenjobs | 4, 13, 15–22 | Economy Designer, Backend, Frontend |

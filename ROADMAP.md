@@ -91,8 +91,8 @@ Nutzerwunsch, höchste Priorität: ein ALL-Chat als kleine Leiste unten rechts, 
 
 ### C. Aus Pennergame, fehlt noch
 10. Mehrere Städte als eigene Spielwelten
-11. Bandenhaus mit mehr Ausbauten + Bandenaufgaben (Wochenziele)
-12. Forum / Bandenforum mit Themen
+11. ✅ Bandenhaus mit mehr Ausbauten + Bandenaufgaben (Wochenziele)
+12. ✅ Forum / Bandenforum mit Themen
 13. Waffen und Ausrüstung im Basar handeln
 14. Mehr Ranglisten (Tiere, Geld, Flaschen, Kampfquote)
 
@@ -110,8 +110,8 @@ Nutzerwunsch, höchste Priorität: ein ALL-Chat als kleine Leiste unten rechts, 
 
 ### F. Charakter
 23. Kosmetik: Kleidung, Avatar-Rahmen, Titel-Farben ⭐
-24. Hunger/Durst: regelmäßig essen, sonst weniger Energie ⭐
-25. Sucht & Entzug beim Alkohol (Nachteil bei zu viel Promille über Tage) ⭐
+24. ✅ Hunger/Durst: regelmäßig essen, sonst weniger Energie ⭐
+25. ✅ Sucht & Entzug beim Alkohol (Nachteil bei zu viel Promille über Tage) ⭐
 26. Ruf bei Kiez-Gruppen (Polizei, Unterwelt, Nachbarn) mit Freischaltungen ⭐
 
 ### G. Sozial
@@ -145,7 +145,7 @@ Nutzerwunsch, höchste Priorität: ein ALL-Chat als kleine Leiste unten rechts, 
 48. Login-Serie mit steigenden Belohnungen + Serien-Schutz ⭐
 49. Feste Kiez-Zeiten (z. B. 19–20 Uhr Happy Hour, 22 Uhr Razzia) ⭐
 50. Liegengelassenes Pfand verdirbt / wird geklaut
-51. Bande kann dich anstupsen, Bandenziel braucht dich
+51. ✅ Bande kann dich anstupsen, Bandenziel braucht dich
 52. Optionale E-Mail „Während du weg warst …“
 
 ### K. Fahrzeuge (27.09.2026)
@@ -165,11 +165,11 @@ Aufstieg: Einkaufswagen → Bollerwagen → Fahrrad mit Anhänger → Lastenrad 
 
 ### L. Einheitliches Aussehen überall (27.09.2026) ⭐
 Nutzerwunsch: Ungleichheiten auf allen Seiten richtig machen. Beispiel: Karte „Dein Inventar“ (Pfand-/Übersichtsbereich) hat kein Foto, Emojis als Symbole (🍾 🔩 🪵 🔺 🧵), Eingabefeld und Knöpfe unterschiedlich hoch.
-65. Jede Karte gleich aufgebaut: Foto links/oben, Titel, Text, Knöpfe in einer Reihe – auf jeder Seite, auch dort, wo dieselbe Karte ein zweites Mal vorkommt ⭐
-66. Keine Emojis als Symbole in Karten und Werten – stattdessen einheitliche kleine Bilder/Icons oder nur Text ⭐
-67. Eingabefelder und Knöpfe gleich hoch und bündig (Menge + Verkaufen + Alle verkaufen in einer Linie) ⭐
-68. Gleiche Abstände, Schriftgrößen und Farben für Überschriften, Werte und Hinweise auf allen Seiten ⭐
-69. Prüfskript, das alle Seiten durchgeht und Abweichungen meldet (Karte ohne Bild, Emoji im Titel, ungleiche Knopfhöhen) ⭐
+65. ✅ Jede Karte gleich aufgebaut: Foto links/oben, Titel, Text, Knöpfe in einer Reihe – auf jeder Seite, auch dort, wo dieselbe Karte ein zweites Mal vorkommt ⭐
+66. ✅ Keine Emojis als Symbole in Karten und Werten – stattdessen einheitliche kleine Bilder/Icons oder nur Text ⭐
+67. ✅ Eingabefelder und Knöpfe gleich hoch und bündig (Menge + Verkaufen + Alle verkaufen in einer Linie) ⭐
+68. ✅ Gleiche Abstände, Schriftgrößen und Farben für Überschriften, Werte und Hinweise auf allen Seiten ⭐
+69. ✅ Prüfskript, das alle Seiten durchgeht und Abweichungen meldet (Karte ohne Bild, Emoji im Titel, ungleiche Knopfhöhen) ⭐
 69a. ✅ Nichts darf sich überlappen oder schief stehen: Beispiel Gegnerliste (Prügelei) – „Angreifen“ ragt über das Foto, „Tierkampf“/„Melden“ kleben darunter. Knöpfe einer Karte in einer sauberen Reihe mit Abstand, auf PC und Handy; Prüfskript meldet überlappende Elemente ⭐
 69b. ✅ Meldungsfenster beim Knopf (grün/rot, seit PR #26) sieht schlecht aus: Beispiel Weiterbildung „Angriff“ – Meldung steckt als schmale Spalte unten links in der Karte, Text bricht Wort für Wort um. Stattdessen volle Kartenbreite (oder direkt unter dem Knopf), gleiches Aussehen wie andere Hinweise, gut lesbar ⭐
 69c. ✅ Gleiche Karte prüfen: Titel „Angriff 3“, darunter „Aktuelle Stufe: 1“ – widersprüchliche Stufenangabe klären ⭐
@@ -195,14 +195,14 @@ Nutzerwunsch: Der Wechsel zwischen Seiten wirkt ruckelig, und das große Hinterg
 
 ### O. Körperpflege mit echtem Sinn (27.09.2026) ⭐
 Ist-Stand: Sauberkeit sinkt nur durch Pfandtouren, wirkt nur aufs Schnorren (Faktor Sauberkeit/200) und sperrt Touren unter 20 %. Waschen (Katzenwäsche/Schwamm/Waschanlage) lohnt sich dadurch kaum. Soll überall spürbar werden:
-78. Sauberkeit sinkt auch mit der Zeit (z. B. −1 % pro Stunde) und durch Kämpfe, Verbrechen, Mülltonne ⭐
-79. Stufen mit klaren Folgen, im Spiel sichtbar erklärt: gepflegt (Bonus), normal, schmuddelig, verwahrlost ⭐
-80. Schnorren und Musik: saubere Spieler bekommen deutlich mehr, verwahrloste kaum etwas ⭐
-81. Läden: Wer verwahrlost ist, wird aus Supermarkt/Apotheke rausgeworfen oder zahlt Aufschlag ⭐
-82. Kämpfe: Gestank schreckt ab (kleiner Verteidigungsbonus) – aber weniger Beute beim Schnorren; Gegner sehen die Stufe ⭐
-83. Gesundheit: dauerhaft verwahrlost → Krankheit (weniger Energie), Heilung in der Apotheke ⭐
-84. Sozial: Freunde/Bande sehen die Stufe im Profil; Stadtteil Villenviertel nur ab „gepflegt“ gut nutzbar ⭐
-85. Waschen sinnvoll staffeln: mehr Möglichkeiten (Brunnen kostenlos aber langsam, Schwimmbad, Friseur für Bonus), Waschausstattung als echte Investition ⭐
+78. ✅ Sauberkeit sinkt auch mit der Zeit (z. B. −1 % pro Stunde) und durch Kämpfe, Verbrechen, Mülltonne ⭐
+79. ✅ Stufen mit klaren Folgen, im Spiel sichtbar erklärt: gepflegt (Bonus), normal, schmuddelig, verwahrlost ⭐
+80. ✅ Schnorren und Musik: saubere Spieler bekommen deutlich mehr, verwahrloste kaum etwas ⭐
+81. ✅ Läden: Wer verwahrlost ist, wird aus Supermarkt/Apotheke rausgeworfen oder zahlt Aufschlag ⭐
+82. ✅ Kämpfe: Gestank schreckt ab (kleiner Verteidigungsbonus) – aber weniger Beute beim Schnorren; Gegner sehen die Stufe ⭐
+83. ✅ Gesundheit: dauerhaft verwahrlost → Krankheit (weniger Energie), Heilung in der Apotheke ⭐
+84. ✅ Sozial: Freunde/Bande sehen die Stufe im Profil; Stadtteil Villenviertel nur ab „gepflegt“ gut nutzbar ⭐
+85. ✅ Waschen sinnvoll staffeln: mehr Möglichkeiten (Brunnen kostenlos aber langsam, Schwimmbad, Friseur für Bonus), Waschausstattung als echte Investition ⭐
 
 ### P. Balancing aller Gegenstände und Preise (27.09.2026) ⭐
 Nutzerwunsch: Alles, was Werte gibt, und alle Preise im Spiel einmal durchgehen und ausgewogen machen – passend zur neuen Level-Kurve (0016: Level 150 aktiv ~1,5 Jahre).
@@ -216,18 +216,18 @@ Nutzerwunsch: Alles, was Werte gibt, und alle Preise im Spiel einmal durchgehen 
 
 ### Q. Bandensystem komplett und umfangreich (27.09.2026) ⭐
 Ist-Stand: gründen, Ränge (Chef/Vize/Offizier/Mitglied), Einladungen/Bewerbungen, Chat, Protokoll, Kasse, Ausbau Angriff/Verteidigung, Bandenkriege, Highscore, Stadtteile (0015). Soll Spaß machen und viel Tiefe haben:
-93. Bandenlevel mit Erfahrung: Mitglieder-Aktionen (Flaschen, Siege, Einzahlungen, Kriege, Stadtteile) bringen Banden-Punkte; höheres Level = mehr Plätze und neue Ausbauten ⭐
-94. Bandenhaus mit Räumen zum Ausbauen: Lager (Plunder teilen), Trainingsraum (schnellere Weiterbildung), Zwinger (Tier-Bonus), Werkstatt (Basteln), Tresor (Kasse sicher), Kneipe (Energie) ⭐
-95. Bandenaufgaben pro Woche: gemeinsame Ziele (z. B. 50.000 Flaschen, 200 Siege), Belohnung für alle; Anzeige, wer wie viel beigetragen hat ⭐
-96. Bandenkriege ausbauen: Kriegsziele und Einsatz, Kriegsverlauf mit Punkten pro Tag, Waffenruhe/Kapitulation, Kriegsbeute, Kriegs-Rangliste ⭐
-97. Überfall aufs Bandenhaus: gegnerische Bande kann die Kasse angreifen, Verteidiger werden benachrichtigt und können helfen ⭐
-98. Bündnisse und Feinde: Allianzen mit anderen Banden (kein Angriff untereinander, gemeinsame Kriege), Feindesliste ⭐
-99. Bandenforum mit Themen, Ankündigungen vom Chef, Umfragen ⭐
-100. Bandenprofil: Wappen/Farbe, Motto, Beitrittsbedingungen (Mindestlevel, offen/Bewerbung), öffentliche Erfolge ⭐
-101. Feinere Rechte: wer darf einladen, auszahlen, ausbauen, Krieg erklären; Mitgliedsbeiträge und Auszahlungen aus der Kasse mit Protokoll ⭐
-102. Mitgliederübersicht: aktiv/inaktiv, Beitrag diese Woche, anstupsen, Inaktive automatisch markieren ⭐
-103. Bandenboss-Kampf: wöchentlicher Computer-Boss, den die ganze Bande gemeinsam schlägt ⭐
-104. Banden-Saison mit Rangliste und Preisen (Kronkorken, Titel, Wappen-Rahmen) ⭐
+93. ✅ Bandenlevel mit Erfahrung: Mitglieder-Aktionen (Flaschen, Siege, Einzahlungen, Kriege, Stadtteile) bringen Banden-Punkte; höheres Level = mehr Plätze und neue Ausbauten ⭐
+94. ✅ Bandenhaus mit Räumen zum Ausbauen: Lager (Plunder teilen), Trainingsraum (schnellere Weiterbildung), Zwinger (Tier-Bonus), Werkstatt (Basteln), Tresor (Kasse sicher), Kneipe (Energie) ⭐
+95. ✅ Bandenaufgaben pro Woche: gemeinsame Ziele (z. B. 50.000 Flaschen, 200 Siege), Belohnung für alle; Anzeige, wer wie viel beigetragen hat ⭐
+96. ✅ Bandenkriege ausbauen: Kriegsziele und Einsatz, Kriegsverlauf mit Punkten pro Tag, Waffenruhe/Kapitulation, Kriegsbeute, Kriegs-Rangliste ⭐
+97. ✅ Überfall aufs Bandenhaus: gegnerische Bande kann die Kasse angreifen, Verteidiger werden benachrichtigt und können helfen ⭐
+98. ✅ Bündnisse und Feinde: Allianzen mit anderen Banden (kein Angriff untereinander, gemeinsame Kriege), Feindesliste ⭐
+99. ✅ Bandenforum mit Themen, Ankündigungen vom Chef, Umfragen ⭐
+100. ✅ Bandenprofil: Wappen/Farbe, Motto, Beitrittsbedingungen (Mindestlevel, offen/Bewerbung), öffentliche Erfolge ⭐
+101. ✅ Feinere Rechte: wer darf einladen, auszahlen, ausbauen, Krieg erklären; Mitgliedsbeiträge und Auszahlungen aus der Kasse mit Protokoll ⭐
+102. ✅ Mitgliederübersicht: aktiv/inaktiv, Beitrag diese Woche, anstupsen, Inaktive automatisch markieren ⭐
+103. ✅ Bandenboss-Kampf: wöchentlicher Computer-Boss, den die ganze Bande gemeinsam schlägt ⭐
+104. ✅ Banden-Saison mit Rangliste und Preisen (Kronkorken, Titel, Wappen-Rahmen) ⭐
 
 ### R. Fehler: Waffen/Ausrüstung kaufen und anlegen (27.09.2026) ⭐ – hohe Priorität
 Gemeldet: Waffen lassen sich mehrfach kaufen; Anziehen/Ausrüsten für Werte funktioniert gar nicht.
@@ -242,21 +242,21 @@ Gemeldet: Waffen lassen sich mehrfach kaufen; Anziehen/Ausrüsten für Werte fun
 
 ### S. Plunderkiste überarbeiten (27.09.2026) ⭐
 Ist-Stand: Es werden alle 14 Plunderstücke untereinander gezeigt, auch nicht gefundene, dazu Inventar und Basteln auf derselben Seite – unübersichtlich.
-111. Nur Gefundenes groß zeigen; nicht Gefundenes nur als kleine dunkle Umrisse mit „?“ und Seltenheit (Sammelreiz: „9 von 14 gefunden“) ⭐
-112. Oben ein fester Platz „Angelegt“ mit dem getragenen Plunder und seinen Werten, daneben „Wechseln“ ⭐
-113. Reiter statt einer langen Seite: „Meine Stücke“ · „Sammlung“ · „Basteln“ · „Lager/Material“ ⭐
-114. Sortieren/Filtern: nach Seltenheit, Angriff, Verteidigung, Pfand-Bonus; Rahmenfarbe je Seltenheit ⭐
-115. „Neu“-Markierung für frisch gefundene Stücke (bis man sie einmal angesehen hat) ⭐
-116. Vergleich beim Antippen: Werte des Stücks gegen das angelegte (+/− farbig) ⭐
-117. Doppelte mit einem Klick verkaufen oder direkt im Basar anbieten (Preisvorschlag) ⭐
-118. Sets: zusammengehörige Stücke (z. B. „Bauarbeiter“: Bauhelm + Taschenlampe + Handschuh) geben Set-Bonus, Fortschritt sichtbar (verbindet mit Idee 6 Sammelalbum) ⭐
-119. Öffnen-Moment: Plunderkiste aus dem Kronkorken-Tausch mit kurzer Öffnen-Animation und Seltenheits-Aufleuchten ⭐
-120. Mehr Plunder für Langzeit: weitere Stücke pro Seltenheit, saisonale Stücke (Idee 8) ⭐
+111. ✅ Nur Gefundenes groß zeigen; nicht Gefundenes nur als kleine dunkle Umrisse mit „?“ und Seltenheit (Sammelreiz: „9 von 14 gefunden“) ⭐
+112. ✅ Oben ein fester Platz „Angelegt“ mit dem getragenen Plunder und seinen Werten, daneben „Wechseln“ ⭐
+113. ✅ Reiter statt einer langen Seite: „Meine Stücke“ · „Sammlung“ · „Basteln“ · „Lager/Material“ ⭐
+114. ✅ Sortieren/Filtern: nach Seltenheit, Angriff, Verteidigung, Pfand-Bonus; Rahmenfarbe je Seltenheit ⭐
+115. ✅ „Neu“-Markierung für frisch gefundene Stücke (bis man sie einmal angesehen hat) ⭐
+116. ✅ Vergleich beim Antippen: Werte des Stücks gegen das angelegte (+/− farbig) ⭐
+117. ✅ Doppelte mit einem Klick verkaufen oder direkt im Basar anbieten (Preisvorschlag) ⭐
+118. ✅ Sets: zusammengehörige Stücke (z. B. „Bauarbeiter“: Bauhelm + Taschenlampe + Handschuh) geben Set-Bonus, Fortschritt sichtbar (verbindet mit Idee 6 Sammelalbum) ⭐
+119. ✅ Öffnen-Moment: Plunderkiste aus dem Kronkorken-Tausch mit kurzer Öffnen-Animation und Seltenheits-Aufleuchten ⭐
+120. ✅ Mehr Plunder für Langzeit: weitere Stücke pro Seltenheit, saisonale Stücke (Idee 8) ⭐
 
 ### T. Stadtteile vorerst sperren, später Städte (27.09.2026) ⭐
 Nutzerwunsch: Die Stadtteile (Runde 6, 0015 – sind zurzeit live) bleiben vorerst gesperrt. Später wie bei Pennergame mehrere Städte, die man bewohnen kann – aber erst, wenn es genug Spieler gibt.
-121. Stadtteile vorerst sperren: Menüpunkt/Karte zeigen „Bald verfügbar“ statt Revierwahl, Einfluss-Wertung pausieren; Daten und Server-Funktionen bleiben erhalten ⭐
-122. Freischalten per Schalter (Admin) ab einer Spielerzahl, z. B. ab 50 aktiven Spielern ⭐
+121. ✅ Stadtteile vorerst sperren: Menüpunkt/Karte zeigen „Bald verfügbar“ statt Revierwahl, Einfluss-Wertung pausieren; Daten und Server-Funktionen bleiben erhalten ⭐
+122. ✅ Freischalten per Schalter (Admin) ab einer Spielerzahl, z. B. ab 50 aktiven Spielern ⭐
 123. Später mehrere Städte (verbindet mit Idee 10): jede Stadt eigene Welt mit eigenen Ranglisten, Stadtteilen und Banden; Umzug in eine andere Stadt kostet Geld/Zeit ⭐
 124. Erst wenn genug Spieler da sind: neue Stadt eröffnen, wenn die bestehende voll genug ist (Richtwert festlegen) ⭐
 
@@ -268,12 +268,12 @@ Gemeldet: „Nachricht schreiben“ hat eine Auswahlliste mit allen Spielern (so
 
 ### V. Seite „Schnorrplätze“ neu gestalten (27.09.2026) ⭐
 Nutzer: Die Seite ist noch nicht toll. Zurzeit stehen zwei ähnliche Dinge untereinander – Sammelgebiete (Bahnhofs-Hinterhof, Altglas-Gasse …, fürs Pfand) und Schnorrplätze (Englischer Garten, Hauptbahnhof …, fürs Schnorren) – das verwirrt, dazu lange Texte, Emojis (💰), Meldungen erst nach Klick.
-135. Klar trennen: Reiter „Sammelgebiete (Pfand)“ und „Schnorrplätze (Kleingeld)“, jeweils mit kurzer Erklärung oben ⭐
-136. Übersicht als Leiter/Weg: freigeschaltete Plätze hell, gesperrte grau mit „🔒 ab Sammelgebiet X“, der nächste freischaltbare hervorgehoben ⭐
-137. Karten kurz und gleich: Foto, Name, „+0,20 € pro Spende · bis 10×“, Dauer; lange Erklärung nur einmal oben statt auf jeder Karte ⭐
-138. Laufendes Schnorren direkt auf der Karte zeigen: Fortschrittsbalken + Restzeit, am Ende das Ergebnis genau dort (siehe 69g) ⭐
-139. Was wirkt sichtbar machen: Mitleid des Begleiters, Sauberkeit, Rhetorik als kleine Werte („Dein Bonus: +35 %“) ⭐
-140. Letzte Einnahmen pro Platz (heute verdient, bester Platz) als kleine Statistik ⭐
+135. ✅ Klar trennen: Reiter „Sammelgebiete (Pfand)“ und „Schnorrplätze (Kleingeld)“, jeweils mit kurzer Erklärung oben ⭐
+136. ✅ Übersicht als Leiter/Weg: freigeschaltete Plätze hell, gesperrte grau mit „🔒 ab Sammelgebiet X“, der nächste freischaltbare hervorgehoben ⭐
+137. ✅ Karten kurz und gleich: Foto, Name, „+0,20 € pro Spende · bis 10×“, Dauer; lange Erklärung nur einmal oben statt auf jeder Karte ⭐
+138. ✅ Laufendes Schnorren direkt auf der Karte zeigen: Fortschrittsbalken + Restzeit, am Ende das Ergebnis genau dort (siehe 69g) ⭐
+139. ✅ Was wirkt sichtbar machen: Mitleid des Begleiters, Sauberkeit, Rhetorik als kleine Werte („Dein Bonus: +35 %“) ⭐
+140. ✅ Letzte Einnahmen pro Platz (heute verdient, bester Platz) als kleine Statistik ⭐
 
 ### 🏁 ZUM SCHLUSS – Gesamtprüfung und Durchspiel-Test Level 1 bis 150 (27.09.2026) ⭐
 Nutzerwunsch: Ganz am Ende, wenn alles andere gebaut ist, noch einmal alles durchgehen.

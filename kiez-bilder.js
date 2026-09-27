@@ -33,6 +33,9 @@
     ['#plunder', /^Feiner Anzug/, 'basteln-anzug-fein'],
     ['#plunder', /^Kaputter Regenschirm/, 'basteln-schirm-kaputt'],
     ['#plunder', /^Regenschirm/, 'basteln-schirm'],
+    // S4: Infokästen ohne Bild
+    ['#training', /^Lernwarteschlange/, 'training-parallel'],
+    ['body', /^Deine Kampfwerte/, 'kampf-staerke'],
     // Kronkorken
     ['#kronkorken', /^Dein Vorrat/, 'kk-vorrat'],
     ['#kronkorken', /^Energydrink/, 'kk-energie'],
@@ -49,6 +52,18 @@
     ['#gangs', /^(Bandenkasse|Protokoll)/, 'bande-kasse'],
     // Runde 6: Stadtteile, Basar, Zockerbude, Schließfach, Kiez-Geschichte, Chat, Kampfprotokoll, Titel
     ['#stadtteile', /^Dein Revier/, 'start-bande'],
+    ['#stadtteile', /^Stadtteile – bald/, 'bande-krieg'],
+    ['#bandenhaus', /Bandenlevel/, 'bande-liste'], ['#bandenhaus', /^Wochenaufgaben/, 'bande-kasse'], ['#bandenhaus', /^Wer hat/, 'bande-mitglieder'],
+    ['#bandenhaus', /^Bandenhaus überfallen/, 'bande-krieg'], ['#bandenhaus', /^Letzte Kriege/, 'bande-krieg'], ['#bandenhaus', /^Kriegs-Rangliste/, 'bande-liste'],
+    ['#bandenhaus', /^Verbündete/, 'bande-gruenden'], ['#bandenhaus', /^Bandenforum|^Neues Thema/, 'bande-chat'], ['#bandenhaus', /^Mitglieder/, 'bande-mitglieder'],
+    ['#bandenhaus', /^Aus der Kasse/, 'bande-kasse'], ['#bandenhaus', /^Bandenboss/, 'kampf-gegner'], ['#bandenhaus', /^Banden-Saison/, 'bande-liste'],
+    ['#bandenhaus', /^Bandenprofil|^Rechte/, 'bande-gruenden'], ['#bandenhaus', /^Kneipe/, 'essen-dosenbier'], ['#bandenhaus', /^Trainingsraum/, 'szene-training'],
+    ['#bandenhaus', /^Zwinger/, 'szene-tiere'], ['#bandenhaus', /^Werkstatt/, 'basteln-doppelschild'], ['#bandenhaus', /^Lager/, 'lager-inventar'], ['#bandenhaus', /^Tresor/, 'laden-geldversteck'],
+    ['#bandenhaus', /^Kein Bandenhaus/, 'bande-gruenden'], ['#bandenhaus', /^Krieg:|^Euer Überfall|^Überfall von/, 'bande-krieg'],
+    ['#begging', /^Dein Zustand/, 'pflege-katzenwaesche'], ['#apotheke', /^Krankheit/, 'stadt-apotheke'],
+    ['#plunder', /^Angelegt/, 'lager-inventar'], ['#plunder', /^Sammlung/, 'kk-plunderkiste'],
+    ['#plunder', /^Bauarbeiter/, 'plunder-bauhelm'], ['#plunder', /^Kiezadel/, 'plunder-kiezzepter'], ['#plunder', /^Taubenkönig/, 'plunder-taubenpfeife'],
+    ['#plunder', /^Pfandjäger/, 'plunder-goldene_dose'], ['#plunder', /^Straßenkämpfer/, 'plunder-fahrradkette'],
     ['#stadtteile', /^Bahnhofsviertel/, 'gebiet-bahnhof'], ['#stadtteile', /^Altstadt/, 'gebiet-touristen'], ['#stadtteile', /^Hafen/, 'heim-kran'],
     ['#stadtteile', /^Stadtpark/, 'gebiet-park'], ['#stadtteile', /^Marktplatz/, 'schnorr-fussgaengerzone'], ['#stadtteile', /^Villenviertel/, 'gebiet-luxus'],
     ['#basar', /^Plunder anbieten/, 'lager-inventar'], ['#basar', /^Deine Angebote/, 'kk-plunderkiste'],
@@ -150,6 +165,7 @@
       ['Englischer Garten', 'schnorr-garten'], ['Hauptbahnhof', 'schnorr-bahnhof'], ['Fußgängerzone', 'schnorr-fussgaengerzone'],
       ['Jahrmarkt', 'schnorr-jahrmarkt'], ['Vor der Oper', 'schnorr-oper'],
       ['Katzenwäsche', 'pflege-katzenwaesche'], ['Schwamm & Seife', 'pflege-schwamm'], ['Waschanlage', 'pflege-waschanlage'],
+      ['Brunnen', 'heim-brunnen'], ['Schwimmbad', 'kk-dusche'], ['Friseur', 'stadt-waschhaus'],
       ['Flaschenflöte', 'musik-flaschenfloete'], ['Glocke', 'musik-glocke'], ['Trommel', 'musik-trommel'], ['Akkordion', 'musik-akkordeon'],
       ['Radio', 'musik-radio'], ['Gitarre', 'musik-gitarre'], ['Saxophon', 'musik-saxophon'], ['Chor', 'musik-chor'],
       ['Straßenmusik-Kasse', 'musik-kasse'],
@@ -177,7 +193,7 @@
   // Vorschaubilder, die das Foto über --kzbild bekommen (Rest wird als .kz-pic ergänzt)
   const THUMB = ':scope>.generated-item-thumb, :scope>.asset-thumb, :scope .skill-portrait, :scope .city-hub-img, :scope>.pharmacy-thumb';
   // Seitenköpfe je Bereich
-  const SZENE = { stadtteile: 'szene-bande', basar: 'szene-laden', zockerbude: 'szene-stadt', schliessfach: 'szene-unterkunft', geschichte: 'szene-auftrag',
+  const SZENE = { stadtteile: 'szene-bande', bandenhaus: 'szene-bande', basar: 'szene-laden', zockerbude: 'szene-stadt', schliessfach: 'szene-unterkunft', geschichte: 'szene-auftrag',
     chat: 'szene-post', kampfprotokoll: 'szene-pruegelei', pfand: 'szene-pfand', begging: 'szene-schnorren', income: 'szene-stadt', gear: 'szene-unterkunft', training: 'szene-training',
     messages: 'szene-post', gangs: 'szene-bande', missions: 'szene-auftrag', pets: 'szene-tiere', achievements: 'szene-erfolge',
     pvp: 'szene-pruegelei', store: 'szene-laden', leaderboard: 'szene-rangliste', career: 'szene-karriere' };

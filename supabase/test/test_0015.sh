@@ -1,6 +1,8 @@
 #!/bin/bash
 # 0015: Stadtteile, Basar, Zockerbude, Schließfach, Kiez-Geschichte, Chat, Titel, Kampfprotokoll
 cd "$(dirname "$0")/../.."; source supabase/test/lib.sh
+# Stadtteile sind seit 0019 per Schalter gesperrt – für diesen Test einschalten
+$P -tAc "do \$\$ begin if to_regclass('public.feature_flags') is not null then update feature_flags set enabled=true where key='districts'; end if; end \$\$" >/dev/null
 ok(){ [ "$2" = "$3" ] && echo "OK   $1" || { echo "FAIL $1: erwartet '$3', bekommen '$2'"; FAILED=1; }; }
 has(){ echo "$2" | grep -q "$3" && echo "OK   $1" || { echo "FAIL $1: '$2' enthaelt nicht '$3'"; FAILED=1; }; }
 newuser(){ $P -tAc "insert into auth.users(raw_user_meta_data) values('{\"username\":\"$1\"}') returning id"; }
@@ -94,4 +96,5 @@ for t in chat_messages market_listings dice_challenges district_influence distri
   ok "nicht direkt beschreibbar: $t" "$($P -tAc "select has_table_privilege('authenticated','public.$t','insert')")" "f"
 done
 ok  "Auszahlhelfer nicht aufrufbar" "$($P -tAc "select has_function_privilege('authenticated','public.kiez_pay(uuid,numeric)','execute')")" "f"
+$P -tAc "do \$\$ begin if to_regclass('public.feature_flags') is not null then update feature_flags set enabled=false where key='districts'; end if; end \$\$" >/dev/null
 exit ${FAILED:-0}
