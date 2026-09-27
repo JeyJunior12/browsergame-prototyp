@@ -60,7 +60,7 @@ GitHub push ──▶ Action: Tests (Postgres) ──▶ Migration live in Supab
 
 Ziel: Es gibt fast immer etwas zu tun – auch mit wenigen Spielern. Empfohlener Start: 1, 2, 3, 5.
 
-**⭐ Vom Nutzer ausgewählt für später (27.09.2026):** 17, 19, 20, 22, 23, 24, 25, 26, 29, 30, 31, 32, 34, 37 – Kiosk-Stand, Revanche, Kopfgeld, Wetten, Kosmetik, Hunger, Sucht/Entzug, Ruf, Glücksrad, Pfandtour zu zweit, Tag/Nacht, Live-Stadtereignisse, Nebenquests, Ein-Klick-Verkaufen. Alle übrigen Ideen bleiben ebenfalls im Plan.
+**⭐ Vom Nutzer ausgewählt für später (27.09.2026):** 17, 19, 20, 22, 23, 24, 25, 26, 29, 30, 31, 32, 34, 37 – Kiosk-Stand, Revanche, Kopfgeld, Wetten, Kosmetik, Hunger, Sucht/Entzug, Ruf, Glücksrad, Pfandtour zu zweit, Tag/Nacht, Live-Stadtereignisse, Nebenquests, Ein-Klick-Verkaufen. Dazu aus J: 38, 39, 40 (eher selten), 43, 44, 47, 48, 49. Alle übrigen Ideen bleiben ebenfalls im Plan.
 
 ### Offener Fehler
 - Seite scrollt nach 10–15 s ohne Eingabe nach oben (trotz Fix in PR #27; Ursache noch nicht gefunden, Nutzer hat Suche vertagt). Vermutung: Neuzeichnen einer Seite macht sie kurz kürzer. Test-Skizze: alle Seiten 20 s warten, `scrollTo`/`scrollIntoView`/`focus` mitprotokollieren.
@@ -119,4 +119,22 @@ Ziel: Es gibt fast immer etwas zu tun – auch mit wenigen Spielern. Empfohlener
 35. Einsteiger-Tutorial Schritt für Schritt
 36. Statistikseite mit Verlaufskurven (Punkte, Geld, Flaschen)
 37. Schnellaktionen: „Alles verkaufen & neue Tour starten“ mit einem Klick ⭐
+
+### J. Alle 3–5 Minuten etwas tun & wiederkommen (27.09.2026)
+Entwurf der Server-Seite für 38–45 (ungetestet): `supabase/entwuerfe/0017_alle_paar_minuten.sql` (Mülltonne, 3/5-Min.-Touren fair skaliert, Chancen, Glückssträhne, Blitzaufträge, Sortierspiel, Ticker).
+38. Mülltonne durchwühlen alle 3 Min. (Flaschen, Kronkorken, Kleingeld, selten Plunder, manchmal Rattenbiss) ⭐
+39. Kurze Pfandtouren 3 und 5 Min. (pro Minute so ergiebig wie 10 Min.) ⭐
+40. Plötzliche Chancen auf der Seite („Tourist verliert 2 € – 15 Sek. zum Aufheben“) – **eher selten** ⭐
+41. Glückssträhne: Bonus, wenn man innerhalb von 5 Min. weiterspielt
+42. Blitzaufträge alle 5 Min.
+43. Flaschen-Sortierspiel (30 Sek., Bonus-Pfand) ⭐
+44. Leiste „Als Nächstes“ mit Countdowns und Ein-Klick-Aktionen ⭐
+45. Live-Ticker „Gerade im Kiez“
+46. Handy-Benachrichtigungen (als App installierbar)
+47. Tab-Titel blinkt („(1) Tour fertig!“) ⭐
+48. Login-Serie mit steigenden Belohnungen + Serien-Schutz ⭐
+49. Feste Kiez-Zeiten (z. B. 19–20 Uhr Happy Hour, 22 Uhr Razzia) ⭐
+50. Liegengelassenes Pfand verdirbt / wird geklaut
+51. Bande kann dich anstupsen, Bandenziel braucht dich
+52. Optionale E-Mail „Während du weg warst …“
 
