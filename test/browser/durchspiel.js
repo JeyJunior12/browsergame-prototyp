@@ -183,7 +183,7 @@ async function besuch() {
   // 11) neue Tour: längste, die in den Zeitsprung passt
   // Turbo: nächster Besuch, sobald die Weiterbildung fertig ist (10 Min. bis 12 Std.)
   await refresh(); const tr = await pg.evaluate(() => window.kiezProfile?.training_ends_at).catch(() => null);
-  const skip = Math.min(720, Math.max(10, tr ? Math.ceil((new Date(tr) - Date.now()) / 60000) + 1 : 60));
+  const skip = Math.min(720, Math.max(240, tr ? Math.ceil((new Date(tr) - Date.now()) / 60000) + 1 : 240));  // Geld ist ab Level ~25 der Engpass → mind. 4 Std.
   await go('pfand', 'Pfand sammeln');
   const dur = await pg.evaluate(s => { const o = [...document.querySelectorAll('#durationselect option')].map(o => +o.value).filter(v => v <= s); return o.length ? Math.max(...o) : null; }, skip);
   if (dur) await pg.selectOption('#durationselect', String(dur)).catch(() => {});
