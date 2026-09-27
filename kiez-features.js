@@ -1240,7 +1240,7 @@ new MutationObserver(ms => {
 }).observe(document.body, { childList: true, subtree: true, characterData: true });
 const style7 = document.createElement('style');
 style7.textContent = `html body:not(#kz1):not(#kz2) .notice.kz-moved { display: none !important; }
-html body:not(#kz1):not(#kz2) .kz-near { clear: both; margin-top: 12px; grid-column: 1 / -1; flex: 1 0 100%; width: 100%; max-width: none; box-sizing: border-box; }
+html body:not(#kz1):not(#kz2) .kz-near { clear: both; margin-top: 12px; grid-column: 1 / -1; flex: 0 0 auto; width: 100%; max-width: none; box-sizing: border-box; }
 html body:not(#kz1):not(#kz2) .kz-near .notice { margin: 0; width: 100%; box-sizing: border-box; font-size: 15px !important; line-height: 1.45; animation: kzpop .25s ease-out; }
 @keyframes kzpop { from { transform: translateY(-4px); opacity: 0; } to { transform: none; opacity: 1; } }`;
 document.head.appendChild(style7);

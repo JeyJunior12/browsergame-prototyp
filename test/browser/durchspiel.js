@@ -42,7 +42,7 @@ const mark = () => pg.evaluate(S => document.querySelectorAll(S).forEach(n => n.
 const fresh = () => pg.evaluate(S => [...document.querySelectorAll(S)].filter(n => n.offsetParent && n.innerText.trim() && n.dataset.kzseen !== n.innerText.replace(/\s+/g, ' ').trim() && !n.querySelector('.notice,[class*="msg"]')).map(n => n.innerText.replace(/\s+/g, ' ').trim()), MSEL);
 // Knopf klicken wie ein Spieler, neue Meldung abwarten und protokollieren. pick: 'first' | 'last' | Funktion als String (el => Zahl, höchste gewinnt)
 async function click(label, sel, { within, pick = 'first', fill, wait = 5000, quiet } = {}) {
-  await mark(); const t0 = Date.now();
+  await mark(); const t0 = Date.now(); const y0 = await pg.evaluate(() => scrollY);
   if (fill) for (const [s, v] of fill) await pg.fill(s, String(v)).catch(() => {});
   const r = await pg.evaluate(([sel, within, pick, D]) => {
     let els = [...document.querySelectorAll('section.panel.active-view ' + sel + ', #kiezmodalbody ' + sel)].filter(e => e.offsetParent && !e.disabled && !e.classList.contains('hide'));
@@ -56,6 +56,11 @@ async function click(label, sel, { within, pick = 'first', fill, wait = 5000, qu
   if (r == null) { if (!quiet) log({ v: visit, typ: 'KEIN-KNOPF', label }); return null; }
   let neu = [];
   while (Date.now() - t0 < wait) { await pg.waitForTimeout(250); neu = await fresh(); if (neu.length) { await pg.waitForTimeout(300); neu = [...new Set(await fresh())]; break; } }
+  // Aussehen: verdrängt die Meldung den Karteninhalt? springt die Seite?
+  const lay = await pg.evaluate(y0 => { const out = []; document.querySelectorAll('.kz-near').forEach(n => { const c = n.parentElement, top = c.getBoundingClientRect().top;
+      if ([...c.children].some(k => k !== n && k.offsetParent && k.getBoundingClientRect().bottom < top + 2)) out.push('Meldung verdrängt Karteninhalt: ' + (c.querySelector('h3,b')?.textContent || '').trim()); });
+    if (Math.abs(scrollY - y0) > 250) out.push('Seite springt um ' + Math.round(scrollY - y0) + ' px'); return out; }, y0);
+  lay.forEach(m => log({ v: visit, typ: 'LAYOUT', label, msg: m }));
   await popups(label);
   const msg = neu.join(' | ').slice(0, 300);
   const typ = !msg ? 'KEINE-RÜCKMELDUNG' : SUSPECT.test(msg) ? 'VERDÄCHTIG' : 'OK';
