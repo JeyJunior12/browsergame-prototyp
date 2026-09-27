@@ -60,7 +60,7 @@ GitHub push ──▶ Action: Tests (Postgres) ──▶ Migration live in Supab
 
 Ziel: Es gibt fast immer etwas zu tun – auch mit wenigen Spielern. Empfohlener Start: 1, 2, 3, 5.
 
-**⭐ Vom Nutzer ausgewählt für später (27.09.2026):** 17, 19, 20, 22, 23, 24, 25, 26, 29, 30, 31, 32, 34, 37 – Kiosk-Stand, Revanche, Kopfgeld, Wetten, Kosmetik, Hunger, Sucht/Entzug, Ruf, Glücksrad, Pfandtour zu zweit, Tag/Nacht, Live-Stadtereignisse, Nebenquests, Ein-Klick-Verkaufen. Dazu aus J: 38, 39, 40 (eher selten), 43, 44, 47, 48, 49. Dazu aus K (Fahrzeuge): 53, 54 (erst später), 55, 56, 57, 59 (erst später), 60, 61, 63, 64. Dazu L (einheitliches Aussehen): 65–69. Dazu M (Wegweiser): 70–73. Dazu N (flüssiger Seitenwechsel): 74–77. Dazu O (Körperpflege): 78–85. Alle übrigen Ideen bleiben ebenfalls im Plan.
+**⭐ Vom Nutzer ausgewählt für später (27.09.2026):** 17, 19, 20, 22, 23, 24, 25, 26, 29, 30, 31, 32, 34, 37 – Kiosk-Stand, Revanche, Kopfgeld, Wetten, Kosmetik, Hunger, Sucht/Entzug, Ruf, Glücksrad, Pfandtour zu zweit, Tag/Nacht, Live-Stadtereignisse, Nebenquests, Ein-Klick-Verkaufen. Dazu aus J: 38, 39, 40 (eher selten), 43, 44, 47, 48, 49. Dazu aus K (Fahrzeuge): 53, 54 (erst später), 55, 56, 57, 59 (erst später), 60, 61, 63, 64. Dazu L (einheitliches Aussehen): 65–69. Dazu M (Wegweiser): 70–73. Dazu N (flüssiger Seitenwechsel): 74–77. Dazu O (Körperpflege): 78–85. Dazu P (Balancing Gegenstände & Preise): 86–92. Alle übrigen Ideen bleiben ebenfalls im Plan.
 
 ### Offener Fehler
 - Seite scrollt nach 10–15 s ohne Eingabe nach oben (trotz Fix in PR #27; Ursache noch nicht gefunden, Nutzer hat Suche vertagt). Vermutung: Neuzeichnen einer Seite macht sie kurz kürzer. Test-Skizze: alle Seiten 20 s warten, `scrollTo`/`scrollIntoView`/`focus` mitprotokollieren.
@@ -188,4 +188,14 @@ Ist-Stand: Sauberkeit sinkt nur durch Pfandtouren, wirkt nur aufs Schnorren (Fak
 83. Gesundheit: dauerhaft verwahrlost → Krankheit (weniger Energie), Heilung in der Apotheke ⭐
 84. Sozial: Freunde/Bande sehen die Stufe im Profil; Stadtteil Villenviertel nur ab „gepflegt“ gut nutzbar ⭐
 85. Waschen sinnvoll staffeln: mehr Möglichkeiten (Brunnen kostenlos aber langsam, Schwimmbad, Friseur für Bonus), Waschausstattung als echte Investition ⭐
+
+### P. Balancing aller Gegenstände und Preise (27.09.2026) ⭐
+Nutzerwunsch: Alles, was Werte gibt, und alle Preise im Spiel einmal durchgehen und ausgewogen machen – passend zur neuen Level-Kurve (0016: Level 150 aktiv ~1,5 Jahre).
+86. Vollständige Liste aller Dinge mit Werten: Waffen, Verteidigung/Kleidung, Zubehör, Begleiter/Tiere, Plunder, Bastelsachen, Unterkünfte, Instrumente, Bandenausbauten ⭐
+87. Für jedes Stück: Preis, Level-Anforderung, Angriff/Verteidigung/Bonus → Wert pro Euro und pro Level vergleichen; Ausreißer (zu stark/zu billig, nutzlos/zu teuer) korrigieren ⭐
+88. Klare Stufenleiter: jedes nächste Stück spürbar besser, aber teurer; keine „Pflichtkäufe“ und keine toten Gegenstände ⭐
+89. Alle Preise im Spiel prüfen: Läden, Essen/Trinken, Apotheke, Versicherung, Waschen, Weiterbildung, Umzug, Sammelgebiete, Geldbehälter, Kaution, Bande gründen/ausbauen, Kronkorken-Tausch, Basar-Gebühr, Zockerbude-Einsätze, Schließfach ⭐
+90. Einnahmen gegen Ausgaben rechnen: Wie lange spart ein normaler Spieler auf das nächste sinnvolle Ziel? Ziel: immer ein erreichbares nächstes Ziel in Stunden bis wenigen Tagen, große Ziele in Wochen ⭐
+91. Kampfbalance: Level-Bereich 80–150 %, Beute, Versicherung, Tierkämpfe und Bandenboni zusammen prüfen, damit Ausrüstung zählt, aber Level nicht egal ist ⭐
+92. Ergebnis als Tabelle festhalten (supabase/schema/data + Balancing-Notiz) und per Migration umsetzen, mit Test, der Ausreißer erkennt ⭐
 
