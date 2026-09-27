@@ -3523,3 +3523,28 @@ async function ovPet() {
 }
 { const pl = loaders.overview; loaders.overview = (...a) => { pl?.(...a); setTimeout(ovPet, 400); };
   document.addEventListener('click', e => { if (e.target.closest('#overview .profile-paper-tabs button, #overview > .section-tools span')) setTimeout(ovPet, 200); }, true); }
+
+// Lange Listen (Waffen, Kleidung, Zubehör, Tierhandlung): nur die nächsten 3 gesperrten zeigen, Rest eingeklappt (ROADMAP 171)
+{
+  const LISTS = ['#shoplist', '#petshop'];
+  const st = document.createElement('style');
+  st.textContent = 'html body:not(#kz1):not(#kz2) .kz-fold-hide{display:none !important}html body:not(#kz1):not(#kz2) .kz-fold-btn{grid-column:1/-1;justify-self:center;margin:8px auto}';
+  document.head.appendChild(st);
+  const fold = () => LISTS.forEach(sel => { const box = document.querySelector(sel); if (!box || !box.offsetParent) return;
+    // nur Karten, die der Reiter ohnehin zeigt (andere Kategorien blenden alte Skripte aus)
+    const all = [...box.children].filter(c => c.matches('.card'));
+    // nur neu rechnen, wenn sich Reiter, Liste oder Besitz geändert haben (sonst ständige Klassenwechsel → Ruckeln)
+    const sec = box.closest('section.panel'), sig = (box.dataset.kzfold || '') + '|' + (sec?.querySelector(':scope > .section-tools span.subtab-active')?.textContent || sec?.dataset.kztab || '') + '|' + all.length + '|' + all.filter(c => c.classList.contains('kz-is-owned') || c.classList.contains('kz-locked')).length + '|' + (window.kiezProfile?.level || 0);
+    if (box.dataset.kzsig === sig) return; box.dataset.kzsig = sig;
+    all.forEach(c => c.classList.remove('kz-fold-hide'));
+    const cards = all.filter(c => c.offsetParent !== null);
+    const isLocked = c => !c.classList.contains('kz-is-owned') && (c.classList.contains('kz-locked') || (![...c.querySelectorAll('button')].some(x => !x.disabled && x.offsetParent) && /Benötigt|gesperrt|ab Level|Sozialkontakte Stufe/i.test(c.textContent)));
+    const locked = cards.filter(isLocked);
+    let btn = box.querySelector(':scope > .kz-fold-btn'); const open = box.dataset.kzfold === 'open', hide = open ? [] : locked.slice(3);
+    cards.forEach(c => c.classList.toggle('kz-fold-hide', hide.includes(c)));
+    if (locked.length <= 3) { btn?.remove(); return; }
+    if (!btn) { btn = document.createElement('button'); btn.className = 'ghost kz-fold-btn'; btn.onclick = () => { box.dataset.kzfold = box.dataset.kzfold === 'open' ? '' : 'open'; delete box.dataset.kzsig; fold(); }; }
+    const last = open ? locked[locked.length - 1] : locked[2]; if (btn.previousElementSibling !== last) last.after(btn);
+    setLabel(btn, open ? 'Gesperrte wieder einklappen' : 'Alle ' + locked.length + ' gesperrten zeigen (' + (locked.length - 3) + ' weitere)'); });
+  setInterval(fold, 1500); const prev = window.kiezShowView; window.kiezShowView = (...a) => { const r = prev?.(...a); setTimeout(fold, 400); return r; };
+}
