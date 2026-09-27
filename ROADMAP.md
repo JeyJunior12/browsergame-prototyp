@@ -62,13 +62,13 @@ Ziel: Es gibt fast immer etwas zu tun – auch mit wenigen Spielern. Empfohlener
 
 ### 🥇 PLATZ 1 – Chat-Leiste unten rechts (wie Facebook) (27.09.2026) ⭐
 Nutzerwunsch, höchste Priorität: ein ALL-Chat als kleine Leiste unten rechts, auf jeder Seite, die man auf- und zuklappen kann; jeder Spieler kann reinschreiben. Privatnachrichten dort mit einbinden.
-128. Leiste unten rechts auf allen Seiten: eingeklappt nur ein Balken „Kiez-Chat“ mit Zähler ungelesener Nachrichten; aufgeklappt Fenster mit Verlauf und Eingabe; Zustand (auf/zu) bleibt beim Seitenwechsel erhalten ⭐
-129. Reiter in der Leiste: „Alle“ (ALL-Chat, nutzt `chat_messages` aus 0015) und je ein Reiter/Fenster pro Privatgespräch; Klick auf einen Spielernamen öffnet ein Privatfenster ⭐
-130. Privatnachrichten aus der Kiezpost dort als Gespräche (Verlauf wie Messenger); neue Nachrichten poppen als kleines Fenster auf und zählen im Balken ⭐
-131. Live-Gefühl: neue Nachrichten ohne Neuladen (Supabase Realtime oder kurzes Abfragen), „schreibt gerade“ optional, Uhrzeit, Spielernamen klickbar zum Profil ⭐
-132. Handy: Leiste als runder Knopf unten rechts, öffnet Vollbild-Chat; darf keine Knöpfe der Seite verdecken ⭐
-133. Schutz: Sperre gegen Spam (bestehende 5 s), Blockierte ausblenden, Melden-Knopf, Admin/eigene Nachrichten löschen, Wortfilter für grobe Beleidigungen ⭐
-134. Die bisherige Seite „Kiez-Chat“ bleibt als große Ansicht bzw. wird durch die Leiste ersetzt ⭐
+128. ✅ Leiste unten rechts auf allen Seiten: eingeklappt nur ein Balken „Kiez-Chat“ mit Zähler ungelesener Nachrichten; aufgeklappt Fenster mit Verlauf und Eingabe; Zustand (auf/zu) bleibt beim Seitenwechsel erhalten ⭐
+129. ✅ Reiter in der Leiste: „Alle“ (ALL-Chat, nutzt `chat_messages` aus 0015) und je ein Reiter/Fenster pro Privatgespräch; Klick auf einen Spielernamen öffnet ein Privatfenster ⭐
+130. ✅ Privatnachrichten aus der Kiezpost dort als Gespräche (Verlauf wie Messenger); neue Nachrichten poppen als kleines Fenster auf und zählen im Balken ⭐
+131. ✅ Live-Gefühl: neue Nachrichten ohne Neuladen (Supabase Realtime oder kurzes Abfragen), „schreibt gerade“ optional, Uhrzeit, Spielernamen klickbar zum Profil ⭐
+132. ✅ Handy: Leiste als runder Knopf unten rechts, öffnet Vollbild-Chat; darf keine Knöpfe der Seite verdecken ⭐
+133. ✅ Schutz: Sperre gegen Spam (bestehende 5 s), Blockierte ausblenden, Melden-Knopf, Admin/eigene Nachrichten löschen, Wortfilter für grobe Beleidigungen ⭐
+134. ✅ Die bisherige Seite „Kiez-Chat“ bleibt als große Ansicht bzw. wird durch die Leiste ersetzt ⭐
 
 
 **⭐ Vom Nutzer ausgewählt für später (27.09.2026):** 17, 19, 20, 22, 23, 24, 25, 26, 29, 30, 31, 32, 34, 37 – Kiosk-Stand, Revanche, Kopfgeld, Wetten, Kosmetik, Hunger, Sucht/Entzug, Ruf, Glücksrad, Pfandtour zu zweit, Tag/Nacht, Live-Stadtereignisse, Nebenquests, Ein-Klick-Verkaufen. Dazu aus J: 38, 39, 40 (eher selten), 43, 44, 47, 48, 49. Dazu aus K (Fahrzeuge): 53, 54 (erst später), 55, 56, 57, 59 (erst später), 60, 61, 63, 64. Dazu L (einheitliches Aussehen): 65–69. Dazu M (Wegweiser): 70–73. Dazu N (flüssiger Seitenwechsel): 74–77. Dazu O (Körperpflege): 78–85. Dazu P (Balancing Gegenstände & Preise): 86–92. Dazu Q (Bandensystem): 93–104. Dazu R (Fehler Waffen kaufen/anlegen, hohe Priorität): 105–109. Dazu S (Plunderkiste): 111–120. Dazu T (Stadtteile sperren, später Städte): 121–124. Dazu U (Kiezpost-Empfänger): 125–127. Dazu V (Schnorrplätze-Seite): 135–140. Alle übrigen Ideen bleiben ebenfalls im Plan. **Zum Schluss:** Gesamtprüfung + Durchspiel-Test Level 1–150 (141–146).
@@ -171,12 +171,12 @@ Nutzerwunsch: Ungleichheiten auf allen Seiten richtig machen. Beispiel: Karte �
 68. Gleiche Abstände, Schriftgrößen und Farben für Überschriften, Werte und Hinweise auf allen Seiten ⭐
 69. Prüfskript, das alle Seiten durchgeht und Abweichungen meldet (Karte ohne Bild, Emoji im Titel, ungleiche Knopfhöhen) ⭐
 69a. Nichts darf sich überlappen oder schief stehen: Beispiel Gegnerliste (Prügelei) – „Angreifen“ ragt über das Foto, „Tierkampf“/„Melden“ kleben darunter. Knöpfe einer Karte in einer sauberen Reihe mit Abstand, auf PC und Handy; Prüfskript meldet überlappende Elemente ⭐
-69b. Meldungsfenster beim Knopf (grün/rot, seit PR #26) sieht schlecht aus: Beispiel Weiterbildung „Angriff“ – Meldung steckt als schmale Spalte unten links in der Karte, Text bricht Wort für Wort um. Stattdessen volle Kartenbreite (oder direkt unter dem Knopf), gleiches Aussehen wie andere Hinweise, gut lesbar ⭐
+69b. ✅ Meldungsfenster beim Knopf (grün/rot, seit PR #26) sieht schlecht aus: Beispiel Weiterbildung „Angriff“ – Meldung steckt als schmale Spalte unten links in der Karte, Text bricht Wort für Wort um. Stattdessen volle Kartenbreite (oder direkt unter dem Knopf), gleiches Aussehen wie andere Hinweise, gut lesbar ⭐
 69c. Gleiche Karte prüfen: Titel „Angriff 3“, darunter „Aktuelle Stufe: 1“ – widersprüchliche Stufenangabe klären ⭐
 69d. Reiter „Lernwarteschlange“ (Weiterbildung) zeigt dieselbe Seite wie „Fähigkeiten“ – eigener Inhalt nötig: laufende Weiterbildung mit Restzeit, geplante Stufen in Reihenfolge, Abbrechen/Abschließen. Allgemein prüfen: jeder Reiter muss etwas anderes zeigen als seine Nachbarn ⭐
-69e. Meldungen verschwinden zu schnell: Beispiel Laden → Angebot „Regenschirm“ kaufen – grünes „Gekauft“ ist nach ~1 Sek. weg (Karte wird neu gezeichnet), nicht lesbar. Meldungen müssen mindestens ~6–8 Sek. stehen bleiben (auch wenn die Karte neu gezeichnet wird) oder bis zum nächsten Klick; überall prüfen ⭐
-69f. Abmelden-Knopf im Spielerkasten oben rechts steht nicht mittig – sauber ausrichten (zentriert bzw. bündig mit dem Kasten), auf PC und Handy ⭐
-69g. Meldung landet bei der falschen Karte: Beispiel Schnorrplätze – „Hingehen“ am Englischen Garten gedrückt, während der Timer läuft woanders geklickt (Altglas-Gasse „Freischalten“) → Ergebnis „+0,71 € von 7 Spenden kassiert“ erscheint bei der Altglas-Gasse. Jede Meldung gehört zu der Aktion, die sie ausgelöst hat (auch bei Timern/zeitversetzten Ergebnissen); Zuordnung pro Aktion statt „zuletzt geklickt“ ⭐
+69e. ✅ Meldungen verschwinden zu schnell: Beispiel Laden → Angebot „Regenschirm“ kaufen – grünes „Gekauft“ ist nach ~1 Sek. weg (Karte wird neu gezeichnet), nicht lesbar. Meldungen müssen mindestens ~6–8 Sek. stehen bleiben (auch wenn die Karte neu gezeichnet wird) oder bis zum nächsten Klick; überall prüfen ⭐
+69f. ✅ Abmelden-Knopf im Spielerkasten oben rechts steht nicht mittig – sauber ausrichten (zentriert bzw. bündig mit dem Kasten), auf PC und Handy ⭐
+69g. ✅ Meldung landet bei der falschen Karte: Beispiel Schnorrplätze – „Hingehen“ am Englischen Garten gedrückt, während der Timer läuft woanders geklickt (Altglas-Gasse „Freischalten“) → Ergebnis „+0,71 € von 7 Spenden kassiert“ erscheint bei der Altglas-Gasse. Jede Meldung gehört zu der Aktion, die sie ausgelöst hat (auch bei Timern/zeitversetzten Ergebnissen); Zuordnung pro Aktion statt „zuletzt geklickt“ ⭐
 
 ### M. Wegweiser: Klick führt genau dorthin (27.09.2026) ⭐
 Nutzerwunsch: Wer oben auf einen Wert klickt, muss direkt bei der passenden Stelle landen. Beispiel: Klick auf „Pfandlager“ in der Kopfleiste öffnet die Plunderkiste, der Pfand-Bereich (Flaschen verkaufen) kommt erst weiter unten – komplett falsch.
@@ -262,9 +262,9 @@ Nutzerwunsch: Die Stadtteile (Runde 6, 0015 – sind zurzeit live) bleiben vorer
 
 ### U. Kiezpost: Empfänger richtig auswählen (27.09.2026) ⭐
 Gemeldet: „Nachricht schreiben“ hat eine Auswahlliste mit allen Spielern (sogar dem eigenen Namen). Das skaliert nicht und ist unpraktisch.
-125. Auswahlliste nur mit Freunden (und Bandenmitgliedern), eigener Name nie ⭐
-126. Zusätzlich Namensfeld: Spielernamen eintippen, Vorschläge beim Tippen, Prüfung ob der Spieler existiert/einen blockiert hat ⭐
-127. Von überall schreiben: auf Profilen, in Gegnerliste, Chat und Rangliste ein „Nachricht“-Knopf, der den Empfänger vorausfüllt ⭐
+125. ✅ Auswahlliste nur mit Freunden (und Bandenmitgliedern), eigener Name nie ⭐
+126. ✅ Zusätzlich Namensfeld: Spielernamen eintippen, Vorschläge beim Tippen, Prüfung ob der Spieler existiert/einen blockiert hat ⭐
+127. ✅ Von überall schreiben: auf Profilen, in Gegnerliste, Chat und Rangliste ein „Nachricht“-Knopf, der den Empfänger vorausfüllt ⭐
 
 ### V. Seite „Schnorrplätze“ neu gestalten (27.09.2026) ⭐
 Nutzer: Die Seite ist noch nicht toll. Zurzeit stehen zwei ähnliche Dinge untereinander – Sammelgebiete (Bahnhofs-Hinterhof, Altglas-Gasse …, fürs Pfand) und Schnorrplätze (Englischer Garten, Hauptbahnhof …, fürs Schnorren) – das verwirrt, dazu lange Texte, Emojis (💰), Meldungen erst nach Klick.

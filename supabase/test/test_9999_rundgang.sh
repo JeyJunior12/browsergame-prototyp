@@ -89,6 +89,14 @@ call $A "select delete_chat((select max(id) from chat_messages))"
 call $A "select set_title((select achievement_id from user_achievements where user_id='$A' limit 1))"
 call $A "select set_title(null)"
 call $A "select fight_history()"
+# Chat-Leiste (0017)
+call $A "select send_player_message('$B','Rundgang privat')"
+call $A "select chat_conversations()"
+call $A "select chat_thread('$B')"
+call $A "select find_players('Rund')"
+call $A "select find_players('')"
+call $B "select post_chat('Rundgang Chat')"
+call $A "select report_chat((select max(id) from chat_messages))"
 # Anonym
 N=$((N+1)); out=$($P -tAc "set request.headers='{\"cf-connecting-ip\":\"7.7.7.7\"}'; select donate_link('Rundgang_A')" 2>&1)
 echo "$out" | grep -Eiq "$BAD" && { echo "FAIL anonyme Spende → $out"; FAILED=1; } || echo "OK   anonyme Spende"
