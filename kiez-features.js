@@ -3496,3 +3496,22 @@ function crimeLocks() {
     if (pad > 0 && pad < b.width - 200) bar.style.setProperty('--kz-qb-pad', pad + 'px'); }); };
   addEventListener('resize', fixQB); setInterval(fixQB, 2000); const prev = window.kiezShowView; window.kiezShowView = (...a) => { const r = prev?.(...a); setTimeout(fixQB, 60); setTimeout(fixQB, 500); return r; }; setTimeout(fixQB, 800);
 }
+
+// Übersicht › Haustier: war leer, seit die Tierliste wieder auf der Begleiter-Seite steht (ROADMAP 158) → Karte des aktiven Begleiters
+async function ovPet() {
+  const wrap = document.querySelector('#overview .overview-pet-wrap'), p = window.kiezProfile; if (!wrap || !p) return;
+  let box = wrap.querySelector('.kz-ovpet'); if (!box) { box = document.createElement('div'); box.className = 'kz-ovpet'; wrap.appendChild(box); }
+  const { data } = await sb.from('user_pets').select('pet_id,active,level,attack_level,defense_level,mitleid_level,training_ends_at').eq('user_id', p.id);
+  const cat = (await sb.from('pet_catalog').select('id,name,description,attack,defense,health').in('id', (data || []).map(x => x.pet_id).concat(['-']))).data || [];
+  const byId = Object.fromEntries(cat.map(c => [c.id, c])), act = (data || []).find(x => x.active), n = (data || []).length;
+  const btns = '<div class="kf-row"><a href="#" class="kz-hint kf-btnlink" data-v="pets" data-t="Meine Begleiter">Deine Begleiter (' + n + ') ›</a> <a href="#" class="kz-hint kf-btnlink" data-v="pets" data-t="Tierhandlung">Zur Tierhandlung ›</a></div>';
+  let h;
+  if (!act) h = '<p>' + (n ? 'Du hast ' + n + ' Begleiter, aber keiner läuft gerade mit. Nimm einen mit – das bringt Kampfkraft und Mitleid beim Schnorren.' : 'Noch keiner folgt dir. In der Tierhandlung gibt es schon eine Kakerlake für 1 Cent.') + '</p>' + btns;
+  else { const c = byId[act.pet_id] || { name: act.pet_id }, tr = act.training_ends_at && new Date(act.training_ends_at) > new Date();
+    h = '<div class="card kz-ovpet-card"><b>' + esc(c.name) + '</b><p class="kf-muted">Stufe ' + (act.level || 1) + '</p><p class="kf-muted">' + esc(c.description || '') + '</p>'
+      + '<p>Angriff-Training ' + (act.attack_level || 1) + ' · Verteidigung-Training ' + (act.defense_level || 1) + ' · Mitleid-Training ' + (act.mitleid_level || 1) + '</p>'
+      + '<p>' + (tr ? 'Im Training bis ' + new Date(act.training_ends_at).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) + ' Uhr.' : 'Gerade kein Training – bei „Deine Begleiter“ kannst du eins starten.') + '</p></div>' + btns; }
+  if (box.innerHTML !== h) box.innerHTML = h;
+}
+{ const pl = loaders.overview; loaders.overview = (...a) => { pl?.(...a); setTimeout(ovPet, 400); };
+  document.addEventListener('click', e => { if (e.target.closest('#overview .profile-paper-tabs button, #overview > .section-tools span')) setTimeout(ovPet, 200); }, true); }
