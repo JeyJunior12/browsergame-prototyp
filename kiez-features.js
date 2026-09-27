@@ -3209,6 +3209,10 @@ html body:not(#kz1):not(#kz2) #income[data-kztab="Instrumente"] > .inside > .car
       else return;
       hideEl(c, !on);
     });
+    // Zubehör-Laden zeigte zusätzlich alle Waffen und Kleidung (~10.000 px Seite, ROADMAP 170) → nur Zubehör und Plunder
+    ins.querySelectorAll('#shoplist > .card').forEach(cd => { const id = cd.querySelector('[data-id]')?.dataset.id, cat = OWN.cat?.[id]?.category;
+      const off = tab === 'Zubehör' && !!cat && !['zubehoer', 'plunder'].includes(cat);
+      if (off) { cd.dataset.kzzub = '1'; hideEl(cd, true); } else if (cd.dataset.kzzub) { delete cd.dataset.kzzub; hideEl(cd, false); } });
   };
   tools?.addEventListener('click', e => { if (e.target.closest('span')) setTimeout(fixStore, 120); });
   const prevS = loaders.store; loaders.store = () => { prevS?.(); setTimeout(fixStore, 300); }; setTimeout(fixStore, 1500);
