@@ -62,6 +62,8 @@
     ['#bandenhaus', /^Kein Bandenhaus/, 'bande-gruenden'], ['#bandenhaus', /^Krieg:|^Euer Überfall|^Überfall von/, 'bande-krieg'],
     ['#begging', /^Dein Zustand/, 'pflege-katzenwaesche'], ['#apotheke', /^Krankheit/, 'stadt-apotheke'],
     ['#plunder', /^Angelegt/, 'lager-inventar'], ['#plunder', /^Sammlung/, 'kk-plunderkiste'],
+    ['#overview', /^Gerade im Kiez/, 'mission-heute'], ['#missions', /^Heute: 3 Aufgaben/, 'mission-heute'], ['#einstellungen', /^Hinweise/, 'post-fach'],
+    ['#ausruestung', /^Angelegt/, 'lager-inventar'], ['#ausruestung', /^Deine Kampfwerte/, 'kampf-staerke'],
     ['#plunder', /^Bauarbeiter/, 'plunder-bauhelm'], ['#plunder', /^Kiezadel/, 'plunder-kiezzepter'], ['#plunder', /^Taubenkönig/, 'plunder-taubenpfeife'],
     ['#plunder', /^Pfandjäger/, 'plunder-goldene_dose'], ['#plunder', /^Straßenkämpfer/, 'plunder-fahrradkette'],
     ['#stadtteile', /^Bahnhofsviertel/, 'gebiet-bahnhof'], ['#stadtteile', /^Altstadt/, 'gebiet-touristen'], ['#stadtteile', /^Hafen/, 'heim-kran'],
@@ -154,7 +156,23 @@
       ['Hausziege', 'tier-ziege'], ['Pudel', 'tier-pudel'], ['Dressierte Maus', 'tier-dressierte-maus'], ['Adler', 'tier-adler'],
       ['Schaeferhund', 'tier-schaeferhund'], ['Pitbull', 'tier-pitbull'], ['Cocker Spaniel', 'tier-cocker'], ['Chihuahua', 'tier-chihuahua'],
       ['Pferd', 'tier-pferd'], ['Giraffe', 'tier-giraffe'], ['Krokodil', 'tier-krokodil'], ['Tiger', 'tier-tiger'],
-      ['Aeffchen', 'tier-affe'], ['Nashorn', 'tier-nashorn'], ['Taubenpfeife', 'plunder-taubenpfeife'],
+      ['Aeffchen', 'tier-affe'], ['Nashorn', 'tier-nashorn'],
+      // S18: neue Stücke bis Level 150 (Fotos in bilder2.py, bis dahin Ersatzbild)
+      ...[['Brechstange', 'waffe-brechstange'], ['Baseballschläger', 'waffe-baseballschlaeger'], ['Vorschlaghammer', 'waffe-vorschlaghammer'],
+        ['Kettensäge ohne Kette', 'waffe-kettensaege'], ['Stuhlbein-Nunchakus', 'waffe-nunchakus'], ['Eishockeyschläger', 'waffe-hockeyschlaeger'],
+        ['Einkaufswagen-Rammbock', 'waffe-rammbock'], ['Laubbläser-Kanone', 'waffe-laubblaeser'], ['Streusalz-Schleuder', 'waffe-salzschleuder'],
+        ['Gabelstaplergabel', 'waffe-gabel'], ['Mini-Abrissbirne', 'waffe-abrissbirne'], ['Feuerwehraxt', 'waffe-feuerwehraxt'],
+        ['Stählernes Kiezkönig-Zepter', 'waffe-zepter']].map(([n, f]) => ['body', new RegExp('^' + n + '$'), f + '|stadt-waffenladen']),
+      ...[['Flohmarkt-Lederjacke', 'kleidung-lederjacke'], ['Motorradkombi', 'kleidung-motorradkombi'], ['Alte Feuerwehrjacke', 'kleidung-feuerwehrjacke'],
+        ['Gebrauchte Schutzweste', 'kleidung-schutzweste'], ['Bundeswehr-Parka', 'kleidung-parka'], ['Chemieschutzanzug', 'kleidung-chemieschutz'],
+        ['Stichschutzweste', 'kleidung-stichschutz'], ['Verstärkter Imkeranzug', 'kleidung-imkeranzug'], ['Ausgemusterter Kampfmittelanzug', 'kleidung-kampfmittelanzug'],
+        ['Ritterrüstung aus dem Theaterfundus', 'kleidung-ritterruestung'], ['Kiez-Panzermantel', 'kleidung-panzermantel']].map(([n, f]) => ['body', new RegExp('^' + n + '$'), f + '|laden-wintermantel']),
+      ...[['Nachtsichtgerät', 'zubehoer-nachtsicht'], ['Sperrmüll-Drohne', 'zubehoer-drohne'], ['Akku-Stirnlampe', 'zubehoer-stirnlampe'],
+        ['Wärmebildkamera', 'zubehoer-waermebild'], ['Motorisierte Sackkarre', 'zubehoer-sackkarre'], ['Ghettoblaster mit Bass', 'zubehoer-ghettoblaster'],
+        ['Kiez-Funknetz', 'zubehoer-funknetz'], ['Stahl-Lastenanhänger', 'zubehoer-anhaenger'], ['Notstromaggregat', 'zubehoer-generator'],
+        ['Selbstgebaute Alarmanlage', 'zubehoer-alarmanlage'], ['Siegelring des Kiezkönigs', 'zubehoer-siegelring']].map(([n, f]) => ['body', new RegExp('^' + n + '$'), f + '|stadt-zubehoer']),
+      ...[['Wolf', 'tier-wolf|heim-wolfsrudel'], ['Bär', 'tier-baer'], ['Löwe', 'tier-loewe'], ['Gorilla', 'tier-gorilla'], ['Elefant', 'tier-elefant']]
+        .map(([n, f]) => ['body', new RegExp('^' + n + '$'), f.includes('|') ? f : f + '|stadt-tierhandlung']), ['Taubenpfeife', 'plunder-taubenpfeife'],
       // Unterkünfte
       ['Bürgersteig', 'heim-buergersteig'], ['Parkbank', 'heim-parkbank'], ['Pennerbox', 'heim-pennerbox'], ['Brunnen', 'heim-brunnen'],
       ['Brücke', 'heim-bruecke'], ['Katakomben', 'heim-katakomben'], ['Elbstrand', 'heim-elbstrand'], ['Baumhaus', 'heim-baumhaus'],
@@ -190,10 +208,11 @@
   ];
   // Basar: dieselben Plunder-Fotos wie in der Plunderkiste
   R.push(...R.filter(r => r[0] === '#plunder' && r[2].startsWith('plunder-')).map(r => ['#basar', r[1], r[2]]));
+  R.push(...R.filter(r => r[0] === '#store').map(r => ['#ausruestung', r[1], r[2]]));
   // Vorschaubilder, die das Foto über --kzbild bekommen (Rest wird als .kz-pic ergänzt)
   const THUMB = ':scope>.generated-item-thumb, :scope>.asset-thumb, :scope .skill-portrait, :scope .city-hub-img, :scope>.pharmacy-thumb';
   // Seitenköpfe je Bereich
-  const SZENE = { stadtteile: 'szene-bande', bandenhaus: 'szene-bande', basar: 'szene-laden', zockerbude: 'szene-stadt', schliessfach: 'szene-unterkunft', geschichte: 'szene-auftrag',
+  const SZENE = { stadtteile: 'szene-bande', bandenhaus: 'szene-bande', ausruestung: 'szene-laden', basar: 'szene-laden', zockerbude: 'szene-stadt', schliessfach: 'szene-unterkunft', geschichte: 'szene-auftrag',
     chat: 'szene-post', kampfprotokoll: 'szene-pruegelei', pfand: 'szene-pfand', begging: 'szene-schnorren', income: 'szene-stadt', gear: 'szene-unterkunft', training: 'szene-training',
     messages: 'szene-post', gangs: 'szene-bande', missions: 'szene-auftrag', pets: 'szene-tiere', achievements: 'szene-erfolge',
     pvp: 'szene-pruegelei', store: 'szene-laden', leaderboard: 'szene-rangliste', career: 'szene-karriere' };
@@ -250,7 +269,10 @@
     for (const [scope, re, file] of R) {
       document.querySelectorAll(scope === 'body' ? CARD : scope[0] === '=' ? scope.slice(1) : CARD.split(',').map(c => scope + ' ' + c.trim()).join(',')).forEach(card => {
         const t = titleOf(card);
-        if (re.test(text(t)) && exists(file)) apply(card, file, t);
+        if (!re.test(text(t))) return;
+        // 'neu|ersatz': neues Foto, solange es noch fehlt das Ersatzbild
+        const f = file.split('|').find(exists);
+        if (f) apply(card, f, t);
       });
     }
     // Sammelgebiete (Stadt & Einkommen → Schnorrplätze)

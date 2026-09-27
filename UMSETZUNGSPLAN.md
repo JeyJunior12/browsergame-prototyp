@@ -63,15 +63,15 @@ Innerhalb eines Sprints wird nach Nummer gearbeitet.
 | **S7** ✅ live | Körperpflege mit Sinn, Hunger, Sucht/Entzug | 78–85, 24, 25 | Game Designer, Backend |
 | **S8** ✅ live | Banden I: Level, Bandenhaus, Wochenaufgaben, Kriege, Überfall, Bündnisse | 93–98, 11 | Game Designer, Backend, Frontend |
 | **S9** ✅ live | Banden II: Forum, Profil/Wappen, Rechte, Mitglieder, Boss, Saison, Anstupsen | 99–104, 12, 51 | Game Designer, Backend, Frontend |
-| **S10** | Immer etwas zu tun I: Computer-Gegner/Kiezboss, Tagesaufgaben, Tour-Ereignisse, Mülltonne, kurze Touren, Chancen, Strähne, Blitzaufträge, Sortierspiel, Leiste „Als Nächstes“ | 1, 2, 3, 38–44 | Game Designer, Backend, Frontend |
-| **S11** | Wiederkommen: Benachrichtigungen, Ticker, App, Tab-Titel, Login-Serie, Kiez-Zeiten, Pfand verdirbt, E-Mail, Ein-Klick, Tutorial | 5, 35, 37, 45–50, 52 | Frontend, Backend, Security |
+| **S10** ✅ live | Immer etwas zu tun I: Computer-Gegner/Kiezboss, Tagesaufgaben, Tour-Ereignisse, Mülltonne, kurze Touren, Chancen, Strähne, Blitzaufträge, Sortierspiel, Leiste „Als Nächstes“ | 1, 2, 3, 38–44 | Game Designer, Backend, Frontend |
+| **S11** ✅ live | Wiederkommen: Benachrichtigungen, Ticker, App, Tab-Titel, Login-Serie, Kiez-Zeiten, Pfand verdirbt, E-Mail, Ein-Klick, Tutorial | 5, 35, 37, 45–50, 52 | Frontend, Backend, Security |
 | **S12** | Wirtschaft & Kampf: Pfand-Lager, Auktion, Kiosk, Kredithai, Revanche, Kopfgeld, Turnier, Wetten, Basar Waffen, Nebenjobs | 4, 13, 15–22 | Economy Designer, Backend, Frontend |
 | **S13** | Charakter, Sozial, Welt: Kosmetik, Ruf, Mentor, Geschenke, Glücksrad, zu zweit, Tag/Nacht, Live-Ereignisse, Razzien, Nebenquests | 23, 26–34 | Game Designer, Backend, Frontend |
 | **S14** | Langzeit: Sammelalbum, Kiez-Saison, Saison-Events, Neustart ab 150, Ranglisten, Statistik | 6–9, 14, 36 | Game Designer, Frontend |
 | **S15** | Fahrzeuge I: Pfandtour, Führerschein (spät), Sprit/Pannen, Tuning, Schrottplatz, Stadtteil-Fahrten, Anzeige | 53–57, 63, 64 | Game Designer, Economy, Backend |
 | **S16** | Fahrzeuge II: Wohnmobil, Fahrer-Jobs (spät), Rennen, Diebstahl, Bandenfahrzeug | 58–62 | Game Designer, Backend, Frontend |
 | **S17** | Städte-Grundlage (gesperrt bis genug Spieler) | 10, 123, 124 | Backend Architect |
-| **S18** | Balancing aller Gegenstände und Preise | 86–92 | Economy Designer |
+| **S18** ✅ | Balancing aller Gegenstände und Preise (0032, supabase/schema/data/BALANCING.md) | 86–92 | Economy Designer |
 | **S19** | Schlussprüfung + Durchspiel-Test Level 1–150 | 141–146 | Reality Checker, Evidence, Economy |
 
 Bilder: Neue Seiten nutzen vorhandene Fotos; fehlende Motive kommen in `bilder-neu/BILDERLISTE.md` für die PC-Sitzung (Forge).

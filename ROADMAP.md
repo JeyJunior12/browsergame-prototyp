@@ -77,11 +77,11 @@ Nutzerwunsch, höchste Priorität: ein ALL-Chat als kleine Leiste unten rechts, 
 - ✅ Seite scrollt nach 10–15 s ohne Eingabe nach oben – Ursache: `load()` (alle 60 s und nach Aktionen) rief `showView(currentView)` auf; passte die offene Seite nicht genau zu `currentView`, scrollte sie hoch. Behoben in S3 (Neuladen scrollt nie), Test `test/browser/leerlauf.js`.
 
 ### A. Immer etwas zu tun
-1. Computer-Gegner in jedem Level-Bereich + wöchentlicher Kiezboss (alle prügeln gemeinsam, Beute für alle)
-2. Täglich 3 wechselnde Aufgaben + Wochenaufgaben
-3. Ereignisse auf der Pfandtour mit Entscheidung (Hund, Polizei, voller Container …)
+1. ✅ Computer-Gegner in jedem Level-Bereich + wöchentlicher Kiezboss (alle prügeln gemeinsam, Beute für alle)
+2. ✅ Täglich 3 wechselnde Aufgaben + Wochenaufgaben
+3. ✅ Ereignisse auf der Pfandtour mit Entscheidung (Hund, Polizei, voller Container …)
 4. Nebenjobs mit Laufzeit parallel zur Pfandtour
-5. Browser-Hinweis, wenn Tour/Weiterbildung/Energie fertig (Push, als App installierbar)
+5. ✅ Browser-Hinweis, wenn Tour/Weiterbildung/Energie fertig (Push, als App installierbar)
 
 ### B. Langfristige Ziele
 6. Sammelalbum: Plunder-Sets mit Dauerbonus
@@ -127,26 +127,26 @@ Nutzerwunsch, höchste Priorität: ein ALL-Chat als kleine Leiste unten rechts, 
 34. Nebenquests von Kiez-Figuren (mehrteilig, neben der Kiez-Geschichte) ⭐
 
 ### I. Komfort
-35. Einsteiger-Tutorial Schritt für Schritt
+35. ✅ Einsteiger-Tutorial Schritt für Schritt
 36. Statistikseite mit Verlaufskurven (Punkte, Geld, Flaschen)
-37. Schnellaktionen: „Alles verkaufen & neue Tour starten“ mit einem Klick ⭐
+37. ✅ Schnellaktionen: „Alles verkaufen & neue Tour starten“ mit einem Klick ⭐
 
 ### J. Alle 3–5 Minuten etwas tun & wiederkommen (27.09.2026)
-38. Mülltonne durchwühlen alle 3 Min. (Flaschen, Kronkorken, Kleingeld, selten Plunder, manchmal Rattenbiss) ⭐
-39. Kurze Pfandtouren 3 und 5 Min. (pro Minute so ergiebig wie 10 Min.) ⭐
-40. Plötzliche Chancen auf der Seite („Tourist verliert 2 € – 15 Sek. zum Aufheben“) – **eher selten** ⭐
-41. Glückssträhne: Bonus, wenn man innerhalb von 5 Min. weiterspielt
-42. Blitzaufträge alle 5 Min.
-43. Flaschen-Sortierspiel (30 Sek., Bonus-Pfand) ⭐
-44. Leiste „Als Nächstes“ mit Countdowns und Ein-Klick-Aktionen ⭐
-45. Live-Ticker „Gerade im Kiez“
-46. Handy-Benachrichtigungen (als App installierbar)
-47. Tab-Titel blinkt („(1) Tour fertig!“) ⭐
-48. Login-Serie mit steigenden Belohnungen + Serien-Schutz ⭐
-49. Feste Kiez-Zeiten (z. B. 19–20 Uhr Happy Hour, 22 Uhr Razzia) ⭐
-50. Liegengelassenes Pfand verdirbt / wird geklaut
+38. ✅ Mülltonne durchwühlen alle 3 Min. (Flaschen, Kronkorken, Kleingeld, selten Plunder, manchmal Rattenbiss) ⭐
+39. ✅ Kurze Pfandtouren 3 und 5 Min. (pro Minute so ergiebig wie 10 Min.) ⭐
+40. ✅ Plötzliche Chancen auf der Seite („Tourist verliert 2 € – 15 Sek. zum Aufheben“) – **eher selten** ⭐
+41. ✅ Glückssträhne: Bonus, wenn man innerhalb von 5 Min. weiterspielt
+42. ✅ Blitzaufträge alle 5 Min.
+43. ✅ Flaschen-Sortierspiel (30 Sek., Bonus-Pfand) ⭐
+44. ✅ Leiste „Als Nächstes“ mit Countdowns und Ein-Klick-Aktionen ⭐
+45. ✅ Live-Ticker „Gerade im Kiez“
+46. ✅ Handy-Benachrichtigungen (als App installierbar; Hinweise solange der Browser offen ist – echte Push ohne offenen Browser braucht einen Push-Dienst)
+47. ✅ Tab-Titel blinkt („(1) Tour fertig!“) ⭐
+48. ✅ Login-Serie mit steigenden Belohnungen + Serien-Schutz ⭐
+49. ✅ Feste Kiez-Zeiten (z. B. 19–20 Uhr Happy Hour, 22 Uhr Razzia) ⭐
+50. ✅ Liegengelassenes Pfand verdirbt / wird geklaut
 51. ✅ Bande kann dich anstupsen, Bandenziel braucht dich
-52. Optionale E-Mail „Während du weg warst …“
+52. ✅ Optionale E-Mail „Während du weg warst …“ (im Spiel als Zusammenfassung beim Wiederkommen + Einstellung zum Abonnieren; echter Mailversand braucht einen Mailserver – vorbereitet)
 
 ### K. Fahrzeuge (27.09.2026)
 Aufstieg: Einkaufswagen → Bollerwagen → Fahrrad mit Anhänger → Lastenrad → Mofa → rostiger Kombi → Transporter → Wohnmobil. Am Anfang ist man ein echter Penner – Motorfahrzeuge erst deutlich später.
@@ -206,13 +206,13 @@ Ist-Stand: Sauberkeit sinkt nur durch Pfandtouren, wirkt nur aufs Schnorren (Fak
 
 ### P. Balancing aller Gegenstände und Preise (27.09.2026) ⭐
 Nutzerwunsch: Alles, was Werte gibt, und alle Preise im Spiel einmal durchgehen und ausgewogen machen – passend zur neuen Level-Kurve (0016: Level 150 aktiv ~1,5 Jahre).
-86. Vollständige Liste aller Dinge mit Werten: Waffen, Verteidigung/Kleidung, Zubehör, Begleiter/Tiere, Plunder, Bastelsachen, Unterkünfte, Instrumente, Bandenausbauten ⭐
-87. Für jedes Stück: Preis, Level-Anforderung, Angriff/Verteidigung/Bonus → Wert pro Euro und pro Level vergleichen; Ausreißer (zu stark/zu billig, nutzlos/zu teuer) korrigieren ⭐
-88. Klare Stufenleiter: jedes nächste Stück spürbar besser, aber teurer; keine „Pflichtkäufe“ und keine toten Gegenstände ⭐
-89. Alle Preise im Spiel prüfen: Läden, Essen/Trinken, Apotheke, Versicherung, Waschen, Weiterbildung, Umzug, Sammelgebiete, Geldbehälter, Kaution, Bande gründen/ausbauen, Kronkorken-Tausch, Basar-Gebühr, Zockerbude-Einsätze, Schließfach ⭐
-90. Einnahmen gegen Ausgaben rechnen: Wie lange spart ein normaler Spieler auf das nächste sinnvolle Ziel? Ziel: immer ein erreichbares nächstes Ziel in Stunden bis wenigen Tagen, große Ziele in Wochen ⭐
-91. Kampfbalance: Level-Bereich 80–150 %, Beute, Versicherung, Tierkämpfe und Bandenboni zusammen prüfen, damit Ausrüstung zählt, aber Level nicht egal ist ⭐
-92. Ergebnis als Tabelle festhalten (supabase/schema/data + Balancing-Notiz) und per Migration umsetzen, mit Test, der Ausreißer erkennt ⭐
+86. ✅ Vollständige Liste aller Dinge mit Werten: Waffen, Verteidigung/Kleidung, Zubehör, Begleiter/Tiere, Plunder, Bastelsachen, Unterkünfte, Instrumente, Bandenausbauten ⭐
+87. ✅ Für jedes Stück: Preis, Level-Anforderung, Angriff/Verteidigung/Bonus → Wert pro Euro und pro Level vergleichen; Ausreißer (zu stark/zu billig, nutzlos/zu teuer) korrigieren ⭐
+88. ✅ Klare Stufenleiter: jedes nächste Stück spürbar besser, aber teurer; keine „Pflichtkäufe“ und keine toten Gegenstände ⭐
+89. ✅ Alle Preise im Spiel prüfen: Läden, Essen/Trinken, Apotheke, Versicherung, Waschen, Weiterbildung, Umzug, Sammelgebiete, Geldbehälter, Kaution, Bande gründen/ausbauen, Kronkorken-Tausch, Basar-Gebühr, Zockerbude-Einsätze, Schließfach ⭐
+90. ✅ Einnahmen gegen Ausgaben rechnen: Wie lange spart ein normaler Spieler auf das nächste sinnvolle Ziel? Ziel: immer ein erreichbares nächstes Ziel in Stunden bis wenigen Tagen, große Ziele in Wochen ⭐
+91. ✅ Kampfbalance: Level-Bereich 80–150 %, Beute, Versicherung, Tierkämpfe und Bandenboni zusammen prüfen, damit Ausrüstung zählt, aber Level nicht egal ist ⭐
+92. ✅ Ergebnis als Tabelle festhalten (supabase/schema/data + Balancing-Notiz) und per Migration umsetzen, mit Test, der Ausreißer erkennt ⭐
 
 ### Q. Bandensystem komplett und umfangreich (27.09.2026) ⭐
 Ist-Stand: gründen, Ränge (Chef/Vize/Offizier/Mitglied), Einladungen/Bewerbungen, Chat, Protokoll, Kasse, Ausbau Angriff/Verteidigung, Bandenkriege, Highscore, Stadtteile (0015). Soll Spaß machen und viel Tiefe haben:
@@ -284,3 +284,6 @@ Nutzerwunsch: Ganz am Ende, wenn alles andere gebaut ist, noch einmal alles durc
 145. Auswertung: Wo wird es zu zäh, wo zu leicht, wo fehlt Geld, wo ist Geld nutzlos, welche Gegenstände/Tiere sind zu stark oder nie sinnvoll → Balancing anpassen (verbindet mit P 86–92) und Test wiederholen ⭐
 146. Danach Testmodus und Testkonten wieder entfernen (wie 0014) und Ergebnis in ROADMAP/CLAUDE.md festhalten ⭐
 
+### W. Ausrüstung verwalten (Nutzer, 27.09.2026) ⭐
+147. ✅ Eigener Reiter „Ausrüstung“ (Mein Kiez): alle gekauften Waffen, Kleidung, Zubehör und Verteidigung mit Bild und Werten; Anlegen/Ablegen dort statt nur im Laden; angelegte Stücke je Platz oben, Kampfwerte daneben ⭐
+148. ✅ Postfach: Privatnachricht aus der Chat-Leiste (z. B. „An ClaudeDesign: hi“) liegt als Kasten über dem Kartenbild und die Karte wirkt leer – Nachrichten im Postfach sauber als Liste in der Karte zeigen (Absender/Empfänger, Zeit, Antworten öffnet den Chat), nichts überlappt ⭐

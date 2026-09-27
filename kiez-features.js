@@ -1007,7 +1007,7 @@ window.kiezGoTab = go;
 
 // ---------- Hauptmenü nach Pennergame-Aufbau: 7 Bereiche, Unterpunkte klappen auf ----------
 const NAV = [
-  ['Mein Kiez', 'szene-uebersicht', [['Übersicht', 'overview'], ['Mein Profil', 'profil'], ['Plunderkiste & Inventar', 'plunder'], ['Kronkorken', 'kronkorken'],
+  ['Mein Kiez', 'szene-uebersicht', [['Übersicht', 'overview'], ['Mein Profil', 'profil'], ['Ausrüstung', 'ausruestung'], ['Plunderkiste & Inventar', 'plunder'], ['Kronkorken', 'kronkorken'],
     ['Begleiter', 'pets'], ['Unterkunft', 'gear'], ['Karriere', 'career'], ['Erfolge', 'achievements'], ['Einstellungen', 'einstellungen']]],
   ['Aktionen', 'szene-pfand', [['Pfand sammeln', 'pfand'], ['Verbrechen', 'pfand', 'Verbrechen begehen'], ['Schnorren', 'begging'], ['Weiterbildung', 'training'],
     ['Kiez-Geschichte', 'geschichte'], ['Tagesauftrag', 'missions']]],
@@ -2224,6 +2224,396 @@ html body:not(#kz1):not(#kz2) .kz-look label{display:flex;flex-direction:column;
 html body:not(#kz1):not(#kz2) .kz-look input[type=color]{padding:2px !important;height:44px}
 html body:not(#kz1):not(#kz2) tr.kz-now td{background:rgba(209,169,79,.18)}`;
 document.head.appendChild(style17);
+
+// ================= S10: Immer etwas zu tun (1–3, 38–44) =================
+const FLASH_DE = { bin: 'Durchwühle eine Mülltonne', beg: 'Geh einmal schnorren', bottles: 'Sammle Flaschen (Tour, Tonne oder Sortieren)', npc: 'Besiege einen Computer-Gegner', crime: 'Beg ein Verbrechen' };
+const TASK_DE = { bottles: ['Flaschen sammeln', 'Flaschen'], beg: ['Schnorren', 'mal'], bin: ['Mülltonnen durchwühlen', 'Tonnen'], npc: ['Computer-Gegner besiegen', 'Siege'], crime: ['Verbrechen begehen', 'mal'], wins: ['Einen Kampf gewinnen', 'Sieg'], sort: ['Flaschen sortieren', 'Runde'] };
+const mmss = ms => { const s = Math.max(0, Math.round(ms / 1000)); return s >= 3600 ? Math.floor(s / 3600) + ' Std. ' + Math.floor(s % 3600 / 60) + ' Min.' : Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
+const cardMsg = (card, html, good) => { let m = card.querySelector('.kz-cmsg'); if (!m) { m = document.createElement('div'); m.className = 'kz-cmsg'; card.appendChild(m); } say(m, html, good); };
+
+// ---------- 44: Leiste „Als Nächstes“ ----------
+const NX = { d: null, at: 0, off: 0 };
+const nextBar = document.createElement('div'); nextBar.id = 'kz-next'; nextBar.setAttribute('aria-label', 'Als Nächstes');
+document.querySelector('.stats')?.after(nextBar);
+async function nextLoad() {
+  if (!window.kiezProfile) return;
+  try { NX.d = await rpc('next_actions'); NX.off = Date.now() - new Date(NX.d.now).getTime(); NX.at = Date.now(); } catch (e) { return; }
+  nextDraw();
+}
+function nextDraw() {
+  const d = NX.d; if (!d) { nextBar.hidden = true; return; }
+  nextBar.hidden = document.getElementById('game')?.classList.contains('hide');
+  const left = t => t ? new Date(t).getTime() + NX.off - Date.now() : 0;
+  const item = (label, state, act, cls) => '<div class="kz-nx' + (cls ? ' ' + cls : '') + '"><small>' + label + '</small><b>' + state + '</b>' + (act || '') + '</div>';
+  const tour = d.tour_ends_at ? (left(d.tour_ends_at) > 0 ? item('Pfandtour', mmss(left(d.tour_ends_at))) : item('Pfandtour', 'fertig', '<button class="ghost kz-nx-go" data-go="pfand">Ausladen</button>', 'kz-ready'))
+    : left(d.tour_ready_at) > 0 ? item('Pfandtour', 'Pause ' + mmss(left(d.tour_ready_at))) : item('Pfandtour', 'bereit', '<button class="ghost kz-nx-go" data-go="pfand">Starten</button>', 'kz-ready');
+  const train = d.training_ends_at ? (left(d.training_ends_at) > 0 ? item('Weiterbildung', mmss(left(d.training_ends_at))) : item('Weiterbildung', 'fertig', '<button class="ghost kz-nx-go" data-go="training">Ansehen</button>', 'kz-ready'))
+    : item('Weiterbildung', 'frei', '<button class="ghost kz-nx-go" data-go="training">Lernen</button>');
+  const bin = left(d.bin_ready_at) > 0 ? item('Mülltonne', mmss(left(d.bin_ready_at))) : item('Mülltonne', 'bereit', '<button class="ghost kz-nx-bin">Durchwühlen</button>', 'kz-ready');
+  const flashLeft = left(d.flash.ends_at);
+  const flash = item('Blitzauftrag · ' + mmss(flashLeft), d.flash.done ? 'erledigt' : esc(FLASH_DE[d.flash.kind] || d.flash.kind), '', d.flash.done ? 'kz-done' : 'kz-flashjob');
+  const streak = d.streak > 0 ? item('Glückssträhne', d.streak + ' in Folge', '<em>' + mmss(left(d.streak_until)) + ' Zeit · jede 5. = 1 Kronkorken</em>', 'kz-streak') : '';
+  const sort = left(d.sort_ready_at) > 0 ? item('Sortieren', mmss(left(d.sort_ready_at))) : item('Sortieren', 'bereit', '<button class="ghost kz-nx-go" data-go="pfand" data-sel="#kz-sortgame">Spielen</button>', 'kz-ready');
+  const boss = left(d.boss_ready_at) > 0 ? item('Kiezboss', mmss(left(d.boss_ready_at))) : item('Kiezboss', 'bereit', '<button class="ghost kz-nx-go" data-go="pvp" data-sel="#kz-wboss">Hin</button>', 'kz-ready');
+  const tasks = Number(d.tasks_open) ? item('Tagesaufgaben', d.tasks_open + ' abholen', '<button class="ghost kz-nx-go" data-go="missions" data-tab="Tagesauftrag" data-sel=".kz-daily">Abholen</button>', 'kz-ready') : '';
+  nextBar.innerHTML = '<div class="kz-nx-row">' + tour + train + bin + flash + sort + boss + streak + tasks + '</div><div class="kz-nx-msg"></div>';
+  nextBar.querySelectorAll('.kz-nx-go').forEach(b => b.onclick = () => b.dataset.sel ? window.kiezJumpTo(b.dataset.go, b.dataset.tab || null, b.dataset.sel) : go(b.dataset.go, b.dataset.tab));
+  const binBtn = nextBar.querySelector('.kz-nx-bin'); if (binBtn) binBtn.onclick = () => digBin(nextBar.querySelector('.kz-nx-msg'));
+}
+setInterval(() => { if (!document.hidden) nextDraw(); }, 1000);
+setInterval(() => { if (!document.hidden) nextLoad(); }, 30000);
+setTimeout(nextLoad, 2000);
+window.kiezNextLoad = nextLoad;
+
+// ---------- 38: Mülltonne ----------
+const BIN_DE = { flaschen: n => '+' + n + ' Pfandflaschen gefunden.', kronkorken: n => '+' + n + ' Kronkorken gefunden.', geld: n => eur(n) + ' Kleingeld gefunden!', plunder: (n, x) => 'Plunder gefunden: ' + esc(x) + '!', ratte: () => 'Eine Ratte hat dich gebissen! −5 Energie, −5 % Sauberkeit.' };
+async function digBin(box) {
+  try { const r = await rpc('dig_bin'); window.kiezRenderProfile?.(r.profile); say(box, BIN_DE[r.what](r.amount, r.plunder_name), r.what !== 'ratte'); }
+  catch (e) { say(box, esc(e.message), false); }
+  nextLoad();
+}
+// Aktionen-Karten auf der Pfand-Seite: Mülltonne + Sortierspiel
+function actionCards() {
+  const anchor = document.getElementById('kz-pfandsell'); if (!anchor || document.getElementById('kz-bin')) return;
+  const bin = document.createElement('div'); bin.id = 'kz-bin'; bin.className = 'card';
+  bin.innerHTML = '<b>Mülltonne durchwühlen</b><p>Alle 3 Minuten: Flaschen, Kronkorken, Kleingeld, mit Glück Plunder – manchmal beißt eine Ratte. Kostet 2 % Sauberkeit.</p><div class="kf-row"><button class="big kz-bin-go">Durchwühlen</button></div><div class="kz-bin-msg"></div>';
+  const sg = document.createElement('div'); sg.id = 'kz-sortgame'; sg.className = 'card';
+  sg.innerHTML = '<b>Flaschen sortieren</b><p>30 Sekunden: Sortiere Glas, Plastik und Dosen in die richtige Kiste. Jede richtige = 1 Pfandflasche. Alle 20 Minuten.</p><div class="kz-sort-area"></div><div class="kf-row"><button class="big kz-sort-go">Loslegen</button></div><div class="kz-sort-msg"></div>';
+  anchor.after(bin, sg);
+  bin.querySelector('.kz-bin-go').onclick = async e => { e.target.disabled = true; await digBin(bin.querySelector('.kz-bin-msg')); e.target.disabled = false; };
+  sg.querySelector('.kz-sort-go').onclick = () => sortGame(sg);
+}
+setInterval(actionCards, 1500);
+
+// ---------- 43: Sortierspiel ----------
+const SORT_ITEM = { g: 'Glas', p: 'Plastik', d: 'Dose' };
+async function sortGame(card) {
+  const area = card.querySelector('.kz-sort-area'), msg = card.querySelector('.kz-sort-msg'), btn = card.querySelector('.kz-sort-go');
+  let g; try { g = await rpc('sort_game_start'); } catch (e) { say(msg, esc(e.message), false); return; }
+  btn.hidden = true; say(msg, '', true); msg.innerHTML = '';
+  let i = 0, answers = ''; const end = Date.now() + g.seconds * 1000;
+  const draw = () => {
+    if (i >= g.items.length || Date.now() > end) return finish();
+    area.innerHTML = '<div class="kz-sort-now kz-sort-' + g.items[i] + '">' + SORT_ITEM[g.items[i]] + '<small>' + (i + 1) + ' / ' + g.items.length + ' · noch ' + Math.ceil((end - Date.now()) / 1000) + ' s</small></div>'
+      + '<div class="kf-row kz-sort-bins">' + Object.entries(SORT_ITEM).map(([k, v]) => '<button class="ghost kz-sort-bin" data-k="' + k + '">Kiste ' + v + '</button>').join('') + '</div>';
+    area.querySelectorAll('.kz-sort-bin').forEach(b => b.onclick = () => { answers += b.dataset.k; i++; draw(); });
+  };
+  const timer = setInterval(() => { if (Date.now() > end) { clearInterval(timer); finish(); } else { const s = area.querySelector('.kz-sort-now small'); if (s) s.textContent = (i + 1) + ' / ' + g.items.length + ' · noch ' + Math.ceil((end - Date.now()) / 1000) + ' s'; } }, 250);
+  let done = false;
+  async function finish() {
+    if (done) return; done = true; clearInterval(timer); area.innerHTML = '';
+    try { const r = await rpc('sort_game_finish', { game: g.id, answers }); window.kiezRenderProfile?.(r.profile); say(msg, r.right + ' von 20 richtig – +' + r.bottles + ' Pfandflaschen.', true); }
+    catch (e) { say(msg, esc(e.message), false); }
+    btn.hidden = false; nextLoad();
+  }
+  draw();
+}
+
+// ---------- 3: Ereignisse nach der Pfandtour ----------
+async function tourEvent() {
+  let e; try { e = await rpc('tour_event'); } catch (x) { return; }
+  const host = document.getElementById('kz-pfandsell'); if (!e || !host) return;
+  let c = document.getElementById('kz-tourevent'); if (!c) { c = document.createElement('div'); c.id = 'kz-tourevent'; c.className = 'card kz-event'; document.getElementById('pfanduebersicht')?.after(c); }
+  c.innerHTML = '<b>Unterwegs passiert: ' + ({ hund: 'Ein Hund', polizei: 'Die Polizei', container: 'Ein voller Container' })[e.kind] + '</b><p>' + esc(e.text) + '</p><div class="kf-row">' + e.options.map((o, i) => '<button class="ghost kz-ev" data-i="' + (i + 1) + '">' + esc(o) + '</button>').join('') + '</div><div class="kz-ev-msg"></div>';
+  c.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  c.querySelectorAll('.kz-ev').forEach(b => b.onclick = async () => {
+    c.querySelectorAll('.kz-ev').forEach(x => x.disabled = true);
+    try { const r = await rpc('resolve_tour_event', { choice: Number(b.dataset.i) }); window.kiezRenderProfile?.(r.profile); say(c.querySelector('.kz-ev-msg'), esc(r.message), true); setTimeout(() => c.remove(), 8000); }
+    catch (x) { say(c.querySelector('.kz-ev-msg'), esc(x.message), false); c.querySelectorAll('.kz-ev').forEach(y => y.disabled = false); }
+  });
+}
+document.addEventListener('click', e => { if (e.target.closest('#finishcollect')) setTimeout(() => { tourEvent(); nextLoad(); }, 1500); if (e.target.closest('#collect')) setTimeout(nextLoad, 1500); });
+setTimeout(tourEvent, 3000);
+
+// ---------- 40: seltene Chancen ----------
+let chanceOn = null;
+async function chancePoll() {
+  if (document.hidden || !window.kiezProfile || chanceOn) return;
+  let c; try { c = await rpc('chance_poll'); } catch (e) { return; }
+  if (!c) return;
+  chanceOn = c;
+  const t = document.createElement('div'); t.className = 'kz-chance'; t.setAttribute('role', 'alert');
+  const end = new Date(c.expires_at).getTime();
+  t.innerHTML = '<b>' + esc(c.text) + '</b><p>' + eur(c.amount) + ' – schnell!</p><div class="kf-row"><button class="big kz-ch-go">Aufheben</button><small class="kz-ch-t"></small></div><div class="kz-ch-msg"></div>';
+  document.body.appendChild(t);
+  const tick = setInterval(() => { const s = Math.ceil((end - Date.now()) / 1000); t.querySelector('.kz-ch-t').textContent = s > 0 ? 'noch ' + s + ' s' : 'weg'; if (s <= -3) close(); }, 250);
+  const close = () => { clearInterval(tick); t.remove(); chanceOn = null; };
+  t.querySelector('.kz-ch-go').onclick = async () => {
+    try { const r = await rpc('chance_claim', { chance: c.id }); window.kiezRenderProfile?.(r.profile); say(t.querySelector('.kz-ch-msg'), 'Eingesteckt: ' + eur(r.amount) + '!', true); }
+    catch (e) { say(t.querySelector('.kz-ch-msg'), esc(e.message), false); }
+    t.querySelector('.kz-ch-go').disabled = true; setTimeout(close, 3000);
+  };
+}
+setInterval(chancePoll, 120000); setTimeout(chancePoll, 20000);
+
+// ---------- 1: Computer-Gegner + Kiezboss in der Prügelei ----------
+async function drawNpc() {
+  const pvp = document.querySelector('#pvp .inside'); if (!pvp || !window.kiezProfile) return;
+  let box = document.getElementById('kz-npcs'); if (!box) { box = document.createElement('div'); box.id = 'kz-npcs'; pvp.prepend(box); }
+  let npcs, boss; try { [npcs, boss] = await Promise.all([rpc('npc_overview'), rpc('world_boss_status')]); } catch (e) { return; }
+  const now = Date.now();
+  box.innerHTML = '<div class="kf-box" id="kz-wboss"><h3>Kiezboss der Woche: ' + esc(boss.name) + '</h3><div class="progress kz-bad"><span style="width:' + Math.round(boss.hp / boss.max_hp * 100) + '%"></span></div>'
+    + '<p>' + (boss.defeated ? 'Besiegt! Nächste Woche kommt ein neuer.' : boss.hp + ' von ' + boss.max_hp + ' Lebenspunkten · ' + boss.fighters + ' Kämpfer · dein Schaden: ' + boss.my_damage) + '</p>'
+    + '<p class="kf-muted">Alle im Kiez prügeln gemeinsam – einmal pro Stunde (10 Energie). Fällt er, bekommt jeder, der mitgemacht hat, 5 €, 15 Kronkorken und 150 Punkte.</p>'
+    + '<div class="kf-row"><button class="big kz-wb-hit"' + (boss.defeated || boss.next_hit_at ? ' disabled' : '') + '>' + (boss.defeated ? 'Besiegt' : boss.next_hit_at ? 'Wieder ab ' + new Date(boss.next_hit_at).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) : 'Zuschlagen') + '</button></div><div class="kz-wb-msg"></div>'
+    + (boss.top.length ? '<p class="kf-muted">Beste Schläger: ' + boss.top.slice(0, 5).map(t => playerLink(t.user_id, t.name) + ' (' + t.damage + ')').join(' · ') + '</p>' : '') + '</div>'
+    + '<div class="kf-box"><h3>Computer-Gegner</h3><p class="kf-muted">Immer jemand zum Prügeln da – die Gegner wachsen mit dir. 10 Energie, jeder Gegner alle 10 Minuten.</p><div class="kf-grid">'
+    + npcs.map(n => { const wait = n.ready_at && new Date(n.ready_at).getTime() > now; return '<div class="card kz-npc" data-npc="' + n.id + '"><b>' + esc(n.name) + '</b><p class="kf-muted">' + esc(n.description) + '</p><p>Stärke ca. ' + n.power + ' · Beute bis ' + eur(n.loot * 1.2) + ' · ' + n.xp + ' Punkte</p><div class="kf-row"><button class="big kz-npc-go"' + (wait ? ' disabled' : '') + '>' + (wait ? 'Erholt sich bis ' + new Date(n.ready_at).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) : 'Angreifen') + '</button></div><div class="kz-npc-msg"></div></div>'; }).join('') + '</div></div>';
+  const hit = box.querySelector('.kz-wb-hit'); if (!hit.disabled) act(hit, box.querySelector('.kz-wb-msg'), async () => { const r = await rpc('world_boss_hit'); window.kiezRenderProfile?.(r.profile); setTimeout(drawNpc, 600); nextLoad(); return r.defeated ? 'Volltreffer – der Kiezboss ist erledigt!' : 'Treffer: ' + r.damage + ' Schaden.'; });
+  box.querySelectorAll('.kz-npc').forEach(c => { const b = c.querySelector('.kz-npc-go'); if (!b.disabled) act(b, c.querySelector('.kz-npc-msg'), async () => { const r = await rpc('fight_npc', { npc_id: c.dataset.npc }); window.kiezRenderProfile?.(r.profile); setTimeout(drawNpc, 4000); nextLoad(); if (!r.won) throw new Error('Verloren gegen ' + r.npc + ' (' + r.mine + ' zu ' + r.theirs + '). Trainier Angriff und komm wieder.'); return 'Gewonnen gegen ' + esc(r.npc) + ' (' + r.mine + ' zu ' + r.theirs + '): +' + eur(r.loot) + ', +' + r.xp + ' Punkte.'; }); });
+}
+{ const prevPvp = loaders.pvp; loaders.pvp = () => { prevPvp?.(); setTimeout(drawNpc, 300); }; }
+
+// ---------- 2: Tagesaufgaben im Reiter Tagesauftrag ----------
+async function drawDaily() {
+  const ins = document.querySelector('#missions .inside'); if (!ins || !window.kiezProfile) return;
+  let box = ins.querySelector('.kz-daily'); if (!box) { box = document.createElement('div'); box.className = 'kf-box kz-daily'; ins.prepend(box); }
+  let s; try { s = await rpc('daily_tasks_status'); } catch (e) { return; }
+  box.innerHTML = '<h3>Heute: 3 Aufgaben</h3><p class="kf-muted">Jede bringt 2 € (bis zur Behältergrenze), 2 Kronkorken und 20 Punkte. 15 geschaffte Aufgaben in einer Woche: +25 Kronkorken (' + s.week_done + '/15' + (s.week_bonus_claimed ? ', abgeholt' : '') + ').</p>'
+    + s.tasks.map(t => '<div class="kz-dt' + (t.claimed ? ' kz-done' : '') + '" data-slot="' + t.slot + '"><b>' + (TASK_DE[t.kind] || [t.kind])[0] + '</b><div class="progress"><span style="width:' + Math.round(t.progress / t.target * 100) + '%"></span></div><small>' + t.progress + ' / ' + t.target + ' ' + ((TASK_DE[t.kind] || [])[1] || '') + '</small>'
+      + '<div class="kf-row"><button class="ghost kz-dt-go"' + (t.claimed || t.progress < t.target ? ' disabled' : '') + '>' + (t.claimed ? 'Abgeholt' : t.progress < t.target ? 'Noch nicht geschafft' : 'Belohnung abholen') + '</button></div><div class="kz-dt-msg"></div></div>').join('');
+  box.querySelectorAll('.kz-dt').forEach(d => { const b = d.querySelector('.kz-dt-go'); if (!b.disabled) act(b, d.querySelector('.kz-dt-msg'), async () => { const r = await rpc('claim_daily_task', { task_slot: Number(d.dataset.slot) }); window.kiezRenderProfile?.(r.profile); setTimeout(drawDaily, 1500); nextLoad(); return 'Abgeholt: 2 €, 2 Kronkorken, 20 Punkte' + (r.week_bonus ? ' – und der Wochenbonus: +25 Kronkorken!' : '') + '.'; }); });
+}
+{ const prevMis = loaders.missions; loaders.missions = () => { prevMis?.(); setTimeout(drawDaily, 300); }; }
+
+// Kurze Touren (39): 3 und 5 Minuten in der Auswahl
+{ const sel = document.getElementById('durationselect');
+  if (sel && !sel.querySelector('option[value="3"]')) sel.insertAdjacentHTML('afterbegin', '<option value="3">3 Minuten (kurz)</option><option value="5">5 Minuten (kurz)</option>');
+  const hint = document.getElementById('collectionhint'); if (hint && /10 Minuten/.test(hint.textContent)) hint.textContent = 'Wähle 3 Minuten bis 8 Stunden.'; }
+
+const style18 = document.createElement('style');
+style18.textContent = `html body:not(#kz1):not(#kz2) #kz-next{margin:6px 0 10px;background:rgba(20,16,12,.88);border:1px solid var(--line,#5a4a36);border-radius:var(--radius,8px);padding:8px}
+html body:not(#kz1):not(#kz2) #kz-next[hidden]{display:none !important}
+html body:not(#kz1):not(#kz2) .kz-nx-row{display:flex;gap:8px;overflow-x:auto;scrollbar-width:thin}
+html body:not(#kz1):not(#kz2) .kz-nx{flex:0 0 auto;min-width:130px;padding:6px 10px;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;gap:2px}
+html body:not(#kz1):not(#kz2) .kz-nx small{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted,#bdb19d)}
+html body:not(#kz1):not(#kz2) .kz-nx b{font-size:15px;color:var(--text,#efe3c3)}
+html body:not(#kz1):not(#kz2) .kz-nx em{font-style:normal;font-size:12px;color:var(--muted,#bdb19d)}
+html body:not(#kz1):not(#kz2) #kz-next .kz-nx button.ghost{min-height:32px !important;padding:3px 10px !important;font-size:13px !important;margin-top:4px}
+html body:not(#kz1):not(#kz2) .kz-nx.kz-streak{min-width:170px}
+html body:not(#kz1):not(#kz2) .kz-nx.kz-ready{border-color:var(--brass,#d1a94f)}
+html body:not(#kz1):not(#kz2) .kz-nx.kz-flashjob{border-color:var(--rust,#9b3c1f);max-width:230px}
+html body:not(#kz1):not(#kz2) .kz-nx.kz-streak b{color:var(--brass,#d1a94f)}
+html body:not(#kz1):not(#kz2) .kz-nx-msg:empty{display:none}
+html body:not(#kz1):not(#kz2) .kz-sort-now{font:700 28px var(--font-head,serif);text-align:center;padding:14px;border-radius:10px;margin:8px 0;background:rgba(0,0,0,.3)}
+html body:not(#kz1):not(#kz2) .kz-sort-now small{display:block;font:400 13px var(--font-body,sans-serif);color:var(--muted,#bdb19d)}
+html body:not(#kz1):not(#kz2) .kz-sort-g{color:#8fc26a}html body:not(#kz1):not(#kz2) .kz-sort-p{color:#6fb3e0}html body:not(#kz1):not(#kz2) .kz-sort-d{color:#e0b35a}
+html body:not(#kz1):not(#kz2) .kz-sort-bins{justify-content:center;gap:8px}
+html body:not(#kz1):not(#kz2) .kz-event{box-shadow:0 0 0 2px var(--brass,#d1a94f) !important}
+.kz-chance{position:fixed;left:16px;bottom:16px;z-index:9000;max-width:320px;padding:14px;border-radius:12px;background:#2b2116;border:2px solid #d1a94f;color:#efe3c3;box-shadow:0 8px 30px rgba(0,0,0,.6);animation:kzpop .3s ease-out}
+.kz-chance b{font-family:var(--font-head,serif);font-size:17px}.kz-chance small{font-size:13px;margin-left:8px}
+html body:not(#kz1):not(#kz2) .kz-dt{margin:10px 0}html body:not(#kz1):not(#kz2) .kz-dt small{font-size:13px;color:var(--muted,#bdb19d)}
+html body:not(#kz1):not(#kz2) .kz-dt.kz-done b{color:#9bd17a}
+@media (max-width:760px){html body:not(#kz1):not(#kz2) .kz-nx{min-width:118px}}`;
+document.head.appendChild(style18);
+
+// ================= S11: Wiederkommen (5, 35, 37, 45–50, 52) =================
+const KZT = { happyhour: 'Happy Hour: Getränke halber Preis, Pfand +10 % (19–20 Uhr)', mittag: 'Mittagspause: Schnorren +20 % (12–13 Uhr)', razzia: 'Razzia: Verbrechen deutlich riskanter (22–22:30 Uhr)' };
+// ---------- 45/49: Ticker „Gerade im Kiez“ + Kiez-Zeit ----------
+let tickerData = null;
+async function tickerLoad() {
+  if (!window.kiezProfile) return;
+  try { tickerData = await rpc('kiez_ticker_feed'); } catch (e) { return; }
+  const ov = document.querySelector('#overview'); if (!ov) return;
+  let box = document.getElementById('kz-ticker');
+  if (!box) { box = document.createElement('div'); box.id = 'kz-ticker'; box.className = 'kf-box'; (ov.querySelector('.inside') || ov).prepend(box); }
+  box.innerHTML = '<h3>Gerade im Kiez <small class="kf-muted">' + esc(tickerData.berlin) + ' Uhr</small></h3>'
+    + (tickerData.time ? '<p class="kz-kzt">' + KZT[tickerData.time] + '</p>' : '<p class="kf-muted">Kiez-Zeiten: 12–13 Uhr Mittagspause (Schnorren +20 %) · 19–20 Uhr Happy Hour (Getränke ½ Preis, Pfand +10 %) · 22–22:30 Uhr Razzia.</p>')
+    + (tickerData.items.length ? '<ul class="kz-ticker">' + tickerData.items.slice(0, 8).map(i => '<li><small>' + new Date(i.at).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) + '</small> ' + esc(i.body) + '</li>').join('') + '</ul>' : '<p class="kf-muted">Noch ruhig im Kiez.</p>');
+}
+setTimeout(tickerLoad, 3000); setInterval(() => { if (!document.hidden) tickerLoad(); }, 60000);
+{ const prevOv = loaders.overview; loaders.overview = () => { prevOv?.(); setTimeout(tickerLoad, 300); }; }
+
+// ---------- 37: Ausladen + alles verkaufen mit einem Klick ----------
+setInterval(() => {
+  const c = document.getElementById('kz-pfandsell'); if (!c || c.querySelector('.kz-quick')) return;
+  const row = document.createElement('div'); row.className = 'kf-row';
+  row.innerHTML = '<button class="big kz-quick">Ausladen & alles verkaufen</button>';
+  c.querySelector('.kz-ps-msg').before(row);
+  row.querySelector('.kz-quick').onclick = async e => {
+    const b = e.target, m = c.querySelector('.kz-ps-msg'); b.disabled = true;
+    try {
+      const r = await rpc('quick_unload_sell'); window.kiezRenderProfile?.(r.profile);
+      const t = [r.finished ? 'Tour ausgeladen: +' + r.finished.found + ' Flaschen' : '', r.sold ? r.sold.sold + ' Flaschen verkauft für ' + eur(r.sold.paid) : ''].filter(Boolean).join(' · ');
+      say(m, esc(t) + ' – in 30 Sekunden kannst du die nächste Tour starten.', true);
+      setTimeout(() => { if (typeof tourEvent === 'function') tourEvent(); }, 800);
+    } catch (x) { say(m, esc(x.message), false); }
+    b.disabled = false; window.kiezNextLoad?.();
+  };
+}, 1500);
+
+// ---------- 47: Tab-Titel blinkt ----------
+const baseTitle = document.title; let blink = null;
+setInterval(() => {
+  const d = typeof NX !== 'undefined' ? NX.d : null; if (!d) return;
+  const ready = [], now = Date.now() - NX.off;
+  if (d.tour_ends_at && new Date(d.tour_ends_at).getTime() <= now) ready.push('Tour fertig!');
+  if (d.training_ends_at && new Date(d.training_ends_at).getTime() <= now) ready.push('Weiterbildung fertig!');
+  if (document.hidden && ready.length) { blink = !blink; document.title = blink ? '(' + ready.length + ') ' + ready[0] : baseTitle; }
+  else if (document.title !== baseTitle) document.title = baseTitle;
+}, 1500);
+
+// ---------- 5/46: Hinweise (Browser-Benachrichtigung, App installierbar) ----------
+let swReg = null;
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').then(r => { swReg = r; }).catch(() => {});
+const notifyTimers = {};
+function notifyAt(key, when, text) {
+  clearTimeout(notifyTimers[key]); if (!when || typeof Notification === 'undefined' || Notification.permission !== 'granted') return;
+  const ms = new Date(when).getTime() - Date.now(); if (ms <= 0 || ms > 12 * 3600e3) return;
+  notifyTimers[key] = setTimeout(() => { const o = { body: text, icon: '/favicon.svg', tag: key }; if (swReg?.showNotification) swReg.showNotification('Kiezkönig', o); else new Notification('Kiezkönig', o); }, ms);
+}
+setInterval(() => { const d = typeof NX !== 'undefined' ? NX.d : null; if (!d) return; notifyAt('tour', d.tour_ends_at, 'Dein Einkaufswagen ist zurück – Flaschen ausladen!'); notifyAt('train', d.training_ends_at, 'Deine Weiterbildung ist fertig.'); }, 30000);
+
+// ---------- 48/52: Einstellungen – Hinweise, Login-Serie, Mail ----------
+function settingsExtra() {
+  const body = document.querySelector('#einstellungen .kf-body'); if (!body || !window.kiezProfile || body.querySelector('.kz-notify')) return;
+  const p = window.kiezProfile;
+  const box = document.createElement('div'); box.className = 'kf-box kz-notify';
+  box.innerHTML = '<h3>Hinweise & Wiederkommen</h3><p>Lass dich benachrichtigen, wenn Pfandtour oder Weiterbildung fertig sind (solange der Browser offen ist). Auf dem Handy: im Browsermenü „Zum Startbildschirm hinzufügen“ – dann läuft Kiezkönig wie eine App.</p>'
+    + '<div class="kf-row"><button class="ghost kz-np">' + (typeof Notification !== 'undefined' && Notification.permission === 'granted' ? 'Hinweise sind an' : 'Hinweise erlauben') + '</button></div>'
+    + '<p>Login-Serie: <b>' + (p.login_streak || 0) + ' Tage</b> · Serien-Schutz: <b>' + (p.streak_shields || 0) + '</b> (jeder 7. Tag gibt einen; er rettet die Serie, wenn du einen Tag verpasst).</p>'
+    + '<label class="kz-check"><input type="checkbox" class="kz-mail"' + (p.email_digest ? ' checked' : '') + '> E-Mail „Während du weg warst“ (wird verschickt, sobald der Mailversand eingerichtet ist)</label><div class="kz-np-msg"></div>';
+  body.appendChild(box);
+  const m = box.querySelector('.kz-np-msg');
+  box.querySelector('.kz-np').onclick = async () => {
+    if (typeof Notification === 'undefined') return say(m, 'Dein Browser kann keine Hinweise anzeigen.', false);
+    const r = await Notification.requestPermission();
+    say(m, r === 'granted' ? 'Hinweise sind an.' : 'Hinweise wurden nicht erlaubt – das kannst du in den Browsereinstellungen ändern.', r === 'granted');
+    box.querySelector('.kz-np').textContent = r === 'granted' ? 'Hinweise sind an' : 'Hinweise erlauben';
+  };
+  box.querySelector('.kz-mail').onchange = async e => { try { await rpc('set_email_digest', { on_off: e.target.checked }); say(m, e.target.checked ? 'Gemerkt.' : 'Abbestellt.', true); } catch (x) { say(m, esc(x.message), false); } };
+}
+{ const prevSet = loaders.einstellungen; loaders.einstellungen = async () => { await prevSet?.(); settingsExtra(); }; }
+
+// ---------- 52: „Während du weg warst“ ----------
+setTimeout(async () => {
+  if (!window.kiezProfile) return;
+  let w; try { w = await rpc('welcome_back'); } catch (e) { return; }
+  if (!w?.show) return;
+  const ov = document.createElement('div'); ov.className = 'kz-box-ov kz-go';
+  const items = [w.tour_ready ? 'Dein Einkaufswagen ist zurück.' : '', w.training_ready ? 'Deine Weiterbildung ist fertig.' : '', w.attacks ? w.attacks + '× wurdest du angegriffen' + (w.lost_fights ? ', ' + w.lost_fights + '× verloren' : '') + '.' : '', w.messages ? w.messages + ' neue Nachricht(en).' : '', 'Energie: ' + w.energy + ' / 100'].filter(Boolean);
+  ov.innerHTML = '<div class="kz-box-card kz-welcome"><h3>Während du weg warst …</h3><ul>' + items.map(x => '<li>' + esc(x) + '</li>').join('') + (w.notifications || []).slice(0, 5).map(n => '<li>' + esc(n) + '</li>').join('') + '</ul><button class="big kz-box-ok">Los geht’s</button></div>';
+  document.body.appendChild(ov);
+  ov.querySelector('.kz-box-ok').onclick = () => ov.remove(); ov.addEventListener('click', e => { if (e.target === ov) ov.remove(); });
+}, 4000);
+
+// ---------- 35: Einsteiger-Tutorial ----------
+const TUT = [
+  null,
+  ['Willkommen im Kiez!', 'Starte deine erste Pfandtour: Wähl 3 Minuten und schick den Einkaufswagen los.', 'pfand', null, '#collect', p => !!p.collection_ends_at],
+  ['Wagen ausladen', 'Wenn der Wagen zurück ist: „Einkaufswagen ausladen“ – oder unten „Ausladen & alles verkaufen“.', 'pfand', null, '#kz-pfandsell', p => !p.collection_ends_at && (p.bottles > 0 || Number(p.money) > 0)],
+  ['Flaschen verkaufen', 'Verkauf deine Flaschen zum aktuellen Kurs – liegen sie länger als einen Tag, werden welche geklaut.', 'pfand', null, '#kz-pfandsell', p => p.bottles === 0],
+  ['Weiterbilden', 'Starte eine Weiterbildung. Die läuft auch, wenn du offline bist.', 'training', 'Fähigkeiten', '#training .skill-grid', p => !!p.training_type || !!p.training_ends_at],
+  ['Mülltonne', 'Alle 3 Minuten kannst du eine Mülltonne durchwühlen – oben in der Leiste „Als Nächstes“.', 'pfand', null, '#kz-bin', p => !!p.bin_at],
+  ['Tagesaufgaben', 'Jeden Tag gibt es 3 neue Aufgaben mit Belohnung. Schau sie dir an!', 'missions', 'Tagesauftrag', '.kz-daily', () => document.getElementById('missions')?.classList.contains('active-view')],
+];
+async function tutorial() {
+  const p = window.kiezProfile; if (!p || (p.tutorial_step ?? 99) >= 99) { document.getElementById('kz-tut')?.remove(); return; }
+  let step = Math.max(1, p.tutorial_step || 1);
+  // erledigte Schritte automatisch weiterzählen
+  while (step < TUT.length && TUT[step][5](p)) step++;
+  if (step !== p.tutorial_step) { try { const r = await rpc('tutorial_advance', { step: step >= TUT.length ? 99 : step }); window.kiezRenderProfile?.(r.profile); if (r.reward) say(document.querySelector('#kz-tut .kz-tut-msg') || document.body.appendChild(document.createElement('div')), 'Tutorial geschafft: +5 Kronkorken!', true); } catch (e) { } }
+  if (step >= TUT.length) { const t = document.getElementById('kz-tut'); if (t) { t.querySelector('.kz-tut-body').innerHTML = '<b>Geschafft!</b><p>Du kennst jetzt das Wichtigste. +5 Kronkorken als Starthilfe.</p>'; setTimeout(() => t.remove(), 8000); } return; }
+  const [h, txt, view, tab, sel] = TUT[step];
+  let t = document.getElementById('kz-tut');
+  if (!t) { t = document.createElement('div'); t.id = 'kz-tut'; document.body.appendChild(t); }
+  t.innerHTML = '<div class="kz-tut-body"><small>Schritt ' + step + ' von ' + (TUT.length - 1) + '</small><b>' + h + '</b><p>' + txt + '</p></div><div class="kf-row"><button class="big kz-tut-go">Zeig mir wo</button><button class="ghost kz-tut-skip">Überspringen</button></div><div class="kz-tut-msg"></div>';
+  t.querySelector('.kz-tut-go').onclick = () => window.kiezJumpTo(view, tab, sel);
+  t.querySelector('.kz-tut-skip').onclick = async () => { await rpc('tutorial_advance', { step: 99 }).catch(() => {}); if (window.kiezProfile) window.kiezProfile.tutorial_step = 99; t.remove(); };
+}
+setInterval(() => { if (!document.hidden) tutorial(); }, 4000);
+
+const style19 = document.createElement('style');
+style19.textContent = `html body:not(#kz1):not(#kz2) .kz-ticker{list-style:none;margin:6px 0 0;padding:0}html body:not(#kz1):not(#kz2) .kz-ticker li{padding:5px 0;border-top:1px solid rgba(255,255,255,.06);font-size:15px}
+html body:not(#kz1):not(#kz2) .kz-ticker small{color:var(--muted,#bdb19d);margin-right:6px}
+html body:not(#kz1):not(#kz2) .kz-kzt{padding:6px 10px;border-radius:8px;background:rgba(209,169,79,.18);font-weight:700}
+#kz-tut{position:fixed;left:16px;bottom:16px;z-index:8500;width:min(330px,calc(100vw - 32px));padding:14px;border-radius:12px;background:#2b2116;border:2px solid #d1a94f;color:#efe3c3;box-shadow:0 8px 30px rgba(0,0,0,.6);font-family:var(--font-body,sans-serif)}
+#kz-tut small{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:#d1a94f}#kz-tut b{font-family:var(--font-head,serif);font-size:18px}#kz-tut p{font-size:15px;margin:6px 0}
+#kz-tut .kf-row{display:flex;gap:8px;flex-wrap:wrap}
+.kz-welcome ul{text-align:left;margin:8px 0 12px;padding-left:18px}.kz-welcome li{margin:4px 0;font-size:15px}
+@media (max-width:760px){#kz-tut{bottom:84px}}`;
+document.head.appendChild(style19);
+
+// ================= 147: Reiter „Ausrüstung“ – gekaufte Stücke ansehen, anlegen, ablegen =================
+const gearBody = addPanel('ausruestung', 'Ausrüstung', 'Ausrüstung');
+const SLOT_DE = { waffe: 'Waffe', schutz: 'Kleidung & Schutz', zubehoer: 'Zubehör' };
+const slotOf = i => ['zubehoer', 'plunder'].includes(i.category) ? 'zubehoer' : i.attack > i.defense ? 'waffe' : 'schutz';
+const GEAR = { tab: 'Übersicht' };
+{
+  const t = document.createElement('div'); t.className = 'section-tools';
+  t.innerHTML = ['Übersicht', 'Waffen', 'Kleidung & Schutz', 'Zubehör'].map(x => '<span>' + x + '</span>').join('');
+  document.querySelector('#ausruestung > h2')?.after(t);
+  t.addEventListener('click', e => { const s = e.target.closest('span'); if (!s) return; GEAR.tab = s.textContent.trim(); gearTab(); });
+}
+function gearTab() {
+  document.querySelectorAll('#ausruestung > .section-tools span').forEach(s => s.classList.toggle('subtab-active', s.textContent.trim() === GEAR.tab));
+  gearBody.querySelectorAll('[data-gtab]').forEach(el => el.dataset.gtab === GEAR.tab ? el.style.removeProperty('display') : el.style.setProperty('display', 'none', 'important'));
+}
+let gearSeq = 0;
+loaders.ausruestung = async () => {
+  const t = ++gearSeq;
+  let c, cat, pl;
+  try { [c, { data: cat }] = await Promise.all([rpc('combat_overview'), sb.from('shop_items').select('id,name,description,attack,defense,category,required_level,price')]); } catch (e) { gearBody.innerHTML = '<p class="notice bad">' + esc(e.message) + '</p>'; return; }
+  if (t !== gearSeq) return;
+  const p = window.kiezProfile || {};
+  if (p.equipped_plunder) pl = (await sb.from('plunder_catalog').select('name,attack,defense,bottle_bonus').eq('id', p.equipped_plunder).maybeSingle()).data;
+  const byId = Object.fromEntries((cat || []).map(i => [i.id, i]));
+  const on = new Set((c.equipped || []).map(e => e.id));
+  const owned = (c.owned || []).map(id => byId[id]).filter(Boolean);
+  const vals = i => [i.attack ? 'Angriff +' + i.attack : '', i.defense ? 'Verteidigung +' + i.defense : ''].filter(Boolean).join(' · ') || 'keine Kampfwerte';
+  const card = i => '<div class="card kz-gear' + (on.has(i.id) ? ' kz-p-on' : '') + '" data-id="' + i.id + '"><b>' + esc(i.name) + '</b><p class="kf-muted">' + SLOT_DE[slotOf(i)] + (on.has(i.id) ? ' · angelegt' : '') + '</p><p>' + vals(i) + '</p>'
+    + '<div class="kf-row"><button class="ghost kz-geq">' + (on.has(i.id) ? 'Ablegen' : 'Anlegen') + '</button></div><div class="kz-gear-msg"></div></div>';
+  const list = slot => { const l = owned.filter(i => slotOf(i) === slot).sort((a, b) => (b.attack + b.defense) - (a.attack + a.defense));
+    return l.length ? '<div class="kf-grid">' + l.map(card).join('') + '</div>' : '<div class="kf-box"><h3>' + SLOT_DE[slot] + '</h3><p class="kf-muted">Hier ist noch nichts. Gekaufte Stücke landen automatisch hier – dann kannst du sie anlegen oder ablegen. <a href="#" class="kz-gshop" data-tab="' + ({ waffe: 'Waffen', schutz: 'Kleidung', zubehoer: 'Zubehör' })[slot] + '">Zum Laden</a></p></div>'; };
+  const slotBox = slot => { const e = (c.equipped || []).find(x => x.slot === slot); const i = e && byId[e.id];
+    return '<div class="card kz-slot"><b>' + SLOT_DE[slot] + '</b><p>' + (i ? esc(i.name) + '<br><span class="kf-muted">' + vals(i) + '</span>' : '<span class="kf-muted">nichts angelegt</span>') + '</p></div>'; };
+  gearBody.innerHTML = '<div data-gtab="Übersicht"><div class="kf-box"><h3>Angelegt</h3><div class="kf-grid kz-slots">' + ['waffe', 'schutz', 'zubehoer'].map(slotBox).join('')
+    + '<div class="card kz-slot"><b>Plunder</b><p>' + (pl ? esc(pl.name) + '<br><span class="kf-muted">' + vals(pl) + (pl.bottle_bonus ? ' · Pfand +' + pl.bottle_bonus + ' %' : '') + '</span>' : '<span class="kf-muted">nichts angelegt</span>') + '</p><a href="#" class="kz-gplunder">Zur Plunderkiste</a></div></div></div>'
+    + '<div class="kf-box"><h3>Deine Kampfwerte</h3><div class="kz-combat"><div><small>Angriff</small><b>' + c.attack.total + '</b><span>Grundwert ' + c.attack.base + ' · Ausrüstung +' + c.attack.items + ' · Begleiter +' + c.attack.pets + ' · Bande +' + c.attack.gang + ' · Plunder +' + c.attack.plunder + '</span></div>'
+    + '<div><small>Verteidigung</small><b>' + c.defense.total + '</b><span>Grundwert ' + c.defense.base + ' · Unterkunft +' + c.defense.shelter + ' · Ausrüstung +' + c.defense.items + ' · Begleiter +' + c.defense.pets + ' · Bande +' + c.defense.gang + ' · Plunder +' + c.defense.plunder + (c.defense.traps ? ' · Fallen +' + c.defense.traps : '') + (c.defense.stench ? ' · Gestank +' + c.defense.stench : '') + '</span></div></div>'
+    + '<p class="kf-muted">Pro Platz (Waffe, Kleidung & Schutz, Zubehör) zählt ein Stück. Anlegen tauscht das alte automatisch aus.</p></div></div>'
+    + '<div data-gtab="Waffen">' + list('waffe') + '</div><div data-gtab="Kleidung & Schutz">' + list('schutz') + '</div><div data-gtab="Zubehör">' + list('zubehoer') + '</div>';
+  gearTab();
+  gearBody.querySelectorAll('.kz-gear').forEach(cd => act(cd.querySelector('.kz-geq'), cd.querySelector('.kz-gear-msg'), async () => {
+    const wasOn = on.has(cd.dataset.id);
+    await rpc(wasOn ? 'unequip_item' : 'equip_item', { wanted_item: cd.dataset.id });
+    setTimeout(loaders.ausruestung, 300); window.kiezNextLoad?.();
+    return (wasOn ? 'Abgelegt: ' : 'Angelegt: ') + esc(byId[cd.dataset.id].name) + '.';
+  }));
+  gearBody.querySelectorAll('.kz-gshop').forEach(a => a.onclick = e => { e.preventDefault(); go('store', a.dataset.tab); });
+  gearBody.querySelector('.kz-gplunder')?.addEventListener('click', e => { e.preventDefault(); go('plunder'); });
+};
+const style20 = document.createElement('style');
+style20.textContent = `html body:not(#kz1):not(#kz2) .kz-slots{grid-template-columns:repeat(auto-fit,minmax(180px,1fr)) !important}
+html body:not(#kz1):not(#kz2) .kz-slot a{font-size:14px}`;
+document.head.appendChild(style20);
+
+// ================= 148: Postfach als Gesprächsliste (keine Kästen über dem Kartenbild) =================
+let inboxBusy = false;
+async function inboxList() {
+  const box = document.getElementById('inbox'); if (!box || !window.kiezProfile || inboxBusy || box.dataset.kz === '1') return;
+  inboxBusy = true;
+  try {
+    const list = await rpc('chat_conversations');
+    box.dataset.kz = '1';
+    box.innerHTML = list.length ? '<ul class="kz-inbox">' + list.map(c => '<li class="' + (Number(c.unread) ? 'kz-unread' : '') + '"><div><b>' + esc(c.name) + '</b>' + (Number(c.unread) ? ' <span class="kz-tag">' + c.unread + ' neu</span>' : '')
+      + '<p>' + (c.last_mine ? 'Du: ' : '') + esc(String(c.last_body || '').slice(0, 120)) + '</p><small>' + new Date(c.last_at).toLocaleString('de-DE') + '</small></div>'
+      + '<button class="ghost kz-inbox-open" data-id="' + c.partner + '" data-name="' + esc(c.name) + '">Antworten</button></li>').join('') + '</ul>' : '<p class="kf-muted">Noch gähnende Leere.</p>';
+    box.querySelectorAll('.kz-inbox-open').forEach(b => b.onclick = () => window.kiezDM?.(b.dataset.id, b.dataset.name));
+  } catch (e) { } finally { inboxBusy = false; }
+}
+// index.html schreibt das Postfach neu → danach wieder als Liste zeichnen
+if (document.getElementById('inbox')) new MutationObserver(() => { const b = document.getElementById('inbox'); if (b.dataset.kz === '1' && !b.querySelector('.kz-inbox, .kf-muted')) b.dataset.kz = ''; if (b.dataset.kz !== '1') inboxList(); }).observe(document.getElementById('inbox'), { childList: true });
+setTimeout(inboxList, 3000);
+const style21 = document.createElement('style');
+style21.textContent = `html body:not(#kz1):not(#kz2) #inbox{clear:both;width:100%}
+html body:not(#kz1):not(#kz2) .kz-inbox{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
+html body:not(#kz1):not(#kz2) .kz-inbox li{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:10px 12px;border:1px solid var(--line,#5a4a36);border-radius:var(--radius,8px);background:rgba(0,0,0,.25)}
+html body:not(#kz1):not(#kz2) .kz-inbox li.kz-unread{border-color:var(--brass,#d1a94f)}
+html body:not(#kz1):not(#kz2) .kz-inbox li p{margin:2px 0;font-size:15px;padding:0;background:none;border:0}
+html body:not(#kz1):not(#kz2) .kz-inbox li p:before{content:none}
+html body:not(#kz1):not(#kz2) .kz-inbox small{font-size:13px;color:var(--muted,#bdb19d)}`;
+document.head.appendChild(style21);
 
 // Zuletzt geöffnete neue Seite wiederherstellen
 try { const last = localStorage.getItem('kiez_last_view'); if (loaders[last]) setTimeout(() => show(last), 1500); } catch (e) { }
