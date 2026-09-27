@@ -225,7 +225,10 @@ async function besuch() {
 
 async function extras(k) {
   const p = await prof();
-  if (k === 0) { await go('missions', 'Glücksspiel'); await click('Glücksrad', '.kz-spin', { quiet: true }); if (p.money > 50) { await click('Rubbellos', '#buyscratch'); await click('Lotto', '.lbuy'); } }
+  if (k === 0) { await go('missions', 'Glücksspiel'); await click('Glücksrad', '.kz-spin', { quiet: true }); if (p.money > 50) { await click('Rubbellos kaufen', '#buyscratch');
+    // Minispiel: drei Felder freirubbeln (Klicks), dann steht das Ergebnis da
+    for (let k = 0; k < 4; k++) await pg.evaluate(() => document.querySelectorAll('.scratch-field canvas').forEach(c => c.click()));
+    await pg.waitForTimeout(800); log({ v: visit, typ: 'OK', label: 'Rubbellos Ergebnis', msg: await pg.evaluate(() => document.querySelector('#scratchmsg')?.innerText.trim() + ' | ' + [...document.querySelectorAll('.scratch-field')].map(f => f.textContent).join(' ')) }); await click('Lotto', '.lbuy'); } }
   if (k === 1) { await go('kiosk'); await explore('kiosk', p.money); }
   if (k === 2) { await go('schliessfach'); if (p.money > 100) await click('Einzahlen', '.bdep', { fill: [['section.panel.active-view .bin', Math.floor(p.money * 0.1)]] }); }
   if (k === 3) { await go('zockerbude'); await explore('zockerbude', p.money); }

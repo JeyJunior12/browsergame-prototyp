@@ -3445,7 +3445,7 @@ function crimeLocks() {
     const desc = card.querySelector('p'); if (desc) desc.textContent = 'Ein Los kostet 10 €. Rubbel die drei Felder frei: Dreimal derselbe Betrag gewinnt ihn – 10 € heißt Einsatz zurück, bis 500 € ist drin.';
     const AMOUNTS = [10, 15, 20, 50, 100, 500];
     const st = document.createElement('style');
-    st.textContent = 'html body:not(#kz1):not(#kz2) .scratch-field{position:relative;overflow:hidden;user-select:none;touch-action:none;cursor:crosshair;font-weight:700}'
+    st.textContent = 'html body:not(#kz1):not(#kz2) .scratch-field{position:relative;overflow:hidden;user-select:none;touch-action:none;cursor:crosshair;font-weight:700;font-size:20px !important;min-height:64px}'
       + 'html body:not(#kz1):not(#kz2) .scratch-field canvas{position:absolute;inset:0;width:100%;height:100%}';
     document.head.appendChild(st);
     btn.onclick = async () => {
