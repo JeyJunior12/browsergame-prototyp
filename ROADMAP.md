@@ -60,7 +60,7 @@ GitHub push ──▶ Action: Tests (Postgres) ──▶ Migration live in Supab
 
 Ziel: Es gibt fast immer etwas zu tun – auch mit wenigen Spielern. Empfohlener Start: 1, 2, 3, 5.
 
-**⭐ Vom Nutzer ausgewählt für später (27.09.2026):** 17, 19, 20, 22, 23, 24, 25, 26, 29, 30, 31, 32, 34, 37 – Kiosk-Stand, Revanche, Kopfgeld, Wetten, Kosmetik, Hunger, Sucht/Entzug, Ruf, Glücksrad, Pfandtour zu zweit, Tag/Nacht, Live-Stadtereignisse, Nebenquests, Ein-Klick-Verkaufen. Dazu aus J: 38, 39, 40 (eher selten), 43, 44, 47, 48, 49. Dazu aus K (Fahrzeuge): 53, 54 (erst später), 55, 56, 57, 59 (erst später), 60, 61, 63, 64. Dazu L (einheitliches Aussehen): 65–69. Dazu M (Wegweiser): 70–73. Dazu N (flüssiger Seitenwechsel): 74–77. Dazu O (Körperpflege): 78–85. Dazu P (Balancing Gegenstände & Preise): 86–92. Dazu Q (Bandensystem): 93–104. Dazu R (Fehler Waffen kaufen/anlegen, hohe Priorität): 105–109. Dazu S (Plunderkiste): 111–120. Alle übrigen Ideen bleiben ebenfalls im Plan.
+**⭐ Vom Nutzer ausgewählt für später (27.09.2026):** 17, 19, 20, 22, 23, 24, 25, 26, 29, 30, 31, 32, 34, 37 – Kiosk-Stand, Revanche, Kopfgeld, Wetten, Kosmetik, Hunger, Sucht/Entzug, Ruf, Glücksrad, Pfandtour zu zweit, Tag/Nacht, Live-Stadtereignisse, Nebenquests, Ein-Klick-Verkaufen. Dazu aus J: 38, 39, 40 (eher selten), 43, 44, 47, 48, 49. Dazu aus K (Fahrzeuge): 53, 54 (erst später), 55, 56, 57, 59 (erst später), 60, 61, 63, 64. Dazu L (einheitliches Aussehen): 65–69. Dazu M (Wegweiser): 70–73. Dazu N (flüssiger Seitenwechsel): 74–77. Dazu O (Körperpflege): 78–85. Dazu P (Balancing Gegenstände & Preise): 86–92. Dazu Q (Bandensystem): 93–104. Dazu R (Fehler Waffen kaufen/anlegen, hohe Priorität): 105–109. Dazu S (Plunderkiste): 111–120. Dazu T (Stadtteile sperren, später Städte): 121–124. Alle übrigen Ideen bleiben ebenfalls im Plan.
 
 ### Offener Fehler
 - Seite scrollt nach 10–15 s ohne Eingabe nach oben (trotz Fix in PR #27; Ursache noch nicht gefunden, Nutzer hat Suche vertagt). Vermutung: Neuzeichnen einer Seite macht sie kurz kürzer. Test-Skizze: alle Seiten 20 s warten, `scrollTo`/`scrollIntoView`/`focus` mitprotokollieren.
@@ -238,4 +238,11 @@ Ist-Stand: Es werden alle 14 Plunderstücke untereinander gezeigt, auch nicht ge
 118. Sets: zusammengehörige Stücke (z. B. „Bauarbeiter“: Bauhelm + Taschenlampe + Handschuh) geben Set-Bonus, Fortschritt sichtbar (verbindet mit Idee 6 Sammelalbum) ⭐
 119. Öffnen-Moment: Plunderkiste aus dem Kronkorken-Tausch mit kurzer Öffnen-Animation und Seltenheits-Aufleuchten ⭐
 120. Mehr Plunder für Langzeit: weitere Stücke pro Seltenheit, saisonale Stücke (Idee 8) ⭐
+
+### T. Stadtteile vorerst sperren, später Städte (27.09.2026) ⭐
+Nutzerwunsch: Die Stadtteile (Runde 6, 0015 – sind zurzeit live) bleiben vorerst gesperrt. Später wie bei Pennergame mehrere Städte, die man bewohnen kann – aber erst, wenn es genug Spieler gibt.
+121. Stadtteile vorerst sperren: Menüpunkt/Karte zeigen „Bald verfügbar“ statt Revierwahl, Einfluss-Wertung pausieren; Daten und Server-Funktionen bleiben erhalten ⭐
+122. Freischalten per Schalter (Admin) ab einer Spielerzahl, z. B. ab 50 aktiven Spielern ⭐
+123. Später mehrere Städte (verbindet mit Idee 10): jede Stadt eigene Welt mit eigenen Ranglisten, Stadtteilen und Banden; Umzug in eine andere Stadt kostet Geld/Zeit ⭐
+124. Erst wenn genug Spieler da sind: neue Stadt eröffnen, wenn die bestehende voll genug ist (Richtwert festlegen) ⭐
 
