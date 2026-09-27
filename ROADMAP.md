@@ -60,7 +60,7 @@ GitHub push ──▶ Action: Tests (Postgres) ──▶ Migration live in Supab
 
 Ziel: Es gibt fast immer etwas zu tun – auch mit wenigen Spielern. Empfohlener Start: 1, 2, 3, 5.
 
-**⭐ Vom Nutzer ausgewählt für später (27.09.2026):** 17, 19, 20, 22, 23, 24, 25, 26, 29, 30, 31, 32, 34, 37 – Kiosk-Stand, Revanche, Kopfgeld, Wetten, Kosmetik, Hunger, Sucht/Entzug, Ruf, Glücksrad, Pfandtour zu zweit, Tag/Nacht, Live-Stadtereignisse, Nebenquests, Ein-Klick-Verkaufen. Dazu aus J: 38, 39, 40 (eher selten), 43, 44, 47, 48, 49. Dazu aus K (Fahrzeuge): 53, 54 (erst später), 55, 56, 57, 59 (erst später), 60, 61, 63, 64. Dazu L (einheitliches Aussehen): 65–69. Dazu M (Wegweiser): 70–73. Alle übrigen Ideen bleiben ebenfalls im Plan.
+**⭐ Vom Nutzer ausgewählt für später (27.09.2026):** 17, 19, 20, 22, 23, 24, 25, 26, 29, 30, 31, 32, 34, 37 – Kiosk-Stand, Revanche, Kopfgeld, Wetten, Kosmetik, Hunger, Sucht/Entzug, Ruf, Glücksrad, Pfandtour zu zweit, Tag/Nacht, Live-Stadtereignisse, Nebenquests, Ein-Klick-Verkaufen. Dazu aus J: 38, 39, 40 (eher selten), 43, 44, 47, 48, 49. Dazu aus K (Fahrzeuge): 53, 54 (erst später), 55, 56, 57, 59 (erst später), 60, 61, 63, 64. Dazu L (einheitliches Aussehen): 65–69. Dazu M (Wegweiser): 70–73. Dazu N (flüssiger Seitenwechsel): 74–77. Alle übrigen Ideen bleiben ebenfalls im Plan.
 
 ### Offener Fehler
 - Seite scrollt nach 10–15 s ohne Eingabe nach oben (trotz Fix in PR #27; Ursache noch nicht gefunden, Nutzer hat Suche vertagt). Vermutung: Neuzeichnen einer Seite macht sie kurz kürzer. Test-Skizze: alle Seiten 20 s warten, `scrollTo`/`scrollIntoView`/`focus` mitprotokollieren.
@@ -170,4 +170,11 @@ Nutzerwunsch: Wer oben auf einen Wert klickt, muss direkt bei der passenden Stel
 71. Alle Werte in der Kopfleiste prüfen und richtig verlinken (Bargeld → Schließfach/Einnahmen, Alkoholpegel → Apotheke/Supermarkt, Weiterbildung → Weiterbildung, Pfandpreis → Pfandkurs, Energie → Aktionen, Kronkorken → Kronkorken-Tausch) ⭐
 72. Nach dem Sprung zur Stelle scrollen und sie kurz hervorheben, damit man sofort sieht, wo man ist ⭐
 73. Prüfskript: jeden Link/Wert anklicken und prüfen, ob die passende Karte oben im Bild steht ⭐
+
+### N. Flüssiger Seitenwechsel (27.09.2026) ⭐
+Nutzerwunsch: Der Wechsel zwischen Seiten wirkt ruckelig, und das große Hintergrundbild wechselt bei jedem Klick zu stark – das stört.
+74. Hintergrundbild nur pro Hauptbereich des Menüs wechseln (Mein Kiez, Aktionen, Stadt, Kampf, Bande, Kommunikation, Highscore), nicht bei jeder Unterseite/jedem Reiter ⭐
+75. Weicher Übergang: Hintergrund sanft überblenden statt hart tauschen, Inhalt kurz einblenden (ohne Springen/Flackern) ⭐
+76. Beim Wechsel kein „Lade …“-Aufblitzen und kein Zusammenfallen der Seite: alter Inhalt bleibt stehen, bis der neue da ist, Platz wird freigehalten ⭐
+77. Bilder der Hintergründe vorladen, damit beim Wechsel nichts nachlädt ⭐
 
