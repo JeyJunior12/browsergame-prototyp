@@ -17,7 +17,7 @@ ok  "Katzenwaesche geht" "$(as_user $A "select (wash_up())->>'gain'")" "35"
 as_user $A "select buy_progress('wash'); select buy_progress('wash')" >/dev/null
 ok  "Waschanlage nach Kauf" "$(as_user $A "update profiles set cleanliness=10 where id=auth.uid(); select (wash_up('waschanlage'))->>'gain'" | tail -1)" "100"
 PET=$($P -tAc "select id from pet_catalog order by price limit 1")
-as_user $A "update profiles set social_skill=45 where id=auth.uid()" >/dev/null
+as_user $A "update profiles set social_skill=45, xp=500 where id=auth.uid()" >/dev/null  # seit 0033: Level nötig
 as_user $A "select buy_pet('$PET')" >/dev/null
 has "Tier nicht doppelt kaufbar" "$(as_user $A "select buy_pet('$PET')")" "hast du schon"
 as_user $A "update profiles set level=50 where id=auth.uid(); select buy_item('street_sign'); select buy_item('winter_coat'); select buy_item('whistle'); select equip_item('street_sign'); select equip_item('winter_coat'); select equip_item('whistle')" >/dev/null

@@ -87,3 +87,12 @@ Testkonten wurden nach Runde 3 gelöscht (0014) – bei Bedarf neu anlegen. Neue
 - Server 0026–0031 (S12–S17) liegen als Migration + Test bereit; Oberfläche-Entwürfe im Scratchpad (s12/s13/s14.js). PL/pgSQL-Falle: `if x - case … then … end > 0 then` bricht (THEN im CASE) → erst in Variable rechnen. Level ändert sich per BEFORE-Trigger → Trigger nie „after update of level“, sondern `when (new.level > old.level)`.
 
 - S18 Balancing (0032): Leitwerte + Tabellen in `supabase/schema/data/BALANCING.md`, Ausreißer-Test `test_0032.sh` (Stufenleiter, Lücken ≤ 16 Level bis 150, Geldbehälter bezahlbar). Neue Stücke/Tiere haben Foto-Aufträge in `bilder2.py` („S18“) – bis zum Erzeugen zeigt `kiez-bilder.js` ein Ersatzbild (Datei-Syntax `'neu|ersatz'`).
+- S12–S17 Oberfläche: neue Seiten `nebenjobs`, `auktion`, `kiosk`, `kredithai`, `kiezfiguren`, `saison`, `statistik`, `garage` (Reiter per `data-rtab`); Zusätze in Basar, Prügelei (Revanche/Kopfgeld/Turnier), Zockerbude (Wettbüro), Karriere (Ruf/Legende), Rangliste, Glücksspiel (Glücksrad, CONTENT_ZONES `.kz-wheel`), Freunde, Einstellungen (Kosmetik), Stadtteile (Städte). Klicktest `test/browser/welt.js`.
+- „Als Nächstes“ (`#kz-next`) ist seit 149 eine Karte oben in `#overview` (Liste), **nicht** mehr eine Leiste unter `.stats` – Nutzer: Leiste über dem Kopfbild „macht das Bild kaputt“. Nichts über das Kopfbild legen.
+
+## Schlussrunde (S19, 27.09.2026)
+- **Leistung:** `kiez-features.js` schützt `textContent`/`innerHTML` global: gleicher Text wird nicht neu geschrieben (sonst Endlosschleife zwischen DOM-Beobachtern, Emoji-Ersatz und alten Skripten → Ruckeln). Knopftexte über `setLabel(btn, text)`. `kiez-bilder.js` ordnet pro Karte einmal zu und merkt sich das Ergebnis (`memo`). Messung: `$S/perf.js`-Muster (Long Tasks im Leerlauf, Ziel 0).
+- **Reiter, die alte Skripte zurücksetzen:** per Datenattribut + Stylesheet-`!important` lösen (Beispiel `#income[data-kztab]`), nicht per Inline-Stil.
+- **Durchspiel-Test:** `supabase/test/durchspiel.sh aktiv|gelegenheit [Tage]` (nur lokal) spielt über die echten Funktionen, Zeit vergeht per `sim_advance` (alle Zeitstempel des Spielers zurück). Ergebnis in Tabelle `sim_log`.
+- **0033–0036:** Mitleid-Werte zurück (`pet_catalog.health` = Mitleid!), Tierkauf = Level + Sozialkontakte (max. 45); Pfandmenge 5 + 4×√Straßenkenntnis; Texte im Assi-Ton; Nebenjob-Lohn ≈ 30 % Pfand-Stundenlohn.
+- Pfand-Seite hat echte Reiter „Pfand sammeln“/„Verbrechen“; „Als Nächstes“ steht unter „Dein Kiezbewohner“ und führt nur zur Seite.

@@ -20,8 +20,8 @@ ok "Keine Lücke > 16 Level" "$(Q "select string_agg(category||' '||required_lev
   lead(required_level) over (partition by category order by required_level) nx from shop_items where category in ('waffen','kleidung','zubehoer')) x where nx-required_level>16")" ""
 ok "Jede Kategorie reicht bis Level 150" "$(Q "select count(distinct category) from shop_items where category in ('waffen','kleidung','zubehoer') and required_level=150")" "3"
 ok "Begleiter reichen bis Level 150" "$(Q "select max(required_level) from pet_catalog")" "150"
-ok "Kein Begleiter ohne Lebenspunkte" "$(Q "select string_agg(name,', ') from pet_catalog where price>=1 and health<5")" ""
-ok "Begleiter-Leiter: teurer = stärker (grob)" "$(Q "select string_agg(name,', ') from (select name,attack+defense v, max(attack+defense) over (order by price rows between unbounded preceding and 1 preceding) prevmax from pet_catalog where price>=100) x where v < prevmax*0.5")" ""
+# (health = Mitleid-Bonus, niedrige Werte bei Kampftieren sind gewollt – siehe 0033)
+ok "Begleiter-Leiter: teurer = stärker (Kampf + halbes Mitleid, grob)" "$(Q "select string_agg(name,', ') from (select name,attack+defense+health/2 v, max(attack+defense+health/2) over (order by price rows between unbounded preceding and 1 preceding) prevmax from pet_catalog where price>=100) x where v < prevmax*0.5")" ""
 # Herstellen prüft das Level
 A=$(newuser 'Balance_A'); Q "update profiles set money=500, mat_nails=50, mat_wood=50, mat_textile=50 where id='$A'" >/dev/null
 has "Regenschirm erst ab Level 22" "$(as_user $A "select craft_item('regenschirm')")" "Level 22"

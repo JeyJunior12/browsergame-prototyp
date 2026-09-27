@@ -5,7 +5,7 @@ has(){ echo "$2" | grep -q "$3" && echo "OK   $1" || { echo "FAIL $1: '$2' entha
 newuser(){ $P -tAc "insert into auth.users(raw_user_meta_data) values('{\"username\":\"$1\"}') returning id"; }
 A=$(newuser 'Tier_A'); B=$(newuser 'Tier_B'); C=$(newuser 'Tier_C')
 ok  "Startgeld 5 EUR" "$($P -tAc "select money from profiles where id='$A'")" "5.00"
-$P -tAc "update profiles set money=500, cash_capacity=10000, energy=100, social_skill=45 where id in ('$A','$B','$C')"
+$P -tAc "update profiles set money=500, cash_capacity=10000, energy=100, social_skill=45, xp=500 where id in ('$A','$B','$C')"  # xp: Tierkauf braucht seit 0033 das Level
 
 # Tierkampf
 PET=$($P -tAc "select id from pet_catalog where attack>0 order by price limit 1")

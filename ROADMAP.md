@@ -80,55 +80,55 @@ Nutzerwunsch, höchste Priorität: ein ALL-Chat als kleine Leiste unten rechts, 
 1. ✅ Computer-Gegner in jedem Level-Bereich + wöchentlicher Kiezboss (alle prügeln gemeinsam, Beute für alle)
 2. ✅ Täglich 3 wechselnde Aufgaben + Wochenaufgaben
 3. ✅ Ereignisse auf der Pfandtour mit Entscheidung (Hund, Polizei, voller Container …)
-4. Nebenjobs mit Laufzeit parallel zur Pfandtour
+4. ✅ Nebenjobs mit Laufzeit parallel zur Pfandtour
 5. ✅ Browser-Hinweis, wenn Tour/Weiterbildung/Energie fertig (Push, als App installierbar)
 
 ### B. Langfristige Ziele
-6. Sammelalbum: Plunder-Sets mit Dauerbonus
-7. Kiez-Saison: kostenlose Belohnungsleiter über 4 Wochen
-8. Saison-Events (Advent, Silvester, Ostern, Halloween) mit eigenem Plunder
-9. Nach Level 150: Neustart mit Dauerbonus („Kiez-Legende“)
+6. ✅ Sammelalbum: Plunder-Sets mit Dauerbonus
+7. ✅ Kiez-Saison: kostenlose Belohnungsleiter über 4 Wochen
+8. ✅ Saison-Events (Advent, Silvester, Ostern, Halloween) mit eigenem Plunder
+9. ✅ Nach Level 150: Neustart mit Dauerbonus („Kiez-Legende“)
 
 ### C. Aus Pennergame, fehlt noch
-10. Mehrere Städte als eigene Spielwelten
+10. ✅ Mehrere Städte als eigene Spielwelten
 11. ✅ Bandenhaus mit mehr Ausbauten + Bandenaufgaben (Wochenziele)
 12. ✅ Forum / Bandenforum mit Themen
-13. Waffen und Ausrüstung im Basar handeln
-14. Mehr Ranglisten (Tiere, Geld, Flaschen, Kampfquote)
+13. ✅ Waffen und Ausrüstung im Basar handeln
+14. ✅ Mehr Ranglisten (Tiere, Geld, Flaschen, Kampfquote)
 
 ### D. Wirtschaft
-15. Pfand-Lager & Spekulation: Flaschen horten, bei hohem Kurs verkaufen (Lager ausbaubar, Flaschen können „verschwinden“)
-16. Auktionshaus für seltenen Plunder (Gebote, Laufzeit)
-17. Eigener Kiosk-Stand: passive Einnahmen, ausbaubar, kann überfallen werden ⭐
-18. Kredithai: Geld leihen mit Zinsen, bei Verzug kommen Schläger
+15. ✅ Pfand-Lager & Spekulation: Flaschen horten, bei hohem Kurs verkaufen (Lager ausbaubar, Flaschen können „verschwinden“)
+16. ✅ Auktionshaus für seltenen Plunder (Gebote, Laufzeit)
+17. ✅ Eigener Kiosk-Stand: passive Einnahmen, ausbaubar, kann überfallen werden ⭐
+18. ✅ Kredithai: Geld leihen mit Zinsen, bei Verzug kommen Schläger
 
 ### E. Kämpfe
-19. Revanche: nach Niederlage einmal sofort zurückschlagen ⭐
-20. Kopfgeld auf Spieler aussetzen, wer ihn besiegt, kassiert ⭐
-21. Wöchentliches Kampfturnier (K.-o.-Baum, automatisch ausgetragen)
-22. Wetten auf Tierkämpfe und Bandenkriege ⭐
+19. ✅ Revanche: nach Niederlage einmal sofort zurückschlagen ⭐
+20. ✅ Kopfgeld auf Spieler aussetzen, wer ihn besiegt, kassiert ⭐
+21. ✅ Wöchentliches Kampfturnier (K.-o.-Baum, automatisch ausgetragen)
+22. ✅ Wetten auf Tierkämpfe und Bandenkriege ⭐
 
 ### F. Charakter
-23. Kosmetik: Kleidung, Avatar-Rahmen, Titel-Farben ⭐
+23. ✅ Kosmetik: Kleidung, Avatar-Rahmen, Titel-Farben ⭐
 24. ✅ Hunger/Durst: regelmäßig essen, sonst weniger Energie ⭐
 25. ✅ Sucht & Entzug beim Alkohol (Nachteil bei zu viel Promille über Tage) ⭐
-26. Ruf bei Kiez-Gruppen (Polizei, Unterwelt, Nachbarn) mit Freischaltungen ⭐
+26. ✅ Ruf bei Kiez-Gruppen (Polizei, Unterwelt, Nachbarn) mit Freischaltungen ⭐
 
 ### G. Sozial
-27. Mentor-System: Erfahrene nehmen Neulinge auf, beide bekommen Bonus
-28. Geschenke an Freunde (Plunder, Getränke, Kronkorken)
-29. Tägliches Glücksrad („Mülltonnen-Lotterie“, 1 Dreh am Tag) ⭐
-30. Freundes-Aktionen: zu zweit auf Pfandtour mit Bonus ⭐
+27. ✅ Mentor-System: Erfahrene nehmen Neulinge auf, beide bekommen Bonus
+28. ✅ Geschenke an Freunde (Plunder, Getränke, Kronkorken)
+29. ✅ Tägliches Glücksrad („Mülltonnen-Lotterie“, 1 Dreh am Tag) ⭐
+30. ✅ Freundes-Aktionen: zu zweit auf Pfandtour mit Bonus ⭐
 
 ### H. Welt
-31. Tag und Nacht: nachts andere Aktionen, Chancen und Preise ⭐
-32. Live-Stadtereignisse: z. B. „Konzert im Stadtpark – 1 Std. doppelt Pfand dort“ ⭐
-33. Razzien und Viertel-Ereignisse in den Stadtteilen
-34. Nebenquests von Kiez-Figuren (mehrteilig, neben der Kiez-Geschichte) ⭐
+31. ✅ Tag und Nacht: nachts andere Aktionen, Chancen und Preise ⭐
+32. ✅ Live-Stadtereignisse: z. B. „Konzert im Stadtpark – 1 Std. doppelt Pfand dort“ ⭐
+33. ✅ Razzien und Viertel-Ereignisse in den Stadtteilen
+34. ✅ Nebenquests von Kiez-Figuren (mehrteilig, neben der Kiez-Geschichte) ⭐
 
 ### I. Komfort
 35. ✅ Einsteiger-Tutorial Schritt für Schritt
-36. Statistikseite mit Verlaufskurven (Punkte, Geld, Flaschen)
+36. ✅ Statistikseite mit Verlaufskurven (Punkte, Geld, Flaschen)
 37. ✅ Schnellaktionen: „Alles verkaufen & neue Tour starten“ mit einem Klick ⭐
 
 ### J. Alle 3–5 Minuten etwas tun & wiederkommen (27.09.2026)
@@ -138,7 +138,7 @@ Nutzerwunsch, höchste Priorität: ein ALL-Chat als kleine Leiste unten rechts, 
 41. ✅ Glückssträhne: Bonus, wenn man innerhalb von 5 Min. weiterspielt
 42. ✅ Blitzaufträge alle 5 Min.
 43. ✅ Flaschen-Sortierspiel (30 Sek., Bonus-Pfand) ⭐
-44. ✅ Leiste „Als Nächstes“ mit Countdowns und Ein-Klick-Aktionen ⭐
+44. ✅ „Als Nächstes“ mit Countdowns – seit 151 als Liste in der Übersicht, Klick führt nur zur Seite (keine Ein-Klick-Aktion mehr) ⭐
 45. ✅ Live-Ticker „Gerade im Kiez“
 46. ✅ Handy-Benachrichtigungen (als App installierbar; Hinweise solange der Browser offen ist – echte Push ohne offenen Browser braucht einen Push-Dienst)
 47. ✅ Tab-Titel blinkt („(1) Tour fertig!“) ⭐
@@ -150,18 +150,18 @@ Nutzerwunsch, höchste Priorität: ein ALL-Chat als kleine Leiste unten rechts, 
 
 ### K. Fahrzeuge (27.09.2026)
 Aufstieg: Einkaufswagen → Bollerwagen → Fahrrad mit Anhänger → Lastenrad → Mofa → rostiger Kombi → Transporter → Wohnmobil. Am Anfang ist man ein echter Penner – Motorfahrzeuge erst deutlich später.
-53. Fahrzeug wirkt auf die Pfandtour: mehr Flaschen, schneller, weiter entfernte Sammelgebiete ⭐
-54. Führerschein als Weiterbildung (Theorie + Praxis), nötig für Mofa/Auto – **erst später erreichbar, nicht früh** ⭐
-55. Sprit und Pannen: Tanken kostet, zufällige Pannen/Polizeikontrolle ohne TÜV ⭐
-56. Tuning aus Plunder/Material: Reifen, Motor, Anhänger, Hupe, Lackierung ⭐
-57. Schrottplatz: Autoteile ausschlachten → Material, Schrott verkaufen ⭐
-58. Wohnmobil als Unterkunft
-59. Fahrer-Jobs mit Laufzeit (Kurier, Umzugshilfe, Sperrmüll) – **erst später, am Anfang ist man ein richtiger Penner** ⭐
-60. Straßenrennen gegen Spieler mit Einsatz, Zuschauer wetten ⭐
-61. Autodiebstahl + Schutz (Lenkradkralle, Garage, Tier im Auto) ⭐
-62. Bandenfahrzeug (Transporter) mit Bonus für Stadtteile/Bandenkriege
-63. Fahrten zwischen Stadtteilen: ohne Auto dauert Revierwechsel länger, mit Auto sofort ⭐
-64. Fahrzeug + Lackierung im Profil und auf dem Stadtplan zeigen ⭐
+53. ✅ Fahrzeug wirkt auf die Pfandtour: mehr Flaschen, schneller, weiter entfernte Sammelgebiete ⭐
+54. ✅ Führerschein als Weiterbildung (Theorie + Praxis), nötig für Mofa/Auto – **erst später erreichbar, nicht früh** ⭐
+55. ✅ Sprit und Pannen: Tanken kostet, zufällige Pannen/Polizeikontrolle ohne TÜV ⭐
+56. ✅ Tuning aus Plunder/Material: Reifen, Motor, Anhänger, Hupe, Lackierung ⭐
+57. ✅ Schrottplatz: Autoteile ausschlachten → Material, Schrott verkaufen ⭐
+58. ✅ Wohnmobil als Unterkunft
+59. ✅ Fahrer-Jobs mit Laufzeit (Kurier, Umzugshilfe, Sperrmüll) – **erst später, am Anfang ist man ein richtiger Penner** ⭐
+60. ✅ Straßenrennen gegen Spieler mit Einsatz, Zuschauer wetten ⭐
+61. ✅ Autodiebstahl + Schutz (Lenkradkralle, Garage, Tier im Auto) ⭐
+62. ✅ Bandenfahrzeug (Transporter) mit Bonus für Stadtteile/Bandenkriege
+63. ✅ Fahrten zwischen Stadtteilen: ohne Auto dauert Revierwechsel länger, mit Auto sofort ⭐
+64. ✅ Fahrzeug + Lackierung im Profil und auf dem Stadtplan zeigen ⭐
 
 ### L. Einheitliches Aussehen überall (27.09.2026) ⭐
 Nutzerwunsch: Ungleichheiten auf allen Seiten richtig machen. Beispiel: Karte „Dein Inventar“ (Pfand-/Übersichtsbereich) hat kein Foto, Emojis als Symbole (🍾 🔩 🪵 🔺 🧵), Eingabefeld und Knöpfe unterschiedlich hoch.
@@ -257,8 +257,8 @@ Ist-Stand: Es werden alle 14 Plunderstücke untereinander gezeigt, auch nicht ge
 Nutzerwunsch: Die Stadtteile (Runde 6, 0015 – sind zurzeit live) bleiben vorerst gesperrt. Später wie bei Pennergame mehrere Städte, die man bewohnen kann – aber erst, wenn es genug Spieler gibt.
 121. ✅ Stadtteile vorerst sperren: Menüpunkt/Karte zeigen „Bald verfügbar“ statt Revierwahl, Einfluss-Wertung pausieren; Daten und Server-Funktionen bleiben erhalten ⭐
 122. ✅ Freischalten per Schalter (Admin) ab einer Spielerzahl, z. B. ab 50 aktiven Spielern ⭐
-123. Später mehrere Städte (verbindet mit Idee 10): jede Stadt eigene Welt mit eigenen Ranglisten, Stadtteilen und Banden; Umzug in eine andere Stadt kostet Geld/Zeit ⭐
-124. Erst wenn genug Spieler da sind: neue Stadt eröffnen, wenn die bestehende voll genug ist (Richtwert festlegen) ⭐
+123. ✅ Später mehrere Städte (verbindet mit Idee 10): jede Stadt eigene Welt mit eigenen Ranglisten, Stadtteilen und Banden; Umzug in eine andere Stadt kostet Geld/Zeit ⭐
+124. ✅ Erst wenn genug Spieler da sind: neue Stadt eröffnen, wenn die bestehende voll genug ist (Richtwert festlegen) ⭐
 
 ### U. Kiezpost: Empfänger richtig auswählen (27.09.2026) ⭐
 Gemeldet: „Nachricht schreiben“ hat eine Auswahlliste mit allen Spielern (sogar dem eigenen Namen). Das skaliert nicht und ist unpraktisch.
@@ -287,3 +287,10 @@ Nutzerwunsch: Ganz am Ende, wenn alles andere gebaut ist, noch einmal alles durc
 ### W. Ausrüstung verwalten (Nutzer, 27.09.2026) ⭐
 147. ✅ Eigener Reiter „Ausrüstung“ (Mein Kiez): alle gekauften Waffen, Kleidung, Zubehör und Verteidigung mit Bild und Werten; Anlegen/Ablegen dort statt nur im Laden; angelegte Stücke je Platz oben, Kampfwerte daneben ⭐
 148. ✅ Postfach: Privatnachricht aus der Chat-Leiste (z. B. „An ClaudeDesign: hi“) liegt als Kasten über dem Kartenbild und die Karte wirkt leer – Nachrichten im Postfach sauber als Liste in der Karte zeigen (Absender/Empfänger, Zeit, Antworten öffnet den Chat), nichts überlappt ⭐
+149. ✅ Leiste „Als Nächstes“ lag als Kästchenreihe über dem Kopfbild (Nutzer-Screenshot) → jetzt eigene Karte „Als Nächstes“ oben in der Übersicht, als Liste (Name · Status · Knopf), Handy einspaltig
+150. ✅ Reiter-Spalte rechts im selben alten Papier wie die Kopfzeile (Nutzer-Screenshot: war dunkel bzw. zu hell)
+151. ✅ „Als Nächstes“: keine Leiste über dem Bild und keine Knöpfe, die sofort etwas auslösen → Liste in der Übersicht, jede Zeile führt nur zur passenden Seite/Karte
+152. ✅ Seite ruckelt manchmal: Endlosschleife zwischen DOM-Beobachtern (Knopftexte/Emoji-Ersatz/alte Skripte) + Bildzuordnung bei jeder Änderung über 350 Regeln → Schreibschutz für unveränderte Texte, Bildzuordnung mit Zwischenspeicher (Leerlauf 0 Blockaden statt ~5/s, Seitenwechsel ~30 ms statt ~220 ms)
+153. ✅ ROADMAP gegen alle Absprachen im Chat prüfen: fehlt etwas, das besprochen wurde? (Nutzer: „ich glaub du hast gar nicht alles rein gemacht“)
+154. ✅ Alle Beschreibungen (Gegenstände, Tiere, Plunder, Jobs, Fahrzeuge, Orte, Aktionen, Meldungen) neu schreiben: assi, pennermäßig, lustig – eigener Stil, nichts von Pennergame kopieren → 0035 (≈190 Texte: Laden, Tiere, Plunder, Fahrzeuge, Sets, Stadtteile, Städte, Erfolge) + 0036 (Nebenjobs) + 20 Unterkünfte/Schnorrplätze in index.html
+155. ✅ Alle Seiten durchgehen: Preise prüfen, Seiten ohne Sinn/schwache Seiten verbessern oder zusammenlegen, Aktionen die zu schnell/zu oft gleich wiederholbar sind begrenzen, falsche Knöpfe reparieren (verbindet mit 141/145) → 19 Befunde behoben (Pfand-Reiter echt statt Sprunglinks, Reiter „Sammelgebiete“ zeigte Instrumente, Laden-Reiter, doppelter Tagesauftrag, falscher Unterkunft-Titel + abgeschriebene Haustexte neu, Nebenjob-Lohn, Punkte-Anzeige, Tier-Sperre, Bilder, Lücken, Leistung)

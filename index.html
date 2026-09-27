@@ -326,7 +326,7 @@ const CONTENT_ZONES={
  income:{sel:':scope > .inside',tabs:{'Schnorrplätze':'.schnorr-spots','Sammelgebiete':'.area-list','Instrumente':'.purchase-card,.instrument-list,:has(#musiccollect)'},view:{'Schnorrplätze':'schnorr','Sammelgebiete':'areas','Instrumente':'music'}},
  training:{sel:':scope > .inside',tabs:{'Fähigkeiten':'p,.skill-grid,#trainmsg','Lernwarteschlange':'#trainmsg,.concentration-card,.section-lead'}},
  messages:{sel:':scope > .inside',tabs:{'Posteingang':'.cards,#msgstatus','System':'#kf-notifications'}},
- missions:{sel:':scope > .inside',tabs:{'Belohnungsserie':'.section-lead','Tagesauftrag':'h3,b,.progress,#missiontext,#claimmission,#missionmsg,#activitymsg,.kz-daily','Glücksspiel':'.scratch-card,#kf-lotto'}},
+ missions:{sel:':scope > .inside',tabs:{'Belohnungsserie':'.section-lead','Tagesauftrag':'h3,b,.progress,#missiontext,#claimmission,#missionmsg,#activitymsg,.kz-daily','Glücksspiel':'.scratch-card,#kf-lotto,.kz-wheel'}},
  achievements:{sel:':scope > .inside',tabs:{'Erfolge':'p,#achievementlist,#checkachievements,#achievementmsg','Kommende Meilensteine':'#kf-milestones'}},
  leaderboard:{sel:':scope > .inside',tabs:{'Spieler':'#leaders,.mini-status'}},
  career:{sel:':scope > .inside',tabs:{'Statistik':':not(#rankladder)','Ränge':'#rankladder'}},
@@ -487,7 +487,7 @@ html{min-height:100%;background:#111}body{min-height:100%;background-color:#1717
 .player-slip{width:196px!important;height:126px!important;padding:10px 9px 7px 64px!important;grid-template-rows:22px 14px 14px 14px 22px 22px!important;clip-path:polygon(1% 3%,98% 0,100% 20%,98% 42%,100% 66%,97% 98%,76% 96%,54% 100%,31% 97%,3% 100%,0 78%,2% 54%,0 28%)!important}.profile-avatar{left:9px!important;top:12px!important;width:47px!important;height:50px!important;border-width:2px!important}.profile-avatar:after{width:16px!important;height:16px!important;font-size:9px!important;line-height:14px!important}.avatar-stats{position:absolute;left:9px;top:66px;width:47px;padding:3px;background:#2c2923;border:1px solid #6e5c40;box-shadow:inset 0 0 5px #000}.avatar-stats i{display:block;height:5px;margin:2px 0;border:1px solid #181713;background:#4b463c;position:relative}.avatar-stats i:after{content:'';display:block;height:100%}.avatar-stats i:nth-child(1):after{width:72%;background:#b7c35f}.avatar-stats i:nth-child(2):after{width:48%;background:#cc744d}.avatar-stats i:nth-child(3):after{width:63%;background:#6b9cb1}.player-slip strong{font-size:13px!important;line-height:18px!important}.player-slip span{grid-template-columns:42px 1fr!important;font-size:7px!important}.player-slip span b{font-size:6px!important}.player-slip .slip-points{display:grid!important}.player-slip .slip-messages{margin-top:2px!important;padding:3px!important}.player-slip>#logout{bottom:7px!important;right:auto!important;left:64px!important;padding:2px 12px!important;width:73px!important;text-align:center!important}
 </style>
 <script id="compact-profile-card-script-v30">
-(()=>{const slip=document.querySelector('.player-slip');if(!slip||slip.dataset.v30)return;slip.dataset.v30='1';if(!slip.querySelector('.avatar-stats')){const bars=document.createElement('div');bars.className='avatar-stats';bars.innerHTML='<i></i><i></i><i></i>';slip.querySelector('.profile-avatar')?.after(bars)}const rows=[...slip.querySelectorAll(':scope>span')];let points=slip.querySelector('.slip-points');if(!points){points=document.createElement('span');points.className='slip-points';const messages=slip.querySelector('.slip-messages');slip.insertBefore(points,messages||slip.querySelector('#logout'))}const sync=()=>{const level=Number(document.querySelector('#level')?.textContent||1),xp=(document.querySelector('#xptext')?.textContent||'0').split('/')[0].trim();points.innerHTML='<b>PUNKTE:</b><i>'+((level-1)*250+Number(xp||0))+'</i>'};sync();setInterval(sync,1000)})();
+(()=>{const slip=document.querySelector('.player-slip');if(!slip||slip.dataset.v30)return;slip.dataset.v30='1';if(!slip.querySelector('.avatar-stats')){const bars=document.createElement('div');bars.className='avatar-stats';bars.innerHTML='<i></i><i></i><i></i>';slip.querySelector('.profile-avatar')?.after(bars)}const rows=[...slip.querySelectorAll(':scope>span')];let points=slip.querySelector('.slip-points');if(!points){points=document.createElement('span');points.className='slip-points';const messages=slip.querySelector('.slip-messages');slip.insertBefore(points,messages||slip.querySelector('#logout'))}const sync=()=>{const level=Number(document.querySelector('#level')?.textContent||1),xp=(document.querySelector('#xptext')?.textContent||'0').split('/')[0].trim();points.innerHTML='<b>PUNKTE:</b><i>'+(window.kiezProfile?.xp??Number(xp||0))+'</i>'};sync();setInterval(sync,1000)})();
 </script>
 <style id="kiez-quickbar-v31">
 .kiez-quickbar{height:27px;margin:-7px 18px 0;display:grid;grid-template-columns:repeat(11,minmax(0,1fr));align-items:end;position:relative;z-index:60;padding:0 4px;background:transparent;border-bottom:4px solid #766448}.kiez-quickbar button{height:23px;margin:0 -1px 0 0;padding:3px 4px;border:1px solid #7c6c50;border-bottom:0;background-color:#cbbb96;background-image:linear-gradient(#ded2b3,#b8a780);color:#352d21;font:700 7px/1 Georgia,serif;white-space:nowrap;cursor:pointer;box-shadow:inset 0 1px #f6ecd3}.kiez-quickbar button:hover,.kiez-quickbar button.active{height:26px;background:#eadbb7;color:#17120c}.panel.active-view{margin-top:8px!important}
@@ -589,26 +589,26 @@ function addHaeuserGalerie(){
  const cards=document.querySelector('#gear .cards');
  if(!cards||document.querySelector('.haeuser-gallery'))return;
  const houses=[
-  {min:1,def:1,name:'Bürgersteig',bezirk:'überall verfügbar',desc:'Hier fangen alle mal an: Mitten auf dem Bürgersteig. Es ist kalt, unsicher und laut.',img:'/scene-city-v1.webp'},
-  {min:2,def:4,name:'Park',bezirk:'überall verfügbar',desc:'Weiche Wiesen, frische Luft und Vogelgezwitscher. Eine gute Alternative zum beliebten und dreckigen Bürgersteig.',img:'/kiez-background-v1.webp'},
-  {min:3,def:8,name:'Parkbank',bezirk:'überall verfügbar',desc:'Im Pennerjargon auch Mittelklasse-Hotel genannt. Ein etwas unbequemes Bett, aber dafür die wunderschöne Natur um dich herum.',img:'/kiez-header-street-v2.webp'},
-  {min:4,def:17,name:'Pennerbox',bezirk:'überall verfügbar',desc:'Die bekannte Firma Schluckspecht bietet neuerdings eine Pennerbox für die Unterschichtspenner an.',img:'/scene-store-v1.webp'},
-  {min:5,def:21,name:'Brunnen',bezirk:'überall verfügbar',desc:'Trockener als man denkt, solange es nicht regnet. Das Wasser holst du dir gleich nebenan.',img:'/scene-fairground-v1.webp'},
-  {min:6,def:24,name:'Brücke',bezirk:'überall verfügbar',desc:'Ein Klassiker unter Kennern. Trocken, zugig und mit Blick auf den Verkehr.',img:'/scene-city-v1.webp'},
-  {min:7,def:28,name:'Katakomben',bezirk:'überall verfügbar',desc:'Etwas gruselig, dafür aber angenehm ruhig. Niemand stört dich hier unten.',img:'/scene-messages-v1.webp'},
-  {min:8,def:31,name:'Elbstrand',bezirk:'Elbstrand',desc:'Meerblick für Arme. Bei Flut wird es allerdings ungemütlich.',img:'/kiez-background-v1.webp'},
-  {min:9,def:34,name:'Baumhaus',bezirk:'überall verfügbar',desc:'Kindheitstraum trifft Obdachlosigkeit. Mit etwas Glück fällt wenigstens niemand raus.',img:'/scene-gang-v1.webp'},
-  {min:10,def:42,name:'Zelt',bezirk:'überall verfügbar',desc:'Regen bleibt meistens draußen. Meistens.',img:'/scene-shelter-v1.webp'},
-  {min:11,def:51,name:'Wolfsrudel',bezirk:'überall verfügbar',desc:'Wärme durch Gesellschaft, auch wenn die Mitbewohner gelegentlich knurren.',img:'/scene-pets-v1.webp'},
-  {min:12,def:58,name:'Wohnwagen',bezirk:'überall verfügbar',desc:'Riecht nach Vorbesitzer, aber die Tür schließt immerhin ab.',img:'/scene-training-v1.webp'},
-  {min:13,def:64,name:'Boot',bezirk:'überall verfügbar',desc:'Schaukelt bei jedem Windstoß, aber wenigstens hast du einen Ausblick, um den dich viele beneiden.',img:'/schnorren-scene-v1.webp'},
-  {min:14,def:73,name:'Grabkammer',bezirk:'Allermöhe',desc:'Auf dem Friedhof steht eine alte Grabkammer. Der Friedhofsgärtner würde sie dir gerne verkaufen. Er kann aber keine Garantie dafür übernehmen, dass du darin völlig allein bist.',img:'/scene-messages-v1.webp'},
-  {min:15,def:82,name:'Tiefgarage',bezirk:'überall verfügbar',desc:'Nicht nur für Autos eine Möglichkeit, nach einem Vollrausch mal abzuschalten. Die Abgase sind nicht sehr gesund, aber das bekommst du sowieso nicht mehr mit.',img:'/scene-training-v1.webp'},
-  {min:16,def:89,name:'Kakaofabrik',bezirk:'Stellingen',desc:'Als Kenner des Industriegebiets bist du natürlich bestens mit den umliegenden Fabriken vertraut. Die Kakaofabrik sticht sofort ins Auge.',img:'/scene-fairground-v1.webp'},
-  {min:17,def:102,name:'Kran',bezirk:'überall verfügbar',desc:'Ganz schön hoch kann man in dieser kleinen engen Kabine über den Dingen stehen, wenn man die schöne Aussicht und die Sicherheit in Betracht zieht.',img:'/scene-shelter-v1.webp'},
-  {min:18,def:125,name:'Leuchtturm',bezirk:'Neuland',desc:'Endlich, dein erstes richtiges Gebäude! Zwar nerven die ewig rotierenden Scheinwerfer, aber wenigstens hast du es schön warm.',img:'/scene-gang-v1.webp'},
-  {min:19,def:147,name:'Alte Kirche',bezirk:'Basel',desc:'Dass Gott dich im Stich gelassen hat, wissen wir beide. Vielleicht drückt er ja ein Auge zu, wenn du bei ihm wohnst.',img:'/scene-messages-v1.webp'},
-  {min:20,def:158,name:'Burg',bezirk:'Kirchwerder',desc:'Nur ein Wunderling wie du zieht heutzutage noch in diese alten Gemäuer ein. Aber diese Burg bietet dir sagenhaften Schutz.',img:'/scene-pets-v1.webp'}
+  {min:1,def:1,name:'Bürgersteig',bezirk:'überall verfügbar',desc:'Pflaster, Kippen, Hundehaufen. Jeder fängt hier an – die meisten schlafen hier auch wieder ein.',img:'/scene-city-v1.webp'},
+  {min:2,def:4,name:'Park',bezirk:'überall verfügbar',desc:'Gras statt Beton, Enten statt Autos. Morgens weckt dich der Rasensprenger.',img:'/kiez-background-v1.webp'},
+  {min:3,def:8,name:'Parkbank',bezirk:'überall verfügbar',desc:'Eigene Bank mit Rückenlehne. Die Armlehne in der Mitte drückt, aber du hast schon Schlimmeres gehabt.',img:'/kiez-header-street-v2.webp'},
+  {min:4,def:17,name:'Pennerbox',bezirk:'überall verfügbar',desc:'Umzugskarton XXL mit Fenster aus Frischhaltefolie. Innen erstaunlich gemütlich, außen „Vorsicht Glas“.',img:'/scene-store-v1.webp'},
+  {min:5,def:21,name:'Brunnen',bezirk:'überall verfügbar',desc:'Im trockenen Zierbrunnen vorm Rathaus. Solange keiner das Wasser anstellt, top Lage.',img:'/scene-fairground-v1.webp'},
+  {min:6,def:24,name:'Brücke',bezirk:'überall verfügbar',desc:'Dach über dem Kopf, Züge über dem Dach. Nach drei Nächten hörst du die nicht mehr.',img:'/scene-city-v1.webp'},
+  {min:7,def:28,name:'Katakomben',bezirk:'überall verfügbar',desc:'Unter der Stadt ist es warm und still. Die Ratten sind höflich, solange du teilst.',img:'/scene-messages-v1.webp'},
+  {min:8,def:31,name:'Elbstrand',bezirk:'Elbstrand',desc:'Sand im Schlafsack, Möwen im Proviant. Dafür Meerblick – fast.',img:'/kiez-background-v1.webp'},
+  {min:9,def:34,name:'Baumhaus',bezirk:'überall verfügbar',desc:'Die Kinder vom Spielplatz haben es aufgegeben. Jetzt bist du der König im Baum.',img:'/scene-gang-v1.webp'},
+  {min:10,def:42,name:'Zelt',bezirk:'überall verfügbar',desc:'Vom Festival übrig geblieben. Riecht nach Bier und Regen, hält aber dicht. Meistens.',img:'/scene-shelter-v1.webp'},
+  {min:11,def:51,name:'Wolfsrudel',bezirk:'überall verfügbar',desc:'Im Stadtwald bei den Hunden, die keiner will. Warm, laut und keiner klaut deine Schuhe.',img:'/scene-pets-v1.webp'},
+  {min:12,def:58,name:'Wohnwagen',bezirk:'überall verfügbar',desc:'Plattfuß, Schimmel an der Decke – aber die Tür schließt ab. Luxus pur.',img:'/scene-training-v1.webp'},
+  {min:13,def:64,name:'Boot',bezirk:'überall verfügbar',desc:'Altes Ruderboot am Kanal. Schaukelt dich in den Schlaf und manchmal ins Wasser.',img:'/schnorren-scene-v1.webp'},
+  {min:14,def:73,name:'Grabkammer',bezirk:'Allermöhe',desc:'Ruhige Nachbarn, keiner beschwert sich. Nur der Friedhofsgärtner guckt komisch.',img:'/scene-messages-v1.webp'},
+  {min:15,def:82,name:'Tiefgarage',bezirk:'überall verfügbar',desc:'Ebene -3, hinter den Mülltonnen. Warm von den Abgasen, bewacht vom Parkautomaten.',img:'/scene-training-v1.webp'},
+  {min:16,def:89,name:'Kakaofabrik',bezirk:'Stellingen',desc:'Stillgelegt, aber es riecht noch nach Schokolade. Du wachst jeden Morgen mit Hunger auf.',img:'/scene-fairground-v1.webp'},
+  {min:17,def:102,name:'Kran',bezirk:'überall verfügbar',desc:'Oben in der Kabine vom Baukran. Keiner kommt hoch, keiner sieht dich – nur der Wind wackelt.',img:'/scene-shelter-v1.webp'},
+  {min:18,def:125,name:'Leuchtturm',bezirk:'Neuland',desc:'Echte Wände, echte Tür, echte Treppe. Das Licht dreht sich die ganze Nacht, du dich auch.',img:'/scene-gang-v1.webp'},
+  {min:19,def:147,name:'Alte Kirche',bezirk:'Basel',desc:'Leere Kirchenbänke, bunte Fenster, Hall bis ins Mark. Der Pfarrer kommt nur noch Sonntags.',img:'/scene-messages-v1.webp'},
+  {min:20,def:158,name:'Burg',bezirk:'Kirchwerder',desc:'Mauern, Türme, Burggraben. Hier wohnt kein Penner mehr – hier residiert der Kiezkönig.',img:'/scene-pets-v1.webp'}
  ];
  const wrap=document.createElement('div');
  wrap.className='haeuser-gallery cards';
@@ -1263,8 +1263,8 @@ function addSchnorrplaetze(){
  const areaCard=document.getElementById('areaname')?.closest('.card');
  if(!areaCard||document.querySelector('.schnorr-spots'))return;
  const spots=[
-  {id:'englischer_garten',name:'Englischer Garten',rate:0.10,seconds:20,area:1,desc:'Hier gibt es nur endlose Wiesen und verliebte Paare. Nur ein Idiot geht hier schnorren.'},
-  {id:'bahnhof',name:'Hauptbahnhof',rate:0.20,seconds:25,area:2,desc:'Pendler mit schlechtem Gewissen und Kleingeld in der Jackentasche.'},
+  {id:'englischer_garten',name:'Englischer Garten',rate:0.10,seconds:20,area:1,desc:'Wiesen, Pärchen, Hundehaufen. Wenig los, aber keiner verjagt dich – der Einstieg für jeden Becher.'},
+  {id:'bahnhof',name:'Hauptbahnhof',rate:0.20,seconds:25,area:2,desc:'Pendler mit schlechtem Gewissen und Kleingeld in der Jacke. Einmal „Haste mal ’n Euro?“ und die Bahn ist weg.'},
   {id:'fussgaengerzone',name:'Fußgängerzone',rate:0.30,seconds:30,area:3,desc:'Einkaufstüten, Straßenmusik und ab und zu ein spendabler Tourist.'},
   {id:'jahrmarkt',name:'Jahrmarkt',rate:0.50,seconds:30,area:4,desc:'Zuckerwatte, Blinklichter und pralle Geldbeutel – hier lohnt sich Betteln richtig.'},
   {id:'oper',name:'Vor der Oper',rate:0.80,seconds:40,area:5,desc:'Abendgarderobe und schlechtes Gewissen – hier sitzt das Geld am lockersten.'}

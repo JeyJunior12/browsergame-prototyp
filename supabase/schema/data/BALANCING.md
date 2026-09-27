@@ -14,7 +14,7 @@ Geprüft wird automatisch mit `supabase/test/test_0032.sh` (Ausreißer, Lücken,
 | Geldbehälter | jede Stufe passt in den vorherigen Behälter: 20 / 95 / 900 / 9.000 € (vorher 150 € bei 100 € Platz und 75.000 € bei 10.000 € Platz = unerreichbar) |
 
 ## Einnahmen gegen Ausgaben (Richtwerte, Pfand ⌀ 0,20 €)
-Flaschen pro 10 Min. = (5 + Straßenkenntnis × 0,8 + (Sack − 1) × 2) × Sammelgebiet-Faktor (1,0–2,5).
+Flaschen pro 10 Min. = (5 + 4 × √Straßenkenntnis + (Sack − 1) × 2) × Sammelgebiet-Faktor (1,0–2,5) – seit 0034 (vorher 0,8 × Stufe linear → Geld im Überfluss ab Level ~40).
 
 | Level | angenommene Werte | Flaschen/Std. | € pro Tag (≈ 8 Std. Touren) | nächstes Stück | Sparzeit |
 |---|---|---|---|---|---|
@@ -31,7 +31,7 @@ Angriff = Angriffstraining × 3 + Straßenkenntnis + Ausrüstung + Begleiter + B
 Mit Leitwerten macht Ausrüstung (Waffe + Zubehör ≈ 1,85 × Level) rund 30 % des Angriffs aus (Training ≈ 4 × Level) – Ausrüstung zählt, Level bleibt wichtiger.
 Gegner nur 80–150 % des eigenen Levels, Beute 10 % der Tasche (mit Versicherung 5 %), 3 Std. Sperre pro Gegner.
 
-## Laden (Stand Migration 0032)
+## Laden (Stand Migration 0036)
 
 | Kategorie | Stück | Level | Preis € | Angriff | Verteidigung | Wert/Level |
 |---|---|---|---|---|---|---|
@@ -92,7 +92,7 @@ Gegner nur 80–150 % des eigenen Levels, Beute 10 % der Tasche (mit Versicherun
 | zubehoer | Klappspaten | 8 | 95 | 7 | 3 | 1.25 |
 | zubehoer | Taschenlampe | 11 | 160 | 2 | 9 | 1.00 |
 | zubehoer | Survival-Rucksack | 15 | 280 | 5 | 12 | 1.13 |
-| zubehoer | Funkgeraet | 19 | 420 | 8 | 10 | 0.95 |
+| zubehoer | Funkgerät | 19 | 420 | 8 | 10 | 0.95 |
 | zubehoer | Solarpanel-Set | 24 | 650 | 6 | 18 | 1.00 |
 | zubehoer | Mofamotor für den Wagen | 28 | 900 | 10 | 20 | 1.07 |
 | zubehoer | Gepanzerte Handkarre | 32 | 1100 | 15 | 20 | 1.09 |
@@ -108,17 +108,17 @@ Gegner nur 80–150 % des eigenen Levels, Beute 10 % der Tasche (mit Versicherun
 | zubehoer | Selbstgebaute Alarmanlage | 139 | 19300 | 70 | 83 | 1.10 |
 | zubehoer | Siegelring des Kiezkönigs | 150 | 22500 | 75 | 90 | 1.10 |
 
-## Begleiter
+## Begleiter (Leben = Mitleid-Bonus beim Schnorren)
 
-| Tier | Level | Preis € | Angriff | Verteidigung | Leben |
+| Tier | Level | Preis € | Angriff | Verteidigung | Mitleid |
 |---|---|---|---|---|---|
-| Kakerlake | 1 | 0.01 | 0 | 0 | 1 |
-| Goldfisch | 3 | 1.00 | 1 | 1 | 5 |
+| Kakerlake | 1 | 0.01 | 0 | 0 | 0 |
+| Goldfisch | 3 | 1.00 | 1 | 1 | 1 |
 | Maus | 5 | 1.50 | 2 | 3 | 7 |
 | Hamster | 7 | 3.80 | 5 | 4 | 12 |
 | Wellensittich | 9 | 5.00 | 7 | 5 | 16 |
-| Taube | 11 | 7.50 | 8 | 3 | 9 |
-| Ratte | 13 | 15.00 | 10 | 5 | 14 |
+| Taube | 11 | 7.50 | 8 | 3 | 1 |
+| Ratte | 13 | 15.00 | 10 | 5 | 0 |
 | Hase | 15 | 22.50 | 13 | 10 | 17 |
 | Frettchen | 17 | 75.00 | 18 | 15 | 19 |
 | Katze | 19 | 85.00 | 25 | 20 | 32 |
@@ -126,20 +126,33 @@ Gegner nur 80–150 % des eigenen Levels, Beute 10 % der Tasche (mit Versicherun
 | Schlange | 23 | 95.00 | 44 | 38 | 10 |
 | Hausziege | 25 | 100.00 | 36 | 40 | 21 |
 | Pudel | 27 | 200.00 | 26 | 29 | 62 |
-| Dressierte Maus | 29 | 1200.00 | 43 | 37 | 60 |
+| Dressierte Maus | 29 | 1200.00 | 43 | 37 | 253 |
 | Adler | 31 | 300.00 | 39 | 41 | 38 |
-| Schaeferhund | 33 | 600.00 | 55 | 45 | 43 |
-| Pitbull | 35 | 1000.00 | 65 | 59 | 60 |
+| Schäferhund | 33 | 600.00 | 55 | 45 | 43 |
+| Pitbull | 35 | 1000.00 | 65 | 59 | 1 |
 | Cocker Spaniel | 37 | 1470.00 | 59 | 40 | 56 |
-| Chihuahua | 39 | 2000.00 | 58 | 50 | 45 |
+| Chihuahua | 39 | 2000.00 | 32 | 28 | 133 |
 | Pferd | 40 | 2500.00 | 62 | 69 | 80 |
 | Giraffe | 41 | 3000.00 | 71 | 82 | 98 |
 | Krokodil | 42 | 4800.00 | 95 | 75 | 30 |
 | Tiger | 43 | 5000.00 | 110 | 70 | 69 |
-| Aeffchen | 44 | 5800.00 | 92 | 76 | 50 |
+| Äffchen | 44 | 5800.00 | 52 | 43 | 230 |
 | Nashorn | 45 | 7000.00 | 100 | 95 | 39 |
 | Wolf | 60 | 12600.00 | 135 | 110 | 50 |
 | Bär | 80 | 22400.00 | 170 | 160 | 55 |
 | Löwe | 100 | 35000.00 | 225 | 170 | 60 |
 | Gorilla | 125 | 55000.00 | 270 | 250 | 65 |
 | Elefant | 150 | 79000.00 | 320 | 340 | 70 |
+
+## Nebenjobs
+
+| Job | ab Level | Dauer | Lohn |
+|---|---|---|---|
+| Flyer verteilen | 1 | 20 Min. | 1.20 € |
+| Teller spülen | 3 | 60 Min. | 4.50 € |
+| Umzugshelfer | 8 | 120 Min. | 15.00 € |
+| Nachtwache am Bauzaun | 15 | 240 Min. | 45.00 € |
+| Messehelfer | 30 | 480 Min. | 190.00 € |
+| Kurierfahrten | 40 | 90 Min. | 55.00 € |
+| Umzugsfahrer | 55 | 180 Min. | 120.00 € |
+| Sperrmüll-Tour | 70 | 240 Min. | 180.00 € |

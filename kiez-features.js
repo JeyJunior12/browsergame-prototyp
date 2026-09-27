@@ -1008,11 +1008,11 @@ window.kiezGoTab = go;
 // ---------- Hauptmenü nach Pennergame-Aufbau: 7 Bereiche, Unterpunkte klappen auf ----------
 const NAV = [
   ['Mein Kiez', 'szene-uebersicht', [['Übersicht', 'overview'], ['Mein Profil', 'profil'], ['Ausrüstung', 'ausruestung'], ['Plunderkiste & Inventar', 'plunder'], ['Kronkorken', 'kronkorken'],
-    ['Begleiter', 'pets'], ['Unterkunft', 'gear'], ['Karriere', 'career'], ['Erfolge', 'achievements'], ['Einstellungen', 'einstellungen']]],
-  ['Aktionen', 'szene-pfand', [['Pfand sammeln', 'pfand'], ['Verbrechen', 'pfand', 'Verbrechen begehen'], ['Schnorren', 'begging'], ['Weiterbildung', 'training'],
-    ['Kiez-Geschichte', 'geschichte'], ['Tagesauftrag', 'missions']]],
+    ['Begleiter', 'pets'], ['Unterkunft', 'gear'], ['Karriere', 'career'], ['Erfolge', 'achievements'], ['Kiez-Saison', 'saison'], ['Statistik', 'statistik'], ['Einstellungen', 'einstellungen']]],
+  ['Aktionen', 'szene-pfand', [['Pfand sammeln', 'pfand', 'Pfand sammeln'], ['Verbrechen', 'pfand', 'Verbrechen'], ['Schnorren', 'begging'], ['Weiterbildung', 'training'],
+    ['Kiez-Geschichte', 'geschichte'], ['Tagesauftrag', 'missions'], ['Nebenjobs', 'nebenjobs'], ['Kiez-Figuren', 'kiezfiguren']]],
   ['Stadt', 'szene-stadt', [['Stadtplan', 'citymap'], ['Stadtteile', 'stadtteile'], ['Kiezladen', 'store'], ['Apotheke', 'apotheke'], ['Schnorrplätze & Musik', 'income'],
-    ['Plunder-Basar', 'basar'], ['Zockerbude', 'zockerbude'], ['Glücksspiel & Lotto', 'missions', 'Glücksspiel'], ['Schließfach', 'schliessfach']]],
+    ['Plunder-Basar', 'basar'], ['Zockerbude', 'zockerbude'], ['Glücksspiel & Lotto', 'missions', 'Glücksspiel'], ['Schließfach', 'schliessfach'], ['Auktionshaus', 'auktion'], ['Kiosk', 'kiosk'], ['Kredithai', 'kredithai'], ['Garage', 'garage']]],
   ['Kampf', 'szene-pruegelei', [['Gegner suchen', 'pvp'], ['Kampfprotokoll', 'kampfprotokoll'], ['Begleiter trainieren', 'pets']]],
   ['Bande', 'szene-bande', [['Meine Bande', 'gangs'], ['Bandenhaus', 'bandenhaus'], ['Stadtteile erobern', 'stadtteile'], ['Banden-Highscore', 'wettbewerb']]],
   ['Kommunikation', 'szene-post', [['Kiezpost', 'messages'], ['Kiez-Chat', 'chat'], ['Kiez-Brett', 'brett'], ['Freunde', 'freunde']]],
@@ -1498,6 +1498,8 @@ function ownSlot(card) {
   if (!s) { s = document.createElement('div'); s.className = 'kz-own'; card.appendChild(s); }
   return s;
 }
+// Knopftext nur schreiben, wenn er sich wirklich ändert – sonst stoßen sich die DOM-Beobachter (Emoji-Ersatz, Bilder, alte Skripte) endlos gegenseitig an
+function setLabel(btn, txt) { if (btn.dataset.kzlbl === txt && btn.textContent.includes(txt.replace(/^🔒\s*/, ''))) return; btn.dataset.kzlbl = txt; btn.textContent = txt; }
 function ownDecorate() {
   const p = window.kiezProfile, c = OWN.combat; if (!p || !c || !OWN.cat) return;
   const owned = new Set(c.owned || []), on = new Set((c.equipped || []).map(x => x.id));
@@ -1525,7 +1527,7 @@ function ownDecorate() {
     card.classList.remove('kz-is-owned'); btn.style.removeProperty('display'); card.querySelector(':scope > .kz-own')?.remove();
     const lvl = p.level < it.required_level, poor = Number(p.money) < Number(it.price);
     btn.disabled = lvl || poor;
-    btn.textContent = lvl ? '🔒 ab Level ' + it.required_level : poor ? btn.dataset.orig + ' · zu wenig Geld' : btn.dataset.orig;
+    setLabel(btn, lvl ? '🔒 ab Level ' + it.required_level : poor ? btn.dataset.orig + ' · zu wenig Geld' : btn.dataset.orig);
     card.classList.toggle('kz-locked', lvl);
   });
   const mine = Object.fromEntries(OWN.myPets.map(x => [x.pet_id, x]));
@@ -1547,9 +1549,10 @@ function ownDecorate() {
       return;
     }
     card.classList.remove('kz-is-owned'); btn.style.removeProperty('display'); card.querySelector(':scope > .kz-own')?.remove();
-    const lock = p.social_skill < pet.required_level, poor = Number(p.money) < Number(pet.price);
+    // wie buy_pet (0033): Spieler-Level und Sozialkontakte bis höchstens Stufe 45
+    const needSoc = Math.min(45, pet.required_level), lvlLock = p.level < pet.required_level, lock = lvlLock || p.social_skill < needSoc, poor = Number(p.money) < Number(pet.price);
     btn.disabled = lock || poor;
-    btn.textContent = lock ? '🔒 Sozialkontakte Stufe ' + pet.required_level : poor ? btn.dataset.orig + ' · zu wenig Geld' : btn.dataset.orig;
+    setLabel(btn, lvlLock ? '🔒 ab Level ' + pet.required_level : lock ? '🔒 Sozialkontakte Stufe ' + needSoc : poor ? btn.dataset.orig + ' · zu wenig Geld' : btn.dataset.orig);
     card.classList.toggle('kz-locked', lock);
   });
 }
@@ -1562,14 +1565,14 @@ function lockAreas() {
     const m = card.innerText.match(/Geschick Stufe (\d+)/), need = m ? +m[1] : 0, price = Number((btn.dataset.orig.match(/([\d.]+,\d{2})/) || [])[1]?.replace('.', '').replace(',', '.') || 0);
     const lock = need && p.streetwise < need, poor = price && Number(p.money) < price;
     btn.disabled = !!(lock || poor); if (lock || poor) btn.dataset.kzlock = '1'; else delete btn.dataset.kzlock;
-    btn.textContent = lock ? '🔒 Geschick Stufe ' + need + ' nötig' : poor ? btn.dataset.orig + ' · zu wenig Geld' : btn.dataset.orig;
-    card.classList.toggle('kz-locked', !!lock);
+    setLabel(btn, lock ? '🔒 Geschick Stufe ' + need + ' nötig' : poor ? btn.dataset.orig + ' · zu wenig Geld' : btn.dataset.orig);
+    if (card.classList.contains('kz-locked') !== !!lock) card.classList.toggle('kz-locked', !!lock);
   });
   document.querySelectorAll('#income .card[data-spot]').forEach(card => {
     const need = Number(card.dataset.area) || 1, btn = card.querySelector('.schnorr-go'); if (!btn) return;
     const lock = (p.area_level || 1) < need;
-    if (lock) { btn.disabled = true; btn.dataset.kzlock = '1'; btn.textContent = '🔒 ab Sammelgebiet ' + need; card.classList.add('kz-locked'); }
-    else if (card.classList.contains('kz-locked')) { btn.disabled = false; delete btn.dataset.kzlock; btn.textContent = 'Hingehen'; card.classList.remove('kz-locked'); }
+    if (lock) { btn.disabled = true; btn.dataset.kzlock = '1'; setLabel(btn, '🔒 ab Sammelgebiet ' + need); if (!card.classList.contains('kz-locked')) card.classList.add('kz-locked'); }
+    else if (card.classList.contains('kz-locked')) { btn.disabled = false; delete btn.dataset.kzlock; setLabel(btn, 'Hingehen'); card.classList.remove('kz-locked'); }
   });
   // Andere Skripte schalten Knöpfe wieder frei – gesperrte bleiben trotzdem gesperrt
   document.querySelectorAll('[data-kzlock]').forEach(b => { if (!b.disabled) b.disabled = true; });
@@ -1821,6 +1824,24 @@ const EMO_ICON = { '🔒': 'lock', '✔': 'ok', '✔️': 'ok', '✅': 'ok' };
 const EMO_WORD = { '🧢': 'Kronkorken', '⚡': 'Energie', '🛡': 'Schutz', '🛡️': 'Schutz', '⚔': 'Angriff', '⚔️': 'Angriff' };
 const EMO_TAGS = 'h1,h2,h3,h4,b,strong,button,small,label,th,em,.cost,.kz-owned,summary,legend,option';
 const EMO_SKIP = '#kz-dock,.kf-chat,.kz-chat,.chat-list,#chatlist,.guestbook,.kf-guestbook,.msg-body,.kz-usertext,textarea,input,[contenteditable]';
+// Leistung: Alte Skripte schreiben Texte ständig neu (auch unverändert). Jede Schreibung weckt alle DOM-Beobachter,
+// der Emoji-Ersatz ändert den Text, das alte Skript schreibt wieder → Endlosschleife (Ruckeln). Deshalb: gleicher Text = nichts tun.
+{
+  const EMO_RX = /[🔒✅]|✔️?/g, strip = x => String(x ?? '').replace(EMO_RX, '').replace(/\s+/g, ' ').trim();
+  const tc = Object.getOwnPropertyDescriptor(Node.prototype, 'textContent');
+  Object.defineProperty(Node.prototype, 'textContent', { configurable: true, enumerable: tc.enumerable, get() { return tc.get.call(this); },
+    set(v) {
+      if (this.nodeType === 1) {
+        const cur = tc.get.call(this), nv = String(v ?? ''), kids = this.children.length;
+        if (!kids && cur === nv) return;
+        if (kids && [...this.children].every(c => c.classList.contains('kz-ico')) && strip(cur) === strip(nv)) return;
+      }
+      tc.set.call(this, v);
+    } });
+  const ih = Object.getOwnPropertyDescriptor(Element.prototype, 'innerHTML');
+  Object.defineProperty(Element.prototype, 'innerHTML', { configurable: true, enumerable: ih.enumerable, get() { return ih.get.call(this); },
+    set(v) { const nv = String(v ?? ''); if (nv.length < 3000 && ih.get.call(this) === nv) return; ih.set.call(this, v); } });
+}
 function deEmojiText(t) {
   const el = t.parentElement; if (!el || !el.matches(EMO_TAGS) || el.closest(EMO_SKIP)) return;
   const v = t.nodeValue; EMO.lastIndex = 0; if (!EMO.test(v)) return; EMO.lastIndex = 0;
@@ -1906,7 +1927,7 @@ html body:not(#kz1):not(#kz2) #income .kz-sp-bar[hidden]{display:none !important
 html body:not(#kz1):not(#kz2) #income .card.kz-locked,html body:not(#kz1):not(#kz2) #income .area-card.locked:not(.kz-cur){filter:grayscale(.85);opacity:.6}
 html body:not(#kz1):not(#kz2) #income .card.kz-next{filter:none;opacity:1;box-shadow:0 0 0 2px var(--brass,#d1a94f) !important}
 html body:not(#kz1):not(#kz2) #income .area-card.kz-cur{box-shadow:0 0 0 2px var(--moss,#6f8a3c) !important}
-html body:not(#kz1):not(#kz2) #income .card.kz-best>b:after{content:'Bester Platz';display:inline-block;white-space:nowrap;margin-left:8px;padding:1px 8px;border-radius:10px;background:var(--brass,#d1a94f);color:#241b10;font-size:12px;vertical-align:2px}
+html body:not(#kz1):not(#kz2) #income .card.kz-best>b:after{content:'Dein bester Platz';display:inline-block;white-space:nowrap;margin-left:8px;padding:1px 8px;border-radius:10px;background:var(--brass,#d1a94f);color:#241b10;font-size:12px;vertical-align:2px}
 html body:not(#kz1):not(#kz2) .kz-soon .progress{margin:6px 0 10px}`;
 document.head.appendChild(style13);
 
@@ -2021,6 +2042,8 @@ loaders.bandenhaus = async () => {
   try { o = await rpc('gang_house'); } catch (e) { houseBody.innerHTML = '<p class="notice bad">' + esc(e.message) + '</p>'; return; }
   if (t !== houseSeq) return;
   HOUSE.data = o;
+  // ohne Bande keine leeren Reiter (ließen eine große Lücke über der Karte)
+  { const bt = document.querySelector('#bandenhaus > .section-tools'); if (bt) o.gang ? bt.style.removeProperty('display') : bt.style.setProperty('display', 'none', 'important'); }
   if (!o.gang) { houseBody.innerHTML = '<div class="kf-box"><h3>Kein Bandenhaus</h3><p>Du bist in keiner Bande. Tritt einer bei oder gründe selbst eine – dann gibt es hier Räume, Wochenaufgaben, Kriege und Überfälle.</p><button class="ghost kf-go" data-v="gangs">Zu den Banden</button></div>'; houseBody.querySelector('.kf-go').onclick = () => show('gangs'); return; }
   const g = o.gang, lead = RANKV[o.role] >= 3, officer = RANKV[o.role] >= 2;
   const pctXp = Math.min(100, Math.round((g.xp - g.level_xp) / Math.max(1, g.next_xp - g.level_xp) * 100));
@@ -2233,8 +2256,8 @@ const cardMsg = (card, html, good) => { let m = card.querySelector('.kz-cmsg'); 
 
 // ---------- 44: Leiste „Als Nächstes“ ----------
 const NX = { d: null, at: 0, off: 0 };
-const nextBar = document.createElement('div'); nextBar.id = 'kz-next'; nextBar.setAttribute('aria-label', 'Als Nächstes');
-document.querySelector('.stats')?.after(nextBar);
+// Karte „Als Nächstes“ oben in der Übersicht (nicht mehr als Leiste über dem Kopfbild)
+const nextBar = document.createElement('div'); nextBar.id = 'kz-next'; nextBar.className = 'kf-box'; nextBar.setAttribute('aria-label', 'Als Nächstes');
 async function nextLoad() {
   if (!window.kiezProfile) return;
   try { NX.d = await rpc('next_actions'); NX.off = Date.now() - new Date(NX.d.now).getTime(); NX.at = Date.now(); } catch (e) { return; }
@@ -2243,24 +2266,39 @@ async function nextLoad() {
 function nextDraw() {
   const d = NX.d; if (!d) { nextBar.hidden = true; return; }
   nextBar.hidden = document.getElementById('game')?.classList.contains('hide');
+  // direkt unter „Dein Kiezbewohner“ (die Übersicht ist ein Raster – oben im Panel landete die Karte ganz unten)
+  const core = document.querySelector('#overview .classic-profile-core'), ov = document.getElementById('overview');
+  if (core) { if (core.nextElementSibling !== nextBar) core.after(nextBar); } else if (ov && ov.firstElementChild !== nextBar) ov.prepend(nextBar);
   const left = t => t ? new Date(t).getTime() + NX.off - Date.now() : 0;
-  const item = (label, state, act, cls) => '<div class="kz-nx' + (cls ? ' ' + cls : '') + '"><small>' + label + '</small><b>' + state + '</b>' + (act || '') + '</div>';
-  const tour = d.tour_ends_at ? (left(d.tour_ends_at) > 0 ? item('Pfandtour', mmss(left(d.tour_ends_at))) : item('Pfandtour', 'fertig', '<button class="ghost kz-nx-go" data-go="pfand">Ausladen</button>', 'kz-ready'))
-    : left(d.tour_ready_at) > 0 ? item('Pfandtour', 'Pause ' + mmss(left(d.tour_ready_at))) : item('Pfandtour', 'bereit', '<button class="ghost kz-nx-go" data-go="pfand">Starten</button>', 'kz-ready');
-  const train = d.training_ends_at ? (left(d.training_ends_at) > 0 ? item('Weiterbildung', mmss(left(d.training_ends_at))) : item('Weiterbildung', 'fertig', '<button class="ghost kz-nx-go" data-go="training">Ansehen</button>', 'kz-ready'))
-    : item('Weiterbildung', 'frei', '<button class="ghost kz-nx-go" data-go="training">Lernen</button>');
-  const bin = left(d.bin_ready_at) > 0 ? item('Mülltonne', mmss(left(d.bin_ready_at))) : item('Mülltonne', 'bereit', '<button class="ghost kz-nx-bin">Durchwühlen</button>', 'kz-ready');
+  // Jede Zeile führt nur zur passenden Seite/Karte – ausgelöst wird dort (Nutzerwunsch: nichts automatisch tun)
+  const item = (label, state, to, cls) => '<li class="kz-nx' + (cls ? ' ' + cls : '') + '"' + (to ? ' role="link" tabindex="0" data-go="' + to[0] + '"' + (to[1] ? ' data-tab="' + to[1] + '"' : '') + (to[2] ? ' data-sel="' + to[2] + '"' : '') : '') + '><small>' + label + '</small><b>' + state + '</b>' + (to ? '<span class="kz-nx-arrow" aria-hidden="true">›</span>' : '<span></span>') + '</li>';
+  const P = ['pfand', null, '#collectionbox, #pfand .card'], T = ['training'], B = ['pfand', null, '#kz-bin'], SO = ['pfand', null, '#kz-sortgame'], BO = ['pvp', null, '#kz-wboss'], TA = ['missions', 'Tagesauftrag', '.kz-daily'];
+  const tour = d.tour_ends_at ? (left(d.tour_ends_at) > 0 ? item('Pfandtour', 'unterwegs · ' + mmss(left(d.tour_ends_at)), P) : item('Pfandtour', 'fertig – ausladen', P, 'kz-ready'))
+    : left(d.tour_ready_at) > 0 ? item('Pfandtour', 'Pause · ' + mmss(left(d.tour_ready_at)), P) : item('Pfandtour', 'bereit', P, 'kz-ready');
+  const train = d.training_ends_at ? (left(d.training_ends_at) > 0 ? item('Weiterbildung', 'läuft · ' + mmss(left(d.training_ends_at)), T) : item('Weiterbildung', 'fertig', T, 'kz-ready'))
+    : item('Weiterbildung', 'frei', T, 'kz-ready');
+  const bin = left(d.bin_ready_at) > 0 ? item('Mülltonne', 'wieder in ' + mmss(left(d.bin_ready_at)), B) : item('Mülltonne', 'bereit', B, 'kz-ready');
   const flashLeft = left(d.flash.ends_at);
-  const flash = item('Blitzauftrag · ' + mmss(flashLeft), d.flash.done ? 'erledigt' : esc(FLASH_DE[d.flash.kind] || d.flash.kind), '', d.flash.done ? 'kz-done' : 'kz-flashjob');
-  const streak = d.streak > 0 ? item('Glückssträhne', d.streak + ' in Folge', '<em>' + mmss(left(d.streak_until)) + ' Zeit · jede 5. = 1 Kronkorken</em>', 'kz-streak') : '';
-  const sort = left(d.sort_ready_at) > 0 ? item('Sortieren', mmss(left(d.sort_ready_at))) : item('Sortieren', 'bereit', '<button class="ghost kz-nx-go" data-go="pfand" data-sel="#kz-sortgame">Spielen</button>', 'kz-ready');
-  const boss = left(d.boss_ready_at) > 0 ? item('Kiezboss', mmss(left(d.boss_ready_at))) : item('Kiezboss', 'bereit', '<button class="ghost kz-nx-go" data-go="pvp" data-sel="#kz-wboss">Hin</button>', 'kz-ready');
-  const tasks = Number(d.tasks_open) ? item('Tagesaufgaben', d.tasks_open + ' abholen', '<button class="ghost kz-nx-go" data-go="missions" data-tab="Tagesauftrag" data-sel=".kz-daily">Abholen</button>', 'kz-ready') : '';
-  nextBar.innerHTML = '<div class="kz-nx-row">' + tour + train + bin + flash + sort + boss + streak + tasks + '</div><div class="kz-nx-msg"></div>';
-  nextBar.querySelectorAll('.kz-nx-go').forEach(b => b.onclick = () => b.dataset.sel ? window.kiezJumpTo(b.dataset.go, b.dataset.tab || null, b.dataset.sel) : go(b.dataset.go, b.dataset.tab));
-  const binBtn = nextBar.querySelector('.kz-nx-bin'); if (binBtn) binBtn.onclick = () => digBin(nextBar.querySelector('.kz-nx-msg'));
+  const flash = item('Blitzauftrag', d.flash.done ? 'erledigt' : esc(FLASH_DE[d.flash.kind] || d.flash.kind) + ' · noch ' + mmss(flashLeft), null, d.flash.done ? 'kz-done' : 'kz-flashjob');
+  const streak = d.streak > 0 ? item('Glückssträhne', d.streak + ' in Folge · noch ' + mmss(left(d.streak_until)), null, 'kz-streak') : '';
+  const sort = left(d.sort_ready_at) > 0 ? item('Sortieren', 'wieder in ' + mmss(left(d.sort_ready_at)), SO) : item('Sortieren', 'bereit', SO, 'kz-ready');
+  const boss = left(d.boss_ready_at) > 0 ? item('Kiezboss', 'wieder in ' + mmss(left(d.boss_ready_at)), BO) : item('Kiezboss', 'bereit', BO, 'kz-ready');
+  const tasks = Number(d.tasks_open) ? item('Tagesaufgaben', d.tasks_open + ' zum Abholen', TA, 'kz-ready') : '';
+  const html = '<h3>Als Nächstes</h3><ul class="kz-nx-row">' + tour + train + bin + flash + sort + boss + streak + tasks + '</ul>';
+  if (html === NX.html) return;
+  // Nur die Uhrzeiten geändert → Texte direkt tauschen (weckt keine DOM-Beobachter, kein Ruckeln)
+  const shape = x => x.replace(/\d+:\d{2}/g, '#');
+  if (NX.html && shape(html) === shape(NX.html)) {
+    const tpl = document.createElement('template'); tpl.innerHTML = html;
+    const now = tpl.content.querySelectorAll('.kz-nx b'), cur = nextBar.querySelectorAll('.kz-nx b');
+    if (now.length === cur.length) { cur.forEach((b, k) => { if (b.firstChild && b.firstChild.nodeType === 3 && b.firstChild.data !== now[k].textContent) b.firstChild.data = now[k].textContent; }); NX.html = html; return; }
+  }
+  NX.html = html;
+  nextBar.innerHTML = html;
+  nextBar.querySelectorAll('.kz-nx[data-go]').forEach(li => { const open = () => li.dataset.sel ? window.kiezJumpTo(li.dataset.go, li.dataset.tab || null, li.dataset.sel) : go(li.dataset.go, li.dataset.tab);
+    li.onclick = open; li.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } }; });
 }
-setInterval(() => { if (!document.hidden) nextDraw(); }, 1000);
+setInterval(() => { if (!document.hidden && document.getElementById('overview')?.classList.contains('active-view')) nextDraw(); }, 1000);  // nur sichtbar sekündlich
 setInterval(() => { if (!document.hidden) nextLoad(); }, 30000);
 setTimeout(nextLoad, 2000);
 window.kiezNextLoad = nextLoad;
@@ -2382,17 +2420,18 @@ async function drawDaily() {
   const hint = document.getElementById('collectionhint'); if (hint && /10 Minuten/.test(hint.textContent)) hint.textContent = 'Wähle 3 Minuten bis 8 Stunden.'; }
 
 const style18 = document.createElement('style');
-style18.textContent = `html body:not(#kz1):not(#kz2) #kz-next{margin:6px 0 10px;background:rgba(20,16,12,.88);border:1px solid var(--line,#5a4a36);border-radius:var(--radius,8px);padding:8px}
-html body:not(#kz1):not(#kz2) #kz-next[hidden]{display:none !important}
-html body:not(#kz1):not(#kz2) .kz-nx-row{display:flex;gap:8px;overflow-x:auto;scrollbar-width:thin}
-html body:not(#kz1):not(#kz2) .kz-nx{flex:0 0 auto;min-width:130px;padding:6px 10px;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;gap:2px}
-html body:not(#kz1):not(#kz2) .kz-nx small{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted,#bdb19d)}
-html body:not(#kz1):not(#kz2) .kz-nx b{font-size:15px;color:var(--text,#efe3c3)}
-html body:not(#kz1):not(#kz2) .kz-nx em{font-style:normal;font-size:12px;color:var(--muted,#bdb19d)}
-html body:not(#kz1):not(#kz2) #kz-next .kz-nx button.ghost{min-height:32px !important;padding:3px 10px !important;font-size:13px !important;margin-top:4px}
-html body:not(#kz1):not(#kz2) .kz-nx.kz-streak{min-width:170px}
-html body:not(#kz1):not(#kz2) .kz-nx.kz-ready{border-color:var(--brass,#d1a94f)}
-html body:not(#kz1):not(#kz2) .kz-nx.kz-flashjob{border-color:var(--rust,#9b3c1f);max-width:230px}
+style18.textContent = `html body:not(#kz1):not(#kz2) #kz-next[hidden]{display:none !important}
+html body:not(#kz1):not(#kz2) .kz-nx-row{list-style:none;margin:6px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));column-gap:24px}
+html body:not(#kz1):not(#kz2) .kz-nx{display:grid;grid-template-columns:130px 1fr auto;align-items:center;gap:10px;min-height:48px;padding:4px 0;border-top:1px solid rgba(255,255,255,.07)}
+html body:not(#kz1):not(#kz2) .kz-nx small{font-size:15px;font-weight:600;color:var(--text,#efe3c3);text-transform:none;letter-spacing:0}
+html body:not(#kz1):not(#kz2) .kz-nx b{font-size:15px;font-weight:400;color:var(--muted,#bdb19d)}
+html body:not(#kz1):not(#kz2) .kz-nx.kz-ready b{color:var(--brass,#d1a94f);font-weight:600}
+html body:not(#kz1):not(#kz2) .kz-nx em{font-style:normal;font-size:13px;color:var(--muted,#bdb19d)}
+html body:not(#kz1):not(#kz2) .kz-nx.kz-flashjob small{color:var(--rust-light,#d9774f)}
+html body:not(#kz1):not(#kz2) .kz-nx.kz-done{opacity:.6}
+html body:not(#kz1):not(#kz2) .kz-nx[data-go]{cursor:pointer;border-radius:6px;padding-left:6px;padding-right:6px}html body:not(#kz1):not(#kz2) .kz-nx[data-go]:hover,html body:not(#kz1):not(#kz2) .kz-nx[data-go]:focus-visible{background:rgba(209,169,79,.12);outline:none}
+html body:not(#kz1):not(#kz2) .kz-nx-arrow{font:700 24px var(--font-head,serif);color:var(--brass,#d1a94f);line-height:1}
+@media (max-width:640px){html body:not(#kz1):not(#kz2) .kz-nx-row{grid-template-columns:1fr}html body:not(#kz1):not(#kz2) .kz-nx{grid-template-columns:110px 1fr auto}}
 html body:not(#kz1):not(#kz2) .kz-nx.kz-streak b{color:var(--brass,#d1a94f)}
 html body:not(#kz1):not(#kz2) .kz-nx-msg:empty{display:none}
 html body:not(#kz1):not(#kz2) .kz-sort-now{font:700 28px var(--font-head,serif);text-align:center;padding:14px;border-radius:10px;margin:8px 0;background:rgba(0,0,0,.3)}
@@ -2404,7 +2443,7 @@ html body:not(#kz1):not(#kz2) .kz-event{box-shadow:0 0 0 2px var(--brass,#d1a94f
 .kz-chance b{font-family:var(--font-head,serif);font-size:17px}.kz-chance small{font-size:13px;margin-left:8px}
 html body:not(#kz1):not(#kz2) .kz-dt{margin:10px 0}html body:not(#kz1):not(#kz2) .kz-dt small{font-size:13px;color:var(--muted,#bdb19d)}
 html body:not(#kz1):not(#kz2) .kz-dt.kz-done b{color:#9bd17a}
-@media (max-width:760px){html body:not(#kz1):not(#kz2) .kz-nx{min-width:118px}}`;
+`;
 document.head.appendChild(style18);
 
 // ================= S11: Wiederkommen (5, 35, 37, 45–50, 52) =================
@@ -2614,6 +2653,511 @@ html body:not(#kz1):not(#kz2) .kz-inbox li p{margin:2px 0;font-size:15px;padding
 html body:not(#kz1):not(#kz2) .kz-inbox li p:before{content:none}
 html body:not(#kz1):not(#kz2) .kz-inbox small{font-size:13px;color:var(--muted,#bdb19d)}`;
 document.head.appendChild(style21);
+
+// ================= S12: Wirtschaft & Kampf (4, 13, 15–22) =================
+const tm = d => new Date(d).toLocaleString('de-DE', { weekday: 'short', hour: '2-digit', minute: '2-digit' });
+// ---------- 4: Nebenjobs ----------
+const jobBody = addPanel('nebenjobs', 'Nebenjobs', 'Nebenjobs');
+loaders.nebenjobs = async () => {
+  let o; try { o = await rpc('jobs_overview'); } catch (e) { return; }
+  const p = window.kiezProfile || {};
+  const cur = o.jobs.find(j => j.id === o.current);
+  jobBody.innerHTML = '<p>Nebenjobs laufen neben der Pfandtour. Ein Job zur Zeit – danach Lohn abholen.</p>'
+    + (cur ? '<div class="kf-box kz-job-now"><h3>Gerade: ' + esc(cur.name) + '</h3><p>' + (new Date(o.ends_at) > new Date() ? 'Fertig ' + tm(o.ends_at) : 'Fertig – Lohn abholen!') + '</p><div class="kf-row"><button class="big kz-job-fin"' + (new Date(o.ends_at) > new Date() ? ' disabled' : '') + '>Lohn abholen (' + eur(cur.pay) + ')</button></div><div class="kz-job-msg"></div></div>' : '')
+    + '<div class="kf-grid">' + [...o.jobs].sort((a, b) => a.min_level - b.min_level || a.minutes - b.minutes).map(j => '<div class="card kz-job' + (p.level < j.min_level ? ' kz-locked' : '') + '" data-id="' + j.id + '"><b>' + esc(j.name) + '</b><p class="kf-muted">' + esc(j.description) + '</p><p>' + (j.minutes >= 60 ? j.minutes / 60 + ' Std.' : j.minutes + ' Min.') + ' · ' + eur(j.pay) + ' · ' + j.energy + ' Energie' + (j.min_level > 1 ? ' · ab Level ' + j.min_level : '') + '</p>'
+      + '<div class="kf-row"><button class="ghost kz-job-go"' + (cur || p.level < j.min_level ? ' disabled' : '') + '>' + (p.level < j.min_level ? 'ab Level ' + j.min_level : 'Anfangen') + '</button></div><div class="kz-job-msg"></div></div>').join('') + '</div>';
+  jobBody.querySelectorAll('.kz-job').forEach(c => { const b = c.querySelector('.kz-job-go'); if (!b.disabled) act(b, c.querySelector('.kz-job-msg'), async () => { const r = await rpc('start_job', { job: c.dataset.id }); window.kiezRenderProfile?.(r.profile); setTimeout(loaders.nebenjobs, 400); return esc(r.job) + ' läuft bis ' + tm(r.ends_at) + '.'; }); });
+  const f = jobBody.querySelector('.kz-job-fin'); if (f && !f.disabled) act(f, jobBody.querySelector('.kz-job-now .kz-job-msg'), async () => { const r = await rpc('finish_job'); window.kiezRenderProfile?.(r.profile); setTimeout(loaders.nebenjobs, 1500); return 'Lohn: ' + eur(r.pay) + '.'; });
+};
+
+// ---------- 16: Auktionshaus ----------
+const aucBody = addPanel('auktion', 'Auktionshaus', 'Auktionshaus');
+loaders.auktion = async () => {
+  const me = await myId(); if (!me) return;
+  let list, mine; try { [list, { data: mine }] = await Promise.all([rpc('auctions_list'), sb.from('user_plunder').select('plunder_id,quantity').eq('user_id', me).gt('quantity', 0)]); } catch (e) { return; }
+  const { data: cat } = await sb.from('plunder_catalog').select('id,name,rarity');
+  const nm = Object.fromEntries((cat || []).map(c => [c.id, c]));
+  const rare = (mine || []).filter(x => nm[x.plunder_id] && nm[x.plunder_id].rarity !== 'gewoehnlich');
+  aucBody.innerHTML = '<p>Seltenen Plunder versteigern: Wer am Ende am meisten bietet, bekommt ihn. Dein Gebot wird festgehalten und zurückgezahlt, wenn dich jemand überbietet. 5 % Gebühr für den Verkäufer.</p>'
+    + '<div class="kf-box"><h3>Laufende Auktionen</h3>' + (list.length ? '<div class="kf-grid">' + list.map(a => '<div class="card kz-rar-' + a.rarity + '" data-id="' + a.id + '"><b>' + esc(a.name) + '</b><p class="kf-muted">' + RARITY[a.rarity] + ' · von ' + esc(a.seller) + ' · endet ' + tm(a.ends_at) + '</p><p>' + (a.bid ? 'Höchstgebot ' + eur(a.bid) + ' (' + esc(a.bidder) + ')' : 'Startpreis ' + eur(a.start_price)) + '</p>'
+        + (a.mine ? '<p class="kf-muted">Deine Auktion</p>' : a.leading ? '<p><b>Du führst!</b></p>' : '<div class="kf-row"><input type="number" class="kz-bid" min="' + a.min_bid + '" step="0.1" value="' + a.min_bid + '" style="width:110px"><button class="ghost kz-bid-go">Bieten</button></div>') + '<div class="kz-auc-msg"></div></div>').join('') + '</div>' : '<p class="kf-muted">Gerade keine Auktionen.</p>') + '</div>'
+    + '<div class="kf-box"><h3>Selbst versteigern</h3>' + (rare.length ? '<div class="kf-row"><select class="kz-auc-sel">' + rare.map(x => '<option value="' + x.plunder_id + '">' + esc(nm[x.plunder_id].name) + ' (' + x.quantity + '×)</option>').join('') + '</select><input type="number" class="kz-auc-start" min="0.5" step="0.5" value="2" style="width:100px" aria-label="Startpreis"><select class="kz-auc-h"><option value="1">1 Std.</option><option value="6">6 Std.</option><option value="12">12 Std.</option><option value="24" selected>24 Std.</option></select><button class="big kz-auc-new">Versteigern</button></div>' : '<p class="kf-muted">Du hast keinen seltenen Plunder.</p>') + '<div class="kz-auc-new-msg"></div></div>';
+  aucBody.querySelectorAll('.card[data-id]').forEach(c => { const b = c.querySelector('.kz-bid-go'); if (b) act(b, c.querySelector('.kz-auc-msg'), async () => { const r = await rpc('auction_bid', { auction: Number(c.dataset.id), amount: Number(c.querySelector('.kz-bid').value) }); window.kiezRenderProfile?.(r.profile); setTimeout(loaders.auktion, 1500); return 'Geboten: ' + eur(r.bid) + '.'; }); });
+  const n = aucBody.querySelector('.kz-auc-new'); if (n) act(n, aucBody.querySelector('.kz-auc-new-msg'), async () => { await rpc('auction_create', { wanted: aucBody.querySelector('.kz-auc-sel').value, start_price: Number(aucBody.querySelector('.kz-auc-start').value), hours: Number(aucBody.querySelector('.kz-auc-h').value) }); setTimeout(loaders.auktion, 1500); return 'Auktion läuft.'; });
+};
+
+// ---------- 17: Kiosk ----------
+const kioskBody = addPanel('kiosk', 'Kiosk-Stand', 'Kiosk');
+loaders.kiosk = async () => {
+  let o; try { o = await rpc('kiosk_overview'); } catch (e) { return; }
+  const m = o.mine;
+  kioskBody.innerHTML = '<p>Dein eigener Kiosk bringt jede Stunde Geld – bis zu 24 Stunden sammelt sich die Kasse. Aber Vorsicht: Andere können ihn überfallen.</p>'
+    + '<div class="kf-box kz-kiosk-me"><h3>' + (m ? 'Dein Kiosk (Stufe ' + m.level + ')' : 'Noch kein Kiosk') + '</h3>'
+    + (m ? '<p>' + eur(m.rate) + ' pro Stunde · Kasse: <b>' + eur(m.cash) + '</b> · voll ' + tm(m.full_at) + '</p><div class="kf-row"><button class="big kz-k-col">Kasse leeren</button>' + (m.next_price ? '<button class="ghost kz-k-up">Ausbauen – ' + eur(m.next_price) + '</button>' : '') + '</div>'
+      : '<p>' + (o.can_build ? 'Bau dir für 30 € einen Stand.' : 'Einen Kiosk gibt es ab Level 5.') + '</p><div class="kf-row"><button class="big kz-k-up"' + (o.can_build ? '' : ' disabled') + '>Kiosk bauen – 30,00 €</button></div>') + '<div class="kz-k-msg"></div></div>'
+    + '<div class="kf-box"><h3>Kioske in deiner Gegend</h3><p class="kf-muted">Überfall: 12 Energie, deine Angriffskraft gegen den Stand. Beute 30 % der Kasse, jeder Kiosk höchstens alle 6 Stunden.</p>'
+    + (o.targets.length ? '<table class="kf-table"><tr><th>Besitzer</th><th>Level</th><th>Kiosk</th><th>Kasse</th><th></th></tr>' + o.targets.map(t => '<tr><td>' + playerLink(t.user_id, t.name) + '</td><td>' + t.level + '</td><td>Stufe ' + t.kiosk + '</td><td>' + eur(t.cash) + '</td><td><button class="ghost kz-k-rob" data-id="' + t.user_id + '"' + (t.ready ? '' : ' disabled') + '>' + (t.ready ? 'Überfallen' : 'erst später') + '</button></td></tr>').join('') + '</table>' : '<p class="kf-muted">Keine Kioske in deinem Kampfbereich.</p>') + '<div class="kz-k-rob-msg"></div></div>';
+  const msg = kioskBody.querySelector('.kz-k-msg');
+  const col = kioskBody.querySelector('.kz-k-col'); if (col) act(col, msg, async () => { const r = await rpc('kiosk_collect'); window.kiezRenderProfile?.(r.profile); setTimeout(loaders.kiosk, 1500); return 'Eingesammelt: ' + eur(r.cash) + '.'; });
+  const up = kioskBody.querySelector('.kz-k-up'); if (up && !up.disabled) act(up, msg, async () => { const r = await rpc('kiosk_build'); await refreshProfile(); setTimeout(loaders.kiosk, 1500); return 'Kiosk auf Stufe ' + r.level + ' (' + eur(r.rate) + '/Std.).'; });
+  kioskBody.querySelectorAll('.kz-k-rob').forEach(b => { if (!b.disabled) act(b, kioskBody.querySelector('.kz-k-rob-msg'), async () => { const r = await rpc('kiosk_rob', { target_id: b.dataset.id }); window.kiezRenderProfile?.(r.profile); setTimeout(loaders.kiosk, 2500); if (!r.won) throw new Error('Abgeblitzt (' + r.attack + ' zu ' + r.defense + ').'); return 'Überfall geglückt: ' + eur(r.loot) + ' erbeutet.'; }); });
+};
+
+// ---------- 18: Kredithai ----------
+const loanBody = addPanel('kredithai', 'Kredithai', 'Kredithai');
+loaders.kredithai = async () => {
+  let o; try { o = await rpc('loan_status'); } catch (e) { return; }
+  const l = o.loan;
+  loanBody.innerHTML = '<div class="kf-box"><h3>Der Kredithai</h3><p>Schnelles Geld, schnell zurück: 20 % Zinsen, 3 Tage Zeit. Wer nicht zahlt, bekommt Besuch – die Schläger nehmen dein Bargeld, 20 Energie, und die Restschuld wächst jeden Tag um 10 %.</p>'
+    + (l ? '<p>Offen: <b>' + eur(l.owed) + '</b> · fällig ' + tm(l.due_at) + (new Date(l.due_at) < new Date() ? ' – <b>überfällig!</b>' : '') + '</p><div class="kf-row"><button class="big kz-l-pay">Zurückzahlen (so viel Bargeld da ist)</button></div>'
+      : '<p class="kf-muted">Höchstens ' + eur(o.max) + ' (20 € je Level).</p><div class="kf-row"><input type="number" class="kz-l-amt" min="5" max="' + o.max + '" step="1" value="' + Math.min(20, o.max) + '" style="width:110px" aria-label="Betrag"><button class="big kz-l-take">Leihen</button></div>')
+    + '<div class="kz-l-msg"></div></div>';
+  const m = loanBody.querySelector('.kz-l-msg');
+  const pay = loanBody.querySelector('.kz-l-pay'); if (pay) act(pay, m, async () => { const r = await rpc('loan_repay'); window.kiezRenderProfile?.(r.profile); setTimeout(loaders.kredithai, 1500); return 'Gezahlt: ' + eur(r.paid) + (Number(r.left) ? ', noch ' + eur(r.left) + ' offen.' : ' – schuldenfrei!'); });
+  const take = loanBody.querySelector('.kz-l-take'); if (take) act(take, m, async () => { const r = await rpc('loan_take', { amount: Number(loanBody.querySelector('.kz-l-amt').value) }); window.kiezRenderProfile?.(r.profile); setTimeout(loaders.kredithai, 1500); return eur(r.amount) + ' geliehen – zurück bis ' + tm(r.due_at) + ': ' + eur(r.owed) + '.'; });
+};
+
+// ---------- 13: Ausrüstung im Basar ----------
+async function basarItems() {
+  const body = document.querySelector('#basar .kf-body'); const me = await myId(); if (!body || !me || body.querySelector('.kz-ibox')) return;
+  const [{ data: ls }, { data: cat }, { data: inv }] = await Promise.all([sb.from('item_listings').select('*').order('price'), sb.from('shop_items').select('id,name,attack,defense,price'), sb.from('inventory').select('item_id,equipped').eq('user_id', me)]);
+  const nm = Object.fromEntries((cat || []).map(c => [c.id, c]));
+  const box = document.createElement('div'); box.className = 'kf-box kz-ibox';
+  const sellable = (inv || []).filter(i => !i.equipped && nm[i.item_id]);
+  box.innerHTML = '<h3>Waffen & Ausrüstung</h3><p class="kf-muted">Gebrauchte Ausrüstung von anderen Spielern (5 % Gebühr für den Verkäufer). Jedes Stück hat man nur einmal.</p>'
+    + ((ls || []).length ? '<table class="kf-table"><tr><th>Stück</th><th>Werte</th><th>Preis</th><th></th></tr>' + ls.map(l => { const i = nm[l.item_id] || {}; return '<tr><td>' + esc(i.name) + '</td><td>A ' + i.attack + ' / V ' + i.defense + '</td><td>' + eur(l.price) + ' <small class="kf-muted">(Laden ' + eur(i.price) + ')</small></td><td>' + (l.seller_id === me ? '<button class="ghost kz-i-cancel" data-id="' + l.id + '">Zurückziehen</button>' : '<button class="ghost kz-i-buy" data-id="' + l.id + '">Kaufen</button>') + '</td></tr>'; }).join('') + '</table>' : '<p class="kf-muted">Gerade keine Angebote.</p>')
+    + (sellable.length ? '<div class="kf-row"><select class="kz-i-sel">' + sellable.map(i => '<option value="' + i.item_id + '">' + esc(nm[i.item_id].name) + '</option>').join('') + '</select><input type="number" class="kz-i-price" min="0.1" step="0.1" placeholder="Preis €" style="width:110px"><button class="ghost kz-i-list">Anbieten</button></div>' : '<p class="kf-muted">Nicht angelegte Ausrüstung kannst du hier anbieten.</p>')
+    + '<div class="kz-i-msg"></div>';
+  body.appendChild(box);
+  const m = box.querySelector('.kz-i-msg'), again = () => { box.remove(); setTimeout(basarItems, 300); };
+  box.querySelectorAll('.kz-i-buy').forEach(b => act(b, m, async () => { const r = await rpc('item_buy', { listing: Number(b.dataset.id) }); window.kiezRenderProfile?.(r.profile); setTimeout(again, 1500); return 'Gekauft: ' + esc(r.item) + ' – anlegen unter Mein Kiez → Ausrüstung.'; }));
+  box.querySelectorAll('.kz-i-cancel').forEach(b => act(b, m, async () => { await rpc('item_cancel', { listing: Number(b.dataset.id) }); setTimeout(again, 1500); return 'Zurückgezogen.'; }));
+  const li = box.querySelector('.kz-i-list'); if (li) act(li, m, async () => { await rpc('item_list', { wanted: box.querySelector('.kz-i-sel').value, price: Number(box.querySelector('.kz-i-price').value) }); setTimeout(again, 1500); return 'Angeboten.'; });
+}
+{ const prevB = loaders.basar; loaders.basar = async () => { await prevB?.(); basarItems(); }; }
+
+// ---------- 15: Pfandlager ausbauen ----------
+setInterval(() => {
+  const c = document.getElementById('kz-pfandsell'), p = window.kiezProfile; if (!c || !p) return;
+  let s = c.querySelector('.kz-store-lv'); if (!s) { s = document.createElement('div'); s.className = 'kz-store-lv'; c.querySelector('.kz-ps-msg').before(s); }
+  const lv = p.bottle_storage || 0, key = lv + '';
+  if (s.dataset.k === key) return; s.dataset.k = key;
+  s.innerHTML = '<p class="kf-muted">Lager Stufe ' + lv + '/4: liegengelassene Flaschen verschwinden mit ' + (10 - 2 * lv) + ' % pro Tag.</p>' + (lv < 4 ? '<div class="kf-row"><button class="ghost kz-store-up">Lager ausbauen – ' + eur([10, 40, 120, 300][lv]) + '</button></div>' : '');
+  const b = s.querySelector('.kz-store-up'); if (b) act(b, c.querySelector('.kz-ps-msg'), async () => { const r = await rpc('buy_bottle_storage'); window.kiezRenderProfile?.(r.profile); return 'Lager ausgebaut: nur noch ' + r.theft + ' % Klau pro Tag.'; });
+}, 2000);
+
+// ---------- 19/20/21: Revanche, Kopfgeld, Turnier in der Prügelei ----------
+async function drawFightExtras() {
+  const host = document.getElementById('kz-npcs'); if (!host) return;
+  let rv, bt, tn; try { [rv, bt, tn] = await Promise.all([rpc('revenge_list'), rpc('bounty_list'), rpc('tournament_status')]); } catch (e) { return; }
+  let box = document.getElementById('kz-fightx'); if (!box) { box = document.createElement('div'); box.id = 'kz-fightx'; host.after(box); }
+  box.innerHTML = (rv.length ? '<div class="kf-box kz-revenge"><h3>Revanche</h3><p class="kf-muted">Wer dich verprügelt hat, bekommt einmal sofort die Quittung – ohne Level- und 3-Stunden-Sperre (24 Std. lang).</p>'
+      + rv.map(r => '<div class="kf-row" data-f="' + r.fight_id + '"><span>' + playerLink(r.attacker_id, r.name) + ' · ' + tm(r.at) + (Number(r.loot) ? ' · nahm ' + eur(r.loot) : '') + '</span><button class="big kz-rev">Revanche</button></div>').join('') + '<div class="kz-rev-msg"></div></div>' : '')
+    + '<div class="kf-grid"><div class="kf-box"><h3>Kopfgelder</h3>' + (bt.length ? '<table class="kf-table">' + bt.map(b => '<tr><td>' + playerLink(b.target_id, b.name) + ' (Level ' + b.level + ')</td><td><b>' + eur(b.amount) + '</b></td></tr>').join('') + '</table>' : '<p class="kf-muted">Gerade keine.</p>')
+    + '<p class="kf-muted">Wer den Gesuchten besiegt, kassiert. Kopfgeld aussetzen (5–500 €):</p><div class="kf-row"><input class="kz-b-name" placeholder="Spielername" style="flex:1"><input type="number" class="kz-b-amt" min="5" max="500" value="10" style="width:90px"><button class="ghost kz-b-go">Aussetzen</button></div><div class="kz-b-msg"></div></div>'
+    + '<div class="kf-box"><h3>Kampfturnier der Woche</h3><p>Anmelden für 2 € – am Wochenende wird automatisch im K.-o.-System ausgetragen. Sieger: 70 % des Topfs + 20 Kronkorken, Platz 2: 30 %.</p><p class="kf-muted">' + tn.players + ' angemeldet · Auslosung am ' + new Date(tn.week_ends).toLocaleDateString('de-DE') + '</p>'
+    + '<div class="kf-row"><button class="big kz-t-go"' + (tn.signed ? ' disabled' : '') + '>' + (tn.signed ? 'Du bist dabei' : 'Anmelden – 2,00 €') + '</button></div><div class="kz-t-msg"></div>'
+    + (tn.last ? '<p class="kf-muted">Letzte Woche: Sieger ' + esc(tn.last.winner || '–') + ' (Topf ' + eur(tn.last.pot) + ')</p>' : '') + '</div></div>';
+  box.querySelectorAll('.kz-rev').forEach(b => act(b, box.querySelector('.kz-rev-msg'), async () => { const r = await rpc('revenge_attack', { fight: Number(b.closest('[data-f]').dataset.f) }); window.kiezRenderProfile?.(r.profile); setTimeout(drawFightExtras, 2500); return r.result === 'win' ? 'Revanche geglückt! ' + eur(r.loot) + ' zurückgeholt' + (Number(r.bounty) ? ' + Kopfgeld ' + eur(r.bounty) : '') + '.' : 'Wieder verloren (' + r.attacker_power + ' zu ' + r.defender_power + ').'; }));
+  act(box.querySelector('.kz-b-go'), box.querySelector('.kz-b-msg'), async () => {
+    const n = box.querySelector('.kz-b-name').value.trim(); const { data } = await sb.from('profiles').select('id').ilike('username', n.replace(/[%_\\]/g, '')).maybeSingle();
+    if (!data) throw new Error('Spieler nicht gefunden'); const r = await rpc('bounty_place', { target_id: data.id, amount: Number(box.querySelector('.kz-b-amt').value) }); window.kiezRenderProfile?.(r.profile); setTimeout(drawFightExtras, 1500); return 'Kopfgeld ausgesetzt: ' + eur(r.amount) + '.'; });
+  const tg = box.querySelector('.kz-t-go'); if (!tg.disabled) act(tg, box.querySelector('.kz-t-msg'), async () => { const r = await rpc('tournament_signup'); window.kiezRenderProfile?.(r.profile); setTimeout(drawFightExtras, 1500); return 'Angemeldet – viel Glück!'; });
+}
+{ const prevP = loaders.pvp; loaders.pvp = () => { prevP?.(); setTimeout(drawFightExtras, 1500); }; }
+
+// ---------- 22: Wetten in der Zockerbude ----------
+async function drawBets() {
+  const body = document.querySelector('#zockerbude .kf-body'); if (!body || body.querySelector('.kz-bets')) return;
+  let o; try { o = await rpc('bets_overview'); } catch (e) { return; }
+  const box = document.createElement('div'); box.className = 'kf-box kz-bets';
+  const already = (k, r) => o.mine.some(b => b.kind === k && b.ref === String(r));
+  box.innerHTML = '<h3>Wettbüro</h3><p class="kf-muted">Einsatz 0,50–50 €. Tierkampf: feste Quote 1,9 – das Ergebnis steht morgen fest. Bandenkriege: alle Einsätze in einen Topf, die Gewinner teilen ihn (5 % für den Buchmacher). Auf den Krieg der eigenen Bande darfst du nicht wetten.</p>'
+    + '<div class="kz-bet" data-k="pet" data-r="' + o.pet.day + '"><b>Tierkampf des Tages: ' + esc(o.pet.a) + ' gegen ' + esc(o.pet.b) + '</b>'
+    + (already('pet', o.pet.day) ? '<p>Du hast gewettet.</p>' : '<div class="kf-row"><input type="number" class="kz-bet-amt" min="0.5" max="50" step="0.5" value="1" style="width:90px"><button class="ghost kz-bet-go" data-s="a">Auf ' + esc(o.pet.a) + '</button><button class="ghost kz-bet-go" data-s="b">Auf ' + esc(o.pet.b) + '</button></div>')
+    + (o.pet.yesterday ? '<p class="kf-muted">Gestern gewann: ' + esc(o.pet.yesterday.winner) + '</p>' : '') + '<div class="kz-bet-msg"></div></div>'
+    + o.wars.map(w => '<div class="kz-bet" data-k="war" data-r="' + w.id + '"><b>Bandenkrieg ' + esc(w.attacker) + ' gegen ' + esc(w.defender) + ' (' + w.score + ')</b><p class="kf-muted">Topf: ' + eur(Number(w.pool_a) + Number(w.pool_d)) + ' · endet ' + tm(w.ends_at) + '</p>'
+      + (already('war', w.id) ? '<p>Du hast gewettet.</p>' : '<div class="kf-row"><input type="number" class="kz-bet-amt" min="0.5" max="50" step="0.5" value="1" style="width:90px"><button class="ghost kz-bet-go" data-s="attacker">Auf ' + esc(w.attacker) + '</button><button class="ghost kz-bet-go" data-s="defender">Auf ' + esc(w.defender) + '</button></div>') + '<div class="kz-bet-msg"></div></div>').join('')
+    + (o.mine.length ? '<p class="kf-muted">Deine letzten Wetten: ' + o.mine.map(b => (b.kind === 'pet' ? 'Tierkampf' : 'Krieg') + ' ' + eur(b.amount) + (b.settled ? ' → ' + eur(b.payout) : ' (offen)')).join(' · ') + '</p>' : '');
+  body.appendChild(box);
+  box.querySelectorAll('.kz-bet-go').forEach(b => { const w = b.closest('.kz-bet'); act(b, w.querySelector('.kz-bet-msg'), async () => { const r = await rpc('place_bet', { bet_kind: w.dataset.k, bet_ref: w.dataset.r, bet_side: b.dataset.s, amount: Number(w.querySelector('.kz-bet-amt').value) }); window.kiezRenderProfile?.(r.profile); setTimeout(() => { box.remove(); drawBets(); }, 1500); return 'Gewettet: ' + eur(r.amount) + '.'; }); });
+}
+{ const prevZ = loaders.zockerbude; loaders.zockerbude = async () => { await prevZ?.(); drawBets(); }; }
+
+// ================= S13: Charakter, Sozial, Welt (23, 26–34) =================
+// ---------- 34: Kiez-Figuren (Nebenquests) ----------
+const figBody = addPanel('kiezfiguren', 'Kiez-Figuren', 'Kiez-Figuren');
+const QKIND = { bottles: 'Flaschen', beg: 'mal schnorren', bin: 'Mülltonnen', job: 'Nebenjob', npc: 'Computer-Gegner besiegt', sort: 'mal sortiert', crime: 'Verbrechen', wins: 'Siege' };
+loaders.kiezfiguren = async () => {
+  let q; try { q = await rpc('side_quests_status'); } catch (e) { return; }
+  figBody.innerHTML = '<p>Neben der Kiez-Geschichte haben ein paar Leute im Kiez eigene Aufgaben für dich – jede in mehreren Teilen. Was du dafür tust, verändert auch deinen Ruf.</p><div class="kf-grid">'
+    + q.map(x => '<div class="card kz-fig" data-q="' + x.quest + '"><b>' + esc(x.figure) + '</b><p class="kf-muted">' + (x.done ? 'Alle ' + x.steps + ' Teile erledigt' : 'Teil ' + x.step + ' von ' + x.steps + ': ' + esc(x.title)) + '</p>'
+      + (x.done ? '<p>Danke für alles!</p>' : '<p><i>' + esc(x.body) + '</i></p><div class="progress"><span style="width:' + Math.round(x.progress / x.target * 100) + '%"></span></div><small>' + x.progress + ' / ' + x.target + ' ' + (QKIND[x.kind] || '') + ' · Lohn: ' + eur(x.reward_money) + ', ' + x.reward_caps + ' Kronkorken, ' + x.reward_xp + ' Punkte</small>'
+        + '<div class="kf-row"><button class="big kz-fig-go"' + (x.progress < x.target ? ' disabled' : '') + '>' + (x.progress < x.target ? 'Noch nicht geschafft' : 'Abgeben') + '</button></div>') + '<div class="kz-fig-msg"></div></div>').join('') + '</div>';
+  figBody.querySelectorAll('.kz-fig').forEach(c => { const b = c.querySelector('.kz-fig-go'); if (b && !b.disabled) act(b, c.querySelector('.kz-fig-msg'), async () => { const r = await rpc('claim_side_quest', { q: c.dataset.q }); window.kiezRenderProfile?.(r.profile); setTimeout(loaders.kiezfiguren, 2000); return esc(r.figure) + ' bedankt sich: ' + eur(r.money) + ', ' + r.caps + ' Kronkorken, ' + r.xp + ' Punkte.'; }); });
+};
+
+// ---------- 26: Ruf im Kiez (Karriere → Statistik) ----------
+async function drawRep() {
+  const ins = document.querySelector('#career > .inside'); if (!ins || !window.kiezProfile) return;
+  let r; try { r = await rpc('reputation_status'); } catch (e) { return; }
+  let box = ins.querySelector('.kz-rep'); if (!box) { box = document.createElement('div'); box.className = 'kf-box kz-rep'; ins.prepend(box); }
+  const bar = (label, v) => '<div class="kz-repbar"><small>' + label + ': ' + v + '</small><div class="kz-rb"><span style="left:50%;width:' + Math.abs(v) / 2 + '%;' + (v < 0 ? 'transform:translateX(-100%);background:var(--rust,#9b3c1f)' : '') + '"></span></div></div>';
+  box.innerHTML = '<h3>Ruf im Kiez</h3><p class="kf-muted">Was du tust, spricht sich rum: Verbrechen freuen die Unterwelt und ärgern die Polizei, Schnorren, Mülltonnen und Jobs machen dich bei den Nachbarn beliebt.</p>'
+    + bar('Polizei', r.police) + bar('Unterwelt', r.underworld) + bar('Nachbarn', r.neighbors)
+    + '<ul class="kz-unlocks">' + r.unlocks.map(u => '<li class="' + (u.have ? 'kz-have' : '') + '">' + (u.have ? '<i class="kz-ico kz-ico-ok"></i>' : '<i class="kz-ico kz-ico-lock"></i>') + esc(u.group) + ' ab ' + u.need + ': ' + esc(u.text) + '</li>').join('') + '</ul>';
+}
+{ const prevC = loaders.career; loaders.career = () => { prevC?.(); setTimeout(drawRep, 300); }; }
+
+// ---------- 29: Glücksrad (Aktionszentrale → Glücksspiel) ----------
+const WHEEL = ['Niete', '0,50 €', '1 €', '2 Kronk.', '+20 Energie', '5 Kronk.', 'Plunder', '5 €'];
+function drawWheel() {
+  const ins = document.querySelector('#missions > .inside'); if (!ins || ins.querySelector('.kz-wheel')) return;
+  const box = document.createElement('div'); box.className = 'kf-box kz-wheel';
+  box.innerHTML = '<h3>Glücksrad</h3><p class="kf-muted">Einmal am Tag gratis drehen – vom leeren Joghurtbecher bis zu 5 €.</p><div class="kz-wheel-disc">' + WHEEL.map((w, i) => '<span style="--i:' + i + '">' + w + '</span>').join('') + '</div><div class="kf-row"><button class="big kz-spin">Drehen</button></div><div class="kz-wheel-msg"></div>';
+  ins.appendChild(box); window.kiezRezone?.('missions');  // später eingefügt → Reiter-Sichtbarkeit neu anwenden
+  act(box.querySelector('.kz-spin'), box.querySelector('.kz-wheel-msg'), async () => {
+    const r = await rpc('spin_wheel'); const d = box.querySelector('.kz-wheel-disc');
+    d.style.transition = 'none'; d.style.transform = 'rotate(0deg)'; void d.offsetWidth;
+    d.style.transition = 'transform 2.2s cubic-bezier(.2,.8,.2,1)'; d.style.transform = 'rotate(' + (1440 - r.slot * 45) + 'deg)';
+    await new Promise(x => setTimeout(x, 2300)); window.kiezRenderProfile?.(r.profile); return 'Gewonnen: ' + esc(r.label);
+  });
+}
+{ const prevM = loaders.missions; loaders.missions = () => { prevM?.(); setTimeout(drawWheel, 300); }; }
+
+// ---------- 27/28/30: Mentor, Geschenke, Duo-Tour (Freunde) ----------
+async function drawFriendsExtra() {
+  const body = document.querySelector('#freunde .kf-body'), me = await myId(); if (!body || !me || body.querySelector('.kz-fx')) return;
+  let ms; try { ms = await rpc('mentor_status'); } catch (e) { return; }
+  const { data: fr } = await sb.from('friendships').select('user_id,friend_id,status').eq('status', 'accepted').or('user_id.eq.' + me + ',friend_id.eq.' + me);
+  const ids = (fr || []).map(f => f.user_id === me ? f.friend_id : f.user_id); const nm = await names(ids);
+  const { data: pl } = await sb.from('user_plunder').select('plunder_id,quantity').eq('user_id', me).gt('quantity', 0);
+  const { data: cat } = await sb.from('plunder_catalog').select('id,name'); const pn = Object.fromEntries((cat || []).map(c => [c.id, c.name]));
+  const box = document.createElement('div'); box.className = 'kz-fx';
+  const fsel = ids.length ? '<select class="kz-fx-friend">' + ids.map(i => '<option value="' + i + '">' + esc(nm[i] || '?') + '</option>').join('') + '</select>' : '';
+  box.innerHTML = '<div class="kf-grid"><div class="kf-box"><h3>Zu zweit auf Pfandtour</h3><p class="kf-muted">Lade einen Freund ein. Nimmt er an, gibt es 3 Stunden lang +15 % Flaschen für jede Tour, solange ihr beide unterwegs seid.</p>'
+    + (ids.length ? '<div class="kf-row">' + fsel + '<button class="ghost kz-duo">Einladen / annehmen</button></div>' : '<p class="kf-muted">Erst Freunde finden.</p>') + '<div class="kz-duo-msg"></div></div>'
+    + '<div class="kf-box"><h3>Geschenke</h3><p class="kf-muted">Kronkorken (bis 20 am Tag), Plunder oder ein Bier (+10 Energie für 1 €).</p>'
+    + (ids.length ? '<div class="kf-row">' + fsel.replace('kz-fx-friend', 'kz-g-friend') + '<select class="kz-g-kind"><option value="caps">Kronkorken</option><option value="bier">Bier (1 €)</option>' + ((pl || []).length ? '<option value="plunder">Plunder</option>' : '') + '</select>'
+      + '<input type="number" class="kz-g-qty" min="1" max="20" value="1" style="width:70px" aria-label="Anzahl"><select class="kz-g-pl" hidden>' + (pl || []).map(x => '<option value="' + x.plunder_id + '">' + esc(pn[x.plunder_id] || x.plunder_id) + '</option>').join('') + '</select><button class="ghost kz-gift">Schenken</button></div>' : '') + '<div class="kz-gift-msg"></div></div>'
+    + '<div class="kf-box"><h3>Mentor</h3>' + (ms.mentor ? '<p>Dein Mentor: ' + playerLink(ms.mentor.id, ms.mentor.name) + ' (Level ' + ms.mentor.level + ')</p>' : '')
+    + (ms.mentees.length ? '<p>Deine Schützlinge: ' + ms.mentees.map(m => playerLink(m.id, m.name) + ' (' + m.level + ')').join(', ') + '</p>' : '')
+    + (ms.can_choose ? '<p class="kf-muted">Such dir einen erfahrenen Spieler (ab Level 30). Bei deinen Levels 5, 10, 15 und 20 bekommt ihr beide Kronkorken, dein Mentor zusätzlich Geld.</p>' + (ms.candidates.length ? '<div class="kf-row"><select class="kz-m-sel">' + ms.candidates.map(c => '<option value="' + c.id + '">' + esc(c.name) + ' (Level ' + c.level + ')</option>').join('') + '</select><button class="ghost kz-m-go">Als Mentor wählen</button></div>' : '<p class="kf-muted">Gerade ist niemand ab Level 30 aktiv.</p>')
+      : !ms.mentor && !ms.can_mentor ? '<p class="kf-muted">Mentor werden kannst du ab Level 30.</p>' : '') + '<div class="kz-m-msg"></div></div></div>';
+  body.appendChild(box);
+  const q = s => box.querySelector(s);
+  if (q('.kz-duo')) act(q('.kz-duo'), q('.kz-duo-msg'), async () => { const r = await rpc('duo_invite', { friend: q('.kz-fx-friend').value }); return r.status === 'active' ? 'Ihr seid zu zweit unterwegs – 3 Stunden +15 %!' : 'Eingeladen – dein Freund muss hier auch auf „Einladen / annehmen“ drücken.'; });
+  if (q('.kz-g-kind')) q('.kz-g-kind').onchange = e => { q('.kz-g-pl').hidden = e.target.value !== 'plunder'; q('.kz-g-qty').hidden = e.target.value !== 'caps'; };
+  if (q('.kz-gift')) act(q('.kz-gift'), q('.kz-gift-msg'), async () => { const k = q('.kz-g-kind').value; const r = await rpc('send_gift', { friend: q('.kz-g-friend').value, gift_kind: k, ref: k === 'plunder' ? q('.kz-g-pl').value : null, qty: Number(q('.kz-g-qty').value) || 1 }); window.kiezRenderProfile?.(r.profile); return 'Geschenkt an ' + esc(r.to) + ': ' + esc(r.gift) + '.'; });
+  if (q('.kz-m-go')) act(q('.kz-m-go'), q('.kz-m-msg'), async () => { const r = await rpc('set_mentor', { mentor: q('.kz-m-sel').value }); setTimeout(() => { box.remove(); drawFriendsExtra(); }, 1500); return esc(r.mentor) + ' ist jetzt dein Mentor.'; });
+}
+{ const prevF = loaders.freunde; loaders.freunde = async () => { await prevF?.(); drawFriendsExtra(); }; }
+
+// ---------- 23: Kosmetik (Einstellungen) ----------
+async function drawCosmetics() {
+  const body = document.querySelector('#einstellungen .kf-body'), me = await myId(); if (!body || !me || body.querySelector('.kz-cos')) return;
+  const [{ data: all }, { data: mine }] = await Promise.all([sb.from('cosmetics').select('*').order('sort_order'), sb.from('user_cosmetics').select('cosmetic_id').eq('user_id', me)]);
+  const have = new Set((mine || []).map(x => x.cosmetic_id)), p = window.kiezProfile || {};
+  const box = document.createElement('div'); box.className = 'kf-box kz-cos';
+  box.innerHTML = '<h3>Rahmen & Titelfarbe</h3><p class="kf-muted">Für Kronkorken: ein Rahmen ums Profilbild und eine Farbe für deinen Titel – sehen alle in deinem Profil.</p><div class="kf-grid">'
+    + (all || []).map(c => { const on = (c.kind === 'frame' ? p.avatar_frame : p.title_color) === c.id; return '<div class="card kz-cos-c" data-id="' + c.id + '" data-k="' + c.kind + '"><b style="color:' + esc(c.value) + '">' + esc(c.name) + '</b><div class="kz-cos-prev" style="' + (c.kind === 'frame' ? 'border:5px solid ' + esc(c.value) : 'color:' + esc(c.value)) + '">' + (c.kind === 'frame' ? '' : '„Titel“') + '</div>'
+      + '<div class="kf-row">' + (have.has(c.id) ? '<button class="ghost kz-cos-use">' + (on ? 'Ablegen' : 'Benutzen') + '</button>' : '<button class="ghost kz-cos-buy">Kaufen – ' + c.price_caps + ' Kronkorken</button>') + '</div><div class="kz-cos-msg"></div></div>'; }).join('') + '</div>';
+  body.appendChild(box);
+  box.querySelectorAll('.kz-cos-c').forEach(c => {
+    const b = c.querySelector('.kz-cos-buy'), u = c.querySelector('.kz-cos-use'), m = c.querySelector('.kz-cos-msg'), again = () => setTimeout(() => { box.remove(); drawCosmetics(); applyFrame(); }, 1500);
+    if (b) act(b, m, async () => { const r = await rpc('buy_cosmetic', { wanted: c.dataset.id }); window.kiezRenderProfile?.(r.profile); again(); return 'Gekauft: ' + esc(r.bought) + '.'; });
+    if (u) act(u, m, async () => { const on = u.textContent === 'Ablegen'; const r = await rpc('use_cosmetic', { k: c.dataset.k, wanted: on ? null : c.dataset.id }); window.kiezRenderProfile?.(r.profile); again(); return on ? 'Abgelegt.' : 'Benutzt.'; });
+  });
+}
+{ const prevE = loaders.einstellungen; loaders.einstellungen = async () => { await prevE?.(); drawCosmetics(); }; }
+// Rahmen am eigenen Profilbild im Spielerkasten
+let cosCache = null;
+async function applyFrame() {
+  const p = window.kiezProfile; if (!p) return;
+  if (!cosCache) { const { data } = await sb.from('cosmetics').select('id,value'); cosCache = Object.fromEntries((data || []).map(c => [c.id, c.value])); }
+  document.querySelectorAll('.player-slip .kz-avatar, .player-slip [style*="background-image"]').forEach(a => { a.style.outline = p.avatar_frame ? '4px solid ' + cosCache[p.avatar_frame] : ''; a.style.outlineOffset = '-2px'; });
+}
+setTimeout(applyFrame, 3000); setInterval(applyFrame, 15000);
+
+// ---------- 31/32/33: Tag/Nacht + Stadtereignisse im Ticker ----------
+async function drawCity() {
+  const t = document.getElementById('kz-ticker'); if (!t || !window.kiezProfile) return;
+  let c; try { c = await rpc('city_events_now'); } catch (e) { return; }
+  let box = t.querySelector('.kz-city'); if (!box) { box = document.createElement('div'); box.className = 'kz-city'; t.querySelector('h3')?.after(box); }
+  box.innerHTML = '<p class="kz-daytime">' + (c.daytime === 'nacht' ? 'Nacht im Kiez: Pfand +10 %, Verbrechen lohnen mehr (aber riskanter), Schnorren bringt wenig.' : 'Tag im Kiez.') + '</p>'
+    + c.events.map(e => '<p class="kz-kzt"><b>' + esc(e.title) + '</b> – ' + esc(e.body) + ' <small>bis ' + new Date(e.ends_at).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) + '</small></p>').join('');
+}
+setInterval(() => { if (!document.hidden) drawCity(); }, 300000); setTimeout(drawCity, 5000);
+{ const prevT = window.tickerLoad; }
+
+const style22 = document.createElement('style');
+style22.textContent = `html body:not(#kz1):not(#kz2) .kz-repbar{margin:8px 0}html body:not(#kz1):not(#kz2) .kz-repbar small{font-size:13px;color:var(--muted,#bdb19d)}
+html body:not(#kz1):not(#kz2) .kz-rb{position:relative;height:10px;border-radius:6px;background:rgba(255,255,255,.08)}
+html body:not(#kz1):not(#kz2) .kz-rb span{position:absolute;top:0;bottom:0;border-radius:6px;background:var(--moss,#6f8a3c)}
+html body:not(#kz1):not(#kz2) .kz-rb:after{content:'';position:absolute;left:50%;top:-2px;bottom:-2px;width:2px;background:rgba(255,255,255,.4)}
+html body:not(#kz1):not(#kz2) .kz-unlocks{list-style:none;padding:0;margin:8px 0 0}html body:not(#kz1):not(#kz2) .kz-unlocks li{margin:4px 0;font-size:15px;color:var(--muted,#bdb19d)}html body:not(#kz1):not(#kz2) .kz-unlocks li.kz-have{color:var(--text,#efe3c3)}
+html body:not(#kz1):not(#kz2) .kz-wheel-disc{position:relative;width:220px;height:220px;margin:10px auto;border-radius:50%;border:6px solid var(--brass,#d1a94f);background:conic-gradient(#9b3c1f 0 45deg,#3a2e20 45deg 90deg,#9b3c1f 90deg 135deg,#3a2e20 135deg 180deg,#9b3c1f 180deg 225deg,#3a2e20 225deg 270deg,#9b3c1f 270deg 315deg,#3a2e20 315deg 360deg)}
+html body:not(#kz1):not(#kz2) .kz-wheel-disc span{position:absolute;left:50%;top:50%;width:90px;margin-left:-45px;text-align:center;font-size:12px;font-weight:700;color:#f3e6c4;transform:rotate(calc(var(--i)*45deg + 22.5deg)) translateY(-78px)}
+html body:not(#kz1):not(#kz2) .kz-wheel .kf-row{justify-content:center}
+html body:not(#kz1):not(#kz2) .kz-wheel:before{content:'';display:block;width:0;height:0;margin:0 auto -6px;border:10px solid transparent;border-top-color:var(--brass,#d1a94f)}
+html body:not(#kz1):not(#kz2) .kz-cos-prev{width:70px;height:50px;margin:6px 0;border-radius:6px;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;font-weight:700}
+html body:not(#kz1):not(#kz2) .kz-daytime{font-size:14px;color:var(--muted,#bdb19d)}`;
+document.head.appendChild(style22);
+
+// ================= S14: Langzeit (6–9, 14, 36) =================
+// ---------- 7: Kiez-Saison ----------
+const seasonBody = addPanel('saison', 'Kiez-Saison', 'Kiez-Saison');
+loaders.saison = async () => {
+  let s; try { s = await rpc('season_status'); } catch (e) { return; }
+  const tier = Math.floor(s.points / s.per_tier);
+  const rw = r => [r.caps ? r.caps + ' Kronkorken' : '', Number(r.money) ? eur(r.money) : '', r.plunder ? 'Plunder' : ''].filter(Boolean).join(' + ');
+  seasonBody.innerHTML = '<div class="kf-box"><h3>Saison ' + s.season + ' – noch bis ' + new Date(s.ends).toLocaleDateString('de-DE') + '</h3><p>Jede Aktion im Kiez bringt Saisonpunkte (Flaschen: 1 Punkt je 10). Alle ' + s.per_tier + ' Punkte gibt es eine Belohnung – kostenlos für alle.</p>'
+    + '<div class="progress"><span style="width:' + Math.min(100, Math.round(s.points / (20 * s.per_tier) * 100)) + '%"></span></div><p class="kf-muted">' + s.points + ' Punkte · Stufe ' + Math.min(20, tier) + ' von 20</p></div>'
+    + '<div class="kz-ladder">' + s.tiers.map(t => '<div class="kz-rung' + (t.claimed ? ' kz-done' : s.points >= t.need ? ' kz-ready' : '') + '" data-t="' + t.tier + '"><b>' + t.tier + '</b><small>' + rw(t.reward) + '</small>'
+      + (t.claimed ? '<em>abgeholt</em>' : s.points >= t.need ? '<button class="ghost kz-rung-go">Abholen</button>' : '<em>' + t.need + ' P.</em>') + '</div>').join('') + '</div><div class="kz-rung-msg"></div>';
+  seasonBody.querySelectorAll('.kz-rung-go').forEach(b => act(b, seasonBody.querySelector('.kz-rung-msg'), async () => { const r = await rpc('claim_season_tier', { tier: Number(b.closest('.kz-rung').dataset.t) }); window.kiezRenderProfile?.(r.profile); setTimeout(loaders.saison, 1200); return 'Abgeholt: ' + rw(r) + (r.plunder_name ? ' (' + esc(r.plunder_name) + ')' : '') + '.'; }));
+};
+
+// ---------- 9: Kiez-Legende (Karriere) ----------
+function drawLegend() {
+  const ins = document.querySelector('#career > .inside'), p = window.kiezProfile; if (!ins || !p || ins.querySelector('.kz-legend')) return;
+  const box = document.createElement('div'); box.className = 'kf-box kz-legend';
+  box.innerHTML = '<h3>Kiez-Legende' + (p.legend ? ' (' + p.legend + '×)' : '') + '</h3><p>Wer Level 150 erreicht, kann als Kiez-Legende von vorn anfangen: Level, Punkte und Weiterbildungen gehen zurück auf Anfang, Geld bis auf 50 € weg. Dafür bleibt für immer: +3 Angriff, +3 Verteidigung und +5 % Pfand – je Legenden-Stufe.</p>'
+    + (p.level >= 150 ? '<div class="kf-row"><button class="big kz-leg-go">Kiez-Legende werden</button></div>' : '<p class="kf-muted">Noch ' + (150 - p.level) + ' Level bis dahin.</p>') + '<div class="kz-leg-msg"></div>';
+  ins.appendChild(box);
+  const b = box.querySelector('.kz-leg-go'); if (b) act(b, box.querySelector('.kz-leg-msg'), async () => { if (!confirm('Wirklich von vorn anfangen? Level und Weiterbildungen werden zurückgesetzt.')) return 'Nicht jetzt.'; const r = await rpc('become_legend'); window.kiezRenderProfile?.(r.profile); return 'Du bist Kiez-Legende Nr. ' + r.legend + '!'; });
+}
+{ const prevC2 = loaders.career; loaders.career = () => { prevC2?.(); setTimeout(drawLegend, 400); }; }
+
+// ---------- 14: mehr Ranglisten ----------
+const RK = { geld: 'Reichste (Tasche + Schließfach)', flaschen: 'Meiste Flaschen', quote: 'Beste Kampfquote (ab 20 Kämpfen)', tiere: 'Tierkampf-Siege', legende: 'Kiez-Legenden' };
+async function drawRankings(kind) {
+  const ins = document.querySelector('#leaderboard > .inside'); if (!ins) return;
+  let box = ins.querySelector('.kz-ranks'); if (!box) { box = document.createElement('div'); box.className = 'kf-box kz-ranks'; ins.appendChild(box); }
+  kind = kind || box.dataset.k || 'geld'; box.dataset.k = kind;
+  let r; try { r = await rpc('rankings', { kind }); } catch (e) { return; }
+  box.innerHTML = '<h3>Weitere Ranglisten</h3><div class="kf-row kz-rk-tabs">' + Object.entries(RK).map(([k, v]) => '<button class="ghost kz-rk' + (k === kind ? ' kz-on' : '') + '" data-k="' + k + '">' + v.split(' (')[0] + '</button>').join('') + '</div>'
+    + '<p class="kf-muted">' + RK[kind] + '</p>' + (r.length ? '<table class="kf-table"><tr><th>#</th><th>Spieler</th><th>Level</th><th>Wert</th></tr>' + r.map((x, i) => '<tr><td>' + (i + 1) + '</td><td>' + playerLink(x.id, x.name) + '</td><td>' + x.level + '</td><td>' + (kind === 'geld' ? eur(x.value) : kind === 'quote' ? x.value + ' %' : x.value) + '</td></tr>').join('') + '</table>' : '<p class="kf-muted">Noch niemand.</p>');
+  box.querySelectorAll('.kz-rk').forEach(b => b.onclick = () => drawRankings(b.dataset.k));
+}
+{ const prevL = loaders.leaderboard; loaders.leaderboard = () => { prevL?.(); setTimeout(() => drawRankings(), 400); }; }
+
+// ---------- 36: Statistik mit Verlaufskurven ----------
+const statBody = addPanel('statistik', 'Statistik', 'Statistik');
+const spark = (rows, key, label, fmt) => {
+  if (rows.length < 2) return '<div class="kf-box"><h3>' + label + '</h3><p class="kf-muted">Die Kurve entsteht ab dem zweiten Tag.</p></div>';
+  const v = rows.map(r => Number(r[key])), mn = Math.min(...v), mx = Math.max(...v), w = 300, h = 90, sx = i => 6 + i * (w - 12) / (v.length - 1), sy = x => h - 8 - (mx === mn ? 0.5 : (x - mn) / (mx - mn)) * (h - 16);
+  const pts = v.map((x, i) => sx(i).toFixed(1) + ',' + sy(x).toFixed(1)).join(' ');
+  return '<div class="kf-box"><h3>' + label + ': ' + fmt(v[v.length - 1]) + '</h3><svg viewBox="0 0 ' + w + ' ' + h + '" class="kz-spark" role="img" aria-label="' + label + ' der letzten ' + v.length + ' Tage"><polyline points="' + pts + '" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/><circle cx="' + sx(v.length - 1) + '" cy="' + sy(v[v.length - 1]) + '" r="4" fill="currentColor"/></svg><p class="kf-muted">' + new Date(rows[0].day).toLocaleDateString('de-DE') + ' bis heute · niedrigster ' + fmt(mn) + ' · höchster ' + fmt(mx) + '</p></div>';
+};
+loaders.statistik = async () => {
+  let rows; try { rows = await rpc('stats_history'); } catch (e) { return; }
+  statBody.innerHTML = '<p>Deine Entwicklung der letzten 30 Tage (ein Punkt pro Tag, an dem du vorbeigeschaut hast).</p><div class="kf-grid">'
+    + spark(rows, 'xp', 'Punkte', x => x) + spark(rows, 'money', 'Geld (Tasche + Schließfach)', eur) + spark(rows, 'bottles', 'Flaschen gesammelt', x => x) + spark(rows, 'wins', 'Siege', x => x) + '</div>';
+};
+setTimeout(() => { if (window.kiezProfile) rpc('stats_history').catch(() => {}); }, 8000);  // täglicher Messpunkt
+
+const style23 = document.createElement('style');
+style23.textContent = `html body:not(#kz1):not(#kz2) .kz-ladder{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin-top:10px}
+html body:not(#kz1):not(#kz2) .kz-rung{padding:8px;border-radius:8px;border:1px solid var(--line,#5a4a36);background:rgba(0,0,0,.25);display:flex;flex-direction:column;gap:3px;text-align:center}
+html body:not(#kz1):not(#kz2) .kz-rung b{font:700 20px var(--font-head,serif)}html body:not(#kz1):not(#kz2) .kz-rung small{font-size:13px}html body:not(#kz1):not(#kz2) .kz-rung em{font-style:normal;font-size:13px;color:var(--muted,#bdb19d)}
+html body:not(#kz1):not(#kz2) .kz-rung.kz-ready{border-color:var(--brass,#d1a94f)}html body:not(#kz1):not(#kz2) .kz-rung.kz-done{opacity:.6}
+html body:not(#kz1):not(#kz2) .kz-rk-tabs{flex-wrap:wrap;gap:6px}html body:not(#kz1):not(#kz2) .kz-rk.kz-on{outline:2px solid var(--brass,#d1a94f)}
+html body:not(#kz1):not(#kz2) .kz-spark{width:100%;height:auto;color:var(--brass,#d1a94f);background:rgba(0,0,0,.2);border-radius:8px}`;
+document.head.appendChild(style23);
+
+// ================= S15/S16: Fahrzeuge (53–64) =================
+const garBody = addPanel('garage', 'Garage', 'Garage');
+const GAR = { tab: 'Fahrzeuge' };
+{
+  const t = document.createElement('div'); t.className = 'section-tools';
+  t.innerHTML = ['Fahrzeuge', 'Werkstatt', 'Schrottplatz', 'Rennen', 'Autoklau'].map(x => '<span>' + x + '</span>').join('');
+  document.querySelector('#garage > h2')?.after(t);
+  t.addEventListener('click', e => { const s = e.target.closest('span'); if (!s) return; GAR.tab = s.textContent.trim(); garTab(); });
+}
+function garTab() {
+  document.querySelectorAll('#garage > .section-tools span').forEach(s => s.classList.toggle('subtab-active', s.textContent.trim() === GAR.tab));
+  garBody.querySelectorAll('[data-rtab]').forEach(el => el.dataset.rtab === GAR.tab ? el.style.removeProperty('display') : el.style.setProperty('display', 'none', 'important'));
+}
+loaders.garage = async () => {
+  let g, races, targets; try { [g, races, targets] = await Promise.all([rpc('garage_overview'), rpc('races_overview'), rpc('theft_targets')]); } catch (e) { garBody.innerHTML = '<p class="notice bad">' + esc(e.message) + '</p>'; return; }
+  const p = window.kiezProfile || {}, act_ = g.vehicles.find(v => v.id === g.active) || g.vehicles[0];
+  const when = d => new Date(d).toLocaleString('de-DE', { weekday: 'short', hour: '2-digit', minute: '2-digit' });
+  const lic = g.license_stage >= 2 ? 'Führerschein: <b>vorhanden</b>' : g.license_ends_at ? 'Fahrschule läuft bis ' + when(g.license_ends_at) : 'Führerschein: ' + (g.license_stage === 1 ? 'Theorie bestanden – jetzt Praxis' : 'keiner') + (p.level < 30 ? ' (Fahrschule ab Level 30)' : '');
+  const vals = v => '+' + v.bonus + ' % Flaschen' + (v.speed ? ' · ' + v.speed + ' % schneller' : '') + (Number(v.fuel) ? ' · Sprit ' + eur(v.fuel) + '/Tour' : '');
+  const motor = act_.needs_license, uv = act_;
+  garBody.innerHTML =
+    '<div data-rtab="Fahrzeuge"><div class="kf-box"><h3>Unterwegs mit: ' + esc(act_.name) + '</h3><p>' + vals(act_) + ' · gesamt mit Tuning: +' + g.bonus + ' % Flaschen</p><p class="kf-muted">' + lic + '</p>'
+    + (g.license_stage < 2 ? '<div class="kf-row"><button class="ghost kz-lic"' + (p.level < 30 && !g.license_ends_at ? ' disabled' : '') + '>' + (g.license_ends_at ? (new Date(g.license_ends_at) > new Date() ? 'Fahrschule läuft …' : 'Prüfung abholen') : g.license_stage === 0 ? 'Theorie – 60 €, 1 Std.' : 'Praxis – 150 €, 2 Std.') + '</button></div>' : '') + '<div class="kz-lic-msg"></div></div>'
+    + '<div class="kf-grid">' + g.vehicles.map(v => '<div class="card kz-veh' + (v.id === g.active ? ' kz-p-on' : '') + (!v.owned && p.level < v.min_level ? ' kz-locked' : '') + '" data-id="' + v.id + '"><b>' + esc(v.name) + '</b><p class="kf-muted">' + esc(v.description) + '</p><p>' + vals(v) + '</p>'
+      + (v.owned ? (v.id !== 'wagen' ? '<p class="kf-muted">Zustand ' + v.condition + ' %' + (v.needs_license ? ' · TÜV ' + (v.tuev_until && new Date(v.tuev_until) > new Date() ? 'bis ' + new Date(v.tuev_until).toLocaleDateString('de-DE') : 'abgelaufen') : '') + '</p>' : '')
+        + '<div class="kf-row"><button class="ghost kz-veh-use"' + (v.id === g.active ? ' disabled' : '') + '>' + (v.id === g.active ? 'Im Einsatz' : 'Benutzen') + '</button></div>'
+        : '<p class="kf-muted">' + eur(v.price) + ' · ab Level ' + v.min_level + (v.needs_license ? ' · Führerschein' : '') + '</p><div class="kf-row"><button class="ghost kz-veh-buy"' + (p.level < v.min_level || (v.needs_license && g.license_stage < 2) ? ' disabled' : '') + '>' + (p.level < v.min_level ? 'ab Level ' + v.min_level : v.needs_license && g.license_stage < 2 ? 'Führerschein nötig' : 'Kaufen – ' + eur(v.price)) + '</button></div>')
+      + '<div class="kz-veh-msg"></div></div>').join('') + '</div></div>'
+    // Werkstatt
+    + '<div data-rtab="Werkstatt"><div class="kf-box"><h3>Werkstatt: ' + esc(act_.name) + '</h3>' + (act_.id === 'wagen' ? '<p class="kf-muted">Der Einkaufswagen braucht keine Werkstatt.</p>' :
+      '<p>Zustand ' + uv.condition + ' % – schlechter Zustand macht Pannen wahrscheinlicher.</p><div class="kf-row"><button class="ghost kz-svc" data-k="repair"' + (uv.condition >= 100 ? ' disabled' : '') + '>Reparieren – ' + eur((100 - uv.condition) * 0.2) + '</button>' + (motor ? '<button class="ghost kz-svc" data-k="tuev">TÜV – 20 € (30 Tage)</button>' : '') + '</div>'
+      + '<h3>Tuning aus Material</h3><div class="kf-grid">' + [['reifen', 'Neue Reifen', '5 % schneller', '5 Nägel, 5 Holz'], ['anhaenger', 'Großer Anhänger', '+10 % Flaschen', '10 Nägel, 20 Holz'], ['motor', 'Motor frisiert', '+10 % Flaschen', '15 Nägel, 5 Scherben'], ['hupe', 'Laute Hupe', 'seltener Polizeikontrollen', '3 Scherben']].filter(x => x[0] !== 'motor' || motor)
+        .map(x => '<div class="card"><b>' + x[1] + '</b><p>' + x[2] + '</p><p class="kf-muted">' + x[3] + '</p><div class="kf-row"><button class="ghost kz-tune" data-p="' + x[0] + '"' + ((uv.tuning || {})[x[0]] ? ' disabled' : '') + '>' + ((uv.tuning || {})[x[0]] ? 'Eingebaut' : 'Einbauen') + '</button></div><div class="kz-tune-msg"></div></div>').join('')
+        + '<div class="card"><b>Lackierung</b><p>Farbe im Profil und auf dem Stadtplan</p><p class="kf-muted">10 Textil</p><div class="kf-row"><input type="color" class="kz-paint" value="' + esc(uv.paint || '#9b3c1f') + '"><button class="ghost kz-tune" data-p="lack">Lackieren</button></div><div class="kz-tune-msg"></div></div></div>'
+      + '<h3>Diebstahlschutz</h3><div class="kf-row"><button class="ghost kz-prot" data-k="kralle">Lenkradkralle – 15 €</button><button class="ghost kz-prot" data-k="garage">Garage – 100 €</button></div><p class="kf-muted">Ein Begleiter im Auto schreckt Diebe zusätzlich ab.</p>') + '<div class="kz-svc-msg"></div></div></div>'
+    // Schrottplatz
+    + '<div data-rtab="Schrottplatz"><div class="kf-box"><h3>Schrottplatz</h3><p>Alte Autos ausschlachten: Nägel, Holz, Scherben, Textil – alle 30 Minuten (5 Energie). Überzähliges Material kannst du hier verkaufen.</p><div class="kf-row"><button class="big kz-scrap"' + (g.scrap_ready_at ? ' disabled' : '') + '>' + (g.scrap_ready_at ? 'Wieder ab ' + new Date(g.scrap_ready_at).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) : 'Ausschlachten') + '</button></div>'
+    + '<div class="kf-row"><select class="kz-mat"><option value="nails">Nägel (0,05 €)</option><option value="wood">Holz (0,04 €)</option><option value="shards">Scherben (0,15 €)</option><option value="textile">Textil (0,08 €)</option></select><input type="number" class="kz-mat-n" min="1" value="10" style="width:90px"><button class="ghost kz-mat-go">Verkaufen</button></div><div class="kz-scrap-msg"></div></div></div>'
+    // Rennen
+    + '<div data-rtab="Rennen"><div class="kf-box"><h3>Straßenrennen</h3><p class="kf-muted">Nur mit Motorfahrzeug. Einsatz 5–500 €, Sieger bekommt 1,9×. Nach dem Annehmen 10 Minuten bis zum Start – Zuschauer können wetten.</p>'
+    + '<div class="kf-row"><input type="number" class="kz-race-st" min="5" max="500" value="20" style="width:100px"><button class="ghost kz-race-new"' + (motor ? '' : ' disabled') + '>Herausfordern</button></div>'
+    + (races.length ? '<table class="kf-table">' + races.map(r => '<tr data-r="' + r.id + '"><td>' + esc(r.challenger) + ' (' + esc(r.cv) + ')' + (r.opponent ? ' gegen ' + esc(r.opponent) + ' (' + esc(r.ov) + ')' : '') + '</td><td>' + eur(r.stake) + '</td><td>'
+      + (r.resolved ? (r.winner ? 'Sieger: ' + esc(r.winner) + ' (' + r.cp + ':' + r.op + ')' : 'abgesagt') : !r.opponent ? (r.mine ? 'wartet' : '<button class="ghost kz-race-acc"' + (motor ? '' : ' disabled') + '>Annehmen</button>') : 'Start ' + new Date(r.starts_at).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) + (r.mine || r.my_bet ? '' : ' <button class="ghost kz-race-bet" data-s="a">1 € auf ' + esc(r.challenger) + '</button><button class="ghost kz-race-bet" data-s="b">1 € auf ' + esc(r.opponent) + '</button>')) + '</td></tr>').join('') + '</table>' : '<p class="kf-muted">Gerade keine Rennen.</p>') + '<div class="kz-race-msg"></div></div></div>'
+    // Autoklau
+    + '<div data-rtab="Autoklau"><div class="kf-box"><h3>Autos in deiner Gegend</h3><p class="kf-muted">15 Energie. Chance: 50 % + Taschendiebstahl-Stufe (bis 40), weniger bei Kralle/Garage/Begleiter. Klappt es, zahlt der Hehler 10 % des Neupreises; sonst 20 Minuten Knast.</p>'
+    + (targets.length ? '<table class="kf-table">' + targets.map(t => '<tr><td>' + playerLink(t.user_id, t.name) + ' (Level ' + t.level + ')</td><td>' + esc(t.vehicle) + (t.kralle ? ' · Kralle' : '') + (t.garage ? ' · Garage' : '') + '</td><td><button class="ghost kz-steal" data-id="' + t.user_id + '">Klauen</button></td></tr>').join('') + '</table>' : '<p class="kf-muted">Keine Motorfahrzeuge in deinem Kampfbereich.</p>') + '<div class="kz-steal-msg"></div></div></div>';
+  garTab();
+  const again = () => setTimeout(loaders.garage, 1200);
+  const lb = garBody.querySelector('.kz-lic'); if (lb && !lb.disabled) act(lb, garBody.querySelector('.kz-lic-msg'), async () => { const r = await rpc('license_step'); window.kiezRenderProfile?.(r.profile); again(); return r.done ? 'Führerschein bestanden!' : r.ends_at ? 'Fahrschule bis ' + when(r.ends_at) + '.' : 'Weiter geht’s.'; });
+  garBody.querySelectorAll('.kz-veh').forEach(c => {
+    const b = c.querySelector('.kz-veh-buy'), u = c.querySelector('.kz-veh-use'), m = c.querySelector('.kz-veh-msg');
+    if (b && !b.disabled) act(b, m, async () => { const r = await rpc('buy_vehicle', { wanted: c.dataset.id }); window.kiezRenderProfile?.(r.profile); again(); return 'Gekauft: ' + esc(r.vehicle) + '.'; });
+    if (u && !u.disabled) act(u, m, async () => { const r = await rpc('use_vehicle', { wanted: c.dataset.id }); window.kiezRenderProfile?.(r.profile); again(); return 'Jetzt unterwegs damit.'; });
+  });
+  const sm = garBody.querySelector('.kz-svc-msg');
+  garBody.querySelectorAll('.kz-svc').forEach(b => { if (!b.disabled) act(b, sm, async () => { const r = await rpc('vehicle_service', { kind: b.dataset.k }); window.kiezRenderProfile?.(r.profile); again(); return (b.dataset.k === 'tuev' ? 'TÜV für 30 Tage' : 'Repariert') + ' – ' + eur(r.price) + '.'; }); });
+  garBody.querySelectorAll('.kz-tune').forEach(b => { if (!b.disabled) act(b, b.closest('.card').querySelector('.kz-tune-msg'), async () => { const r = await rpc('tune_vehicle', { part: b.dataset.p, color: b.dataset.p === 'lack' ? garBody.querySelector('.kz-paint').value : null }); window.kiezRenderProfile?.(r.profile); again(); return 'Erledigt.'; }); });
+  garBody.querySelectorAll('.kz-prot').forEach(b => act(b, sm, async () => { const r = await rpc('buy_car_protection', { kind: b.dataset.k }); window.kiezRenderProfile?.(r.profile); return (b.dataset.k === 'kralle' ? 'Lenkradkralle' : 'Garage') + ' für ' + eur(r.price) + '.'; }));
+  const scm = garBody.querySelector('.kz-scrap-msg');
+  const sc = garBody.querySelector('.kz-scrap'); if (!sc.disabled) act(sc, scm, async () => { const r = await rpc('scrapyard_dig'); window.kiezRenderProfile?.(r.profile); again(); return 'Ausgeschlachtet: ' + r.nails + ' Nägel, ' + r.wood + ' Holz, ' + r.shards + ' Scherben, ' + r.textile + ' Textil.'; });
+  act(garBody.querySelector('.kz-mat-go'), scm, async () => { const r = await rpc('sell_material', { kind: garBody.querySelector('.kz-mat').value, qty: Number(garBody.querySelector('.kz-mat-n').value) }); window.kiezRenderProfile?.(r.profile); return 'Verkauft für ' + eur(r.paid) + '.'; });
+  const rm = garBody.querySelector('.kz-race-msg');
+  const rn = garBody.querySelector('.kz-race-new'); if (!rn.disabled) act(rn, rm, async () => { await rpc('race_challenge', { stake: Number(garBody.querySelector('.kz-race-st').value) }); again(); return 'Herausforderung steht.'; });
+  garBody.querySelectorAll('.kz-race-acc').forEach(b => { if (!b.disabled) act(b, rm, async () => { await rpc('race_accept', { race: Number(b.closest('tr').dataset.r) }); again(); return 'Angenommen – Start in 10 Minuten!'; }); });
+  garBody.querySelectorAll('.kz-race-bet').forEach(b => act(b, rm, async () => { const r = await rpc('race_bet', { race: Number(b.closest('tr').dataset.r), bet_side: b.dataset.s, amount: 1 }); window.kiezRenderProfile?.(r.profile); again(); return 'Gewettet: ' + eur(r.amount) + '.'; }));
+  garBody.querySelectorAll('.kz-steal').forEach(b => act(b, garBody.querySelector('.kz-steal-msg'), async () => { const r = await rpc('steal_vehicle', { target_id: b.dataset.id }); window.kiezRenderProfile?.(r.profile); again(); if (!r.stolen) throw new Error('Erwischt! 20 Minuten Knast (Chance war ' + r.chance + ' %).'); return 'Geklaut: ' + esc(r.vehicle) + ' – der Hehler zahlt ' + eur(r.cash) + '.'; }));
+};
+// Fahrzeug im Profil (64)
+window.addEventListener('kz-profile-extra', () => {});
+
+// ================= S17: Städte (10, 123, 124) =================
+async function drawCities() {
+  const body = document.querySelector('#stadtteile .kf-body'); if (!body || body.querySelector('.kz-cities')) return;
+  let c; try { c = await rpc('city_overview'); } catch (e) { return; }
+  const box = document.createElement('div'); box.className = 'kf-box kz-cities';
+  box.innerHTML = '<h3>Städte</h3><p class="kf-muted">' + (c.enabled ? 'Neue Städte öffnen, wenn jede offene Stadt ' + c.needed + ' aktive Spieler hat. Umzug: 100 €, Banden bleiben in ihrer Stadt.' : 'Weitere Städte sind vorbereitet und öffnen, sobald die Hafenstadt voll ist (Richtwert ' + c.needed + ' aktive Spieler).') + '</p>'
+    + '<div class="kf-grid">' + c.cities.map(x => '<div class="card' + (x.open ? '' : ' kz-locked') + '" data-id="' + x.id + '"><b>' + esc(x.name) + (x.id === c.mine ? ' – dein Zuhause' : '') + '</b><p>' + esc(x.description) + '</p><p class="kf-muted">' + (x.open ? x.players + ' aktive Spieler' : 'Bald verfügbar') + '</p>'
+      + (c.enabled && x.open && x.id !== c.mine ? '<div class="kf-row"><button class="ghost kz-move">Umziehen – 100 €</button></div>' : '') + '<div class="kz-move-msg"></div></div>').join('') + '</div>';
+  body.appendChild(box);
+  box.querySelectorAll('.kz-move').forEach(b => { const card = b.closest('.card'); act(b, card.querySelector('.kz-move-msg'), async () => { const r = await rpc('move_city', { wanted: card.dataset.id }); window.kiezRenderProfile?.(r.profile); return 'Umgezogen nach ' + esc(r.city) + '.'; }); });
+}
+{ const prevS = loaders.stadtteile; loaders.stadtteile = async () => { await prevS?.(); drawCities(); }; }
+
+
+// ================= 155: Schlussdurchsicht – Seiten aufräumen =================
+// Reiter-Sichtbarkeit nach spät eingefügten Karten neu anwenden (aktiven Reiter erneut „klicken“)
+window.kiezRezone = id => { const s = document.querySelector('#' + id + ' > .section-tools span.subtab-active'); if (s) s.click(); };
+const hideEl = (el, off) => { if (!el) return; if (off) el.style.setProperty('display', 'none', 'important'); else el.style.removeProperty('display'); };
+
+// Pfand-Seite: echte Reiter „Pfand sammeln“ / „Verbrechen“ statt versteckter Sprunglinks, Pfandtour zuerst
+{
+  const pf = document.getElementById('pfand'), tools = pf?.querySelector(':scope > .section-tools');
+  if (tools) {
+    tools.innerHTML = '<span class="subtab-active">Pfand sammeln</span><span>Verbrechen</span>';
+    const apply = tab => {
+      tools.querySelectorAll('span').forEach(x => x.classList.toggle('subtab-active', x.textContent === tab));
+      const ins = pf.querySelector(':scope > .inside'); if (!ins) return;
+      const crime = tab === 'Verbrechen';
+      [...ins.children].forEach(c => { if (c.matches('input,button.hide')) return; hideEl(c, crime !== c.matches('.crime-card, #paybail, .kz-jail')); });
+    };
+    tools.addEventListener('click', e => { const sp = e.target.closest('span'); if (sp) { e.stopPropagation(); apply(sp.textContent); } });
+    const order = () => { const ins = pf.querySelector(':scope > .inside'), a = ins?.querySelector(':scope > .action'); if (a && ins.firstElementChild !== a) ins.prepend(a); apply(tools.querySelector('.subtab-active')?.textContent || 'Pfand sammeln'); };
+    order(); const prevPf = loaders.pfand; loaders.pfand = () => { prevPf?.(); setTimeout(order, 200); };
+  }
+}
+
+// Unterkunft: richtiger Titel, Reiter „Lager“ (sprang heimlich in die Plunderkiste) entfernt
+{
+  const g = document.getElementById('gear'), h = g?.querySelector(':scope > h2');
+  const fix = () => { if (h && h.textContent !== 'Unterkunft') h.textContent = 'Unterkunft';
+    g?.querySelectorAll(':scope > .section-tools span').forEach(sp => { if (sp.textContent.trim() === 'Lager') sp.remove(); }); };
+  fix(); const prevG = loaders.gear; loaders.gear = () => { prevG?.(); setTimeout(fix, 200); };
+}
+
+// Stadt & Einkommen: jeder Reiter zeigt genau seinen Inhalt (Sammelgebiete zeigten Instrumente, alte Instrument-Karte doppelt)
+{
+  const inc = document.getElementById('income');
+  // per Datenattribut + Stylesheet: alte Skripte setzen Inline-Anzeige zurück, gegen !important im Stylesheet kommen sie nicht an
+  const fixInc = () => { const tab = inc?.querySelector(':scope > .section-tools span.subtab-active')?.textContent.trim(); if (tab && inc.dataset.kztab !== tab) inc.dataset.kztab = tab; };
+  const stInc = document.createElement('style');
+  stInc.textContent = `html body:not(#kz1):not(#kz2) #income[data-kztab] > .inside > *{display:none !important}
+html body:not(#kz1):not(#kz2) #income[data-kztab="Schnorrplätze"] > .inside > .schnorr-spots,
+html body:not(#kz1):not(#kz2) #income[data-kztab="Sammelgebiete"] > .inside > .area-list,
+html body:not(#kz1):not(#kz2) #income[data-kztab="Instrumente"] > .inside > .instrument-list{display:grid !important}
+html body:not(#kz1):not(#kz2) #income[data-kztab="Instrumente"] > .inside > .card:has(#musiccollect){display:block !important}`;
+  document.head.appendChild(stInc);
+  inc?.addEventListener('click', e => { if (e.target.closest('.section-tools span')) setTimeout(fixInc, 60); });
+  const prevI = loaders.income; loaders.income = () => { prevI?.(); setTimeout(fixInc, 250); }; setTimeout(fixInc, 1500);
+}
+
+// Aktionszentrale: alter „Täglicher Pfandauftrag“ doppelt zu den 3 Tagesaufgaben → nur noch die Tagesaufgaben
+{
+  const hideOld = () => { const m = document.querySelector('#missions > .inside'); if (!m) return;
+    ['#missiontext', '#claimmission', '#missionmsg'].forEach(sel => { const el = m.querySelector(sel); if (el && el.parentElement === m) el.classList.add('kz-old-mission'); });
+    [...m.children].forEach(c => { if (c.matches('h3') && /Täglicher Pfandauftrag/.test(c.textContent)) { c.classList.add('kz-old-mission'); let n = c.nextElementSibling; while (n && n.matches('.progress, b, p:not(.kf-muted)')) { n.classList.add('kz-old-mission'); n = n.nextElementSibling; } } }); };
+  hideOld(); const prevM2 = loaders.missions; loaders.missions = () => { prevM2?.(); setTimeout(hideOld, 250); };
+  const st = document.createElement('style'); st.textContent = 'html body:not(#kz1):not(#kz2) #missions .kz-old-mission{display:none !important}'; document.head.appendChild(st);
+}
+
+
+// Laden: pro Reiter genau das Passende (vorher Kampfwerte im Supermarkt, Geldversteck unter „Verteidigung“/„Verkaufen“)
+{
+  const st = document.getElementById('store'), tools = st?.querySelector(':scope > .section-tools');
+  // Zubehör und Supermarkt sind eigene Läden (Stadt-Leiste) – der Waffenladen hat bewusst nur 4 Reiter
+  const fixStore = () => {
+    const ins = st?.querySelector(':scope > .inside'), tab = tools?.querySelector('span.subtab-active')?.textContent.trim() || 'Waffen'; if (!ins) return;
+    const shop = ['Waffen', 'Kleidung', 'Zubehör'].includes(tab);
+    [...ins.children].forEach(c => {
+      const nx = c.nextElementSibling;
+      let on;
+      if (c.matches('.kz-combat-box')) on = shop || tab === 'Verteidigung';
+      else if (c.matches('.kiez-zubehoer-head, .kiez-zubehoer-extra')) on = tab === 'Zubehör';
+      else if (c.matches('#shoplist') || (c.matches('h3') && nx?.matches('#shoplist'))) on = shop;
+      else if (c.matches('#inventorylist') || (c.matches('h3') && nx?.matches('#inventorylist'))) on = tab === 'Verkaufen';
+      else if (c.matches('.supermarket-inline') || (c.matches('h3') && nx?.matches('.supermarket-inline'))) on = tab === 'Verbrauchbares';
+      else if (c.matches('#itemmsg')) on = true;
+      else return;
+      hideEl(c, !on);
+    });
+  };
+  tools?.addEventListener('click', e => { if (e.target.closest('span')) setTimeout(fixStore, 120); });
+  const prevS = loaders.store; loaders.store = () => { prevS?.(); setTimeout(fixStore, 300); }; setTimeout(fixStore, 1500);
+}
+
+
+// Basteln: seit 0032 mit Level-Anforderung – im Knopf anzeigen statt erst beim Klick zu scheitern
+async function craftLocks() {
+  const cards = document.querySelectorAll('.craft-card[data-id]'); if (!cards.length || !window.kiezProfile) return;
+  if (!OWN.cat) await ownLoad();
+  const lvl = window.kiezProfile.level || 1;
+  cards.forEach(card => {
+    const it = OWN.cat?.[card.dataset.id], btn = card.querySelector('.craft-go'); if (!it || !btn) return;
+    if (!btn.dataset.orig) btn.dataset.orig = btn.textContent;
+    const lock = lvl < (it.required_level || 1);
+    if (lock) { btn.disabled = true; btn.dataset.kzlock = '1'; setLabel(btn, '🔒 ab Level ' + it.required_level); }
+    else if (btn.dataset.kzlock) { delete btn.dataset.kzlock; setLabel(btn, btn.dataset.orig); }
+    if (card.classList.contains('kz-locked') !== lock) card.classList.toggle('kz-locked', lock);
+  });
+}
+{ const prevPl = loaders.plunder; loaders.plunder = () => { prevPl?.(); setTimeout(craftLocks, 500); };
+  const prevOP = window.kiezOnProfile; window.kiezOnProfile = p => { prevOP?.(p); craftLocks(); };
+  document.addEventListener('click', e => { if (e.target.closest('#plunder .section-tools span')) setTimeout(craftLocks, 300); }); }
+
+
+// Schnorren (Straße) ↔ Schnorrplätze verbinden, damit es nicht wie zwei gleiche Seiten wirkt
+{
+  const addHint = () => { const b = document.querySelector('#begging #beg'); const card = b?.closest('.card, .kf-box, div'); if (!card || card.querySelector('.kz-beg-more')) return;
+    const p = document.createElement('p'); p.className = 'kz-beg-more kf-muted';
+    p.innerHTML = 'Hier auf der Straße gibt’s Kleingeld auf die Schnelle. Richtig Kohle machst du an besseren Plätzen: <a href="#" class="kz-beg-go">zu den Schnorrplätzen</a>';
+    b.after(p); p.querySelector('a').onclick = e => { e.preventDefault(); go('income', 'Schnorrplätze'); }; };
+  addHint(); const prevB2 = loaders.begging; loaders.begging = () => { prevB2?.(); setTimeout(addHint, 300); };
+}
 
 // Zuletzt geöffnete neue Seite wiederherstellen
 try { const last = localStorage.getItem('kiez_last_view'); if (loaders[last]) setTimeout(() => show(last), 1500); } catch (e) { }
