@@ -3151,7 +3151,12 @@ const hideEl = (el, off) => { if (!el) return; if (off) el.style.setProperty('di
       if (crime) crimeLocks();
     };
     tools.addEventListener('click', e => { const sp = e.target.closest('span'); if (sp) { e.stopPropagation(); apply(sp.textContent); } });
-    const order = () => { const ins = pf.querySelector(':scope > .inside'), a = ins?.querySelector(':scope > .action'); if (a && ins.firstElementChild !== a) ins.prepend(a); apply(tools.querySelector('.subtab-active')?.textContent || 'Pfand sammeln'); };
+    const order = () => { const ins = pf.querySelector(':scope > .inside'), a = ins?.querySelector(':scope > .action'); if (a && ins.firstElementChild !== a) ins.prepend(a);
+      // Aktionen zuerst (Verkaufen, Mülltonne, Sortieren), Übersicht danach, Kursverlauf eingeklappt ganz unten (ROADMAP 172)
+      if (a) { let last = a; ['#kz-pfandsell', '#kz-tourevent', '#kz-bin', '#kz-sortgame', '#pfanduebersicht'].forEach(sel => { const e = ins.querySelector(':scope > ' + sel); if (e) { if (last.nextElementSibling !== e) last.after(e); last = e; } });
+        const hist = ins.querySelector('.pfand-pricehistory-card');
+        if (hist && !hist.closest('.kz-hist')) { const d = document.createElement('details'); d.className = 'card kz-hist'; d.innerHTML = '<summary>Pfandkurs-Verlauf (schwankt alle 20 Min. zwischen 0,10 € und 0,30 €)</summary>'; d.appendChild(hist); last.after(d); last = d; }
+        else if (hist) { const d = hist.closest('.kz-hist'); if (last.nextElementSibling !== d) last.after(d); } } apply(tools.querySelector('.subtab-active')?.textContent || 'Pfand sammeln'); };
     order(); const prevPf = loaders.pfand; loaders.pfand = () => { prevPf?.(); setTimeout(order, 200); };
   }
 }

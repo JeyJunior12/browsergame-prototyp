@@ -329,3 +329,5 @@ html body:not(#kz1):not(#kz2) #overview .profile-warning { font-size: 14px; colo
 /* Spielerkasten: Standardbild statt schwarzer Fläche, solange kein eigenes Profilbild da ist */
 html body:not(#kz1):not(#kz2) .player-slip .profile-avatar { background-color: #2a2620; background-image: url('/bilder/profil-standard.webp'); background-size: cover; background-position: center; }
 html body:not(#kz1):not(#kz2) .kz-hide-lock { display: none !important; }
+html body:not(#kz1):not(#kz2) details.kz-hist > summary { cursor: pointer; font-weight: 700; padding: 6px 0; font-size: 15px; }
+html body:not(#kz1):not(#kz2) details.kz-hist .pfand-pricehistory-card { margin-top: 8px; }
