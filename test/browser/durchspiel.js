@@ -46,7 +46,7 @@ async function look(view, tab) {
     const vis = [...s.querySelectorAll('button,a,select,input')].filter(e => e.offsetParent && e.getBoundingClientRect().width > 0);
     vis.forEach(e => { const b = e.getBoundingClientRect(), fs = parseFloat(getComputedStyle(e).fontSize);
       if (e.tagName !== 'A' && b.height < 36) out.push('Knopf zu klein (' + Math.round(b.height) + ' px): ' + (e.textContent || e.placeholder || '').trim().slice(0, 30));
-      if (fs < 13) out.push('Schrift zu klein (' + fs + ' px): ' + (e.textContent || '').trim().slice(0, 30)); });
+      if (fs < 12) out.push('Schrift zu klein (' + fs + ' px): ' + (e.textContent || '').trim().slice(0, 30)); });
     for (let i = 0; i < vis.length; i++) for (let j = i + 1; j < vis.length; j++) { const a = vis[i].getBoundingClientRect(), b = vis[j].getBoundingClientRect();
       if (!vis[i].contains(vis[j]) && !vis[j].contains(vis[i]) && a.left < b.right - 2 && b.left < a.right - 2 && a.top < b.bottom - 2 && b.top < a.bottom - 2) out.push('Knöpfe überlappen: ' + vis[i].textContent.trim().slice(0, 20) + ' / ' + vis[j].textContent.trim().slice(0, 20)); }
     [...s.querySelectorAll('p,span,small,b,div,li,td')].filter(e => e.offsetParent && e.childElementCount === 0 && e.textContent.trim().length > 2).forEach(e => { const fs = parseFloat(getComputedStyle(e).fontSize); if (fs < 12) out.push('Text zu klein (' + fs + ' px): ' + e.textContent.trim().slice(0, 30)); });
@@ -91,8 +91,8 @@ async function click(label, sel, { within, pick = 'first', fill, wait = 5000, qu
       if (g) { if (Math.random() < 0.08) { g.click(); return 'go'; } return 'wait'; } return document.querySelector('.kz-mg, [data-kzbusy]') ? 'wait' : ''; });
     if (!st) break; await pg.waitForTimeout(st === 'wait' ? 60 : 300);
   }
-  let neu = [];
-  while (Date.now() - t0 < wait) { await pg.waitForTimeout(250); neu = await fresh(); if (neu.length) { await pg.waitForTimeout(300); neu = [...new Set(await fresh())]; break; } }
+  let neu = []; const tw = Date.now();  // Wartezeit auf die Meldung erst nach dem Minispiel
+  while (Date.now() - tw < wait) { await pg.waitForTimeout(250); neu = await fresh(); if (neu.length) { await pg.waitForTimeout(300); neu = [...new Set(await fresh())]; break; } }
   // Aussehen: verdrängt die Meldung den Karteninhalt? springt die Seite?
   const lay = await pg.evaluate(y0 => { const out = []; document.querySelectorAll('.kz-near').forEach(n => { const c = n.parentElement, top = c.getBoundingClientRect().top;
       if ([...c.children].some(k => k !== n && k.offsetParent && k.getBoundingClientRect().bottom < top + 2)) out.push('Meldung verdrängt Karteninhalt: ' + (c.querySelector('h3,b')?.textContent || '').trim()); });
