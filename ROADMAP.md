@@ -170,6 +170,7 @@ Nutzerwunsch: Wer oben auf einen Wert klickt, muss direkt bei der passenden Stel
 71. Alle Werte in der Kopfleiste prüfen und richtig verlinken (Bargeld → Schließfach/Einnahmen, Alkoholpegel → Apotheke/Supermarkt, Weiterbildung → Weiterbildung, Pfandpreis → Pfandkurs, Energie → Aktionen, Kronkorken → Kronkorken-Tausch) ⭐
 72. Nach dem Sprung zur Stelle scrollen und sie kurz hervorheben, damit man sofort sieht, wo man ist ⭐
 73. Prüfskript: jeden Link/Wert anklicken und prüfen, ob die passende Karte oben im Bild steht ⭐
+73a. Klick auf den Spielnamen „KIEZKÖNIG“ oben links führt immer zur Startseite (eingeloggt: Übersicht, ausgeloggt: Startseite), auf PC und Handy ⭐
 
 ### N. Flüssiger Seitenwechsel (27.09.2026) ⭐
 Nutzerwunsch: Der Wechsel zwischen Seiten wirkt ruckelig, und das große Hintergrundbild wechselt bei jedem Klick zu stark – das stört.
