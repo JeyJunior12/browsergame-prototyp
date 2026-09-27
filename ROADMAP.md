@@ -60,6 +60,17 @@ GitHub push ──▶ Action: Tests (Postgres) ──▶ Migration live in Supab
 
 Ziel: Es gibt fast immer etwas zu tun – auch mit wenigen Spielern. Empfohlener Start: 1, 2, 3, 5.
 
+### 🥇 PLATZ 1 – Chat-Leiste unten rechts (wie Facebook) (27.09.2026) ⭐
+Nutzerwunsch, höchste Priorität: ein ALL-Chat als kleine Leiste unten rechts, auf jeder Seite, die man auf- und zuklappen kann; jeder Spieler kann reinschreiben. Privatnachrichten dort mit einbinden.
+128. Leiste unten rechts auf allen Seiten: eingeklappt nur ein Balken „Kiez-Chat“ mit Zähler ungelesener Nachrichten; aufgeklappt Fenster mit Verlauf und Eingabe; Zustand (auf/zu) bleibt beim Seitenwechsel erhalten ⭐
+129. Reiter in der Leiste: „Alle“ (ALL-Chat, nutzt `chat_messages` aus 0015) und je ein Reiter/Fenster pro Privatgespräch; Klick auf einen Spielernamen öffnet ein Privatfenster ⭐
+130. Privatnachrichten aus der Kiezpost dort als Gespräche (Verlauf wie Messenger); neue Nachrichten poppen als kleines Fenster auf und zählen im Balken ⭐
+131. Live-Gefühl: neue Nachrichten ohne Neuladen (Supabase Realtime oder kurzes Abfragen), „schreibt gerade“ optional, Uhrzeit, Spielernamen klickbar zum Profil ⭐
+132. Handy: Leiste als runder Knopf unten rechts, öffnet Vollbild-Chat; darf keine Knöpfe der Seite verdecken ⭐
+133. Schutz: Sperre gegen Spam (bestehende 5 s), Blockierte ausblenden, Melden-Knopf, Admin/eigene Nachrichten löschen, Wortfilter für grobe Beleidigungen ⭐
+134. Die bisherige Seite „Kiez-Chat“ bleibt als große Ansicht bzw. wird durch die Leiste ersetzt ⭐
+
+
 **⭐ Vom Nutzer ausgewählt für später (27.09.2026):** 17, 19, 20, 22, 23, 24, 25, 26, 29, 30, 31, 32, 34, 37 – Kiosk-Stand, Revanche, Kopfgeld, Wetten, Kosmetik, Hunger, Sucht/Entzug, Ruf, Glücksrad, Pfandtour zu zweit, Tag/Nacht, Live-Stadtereignisse, Nebenquests, Ein-Klick-Verkaufen. Dazu aus J: 38, 39, 40 (eher selten), 43, 44, 47, 48, 49. Dazu aus K (Fahrzeuge): 53, 54 (erst später), 55, 56, 57, 59 (erst später), 60, 61, 63, 64. Dazu L (einheitliches Aussehen): 65–69. Dazu M (Wegweiser): 70–73. Dazu N (flüssiger Seitenwechsel): 74–77. Dazu O (Körperpflege): 78–85. Dazu P (Balancing Gegenstände & Preise): 86–92. Dazu Q (Bandensystem): 93–104. Dazu R (Fehler Waffen kaufen/anlegen, hohe Priorität): 105–109. Dazu S (Plunderkiste): 111–120. Dazu T (Stadtteile sperren, später Städte): 121–124. Dazu U (Kiezpost-Empfänger): 125–127. Alle übrigen Ideen bleiben ebenfalls im Plan.
 
 ### Offener Fehler
