@@ -27,6 +27,7 @@ function restoreFlash() {
   const el = document.querySelector('section.panel.active-view .' + flash.cls.split(' ')[0]);
   if (el && !el.innerHTML) say(el, flash.text, flash.good);
 }
+let gangNote = null;  // Meldung für die neu gezeichnete Bandenseite
 function act(btn, box, fn) {
   btn.onclick = async () => {
     btn.disabled = true; flash = null;  // alte Meldung nicht nach dem Neuzeichnen wieder hervorholen (Nutzer: „Gekauft“ tauchte beim Einstellen auf)
@@ -459,7 +460,6 @@ async function renderGangPublic(el, gid, mine, t) {
   if (j) act(j, box, async () => { await rpc('join_gang', { wanted_gang: gid }); gangView = null; setTimeout(window.kiezLoadGang, 500); return 'Willkommen in der Bande!'; });
   if (a) act(a, box, async () => { await rpc('gang_apply', { wanted_gang: gid }); return 'Bewerbung verschickt.'; });
 }
-let gangNote = null;
 async function renderNoGang(el, me, t) {
   const [gangs, mem, req] = await Promise.all([sb.from('gangs').select('*').order('name'), sb.from('gang_members').select('gang_id'), sb.from('gang_requests').select('*').eq('user_id', me)]);
   const count = {}; (mem.data || []).forEach(m => count[m.gang_id] = (count[m.gang_id] || 0) + 1);
@@ -801,7 +801,9 @@ Object.keys(loaders).forEach(k => {
 });
 { const g = window.kiezLoadGang; window.kiezLoadGang = async (...x) => { await g(...x); restoreFlash();
   // Gründen/Beitreten wechselt die ganze Ansicht – Meldung oben in der neuen Ansicht zeigen (Durchspiel-Test 167)
-  const el = document.getElementById('kiezgang'); if (el && gangNote && Date.now() - gangNote.t < 15000 && !el.querySelector('.kz-gangnote')) { const n = document.createElement('div'); n.className = 'notice good kz-gangnote'; n.textContent = gangNote.txt; el.prepend(n); } }; }
+  const el = document.getElementById('kiezgang'); if (el && gangNote && Date.now() - gangNote.t < 15000) { let n = el.querySelector('.kz-gangnote'); if (!n) { n = document.createElement('div'); n.className = 'notice good kz-gangnote'; el.prepend(n); } n.textContent = gangNote.txt;
+    // steht dieselbe Meldung schon beim Knopf, reicht die eine
+    setTimeout(() => { if ([...el.querySelectorAll('.notice')].some(x => x !== n && x.offsetParent && x.textContent.trim() === n.textContent.trim())) n.remove(); }, 400); } }; }
 // ================= Runde 6: Stadtteile, Basar, Zockerbude, Schließfach, Kiez-Geschichte, Kiez-Chat, Kampfprotokoll =================
 const num = v => Number(String(v ?? '').replace(',', '.'));
 const bar = (v, max) => '<div class="kf-bar"><span style="width:' + Math.max(0, Math.min(100, Math.round(100 * v / (max || 1)))) + '%"></span></div>';
