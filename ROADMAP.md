@@ -175,6 +175,7 @@ Nutzerwunsch: Ungleichheiten auf allen Seiten richtig machen. Beispiel: Karte �
 69c. Gleiche Karte prüfen: Titel „Angriff 3“, darunter „Aktuelle Stufe: 1“ – widersprüchliche Stufenangabe klären ⭐
 69d. Reiter „Lernwarteschlange“ (Weiterbildung) zeigt dieselbe Seite wie „Fähigkeiten“ – eigener Inhalt nötig: laufende Weiterbildung mit Restzeit, geplante Stufen in Reihenfolge, Abbrechen/Abschließen. Allgemein prüfen: jeder Reiter muss etwas anderes zeigen als seine Nachbarn ⭐
 69e. Meldungen verschwinden zu schnell: Beispiel Laden → Angebot „Regenschirm“ kaufen – grünes „Gekauft“ ist nach ~1 Sek. weg (Karte wird neu gezeichnet), nicht lesbar. Meldungen müssen mindestens ~6–8 Sek. stehen bleiben (auch wenn die Karte neu gezeichnet wird) oder bis zum nächsten Klick; überall prüfen ⭐
+69f. Abmelden-Knopf im Spielerkasten oben rechts steht nicht mittig – sauber ausrichten (zentriert bzw. bündig mit dem Kasten), auf PC und Handy ⭐
 
 ### M. Wegweiser: Klick führt genau dorthin (27.09.2026) ⭐
 Nutzerwunsch: Wer oben auf einen Wert klickt, muss direkt bei der passenden Stelle landen. Beispiel: Klick auf „Pfandlager“ in der Kopfleiste öffnet die Plunderkiste, der Pfand-Bereich (Flaschen verkaufen) kommt erst weiter unten – komplett falsch.
