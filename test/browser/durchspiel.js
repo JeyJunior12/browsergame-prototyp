@@ -86,7 +86,7 @@ async function click(label, sel, { within, pick = 'first', fill, wait = 5000, qu
   const msg = neu.join(' | ').slice(0, 300);
   // Widerspruch: Meldung sagt Gewinn, aber Tasche + Schließfach sind weniger geworden (Lehre: Rubbellos „Gewonnen 5 €“ bei 10 € Einsatz)
   await pg.waitForTimeout(400); const m1 = await pg.evaluate(() => +(window.kiezProfile?.money || 0) + +(window.kiezProfile?.bank_balance || 0));
-  if (/gewonnen|gewinn|geklappt|treffer!|\+\d/i.test(msg) && !/verloren|niete|daneben|erwischt/i.test(msg) && m1 < m0 - 0.001 && !/gekauft|kosten|eingezahlt|gebühr|training/i.test(msg))
+  if (/gewonnen|gewinn|geklappt|treffer!|\+\d/i.test(msg) && !/verloren|niete|daneben|erwischt/i.test(msg) && m1 < m0 - 0.001 && !/gekauft|kosten|eingezahlt|gebühr|training|gegessen|getrunken|gewaschen|sauber/i.test(msg))
     log({ v: visit, typ: 'WIDERSPRUCH', label, msg: msg.slice(0, 160) + ' | Geld vorher ' + m0.toFixed(2) + ' nachher ' + m1.toFixed(2) });
   const typ = !msg ? 'KEINE-RÜCKMELDUNG' : SUSPECT.test(msg) ? 'VERDÄCHTIG' : 'OK';
   log({ v: visit, typ, label, knopf: knopf.slice(0, 50), msg, ms: Date.now() - t0 });
@@ -147,9 +147,9 @@ async function besuch() {
   await go('training', 'Fähigkeiten'); p = await prof();
   const prio = ['streetwise', 'attack', 'defense', 'social', 'stamina', 'speech', 'music', 'pickpocket'];
   const order = prio.slice().sort((a, b) => ((visit + prio.indexOf(a)) % 4) - ((visit + prio.indexOf(b)) % 4));
-  for (const s of order) if (await click('Weiterbildung ' + s, `.trainbtn[data-skill="${s}"]`, { quiet: true }) != null) break;
+  for (const s of order) if (/gestartet/i.test(await click('Weiterbildung ' + s, `.trainbtn[data-skill="${s}"]`, { quiet: true }) || '')) break;
   await go('training', 'Lernwarteschlange');
-  for (const s of order.slice(1, 3)) { await pg.selectOption('section.panel.active-view .kz-q-skill', { index: prio.indexOf(s) }).catch(() => {}); if (await click('Einplanen ' + s, '.kz-q-add', { quiet: true }) == null) break; }
+  let q = 0; for (const s of order) { if (q >= 2) break; await pg.selectOption('section.panel.active-view .kz-q-skill', { index: prio.indexOf(s) }).catch(() => {}); const m = await click('Einplanen ' + s, '.kz-q-add', { quiet: true }); if (m == null || /voll|maximal/i.test(m)) break; if (/eingeplant/i.test(m)) q++; }
   // 7) Einkaufen: Ausrüstung, Sammelgebiet, Instrument, Begleiter, Unterkunft, Lager
   if (visit % 4 === 0 || full()) {
   p = await prof();
