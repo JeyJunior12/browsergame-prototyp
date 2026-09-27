@@ -69,3 +69,10 @@ Testkonten wurden nach Runde 3 gelöscht (0014) – bei Bedarf neu anlegen. Neue
 - **Meldungen beim Knopf** (Nutzerwunsch: IMMER beim Fenster der Aktion): `kiez-features.js` merkt den zuletzt gedrückten sichtbaren Knopf; erscheint danach (≤ 9 s) eine `.notice` weiter weg, wird sie in dessen Karte gespiegelt (`.kz-near`), Original `.kz-moved` ausgeblendet. Neu gezeichnete Karten werden über Seite + Titel wiedergefunden. Test: `test/browser/meldungen.js` (Abstand < 200 px).
 - **Ideen-Speicher:** `ROADMAP.md` → „Ideen-Speicher“ (37 Ideen A–I + offener Scroll-Fehler). Nutzer will alle umgesetzt haben; vor dem Bauen dort abhaken.
 - **Nächste Priorität (Nutzer, Platz 1):** Chat-Leiste unten rechts wie Facebook (ALL-Chat + Privatnachrichten), siehe `ROADMAP.md` → „PLATZ 1“ (128–134).
+
+## ROADMAP-Runde (ab 27.09.2026) – Absprache mit dem Nutzer
+- Komplette `ROADMAP.md` abarbeiten, **auch Ideen ohne ⭐** („wirklich alles“).
+- Migrationen dürfen **ohne Rückfrage** eingespielt werden, sobald alle Tests grün sind (gilt für diese Runde).
+- Nach jeweils ~10 erledigten ROADMAP-Punkten: PR + Merge (live) + kurzer Schnelltest (crawl/Klicktests). Erledigte Punkte in der ROADMAP mit ✅ markieren.
+- Reihenfolge: Platz 1 Chat-Leiste → Meldungs-Fehler (69b/e/f/g) → R Waffen/Besitz → M/N Links + Seitenwechsel + Scroll-Fehler → L/U → V/T → S → O → Q → A/J → B–I → K → P → Schlussprüfung.
+
