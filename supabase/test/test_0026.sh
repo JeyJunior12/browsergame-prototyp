@@ -37,7 +37,7 @@ ok  "Höchstbietender bekommt Plunder" "$(Q "select quantity from user_plunder w
 # Kiosk
 ok  "Kiosk bauen" "$(as_user $A "select (kiosk_build())->>'level'")" "1"
 Q "update kiosks set collected_at=now()-interval '10 hours' where user_id='$A'" >/dev/null
-ok  "Kasse nach 10 Std." "$(as_user $A "select (kiosk_overview())->'mine'->>'cash'")" "2.50"
+ok  "Kasse nach 10 Std. (seit 0040: 1 €/Std.)" "$(as_user $A "select (kiosk_overview())->'mine'->>'cash'")" "10.00"
 Q "update profiles set attack_skill=100 where id='$B'" >/dev/null
 has "Kiosk überfallen" "$(as_user $B "select kiosk_rob('$A')")" '"won": true'
 has "Besitzer benachrichtigt" "$(Q "select body from notifications where user_id='$A' order by id desc limit 1")" "Kiosk"

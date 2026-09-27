@@ -35,7 +35,7 @@ ok  "Mindestens 30 Erfolge" "$($P -tAc "select count(*)>=30 from achievement_def
 has "Nur Admin darf Events" "$(as_user $A "select admin_create_event('Pfandwoche','',now(),now()+interval '1 day',100,0)")" "Nur für Admins"
 $P -tAc "update profiles set is_admin=true where id='$C'"
 as_user $C "select admin_create_event('Pfandwoche','Doppelt Pfand',now()-interval '1 hour',now()+interval '1 day',100,50)" >/dev/null
-ok  "Event-Bonus aktiv" "$($P -tAc "select kiez_event_bonus('bottles')||'/'||kiez_event_bonus('xp')")" "100/50"
+has "Event-Bonus aktiv (Happy Hour 19–20 Uhr: +10)" "$($P -tAc "select kiez_event_bonus('bottles')||'/'||kiez_event_bonus('xp')")" "^1[01]0/50$"
 $P -tAc "update profiles set collection_minutes=10, collection_started_at=now()-interval '10 minutes', collection_ends_at=now()-interval '1 second' where id='$B'"
 ok  "Event erhoeht Punkte der Tour" "$(as_user $B "select (finish_collection())->>'xp'")" "8"
 exit ${FAILED:-0}

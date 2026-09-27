@@ -20,7 +20,7 @@ ok  "Essen macht satt" "$(Q "select hunger from profiles where id='$A'")" "100"
 # Kampf: Gestank
 ok  "Gestank-Verteidigung schmuddelig" "$(as_user $A "select (combat_overview())->'defense'->>'stench'")" "2"
 # Schnorren nach Stufe
-ok  "Schnorrfaktor schmuddelig" "$(as_user $A "select (body_status())->'beg'->>'clean'")" "0.600"
+has "Schnorrfaktor schmuddelig (nachts ×0,7)" "$(as_user $A "select (body_status())->'beg'->>'clean'")" "^0.600$\|^0.420$"
 # Krankheit nach 24 Std. verwahrlost
 Q "update profiles set cleanliness=5, clean_updated_at=now(), dirty_since=now()-interval '25 hours', sick_until=null where id='$A'" >/dev/null
 has "Krank geworden" "$(as_user $A "select (body_status())->>'sick_until'")" "20"

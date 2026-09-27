@@ -452,6 +452,7 @@ async function renderGangPublic(el, gid, mine, t) {
   if (j) act(j, box, async () => { await rpc('join_gang', { wanted_gang: gid }); gangView = null; setTimeout(window.kiezLoadGang, 500); return 'Willkommen in der Bande!'; });
   if (a) act(a, box, async () => { await rpc('gang_apply', { wanted_gang: gid }); return 'Bewerbung verschickt.'; });
 }
+let gangNote = null;
 async function renderNoGang(el, me, t) {
   const [gangs, mem, req] = await Promise.all([sb.from('gangs').select('*').order('name'), sb.from('gang_members').select('gang_id'), sb.from('gang_requests').select('*').eq('user_id', me)]);
   const count = {}; (mem.data || []).forEach(m => count[m.gang_id] = (count[m.gang_id] || 0) + 1);
@@ -463,8 +464,8 @@ async function renderNoGang(el, me, t) {
     + '<div class="kf-box"><h3>Banden im Kiez</h3><div class="kf-grid">' + ((gangs.data || []).map(g => '<div class="card"><b><a href="#" class="kiez-gang" data-id="' + g.id + '">' + esc(g.name) + '</a></b><p class="kf-muted">' + (count[g.id] || 0) + '/30 · ' + (g.is_open ? 'offen' : 'mit Einladung') + '</p><p>' + esc((g.description || '').slice(0, 120)) + '</p>'
       + (g.is_open ? '<button class="ghost gj" data-id="' + g.id + '">Beitreten</button>' : applied.has(g.id) ? '<button class="ghost gwd" data-id="' + g.id + '">Bewerbung zurückziehen</button>' : '<button class="ghost ga" data-id="' + g.id + '">Bewerben</button>') + '</div>').join('') || '<p class="kf-muted">Noch keine Bande. Gründe die erste!</p>') + '</div></div><div class="gmsg"></div>';
   const box = el.querySelector('.gmsg'), reload = () => setTimeout(window.kiezLoadGang, 400);
-  act(el.querySelector('.gcreate'), box, async () => { await rpc('create_gang', { gang_name: el.querySelector('.gname').value }); await refreshProfile(); reload(); return 'Bande gegründet. Du bist jetzt Chef!'; });
-  el.querySelectorAll('.ginvacc,.gj').forEach(b => act(b, box, async () => { await rpc('join_gang', { wanted_gang: b.dataset.id }); reload(); return 'Willkommen in der Bande!'; }));
+  act(el.querySelector('.gcreate'), box, async () => { await rpc('create_gang', { gang_name: el.querySelector('.gname').value }); await refreshProfile(); gangNote = { txt: 'Bande gegründet. Du bist jetzt Chef! Unten findest du Bandenkasse, Mitglieder und Chat.', t: Date.now() }; reload(); return 'Bande gegründet. Du bist jetzt Chef!'; });
+  el.querySelectorAll('.ginvacc,.gj').forEach(b => act(b, box, async () => { await rpc('join_gang', { wanted_gang: b.dataset.id }); gangNote = { txt: 'Willkommen in der Bande!', t: Date.now() }; reload(); return 'Willkommen in der Bande!'; }));
   el.querySelectorAll('.ginvdec,.gwd').forEach(b => act(b, box, async () => { await rpc('gang_request_delete', { wanted_gang: b.dataset.id, target_id: me }); reload(); }));
   el.querySelectorAll('.ga').forEach(b => act(b, box, async () => { await rpc('gang_apply', { wanted_gang: b.dataset.id }); reload(); return 'Bewerbung verschickt.'; }));
 }
@@ -791,7 +792,9 @@ Object.keys(loaders).forEach(k => {
     restoreFlash();
   };
 });
-{ const g = window.kiezLoadGang; window.kiezLoadGang = async (...x) => { await g(...x); restoreFlash(); }; }
+{ const g = window.kiezLoadGang; window.kiezLoadGang = async (...x) => { await g(...x); restoreFlash();
+  // Gründen/Beitreten wechselt die ganze Ansicht – Meldung oben in der neuen Ansicht zeigen (Durchspiel-Test 167)
+  const el = document.getElementById('kiezgang'); if (el && gangNote && Date.now() - gangNote.t < 15000 && !el.querySelector('.kz-gangnote')) { const n = document.createElement('div'); n.className = 'notice good kz-gangnote'; n.textContent = gangNote.txt; el.prepend(n); } }; }
 // ================= Runde 6: Stadtteile, Basar, Zockerbude, Schließfach, Kiez-Geschichte, Kiez-Chat, Kampfprotokoll =================
 const num = v => Number(String(v ?? '').replace(',', '.'));
 const bar = (v, max) => '<div class="kf-bar"><span style="width:' + Math.max(0, Math.min(100, Math.round(100 * v / (max || 1)))) + '%"></span></div>';
@@ -3132,6 +3135,9 @@ const hideEl = (el, off) => { if (!el) return; if (off) el.style.setProperty('di
       const ins = pf.querySelector(':scope > .inside'); if (!ins) return;
       const crime = tab === 'Verbrechen';
       [...ins.children].forEach(c => { if (c.matches('input,button.hide')) return; hideEl(c, crime !== c.matches('.crime-card, #paybail, .kz-jail')); });
+      // eigener Titel pro Reiter (Durchspiel-Test 173: „Pfandtour: Hinterhof“ stand auch über den Verbrechen)
+      const h = pf.querySelector(':scope > h2'); if (h) { if (!crime) h.dataset.kzpf = h.textContent.startsWith('Verbrechen') ? (h.dataset.kzpf || h.textContent) : h.textContent; const t = crime ? 'Verbrechen' : (h.dataset.kzpf || h.textContent); if (h.textContent !== t) h.textContent = t; }
+      if (crime) crimeLocks();
     };
     tools.addEventListener('click', e => { const sp = e.target.closest('span'); if (sp) { e.stopPropagation(); apply(sp.textContent); } });
     const order = () => { const ins = pf.querySelector(':scope > .inside'), a = ins?.querySelector(':scope > .action'); if (a && ins.firstElementChild !== a) ins.prepend(a); apply(tools.querySelector('.subtab-active')?.textContent || 'Pfand sammeln'); };
@@ -3412,4 +3418,63 @@ document.addEventListener('click', e => {
     putNotice(card, '<div class="notice bad">Dir fehlen ' + eur(miss) + '. ' + (bank >= miss ? 'Im Schließfach liegen ' + eur(bank) + ' – erst abheben.' : 'Geh Pfand sammeln oder such dir einen Nebenjob.') + '</div>');
   }, true);
   const st = document.createElement('style'); st.textContent = 'html body:not(#kz1):not(#kz2) .kz-poor{opacity:.55;filter:grayscale(.6);cursor:not-allowed}'; document.head.appendChild(st);
+}
+
+// Verbrechen: Level-Grenzen seit 0040 sichtbar, nach Schwierigkeit sortiert (Durchspiel-Test 173/177: Bankraub ab Level 1)
+const CRIME_LVL = { 1: 1, 2: 4, 3: 10, 4: 20, 5: 35, 6: 55, 7: 1 };
+function crimeLocks() {
+  const lvl = window.kiezProfile?.level || 1, btns = [...document.querySelectorAll('#pfand .crime-pick')]; if (!btns.length) return;
+  const cards = btns.map(b => ({ b, card: b.closest('.card') || b.parentElement, need: CRIME_LVL[b.dataset.id] || 1, risk: +((b.closest('.card') || b.parentElement).textContent.match(/(\d+)\s*%/) || [0, 0])[1] }));
+  cards.forEach(({ b, card, need }) => {
+    if (lvl < need) { b.disabled = true; b.dataset.kzlock = '1'; setLabel(b, '🔒 ab Level ' + need); card.classList.add('kz-locked'); }
+    else if (b.dataset.kzlock) { b.disabled = false; delete b.dataset.kzlock; setLabel(b, 'Verbrechen begehen'); card.classList.remove('kz-locked'); }
+  });
+  const grid = cards[0].card.parentElement, sorted = cards.slice().sort((x, y) => x.need - y.need || x.risk - y.risk);
+  const cur = [...grid.children].filter(el => cards.some(c => c.card === el));
+  if (cards.every(c => c.card.parentElement === grid) && sorted.some((c, i) => cur[i] !== c.card)) sorted.forEach(c => grid.appendChild(c.card));
+}
+{ const prev = window.kiezOnProfile; window.kiezOnProfile = p => { prev?.(p); crimeLocks(); }; }
+
+// Rubbellos zum Freirubbeln (ROADMAP 168/186): drei gleiche Beträge = Gewinn, 10 € = Einsatz zurück, sonst Niete.
+// Vorher zeigten alle drei Felder „WIN“ und es hieß „Gewonnen 5 €“ bei 10 € Einsatz.
+{
+  const old = document.getElementById('buyscratch');
+  if (old) {
+    const btn = old.cloneNode(true); old.replaceWith(btn);
+    const card = btn.closest('.card') || btn.parentElement, msg = () => card.querySelector('#scratchmsg');
+    const desc = card.querySelector('p'); if (desc) desc.textContent = 'Ein Los kostet 10 €. Rubbel die drei Felder frei: Dreimal derselbe Betrag gewinnt ihn – 10 € heißt Einsatz zurück, bis 500 € ist drin.';
+    const AMOUNTS = [10, 15, 20, 50, 100, 500];
+    const st = document.createElement('style');
+    st.textContent = 'html body:not(#kz1):not(#kz2) .scratch-field{position:relative;overflow:hidden;user-select:none;touch-action:none;cursor:crosshair;font-weight:700}'
+      + 'html body:not(#kz1):not(#kz2) .scratch-field canvas{position:absolute;inset:0;width:100%;height:100%}';
+    document.head.appendChild(st);
+    btn.onclick = async () => {
+      btn.disabled = true; const m = msg(); if (m) m.innerHTML = '';
+      let r; try { r = await rpc('buy_scratch_ticket'); } catch (e) { if (m) say(m, esc(e.message), false); btn.disabled = false; return; }
+      window.kiezRenderProfile?.(r.profile);
+      const prize = +r.prize;
+      let vals;
+      if (prize > 0) vals = [prize, prize, prize];
+      else { do { vals = [0, 1, 2].map(() => AMOUNTS[Math.floor(Math.random() * AMOUNTS.length)]); } while (vals[0] === vals[1] && vals[1] === vals[2]); }
+      const fields = [...card.querySelectorAll('.scratch-field')]; let open = 0;
+      const done = () => {
+        const t = prize === 0 ? 'Niete – die 10 € sind weg. Die Bude freut sich.' : prize === 10 ? 'Einsatz zurück: 10 €. Wenigstens nix verloren.' : 'Gewonnen: ' + eur(prize) + ' (' + eur(prize - 10) + ' mehr als der Einsatz)!' + (+r.profile.bank_balance > 0 && prize > 10 ? ' Was nicht in die Tasche passt, liegt im Schließfach.' : '');
+        if (m) say(m, t, prize >= 10); fields.forEach(f => f.classList.add(prize > 10 ? 'scratch-win' : 'scratch-lose')); btn.disabled = false;
+      };
+      fields.forEach((f, i) => {
+        f.classList.remove('scratch-win', 'scratch-lose'); f.textContent = eur(vals[i]).replace(',00', '');
+        const cv = document.createElement('canvas'); f.appendChild(cv);
+        const w = cv.width = f.clientWidth || 120, h = cv.height = f.clientHeight || 60, ctx = cv.getContext('2d');
+        ctx.fillStyle = '#9a8a6a'; ctx.fillRect(0, 0, w, h); ctx.fillStyle = '#5c5140'; ctx.font = 'bold 15px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('RUBBELN', w / 2, h / 2 + 5);
+        ctx.globalCompositeOperation = 'destination-out'; let down = false, scraped = 0, gone = false;
+        const rub = e => { if (!down || gone) return; const b = cv.getBoundingClientRect(), x = (e.clientX - b.left) * w / b.width, y = (e.clientY - b.top) * h / b.height;
+          ctx.beginPath(); ctx.arc(x, y, 14, 0, 7); ctx.fill(); if (++scraped > 22) { gone = true; cv.remove(); if (++open === 3) done(); } };
+        cv.addEventListener('pointerdown', e => { down = true; cv.setPointerCapture?.(e.pointerId); rub(e); });
+        cv.addEventListener('pointermove', rub); cv.addEventListener('pointerup', () => down = false);
+        // Tippen/Klicken ohne Ziehen: jeder Klick rubbelt ein gutes Stück frei
+        cv.addEventListener('click', () => { if (gone) return; scraped += 8; if (scraped > 22) { gone = true; cv.remove(); if (++open === 3) done(); } });
+      });
+      if (m) say(m, 'Rubbel die drei Felder frei!', true);
+    };
+  }
 }

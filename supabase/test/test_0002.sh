@@ -27,10 +27,10 @@ has "Unbekannter Platz" "$(as_user $C "select beg_at_spot('mond')")" "gibt es ni
 ok  "Alte Bettelfunktion geht" "$(as_user $C "select (beg_for_money())->>'spot'")" "strasse"
 
 # Kampf: Levelbereich, Knast, Sperre, Versicherung
-$P -tAc "update profiles set xp=1215, energy=100, attack_skill=100 where id='$A'"   # Level 10 -> 8..15
+$P -tAc "update profiles set xp=1215, energy=100, attack_skill=100 where id='$A'"   # Level 10 -> ab Level 5
 $P -tAc "update profiles set xp=15 where id='$B'"                                   # Level 2
 $P -tAc "update profiles set xp=2160, money=1000, insurance_active=true where id='$C'" # Level 13
-has "Zu schwacher Gegner" "$(as_user $A "select attack_player('$B')")" "Level 8 bis 15"
+has "Zu schwacher Gegner (seit 0040: höchstens 5 Level darunter)" "$(as_user $A "select attack_player('$B')")" "ab Level 5"
 $P -tAc "update profiles set jail_until=now()+interval '1 hour' where id='$C'"
 has "Kein Angriff auf Knacki" "$(as_user $A "select attack_player('$C')")" "im Knast"
 $P -tAc "update profiles set jail_until=null where id='$C'; update profiles set jail_until=now()+interval '1 hour' where id='$A'"
