@@ -331,3 +331,9 @@ html body:not(#kz1):not(#kz2) .player-slip .profile-avatar { background-color: #
 html body:not(#kz1):not(#kz2) .kz-hide-lock { display: none !important; }
 html body:not(#kz1):not(#kz2) details.kz-hist > summary { cursor: pointer; font-weight: 700; padding: 6px 0; font-size: 15px; }
 html body:not(#kz1):not(#kz2) details.kz-hist .pfand-pricehistory-card { margin-top: 8px; }
+/* Rangliste als Tabelle, eigener Platz hervorgehoben (ROADMAP 174) */
+html body:not(#kz1):not(#kz2) #leaders .kz-rank { width: 100%; border-collapse: collapse; font-size: 15px; }
+html body:not(#kz1):not(#kz2) #leaders .kz-rank th { text-align: left; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--brass, #c9a55a); padding: 8px 10px; border-bottom: 1px solid rgba(201,165,90,.35); }
+html body:not(#kz1):not(#kz2) #leaders .kz-rank td { padding: 9px 10px; border-bottom: 1px solid rgba(255,255,255,.06); }
+html body:not(#kz1):not(#kz2) #leaders .kz-rank tr.kz-me td { background: rgba(201,165,90,.14); font-weight: 700; }
+html body:not(#kz1):not(#kz2) #leaders .kz-rank tbody tr:nth-child(-n+3) td:first-child { color: var(--brass, #c9a55a); font-weight: 700; }
