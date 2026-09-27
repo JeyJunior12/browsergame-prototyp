@@ -224,4 +224,5 @@ Gemeldet: Waffen lassen sich mehrfach kaufen; Anziehen/Ausrüsten für Werte fun
 108. Bereits doppelt gekaufte Stücke: Duplikate automatisch zum Kaufpreis erstatten ⭐
 109. Test per Klick: kaufen → zweiter Kauf gesperrt → anlegen → Angriffswert steigt → ablegen → Wert sinkt ⭐
 110. Überall gilt: Was man schon besitzt, ist sofort sichtbar – Karte ausgegraut bzw. „Im Besitz ✔“ statt „Kaufen“, Knopf gesperrt oder „Mitnehmen/Anlegen“. Beispiel Begleiter „Kakerlake“: erst nach erneutem Kaufversuch kommt „Diesen Begleiter hast du schon“ – das darf nicht sein. Gilt für Begleiter, Waffen, Ausrüstung, Unterkünfte, Instrumente, Sammelgebiete, Waschausstattung, Ausbauten; zu teure/zu hohe Level-Stücke ebenfalls vorab kennzeichnen („ab Level X“, „zu wenig Geld“) ⭐
+   Vorbild (Nutzer findet es gut): Unterkünfte „Häuser im Kiez“ – statt Kaufknopf steht unten „✔ AKTUELL BEWOHNT“ (Häkchen + Großbuchstaben, gedämpfte Farbe). Genau diesen Stil übernehmen: „✔ IM BESITZ“, „✔ ANGELEGT“, „✔ DABEI“ (Begleiter), „✔ FREIGESCHALTET“.
 
