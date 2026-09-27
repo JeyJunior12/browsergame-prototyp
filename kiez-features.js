@@ -108,6 +108,9 @@ loaders.profil = async () => {
   const t = ++profSeq;
   const me = await myId(); if (!me) return;
   const id = profileTarget || me, own = id === me;
+  // Nie einen leeren Kasten zeigen (Durchspiel-Test: 7 s leer, weil 5 Abfragen nacheinander liefen)
+  if (profBody.dataset.pid !== id || !profBody.querySelector('.kf-box')) { profBody.dataset.pid = id; profBody.innerHTML = '<div class="kf-box kf-muted">Lade Profil …</div>'; }
+  const todayP = own ? sb.from('donations').select('id', { count: 'exact', head: true }).eq('target_id', me).eq('donation_day', new Date().toISOString().slice(0, 10)) : null;
   const [pr, gm, gb, fr, bl] = await Promise.all([
     sb.from('profiles').select('id,username,title,level,xp,wins,losses,bio,motto,created_at,equipped_plunder,donations_received,donation_money,pet_wins,is_banned,avatar,cleanliness').eq('id', id).maybeSingle(),
     sb.from('gang_members').select('gang_id,role').eq('user_id', id).maybeSingle(),
@@ -117,9 +120,12 @@ loaders.profil = async () => {
   ]);
   const p = pr.data;
   if (!p) { profBody.innerHTML = 'Spieler nicht gefunden.'; return; }
-  if (gm.data) gm.data.gangs = (await sb.from('gangs').select('name').eq('id', gm.data.gang_id).maybeSingle()).data;
-  const plunderName = p.equipped_plunder ? (await sb.from('plunder_catalog').select('name').eq('id', p.equipped_plunder).maybeSingle()).data?.name : null;
-  const authors = await names((gb.data || []).map(e => e.author_id));
+  const [gang, plu, authors, today] = await Promise.all([
+    gm.data ? sb.from('gangs').select('name').eq('id', gm.data.gang_id).maybeSingle() : null,
+    p.equipped_plunder ? sb.from('plunder_catalog').select('name').eq('id', p.equipped_plunder).maybeSingle() : null,
+    names((gb.data || []).map(e => e.author_id)), todayP]);
+  if (gm.data) gm.data.gangs = gang?.data;
+  const plunderName = plu?.data?.name || null;
   if (t !== profSeq) return;
   const f = (fr.data || [])[0], blocked = (bl.data || []).length > 0;
   const av = p.avatar && /^data:image\/(jpeg|png|webp);base64,/.test(p.avatar) ? '<div style="float:right;width:84px;height:84px;margin:0 0 8px 10px;border:3px solid #756346;background:#11110f center/cover;background-image:url(\'' + p.avatar + '\')"></div>' : '';
@@ -133,10 +139,9 @@ loaders.profil = async () => {
     + '<p class="kf-bio">' + (p.bio ? esc(p.bio) : '<span class="kf-muted">Noch keine Beschreibung.</span>') + '</p><div class="kf-row pact"></div><div class="pmsg"></div></div>';
   if (own) {
     const link = location.origin + '/?spende=' + encodeURIComponent(p.username);
-    const today = await sb.from('donations').select('id', { count: 'exact', head: true }).eq('target_id', me).eq('donation_day', new Date().toISOString().slice(0, 10));
     h += '<div class="kf-box"><h3>💰 Dein Spendenlink</h3><p>Teile den Link: Jeder Besucher kann dir einmal am Tag ein paar Cent spenden – auch ohne Konto.</p>'
       + '<div class="kf-row"><input class="slink" readonly value="' + esc(link) + '" style="flex:1;min-width:200px"><button class="ghost scopy">Kopieren</button></div>'
-      + '<p class="kf-muted">Heute: ' + (today.count || 0) + ' / 100 Spenden · Insgesamt ' + p.donations_received + ' Spenden, ' + eur(p.donation_money) + '</p></div>'
+      + '<p class="kf-muted">Heute: ' + (today?.count || 0) + ' / 100 Spenden · Insgesamt ' + p.donations_received + ' Spenden, ' + eur(p.donation_money) + '</p></div>'
       + '<div class="kf-box"><h3>✏️ Profil bearbeiten</h3><div class="kf-row"><input class="emotto" maxlength="100" placeholder="Motto" style="flex:1" value="' + esc(p.motto) + '"></div>'
       + '<textarea class="ebio" maxlength="1000" placeholder="Erzähl etwas über dich …">' + esc(p.bio) + '</textarea><div class="kf-row"><button class="big esave">Speichern</button></div><div class="emsg"></div></div>';
   }
@@ -3343,4 +3348,26 @@ if (window.kiezProfile) window.kiezOnProfile(window.kiezProfile);
       return 'Tag ' + r.streak + ' der Serie: ' + eur(r.reward) + ', 10 Punkte und ' + (r.bottlecaps || 1) + ' Kronkorken.' + (r.shield_used ? ' Dein Serien-Schutz hat die Serie gerettet.' : ''); });
     const prev = window.kiezOnProfile; window.kiezOnProfile = p => { prev?.(p); sync(p); }; sync(window.kiezProfile);
   }
+}
+
+// Übersicht „Dein Kiezbewohner“: echte Werte (Durchspiel-Test: Sauberkeit zeigte den Rang, Platzierung das Level,
+// ATT/DEF nur die Trainingsstufe, „Deine Waffe“ den Helm) – Werte aus Profil + combat_overview, Rang aus der Punkte-Rangliste
+{
+  let rankAt = 0, rank = null;
+  const ovSync = async () => {
+    const p = window.kiezProfile, box = document.querySelector('#overview .profile-table'); if (!p || !box) return;
+    const set = (sel, t) => { const e = box.querySelector(sel); if (e) e.textContent = t; };
+    set('.pv-clean', Math.round(p.cleanliness ?? 100) + ' %');
+    const c = OWN.combat; if (c) { set('.pv-att', c.attack.total); set('.pv-def', c.defense.total);
+      const w = (c.equipped || []).find(e => e.slot === 'waffe'); const ws = document.getElementById('slotWeapon'); if (ws) ws.textContent = w ? w.name : 'Blanke Fäuste'; }
+    if (Date.now() - rankAt > 60000) { rankAt = Date.now(); const r = await sb.from('profiles').select('id', { count: 'exact', head: true }).gt('xp', p.xp || 0); if (!r.error) rank = (r.count || 0) + 1; }
+    if (rank) set('.pv-place', 'Platz ' + rank);
+    // Laune = Mittel aus Sauberkeit und Sattheit, statt immer „ausbaufähig“
+    const mood = Math.round(((p.cleanliness ?? 100) + (p.hunger ?? 100)) / 2), bar = document.querySelector('#overview .profile-mood span'), warn = document.querySelector('#overview .profile-warning');
+    if (bar) { bar.style.width = mood + '%'; bar.style.background = mood >= 60 ? '#6f8f3a' : mood >= 30 ? '#b08a2e' : '#7d2421'; }
+    if (warn) warn.textContent = 'Laune ' + mood + ' % – ' + (mood >= 60 ? 'läuft bei dir.' : mood >= 30 ? 'geht so. Waschen und Essen hilft.' : 'im Keller. Ab ins Waschhaus und was futtern!');
+  };
+  const prev = window.kiezOnProfile; window.kiezOnProfile = p => { prev?.(p); ovSync(); };
+  const cb = combatBoxes; combatBoxes = (...a) => { cb(...a); ovSync(); };
+  const pl = loaders.overview; loaders.overview = (...a) => { pl?.(...a); setTimeout(ovSync, 300); };
 }
