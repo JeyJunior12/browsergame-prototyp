@@ -60,7 +60,7 @@ GitHub push ──▶ Action: Tests (Postgres) ──▶ Migration live in Supab
 
 Ziel: Es gibt fast immer etwas zu tun – auch mit wenigen Spielern. Empfohlener Start: 1, 2, 3, 5.
 
-**⭐ Vom Nutzer ausgewählt für später (27.09.2026):** 17, 19, 20, 22, 23, 24, 25, 26, 29, 30, 31, 32, 34, 37 – Kiosk-Stand, Revanche, Kopfgeld, Wetten, Kosmetik, Hunger, Sucht/Entzug, Ruf, Glücksrad, Pfandtour zu zweit, Tag/Nacht, Live-Stadtereignisse, Nebenquests, Ein-Klick-Verkaufen. Dazu aus J: 38, 39, 40 (eher selten), 43, 44, 47, 48, 49. Dazu aus K (Fahrzeuge): 53, 54 (erst später), 55, 56, 57, 59 (erst später), 60, 61, 63, 64. Alle übrigen Ideen bleiben ebenfalls im Plan.
+**⭐ Vom Nutzer ausgewählt für später (27.09.2026):** 17, 19, 20, 22, 23, 24, 25, 26, 29, 30, 31, 32, 34, 37 – Kiosk-Stand, Revanche, Kopfgeld, Wetten, Kosmetik, Hunger, Sucht/Entzug, Ruf, Glücksrad, Pfandtour zu zweit, Tag/Nacht, Live-Stadtereignisse, Nebenquests, Ein-Klick-Verkaufen. Dazu aus J: 38, 39, 40 (eher selten), 43, 44, 47, 48, 49. Dazu aus K (Fahrzeuge): 53, 54 (erst später), 55, 56, 57, 59 (erst später), 60, 61, 63, 64. Dazu L (einheitliches Aussehen): 65–69. Alle übrigen Ideen bleiben ebenfalls im Plan.
 
 ### Offener Fehler
 - Seite scrollt nach 10–15 s ohne Eingabe nach oben (trotz Fix in PR #27; Ursache noch nicht gefunden, Nutzer hat Suche vertagt). Vermutung: Neuzeichnen einer Seite macht sie kurz kürzer. Test-Skizze: alle Seiten 20 s warten, `scrollTo`/`scrollIntoView`/`focus` mitprotokollieren.
@@ -151,4 +151,12 @@ Aufstieg: Einkaufswagen → Bollerwagen → Fahrrad mit Anhänger → Lastenrad 
 62. Bandenfahrzeug (Transporter) mit Bonus für Stadtteile/Bandenkriege
 63. Fahrten zwischen Stadtteilen: ohne Auto dauert Revierwechsel länger, mit Auto sofort ⭐
 64. Fahrzeug + Lackierung im Profil und auf dem Stadtplan zeigen ⭐
+
+### L. Einheitliches Aussehen überall (27.09.2026) ⭐
+Nutzerwunsch: Ungleichheiten auf allen Seiten richtig machen. Beispiel: Karte „Dein Inventar“ (Pfand-/Übersichtsbereich) hat kein Foto, Emojis als Symbole (🍾 🔩 🪵 🔺 🧵), Eingabefeld und Knöpfe unterschiedlich hoch.
+65. Jede Karte gleich aufgebaut: Foto links/oben, Titel, Text, Knöpfe in einer Reihe – auf jeder Seite, auch dort, wo dieselbe Karte ein zweites Mal vorkommt ⭐
+66. Keine Emojis als Symbole in Karten und Werten – stattdessen einheitliche kleine Bilder/Icons oder nur Text ⭐
+67. Eingabefelder und Knöpfe gleich hoch und bündig (Menge + Verkaufen + Alle verkaufen in einer Linie) ⭐
+68. Gleiche Abstände, Schriftgrößen und Farben für Überschriften, Werte und Hinweise auf allen Seiten ⭐
+69. Prüfskript, das alle Seiten durchgeht und Abweichungen meldet (Karte ohne Bild, Emoji im Titel, ungleiche Knopfhöhen) ⭐
 
