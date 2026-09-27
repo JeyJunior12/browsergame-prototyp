@@ -309,3 +309,6 @@ html body:not(#kz1):not(#kz2) #einstellungen input[type=file] { width: 100% !imp
 
 /* Kurze Inhalte neben langer Reiterspalte oben ausrichten (Garage/Bandenhaus hatten eine große Lücke darüber) */
 html body:not(#kz1):not(#kz2) main section.panel.active-view > .inside { align-self: start !important; }
+
+/* Vor der Anmeldung kein Spielmenü in der Kopfzeile (Nutzer-Screenshot Anmeldeseite) */
+html body:not(#kz1):not(#kz2):has(#game.hide) .kz-nav, html body:not(#kz1):not(#kz2):has(#game.hide) .kz-drop { display: none !important; }
