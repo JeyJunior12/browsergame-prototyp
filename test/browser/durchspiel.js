@@ -33,6 +33,7 @@ async function go(view, tab) {
   await pg.evaluate(([v, t]) => window.kiezGoTab(v, t), [view, tab || undefined]);
   await pg.waitForTimeout(700);
   await pg.waitForFunction(v => !/Lade[^\n]{0,20}…/.test(document.getElementById(v)?.innerText || ''), view, { timeout: 12000 }).catch(() => log({ v: visit, typ: 'LÄDT-EWIG', wo: view + '/' + (tab || '') }));
+  await pg.waitForFunction(v => !document.querySelector('#' + v + ' .kz-skeleton'), view, { timeout: 8000 }).catch(() => log({ v: visit, typ: 'LÄDT-LANGE', wo: view + '/' + (tab || '') }));
   await pg.waitForTimeout(400); await popups(view);
   if (full()) await look(view, tab);
   const leer = await pg.evaluate(v => { const s = document.getElementById(v); return !s || s.innerText.trim().length < 40; }, view);
