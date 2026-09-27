@@ -297,3 +297,5 @@ Nutzerwunsch: Ganz am Ende, wenn alles andere gebaut ist, noch einmal alles durc
 
 ## Runde „Durchspiel-Test“ (ab 27.09.2026) – wird nach dem Test vervollständigt
 156. Kampfbereich neu (Nutzerwunsch): nach oben darf man **jeden** angreifen (auch viel höhere Level), nach unten nur bis **5 Level** unter dem eigenen – gilt für Spieler-Kampf, Tierkampf, Kiosk-Überfall und Kopfgeld
+157. Stadt-Leiste (Zubehör, Supermarkt … Glücksspiel) läuft unter den Spielerkasten oben rechts – „Musikladen“ ist halb verdeckt (Nutzer-Screenshot). Leiste darf nie unter dem Kasten liegen: Platz rechts freihalten oder Leiste unter den Kasten umbrechen, am PC und Handy prüfen
+158. Übersicht › Reiter „Haustier“ zeigt nur einen leeren Kasten „Dein Begleiter“ (Nutzer-Screenshot) – aktiven Begleiter mit Bild, Werten, Training anzeigen oder Reiter direkt zur Begleiter-Seite führen. Dazu im Ticker „Gerade im Kiez“: erster Eintrag ist anders eingerückt als die übrigen
