@@ -3319,10 +3319,28 @@ html body:not(#kz1):not(#kz2) #pets[data-kztab="Tierhandlung"] #petshop{display:
   ensure(); const prevP2 = loaders.pets; loaders.pets = () => { prevP2?.(); setTimeout(ensure, 150); };
 }
 // Stadt-Leiste „Tierhandlung“ → Laden-Reiter
-document.addEventListener('click', e => { const b = e.target.closest('.kiez-quickbar button'); if (b && b.textContent.trim() === 'Tierhandlung') { e.preventDefault(); e.stopImmediatePropagation(); go('pets', 'Tierhandlung'); } }, true);
+// Stadt-Leiste: Knöpfe, deren altes Ziel den falschen Reiter öffnet (Durchspiel-Test: „Glücksspiel“ landete im Tagesauftrag)
+{ const QB = { 'Tierhandlung': ['pets', 'Tierhandlung'], 'Glücksspiel': ['missions', 'Glücksspiel'] };
+  document.addEventListener('click', e => { const b = e.target.closest('.kiez-quickbar button'), t = QB[b?.textContent.trim()]; if (t) { e.preventDefault(); e.stopImmediatePropagation(); go(t[0], t[1]); } }, true); }
 // Schnorren: Körperpflege-Teile (jetzt im Waschhaus) hier nie mehr zeigen
 { const st = document.createElement('style'); st.textContent = 'html body:not(#kz1):not(#kz2) #begging .wash-list, html body:not(#kz1):not(#kz2) #begging .action-block:has(#wash){display:none !important}'; document.head.appendChild(st); }
 
 // Zuletzt geöffnete neue Seite wiederherstellen
 try { const last = localStorage.getItem('kiez_last_view'); if (loaders[last]) setTimeout(() => show(last), 1500); } catch (e) { }
 if (window.kiezProfile) window.kiezOnProfile(window.kiezProfile);
+
+// Tagesbelohnung: Meldung direkt unter dem Knopf (vorher im unsichtbaren #activitymsg → Klick ohne Rückmeldung),
+// Serie = Login-Serie (0025), Knopf gesperrt, wenn heute schon abgeholt (Durchspiel-Test F1)
+{
+  const btn = document.getElementById('claimdaily');
+  if (btn) {
+    const nb = btn.cloneNode(true); btn.replaceWith(nb);
+    const box = document.createElement('div'); box.className = 'kz-dailymsg'; nb.after(box);
+    const today = () => new Date().toISOString().slice(0, 10);  // current_date der Datenbank = UTC
+    const sync = p => { if (!p) return; const c = document.getElementById('streakcount'); if (c) c.textContent = (p.login_streak || 0) + ((p.login_streak || 0) === 1 ? ' Tag' : ' Tage');
+      const done = p.daily_claim_date === today(); nb.disabled = done; setLabel(nb, done ? 'Heute schon abgeholt – morgen wieder' : 'Tagesbelohnung abholen'); };
+    act(nb, box, async () => { const r = await rpc('claim_daily_reward'); window.kiezRenderProfile?.(r.profile);
+      return 'Tag ' + r.streak + ' der Serie: ' + eur(r.reward) + ', 10 Punkte und ' + (r.bottlecaps || 1) + ' Kronkorken.' + (r.shield_used ? ' Dein Serien-Schutz hat die Serie gerettet.' : ''); });
+    const prev = window.kiezOnProfile; window.kiezOnProfile = p => { prev?.(p); sync(p); }; sync(window.kiezProfile);
+  }
+}
