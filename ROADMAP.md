@@ -71,7 +71,7 @@ Nutzerwunsch, höchste Priorität: ein ALL-Chat als kleine Leiste unten rechts, 
 134. Die bisherige Seite „Kiez-Chat“ bleibt als große Ansicht bzw. wird durch die Leiste ersetzt ⭐
 
 
-**⭐ Vom Nutzer ausgewählt für später (27.09.2026):** 17, 19, 20, 22, 23, 24, 25, 26, 29, 30, 31, 32, 34, 37 – Kiosk-Stand, Revanche, Kopfgeld, Wetten, Kosmetik, Hunger, Sucht/Entzug, Ruf, Glücksrad, Pfandtour zu zweit, Tag/Nacht, Live-Stadtereignisse, Nebenquests, Ein-Klick-Verkaufen. Dazu aus J: 38, 39, 40 (eher selten), 43, 44, 47, 48, 49. Dazu aus K (Fahrzeuge): 53, 54 (erst später), 55, 56, 57, 59 (erst später), 60, 61, 63, 64. Dazu L (einheitliches Aussehen): 65–69. Dazu M (Wegweiser): 70–73. Dazu N (flüssiger Seitenwechsel): 74–77. Dazu O (Körperpflege): 78–85. Dazu P (Balancing Gegenstände & Preise): 86–92. Dazu Q (Bandensystem): 93–104. Dazu R (Fehler Waffen kaufen/anlegen, hohe Priorität): 105–109. Dazu S (Plunderkiste): 111–120. Dazu T (Stadtteile sperren, später Städte): 121–124. Dazu U (Kiezpost-Empfänger): 125–127. Dazu V (Schnorrplätze-Seite): 135–140. Alle übrigen Ideen bleiben ebenfalls im Plan.
+**⭐ Vom Nutzer ausgewählt für später (27.09.2026):** 17, 19, 20, 22, 23, 24, 25, 26, 29, 30, 31, 32, 34, 37 – Kiosk-Stand, Revanche, Kopfgeld, Wetten, Kosmetik, Hunger, Sucht/Entzug, Ruf, Glücksrad, Pfandtour zu zweit, Tag/Nacht, Live-Stadtereignisse, Nebenquests, Ein-Klick-Verkaufen. Dazu aus J: 38, 39, 40 (eher selten), 43, 44, 47, 48, 49. Dazu aus K (Fahrzeuge): 53, 54 (erst später), 55, 56, 57, 59 (erst später), 60, 61, 63, 64. Dazu L (einheitliches Aussehen): 65–69. Dazu M (Wegweiser): 70–73. Dazu N (flüssiger Seitenwechsel): 74–77. Dazu O (Körperpflege): 78–85. Dazu P (Balancing Gegenstände & Preise): 86–92. Dazu Q (Bandensystem): 93–104. Dazu R (Fehler Waffen kaufen/anlegen, hohe Priorität): 105–109. Dazu S (Plunderkiste): 111–120. Dazu T (Stadtteile sperren, später Städte): 121–124. Dazu U (Kiezpost-Empfänger): 125–127. Dazu V (Schnorrplätze-Seite): 135–140. Alle übrigen Ideen bleiben ebenfalls im Plan. **Zum Schluss:** Gesamtprüfung + Durchspiel-Test Level 1–150 (141–146).
 
 ### Offener Fehler
 - Seite scrollt nach 10–15 s ohne Eingabe nach oben (trotz Fix in PR #27; Ursache noch nicht gefunden, Nutzer hat Suche vertagt). Vermutung: Neuzeichnen einer Seite macht sie kurz kürzer. Test-Skizze: alle Seiten 20 s warten, `scrollTo`/`scrollIntoView`/`focus` mitprotokollieren.
@@ -274,4 +274,13 @@ Nutzer: Die Seite ist noch nicht toll. Zurzeit stehen zwei ähnliche Dinge unter
 138. Laufendes Schnorren direkt auf der Karte zeigen: Fortschrittsbalken + Restzeit, am Ende das Ergebnis genau dort (siehe 69g) ⭐
 139. Was wirkt sichtbar machen: Mitleid des Begleiters, Sauberkeit, Rhetorik als kleine Werte („Dein Bonus: +35 %“) ⭐
 140. Letzte Einnahmen pro Platz (heute verdient, bester Platz) als kleine Statistik ⭐
+
+### 🏁 ZUM SCHLUSS – Gesamtprüfung und Durchspiel-Test Level 1 bis 150 (27.09.2026) ⭐
+Nutzerwunsch: Ganz am Ende, wenn alles andere gebaut ist, noch einmal alles durchgehen.
+141. Gesamtdurchgang: jede Seite, jeder Reiter, jeder Knopf auf PC und Handy – alle Punkte dieser Liste abhaken, prüfen ob die gemeldeten Fehler wirklich weg sind und ob alles zum Spiel passt (Texte, Bilder, Stil) ⭐
+142. Testmodus nur für Testkonten wieder anlegen (wie 0010/0011): Wartezeiten überspringen, übersprungene Zeit mitzählen ⭐
+143. Durchspiel-Test von Level 1 bis Level 150 mit realistischem Spielverhalten (z. B. „aktiver Spieler 3–5× am Tag“ und „Gelegenheitsspieler 1× am Tag“), jede Aktion echt über die Spielfunktionen ⭐
+144. Dabei mitschreiben: Punkte, Geld, Werte, Level, Käufe, Wartezeiten pro Spieltag → Kurven für Geld, Punkte und Stärke über die Zeit (inkl. übersprungener Zeit = echte Spielzeit) ⭐
+145. Auswertung: Wo wird es zu zäh, wo zu leicht, wo fehlt Geld, wo ist Geld nutzlos, welche Gegenstände/Tiere sind zu stark oder nie sinnvoll → Balancing anpassen (verbindet mit P 86–92) und Test wiederholen ⭐
+146. Danach Testmodus und Testkonten wieder entfernen (wie 0014) und Ergebnis in ROADMAP/CLAUDE.md festhalten ⭐
 
