@@ -348,3 +348,7 @@ html body:not(#kz1):not(#kz2) #pfand .crime-item b, html body:not(#kz1):not(#kz2
 html body:not(#kz1):not(#kz2) .purchase-card > .kz-own { margin-top: auto !important; }
 html body:not(#kz1):not(#kz2) .kf-grid > .card:has(> .kf-row button) { display: flex !important; flex-direction: column; }
 html body:not(#kz1):not(#kz2) .kf-grid > .card > .kf-row:has(button):not(:has(~ .kf-row)) { margin-top: auto !important; }
+html body:not(#kz1):not(#kz2) :is(.cards, .kf-grid) > .card:has(> button) { display: flex !important; flex-direction: column; }
+html body:not(#kz1):not(#kz2) :is(.cards, .kf-grid) > .card > button:last-of-type { margin-top: auto !important; }
+html body:not(#kz1):not(#kz2) .craft-card > button { align-self: center; }
+html body:not(#kz1):not(#kz2) .kf-district > button { align-self: flex-start; }

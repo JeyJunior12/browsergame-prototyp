@@ -112,6 +112,7 @@ async function click(label, sel, { within, pick = 'first', fill, wait = 5000, qu
       const key = c => c.dataset.t || c.dataset.id || (c.querySelector('b,h3,h4')?.textContent || '').trim();
       const ns = [...document.querySelectorAll(MSEL)].filter(n => n.offsetParent && n.dataset.kzseen !== n.innerText.replace(/\s+/g, ' ').trim() && n.closest('.card'));
       if (!ns.length || ns.some(n => key(n.closest('.card')) === k)) return null;
+      if (![...document.querySelectorAll('section.panel.active-view .card')].some(c => c.offsetParent && key(c) === k)) return null;  // Karte ist weg (z. B. Knast) → Meldung darf woanders stehen
       return 'Meldung in Karte „' + key(ns[0].closest('.card')) + '“ statt „' + k + '“'; }, MSEL).catch(() => null);
     if (wrong) log({ v: visit, typ: 'FALSCHE-KARTE', label, msg: wrong }); }
   await popups(label);
