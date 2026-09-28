@@ -3234,9 +3234,11 @@ async function craftLocks() {
   cards.forEach(card => {
     const it = OWN.cat?.[card.dataset.id], btn = card.querySelector('.craft-go'); if (!it || !btn) return;
     if (!btn.dataset.orig) btn.dataset.orig = btn.textContent;
-    const lock = lvl < (it.required_level || 1);
-    if (lock) { btn.disabled = true; btn.dataset.kzlock = '1'; setLabel(btn, '🔒 ab Level ' + it.required_level); }
-    else if (btn.dataset.kzlock) { delete btn.dataset.kzlock; setLabel(btn, btn.dataset.orig); }
+    const lock = lvl < (it.required_level || 1), have = (OWN.combat?.owned || []).includes(it.id);
+    // schon gebastelt? Jedes Stück gibt es nur einmal (Durchspiel-Test: 8× „Das hast du schon“)
+    if (have) { btn.disabled = true; btn.dataset.kzlock = '1'; setLabel(btn, 'Schon hergestellt'); }
+    else if (lock) { btn.disabled = true; btn.dataset.kzlock = '1'; setLabel(btn, '🔒 ab Level ' + it.required_level); }
+    else if (btn.dataset.kzlock) { delete btn.dataset.kzlock; btn.disabled = false; setLabel(btn, btn.dataset.orig); }
     if (card.classList.contains('kz-locked') !== lock) card.classList.toggle('kz-locked', lock);
   });
 }
@@ -3512,6 +3514,8 @@ function crimeLocks() {
     const overlapY = b.top < s.bottom + 4 && b.bottom > s.top, pad = overlapY && b.right > s.left - 8 ? Math.ceil(b.right - s.left + 12) : 0;
     const want = pad > 0 && pad < b.width - 200 ? pad + 'px' : '0px'; if (bar.style.getPropertyValue('--kz-qb-pad') !== want) bar.style.setProperty('--kz-qb-pad', want); }); };
   new MutationObserver(() => requestAnimationFrame(fixQB)).observe(document.body, { attributes: true, attributeFilter: ['class'], subtree: false });
+  // auch beim Reiterwechsel innerhalb einer Seite (Tagesauftrag › Belohnungsserie lag kurz unter dem Kasten)
+  document.addEventListener('click', e => { if (e.target.closest('.section-tools, .kiez-quickbar, .kz-nav, .kz-drop')) { requestAnimationFrame(fixQB); setTimeout(fixQB, 300); } }, true);
   addEventListener('resize', fixQB); setInterval(fixQB, 2000); const prev = window.kiezShowView; window.kiezShowView = (...a) => { const r = prev?.(...a); fixQB(); requestAnimationFrame(fixQB); setTimeout(fixQB, 500); return r; }; setTimeout(fixQB, 800);
 }
 
@@ -3600,7 +3604,10 @@ document.addEventListener('click', async e => {
     const score = await timingGame(card, { title: 'Schloss knacken', hint: 'Drück, wenn der Zeiger im grünen Bereich ist – je genauer, desto kleiner das Risiko.', zone: Math.max(0.1, 0.3 - risk / 400), speed: 900 + risk * 4, btn: 'Knacken!' });
     let box = card.querySelector(':scope > .kz-crime-msg'); if (!box) { box = document.createElement('div'); box.className = 'kz-crime-msg'; card.appendChild(box); }
     try { const r = await rpc('commit_crime', { crime_id: Number(b.dataset.id), pick_score: score }); window.kiezRenderProfile?.(r.profile);
-      say(box, r.caught ? 'Erwischt bei „' + esc(r.name) + '“! Kaution: ' + eur(r.bail) + '.' + hintFor('knast') : '„' + esc(r.name) + '“ geklappt! +' + eur(r.reward) + '.', !r.caught);
+      const t = r.caught ? 'Erwischt bei „' + esc(r.name) + '“! Kaution: ' + eur(r.bail) + ' – oder den Wärter mit Kronkorken bestechen.' : '„' + esc(r.name) + '“ geklappt! +' + eur(r.reward) + '.';
+      say(box, t, !r.caught);
+      // Erwischt: die Seite schaltet auf die Knast-Ansicht, die Karte verschwindet → Meldung oben im Reiter (Durchspiel-Test)
+      if (r.caught) { const cc = document.querySelector('#pfand .crime-card'); if (cc) { let top = cc.querySelector(':scope > .kz-crime-top'); if (!top) { top = document.createElement('div'); top.className = 'kz-crime-top'; cc.prepend(top); } say(top, t + hintFor('knast'), false); } } else document.querySelector('#pfand .crime-card > .kz-crime-top')?.remove();
     } catch (err) { say(box, esc(err.message) + hintFor(err.message), false); }
   } finally { delete b.dataset.kzbusy; b.disabled = false; crimeLocks(); }
 }, true);
@@ -3680,3 +3687,8 @@ document.addEventListener('click', async e => {
   setTimeout(() => w.remove(), 2500); delete b.dataset.kzbusy; b.disabled = false;
 }, true);
 { const st = document.createElement('style'); st.textContent = 'html body:not(#kz1):not(#kz2) .kz-bin-grid{display:grid;grid-template-columns:repeat(3,72px);gap:6px;margin-top:8px}html body:not(#kz1):not(#kz2) .kz-bin-cell{min-height:48px;font-size:15px !important;padding:0 !important}'; document.head.appendChild(st); }
+
+// Meldung nach dem Neuzeichnen JEDER Seite wieder einsetzen (vorher nur einige Seiten – Kiosk-Ausbau lief ohne Meldung durch)
+{ let q = false; const main = document.querySelector('.main') || document.body;
+  new MutationObserver(() => { if (!flash || Date.now() - flash.t > 8000 || q) return; q = true; requestAnimationFrame(() => { q = false; restoreFlash(); }); })
+    .observe(main, { childList: true, subtree: true }); }
