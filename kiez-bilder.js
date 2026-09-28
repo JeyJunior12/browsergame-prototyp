@@ -304,6 +304,8 @@
   function fileFor(card, tx) {
     const ids = new Set(); for (let e = card.parentElement; e; e = e.parentElement) if (e.id) ids.add('#' + e.id);
     let res = null, done = true;
+    // Garage: Kopf „Unterwegs mit: X“ / „Werkstatt: X“ zeigt das Foto des aktiven Fahrzeugs X (vorher Einkaufswagen bzw. Spaten)
+    const vm = ids.has('#garage') && tx.match(/^(?:Unterwegs mit|Werkstatt): (.+)$/); if (vm) tx = vm[1];
     for (const [scope, re, file] of R) {
       if (scope[0] === '=') continue;
       if (scope !== 'body' && !(SIMPLE.test(scope) ? ids.has(scope) : card.closest(scope))) continue;
