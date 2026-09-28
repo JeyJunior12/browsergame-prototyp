@@ -273,7 +273,9 @@ async function explore(view, money) {
     let p = await prof(); if (p.level == null) { log({ v: visit, typ: 'BOT-FEHLER', msg: 'Profil fehlt – neu starten' }); try { await b.close(); } catch {} await boot(); p = await prof(); }
     snap({ v: visit, skip, t: new Date().toISOString(), sek: Math.round((Date.now() - t0) / 1000), ...p });
     console.log('Besuch', visit, 'Sprung', skip, 'Level', p.level, 'Punkte', p.xp, 'Geld', p.money, 'Bank', p.bank, (Date.now() - t0) / 1000 + 's');
-    const r = await rpc('tester_skip_time', { minutes: skip }); if (r.err) log({ v: visit, typ: 'BOT-FEHLER', msg: 'skip ' + r.err });
+    // Datenbank schonen: langsamer oder fehlgeschlagener Zeitsprung → 5 Min. Pause (Lehre: 0039 überlastete die DB)
+    const ts = Date.now(), r = await rpc('tester_skip_time', { minutes: skip }).catch(e => ({ err: e.message })), dt = Date.now() - ts;
+    if (r.err || dt > 3000) { log({ v: visit, typ: 'BOT-FEHLER', msg: 'Zeitsprung ' + dt + ' ms ' + (r.err || '') }); await new Promise(res => setTimeout(res, 300000)); }
     if (visit % 20 === 19) { await b.close(); await boot(); } else { await refresh(); }
   }
   await b.close();
