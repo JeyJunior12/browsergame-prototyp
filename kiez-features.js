@@ -30,9 +30,9 @@ function restoreFlash() {
 let gangNote = null, gangMsg = null;  // Meldung für die neu gezeichnete Bandenseite
 function act(btn, box, fn) {
   btn.onclick = async () => {
-    btn.disabled = true; flash = null;  // alte Meldung nicht nach dem Neuzeichnen wieder hervorholen (Nutzer: „Gekauft“ tauchte beim Einstellen auf)
+    btn.disabled = true; flash = null; if (box && !box.contains(btn) && box.children.length && [...box.children].every(k => k.classList.contains('notice'))) box.innerHTML = '';  // gleiche Meldung soll beim zweiten Klick sichtbar neu erscheinen; alte Meldung nicht nach dem Neuzeichnen wieder hervorholen (Nutzer: „Gekauft“ tauchte beim Einstellen auf)
     try { const t = await fn(); if (t) { say(box, t, true); if (box?.className) flash = { cls: box.className, text: t, good: true, t: Date.now() }; } }
-    catch (e) { say(box, esc(e.message) + hintFor(e.message), false); }
+    catch (e) { const t = esc(e.message) + hintFor(e.message); say(box, t, false); if (box?.className) flash = { cls: box.className, text: t, good: false, t: Date.now() }; }
     btn.disabled = false;
   };
 }
@@ -335,6 +335,7 @@ setInterval(() => {
   if (!sel || !price || !document.getElementById('basar')?.classList.contains('active-view')) return;
   if ([...sel.options].some(o => o.value === pre.id)) sel.value = pre.id;
   price.value = pre.price; price.scrollIntoView({ block: 'center' }); price.focus();
+  const row = price.closest('.kf-row'); if (row) { let n = row.parentElement.querySelector(':scope > .kz-pre-note'); if (!n) { n = document.createElement('div'); n.className = 'kz-pre-note'; row.after(n); } say(n, 'Preisvorschlag eingetragen – Menge prüfen und „Einstellen“ drücken.', true); }
   window.kiezBasarPrefill = null;
 }, 400);
 // Öffnen-Moment für die Kronkorken-Plunderkiste (119)
