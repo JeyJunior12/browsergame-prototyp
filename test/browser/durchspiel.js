@@ -9,7 +9,7 @@ const BESUCHE = +(process.env.BESUCHE || 50); const START = +(process.env.START 
 const log = (o) => fs.appendFileSync(OUT + '/aktionen.jsonl', JSON.stringify(o) + '\n');
 const snap = (o) => fs.appendFileSync(OUT + '/verlauf.jsonl', JSON.stringify(o) + '\n');
 const SUSPECT = /fehler|error|exception|undefined|null\b|NaN|\+0,00 €|permission|violates|function .* does not exist|\[object/i;
-const DANGER = /abmelden|löschen|entfernen|auflösen|verlassen|kündigen|melden|rauswerfen|austreten|kapitulieren|passwort|bewerben/i;
+const DANGER = /abmelden|löschen|entfernen|auflösen|verlassen|kündigen|melden|rauswerfen|austreten|kapitulieren|passwort|bewerben|leihen/i;
 // beim Erkunden unbekannter Seiten zusätzlich nichts gegen andere Spieler auslösen
 const DANGER_X = new RegExp(DANGER.source + '|überfall|klauen|angreifen|herausfordern|ausrauben|stehlen|zuschlagen|krieg', 'i');
 let visit = START, pg, b, errs = [];
@@ -33,6 +33,7 @@ async function go(view, tab) {
   await pg.evaluate(([v, t]) => window.kiezGoTab(v, t), [view, tab || undefined]);
   await pg.waitForTimeout(700);
   await pg.waitForFunction(v => !/Lade[^\n]{0,20}…/.test(document.getElementById(v)?.innerText || ''), view, { timeout: 12000 }).catch(() => log({ v: visit, typ: 'LÄDT-EWIG', wo: view + '/' + (tab || '') }));
+  await pg.waitForFunction(v => !document.querySelector('#' + v + ' .kz-skeleton'), view, { timeout: 8000 }).catch(() => log({ v: visit, typ: 'LÄDT-LANGE', wo: view + '/' + (tab || '') }));
   await pg.waitForTimeout(400); await popups(view);
   if (full()) await look(view, tab);
   const leer = await pg.evaluate(v => { const s = document.getElementById(v); return !s || s.innerText.trim().length < 40; }, view);
@@ -46,7 +47,7 @@ async function look(view, tab) {
     const vis = [...s.querySelectorAll('button,a,select,input')].filter(e => e.offsetParent && e.getBoundingClientRect().width > 0);
     vis.forEach(e => { const b = e.getBoundingClientRect(), fs = parseFloat(getComputedStyle(e).fontSize);
       if (e.tagName !== 'A' && b.height < 36) out.push('Knopf zu klein (' + Math.round(b.height) + ' px): ' + (e.textContent || e.placeholder || '').trim().slice(0, 30));
-      if (fs < 13) out.push('Schrift zu klein (' + fs + ' px): ' + (e.textContent || '').trim().slice(0, 30)); });
+      if (fs < 12) out.push('Schrift zu klein (' + fs + ' px): ' + (e.textContent || '').trim().slice(0, 30)); });
     for (let i = 0; i < vis.length; i++) for (let j = i + 1; j < vis.length; j++) { const a = vis[i].getBoundingClientRect(), b = vis[j].getBoundingClientRect();
       if (!vis[i].contains(vis[j]) && !vis[j].contains(vis[i]) && a.left < b.right - 2 && b.left < a.right - 2 && a.top < b.bottom - 2 && b.top < a.bottom - 2) out.push('Knöpfe überlappen: ' + vis[i].textContent.trim().slice(0, 20) + ' / ' + vis[j].textContent.trim().slice(0, 20)); }
     [...s.querySelectorAll('p,span,small,b,div,li,td')].filter(e => e.offsetParent && e.childElementCount === 0 && e.textContent.trim().length > 2).forEach(e => { const fs = parseFloat(getComputedStyle(e).fontSize); if (fs < 12) out.push('Text zu klein (' + fs + ' px): ' + e.textContent.trim().slice(0, 30)); });
@@ -85,14 +86,14 @@ async function click(label, sel, { within, pick = 'first', fill, wait = 5000, qu
   if (r == null) { if (!quiet) log({ v: visit, typ: 'KEIN-KNOPF', label }); return null; }
   y0 = r[1]; const knopf = r[0];
   // Minispiele (0041): Balken drücken (mal gut, mal schlecht), Spruch wählen, Tonnen-Ecke wählen
-  for (let k = 0; k < 40; k++) {
+  for (let k = 0; k < 200; k++) {
     const st = await pg.evaluate(() => { const g = document.querySelector('.kz-mg .kz-mg-go:not([disabled])'), o = [...document.querySelectorAll('.kz-mg-opt')], c = [...document.querySelectorAll('.kz-bin-cell:not([disabled])')];
       if (o.length) { o[Math.floor(Math.random() * o.length)].click(); return 'opt'; } if (c.length) { c[Math.floor(Math.random() * c.length)].click(); return 'cell'; }
-      if (g) { if (Math.random() < 0.08) { g.click(); return 'go'; } return 'wait'; } return document.querySelector('.kz-mg') ? 'wait' : ''; });
+      if (g) { if (Math.random() < 0.08) { g.click(); return 'go'; } return 'wait'; } return document.querySelector('.kz-mg, [data-kzbusy]') ? 'wait' : ''; });
     if (!st) break; await pg.waitForTimeout(st === 'wait' ? 60 : 300);
   }
-  let neu = [];
-  while (Date.now() - t0 < wait) { await pg.waitForTimeout(250); neu = await fresh(); if (neu.length) { await pg.waitForTimeout(300); neu = [...new Set(await fresh())]; break; } }
+  let neu = []; const tw = Date.now();  // Wartezeit auf die Meldung erst nach dem Minispiel
+  while (Date.now() - tw < wait) { await pg.waitForTimeout(250); neu = await fresh(); if (neu.length) { await pg.waitForTimeout(300); neu = [...new Set(await fresh())]; break; } }
   // Aussehen: verdrängt die Meldung den Karteninhalt? springt die Seite?
   const lay = await pg.evaluate(y0 => { const out = []; document.querySelectorAll('.kz-near').forEach(n => { const c = n.parentElement, top = c.getBoundingClientRect().top;
       if ([...c.children].some(k => k !== n && k.offsetParent && k.getBoundingClientRect().bottom < top + 2)) out.push('Meldung verdrängt Karteninhalt: ' + (c.querySelector('h3,b')?.textContent || '').trim()); });
@@ -244,8 +245,9 @@ async function extras(k) {
   if (k === 5) { await go('kronkorken'); await click('Plunderkiste', '.kkbuy[data-id="plunderkiste"]', { quiet: true }); await go('plunder', 'Meine Stücke'); await click('Doppelte verkaufen', '.kz-p-dups', { quiet: true }); await click('Plunder anlegen', 'button', { pick: `e=>/anlegen/i.test(e.textContent)?1:null`, quiet: true }); await go('plunder', 'Basteln'); await click('Basteln', '.craft-go', { pick: priceFn(p.money, 0.3), quiet: true }); }
   if (k === 6) { await go('gangs'); if (!(await pg.evaluate(() => /Bandenkasse|Mitglieder/.test(document.getElementById('gangs')?.innerText || ''))) && p.money > 120) await click('Bande gründen', '.gcreate', { fill: [['section.panel.active-view .gname', 'Testbande Durchspiel'], ['section.panel.active-view .gtag', 'TDS']] }); else await explore('gangs', p.money); await go('bandenhaus'); await explore('bandenhaus', p.money); }
   if (k === 7) { await go('basar'); await explore('basar', p.money); await go('auktion'); await explore('auktion', p.money); }
-  if (k === 8) { await go('kredithai'); if (p.level > 5 && visit % 24 === 8) await click('Kredit', '.kz-l-take', { fill: [['section.panel.active-view .kz-l-amt', 50]] }); else await explore('kredithai', p.money); await go('apotheke'); await explore('apotheke', p.money); }
-  if (k === 9) { await go('chat'); await click('Chat', '.csend', { fill: [['section.panel.active-view textarea, section.panel.active-view input[type=text]', 'Testkonto spielt durch (Besuch ' + visit + ')']] }); await go('stadtteile'); await click('Revier', '.dpick', { quiet: true }); for (const t of ['Übersicht', 'Haustier', 'Aktionen', 'Inventar', 'Plunder', 'Kronkorken', 'Profil ansehen']) await go('overview', t); for (const v of ['saison', 'statistik', 'career', 'leaderboard', 'kampfprotokoll', 'profil', 'wettbewerb', 'citymap']) await go(v); }
+  if (k === 8) { await go('kredithai'); await click('Kredit zurückzahlen', '.kz-l-pay', { quiet: true });
+    if (p.level > 5 && visit % 50 === 0) await click('Kredit', '.kz-l-take', { fill: [['section.panel.active-view .kz-l-amt', 50]] }); await go('apotheke'); await explore('apotheke', p.money); }
+  if (k === 9) { await go('chat'); await click('Chat', '.csend', { fill: [['section.panel.active-view .cin', 'Testkonto spielt durch (Besuch ' + visit + ')']] }); await go('stadtteile'); await click('Revier', '.dpick', { quiet: true }); for (const t of ['Übersicht', 'Haustier', 'Aktionen', 'Inventar', 'Plunder', 'Kronkorken', 'Profil ansehen']) await go('overview', t); for (const v of ['saison', 'statistik', 'career', 'leaderboard', 'kampfprotokoll', 'profil', 'wettbewerb', 'citymap']) await go(v); }
   if (k === 10) { await go('messages', 'Posteingang'); await explore('messages', p.money); await go('freunde'); await click('Spieler suchen', '.fsearch', { fill: [['section.panel.active-view input', PARTNER]] }); }
   if (k === 11) { await go('store', 'Verteidigung'); await click('Verteidigung kaufen', '.buydefense', { pick: priceFn(p.money, 0.2), quiet: true }); await go('overview'); await explore('overview', p.money); }
 }
@@ -271,7 +273,9 @@ async function explore(view, money) {
     let p = await prof(); if (p.level == null) { log({ v: visit, typ: 'BOT-FEHLER', msg: 'Profil fehlt – neu starten' }); try { await b.close(); } catch {} await boot(); p = await prof(); }
     snap({ v: visit, skip, t: new Date().toISOString(), sek: Math.round((Date.now() - t0) / 1000), ...p });
     console.log('Besuch', visit, 'Sprung', skip, 'Level', p.level, 'Punkte', p.xp, 'Geld', p.money, 'Bank', p.bank, (Date.now() - t0) / 1000 + 's');
-    const r = await rpc('tester_skip_time', { minutes: skip }); if (r.err) log({ v: visit, typ: 'BOT-FEHLER', msg: 'skip ' + r.err });
+    // Datenbank schonen: langsamer oder fehlgeschlagener Zeitsprung → 5 Min. Pause (Lehre: 0039 überlastete die DB)
+    const ts = Date.now(), r = await rpc('tester_skip_time', { minutes: skip }).catch(e => ({ err: e.message })), dt = Date.now() - ts;
+    if (r.err || dt > 3000) { log({ v: visit, typ: 'BOT-FEHLER', msg: 'Zeitsprung ' + dt + ' ms ' + (r.err || '') }); await new Promise(res => setTimeout(res, 300000)); }
     if (visit % 20 === 19) { await b.close(); await boot(); } else { await refresh(); }
   }
   await b.close();

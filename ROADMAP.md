@@ -331,7 +331,7 @@ Nutzerwunsch: Ganz am Ende, wenn alles andere gebaut ist, noch einmal alles durc
 181. ✅ Weiterbildungspreise der Nebenfähigkeiten viel zu hoch (Level 32: Sozialkontakte 1.178 €, Musik 750 € gegenüber Geschick 180 €) → angleichen; ab Level ~25 bremst sonst nur Geldmangel
 182. ✅ Geldbehälter 1→2 kostet genau den vollen Behälter (20 €); Start fühlt sich zäh an
 183. ✅ „Passanten anschnorren“ lohnt kaum (0,10–0,50 €, meist „Warte kurz“)
-184. Gelegenheitsspieler häufen Geld an (Level 92 mit 124.000 € nach 1 Jahr) → Geldsenken (Fahrzeuge, Bande, Kosmetik, Unterhalt)
+184. ✅ Gelegenheitsspieler häufen Geld an (Level 92 mit 124.000 € nach 1 Jahr) → Geldsenken (Fahrzeuge, Bande, Kosmetik, Unterhalt)
 
 **D4 Minispiele statt nur Klicken (Nutzerwunsch)**
 185. ✅ Verbrechen: „Schloss knacken“ – Zeiger im grünen Bereich stoppen, ändert die Erfolgschance

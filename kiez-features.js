@@ -27,6 +27,7 @@ function restoreFlash() {
   const el = document.querySelector('section.panel.active-view .' + flash.cls.split(' ')[0]);
   if (el && !el.innerHTML) say(el, flash.text, flash.good);
 }
+let gangNote = null;  // Meldung für die neu gezeichnete Bandenseite
 function act(btn, box, fn) {
   btn.onclick = async () => {
     btn.disabled = true; flash = null;  // alte Meldung nicht nach dem Neuzeichnen wieder hervorholen (Nutzer: „Gekauft“ tauchte beim Einstellen auf)
@@ -459,7 +460,6 @@ async function renderGangPublic(el, gid, mine, t) {
   if (j) act(j, box, async () => { await rpc('join_gang', { wanted_gang: gid }); gangView = null; setTimeout(window.kiezLoadGang, 500); return 'Willkommen in der Bande!'; });
   if (a) act(a, box, async () => { await rpc('gang_apply', { wanted_gang: gid }); return 'Bewerbung verschickt.'; });
 }
-let gangNote = null;
 async function renderNoGang(el, me, t) {
   const [gangs, mem, req] = await Promise.all([sb.from('gangs').select('*').order('name'), sb.from('gang_members').select('gang_id'), sb.from('gang_requests').select('*').eq('user_id', me)]);
   const count = {}; (mem.data || []).forEach(m => count[m.gang_id] = (count[m.gang_id] || 0) + 1);
@@ -801,7 +801,9 @@ Object.keys(loaders).forEach(k => {
 });
 { const g = window.kiezLoadGang; window.kiezLoadGang = async (...x) => { await g(...x); restoreFlash();
   // Gründen/Beitreten wechselt die ganze Ansicht – Meldung oben in der neuen Ansicht zeigen (Durchspiel-Test 167)
-  const el = document.getElementById('kiezgang'); if (el && gangNote && Date.now() - gangNote.t < 15000 && !el.querySelector('.kz-gangnote')) { const n = document.createElement('div'); n.className = 'notice good kz-gangnote'; n.textContent = gangNote.txt; el.prepend(n); } }; }
+  const el = document.getElementById('kiezgang'); if (el && gangNote && Date.now() - gangNote.t < 15000) { let n = el.querySelector('.kz-gangnote'); if (!n) { n = document.createElement('div'); n.className = 'notice good kz-gangnote'; el.prepend(n); } n.textContent = gangNote.txt;
+    // steht dieselbe Meldung schon beim Knopf, reicht die eine
+    setTimeout(() => { if ([...el.querySelectorAll('.notice')].some(x => x !== n && x.offsetParent && x.textContent.trim() === n.textContent.trim())) n.remove(); }, 400); } }; }
 // ================= Runde 6: Stadtteile, Basar, Zockerbude, Schließfach, Kiez-Geschichte, Kiez-Chat, Kampfprotokoll =================
 const num = v => Number(String(v ?? '').replace(',', '.'));
 const bar = (v, max) => '<div class="kf-bar"><span style="width:' + Math.max(0, Math.min(100, Math.round(100 * v / (max || 1)))) + '%"></span></div>';
@@ -2940,9 +2942,9 @@ async function drawCosmetics() {
   const [{ data: all }, { data: mine }] = await Promise.all([sb.from('cosmetics').select('*').order('sort_order'), sb.from('user_cosmetics').select('cosmetic_id').eq('user_id', me)]);
   const have = new Set((mine || []).map(x => x.cosmetic_id)), p = window.kiezProfile || {};
   const box = document.createElement('div'); box.className = 'kf-box kz-cos';
-  box.innerHTML = '<h3>Rahmen & Titelfarbe</h3><p class="kf-muted">Für Kronkorken: ein Rahmen ums Profilbild und eine Farbe für deinen Titel – sehen alle in deinem Profil.</p><div class="kf-grid">'
+  box.innerHTML = '<h3>Rahmen & Titelfarbe</h3><p class="kf-muted">Ein Rahmen ums Profilbild und eine Farbe für deinen Titel – sehen alle in deinem Profil. Die einfachen gibt es für Kronkorken, die Protz-Varianten für richtig viel Kohle (Tasche + Schließfach). Bringt nix außer Neid.</p><div class="kf-grid">'
     + (all || []).map(c => { const on = (c.kind === 'frame' ? p.avatar_frame : p.title_color) === c.id; return '<div class="card kz-cos-c" data-id="' + c.id + '" data-k="' + c.kind + '"><b style="color:' + esc(c.value) + '">' + esc(c.name) + '</b><div class="kz-cos-prev" style="' + (c.kind === 'frame' ? 'border:5px solid ' + esc(c.value) : 'color:' + esc(c.value)) + '">' + (c.kind === 'frame' ? '' : '„Titel“') + '</div>'
-      + '<div class="kf-row">' + (have.has(c.id) ? '<button class="ghost kz-cos-use">' + (on ? 'Ablegen' : 'Benutzen') + '</button>' : '<button class="ghost kz-cos-buy">Kaufen – ' + c.price_caps + ' Kronkorken</button>') + '</div><div class="kz-cos-msg"></div></div>'; }).join('') + '</div>';
+      + '<div class="kf-row">' + (have.has(c.id) ? '<button class="ghost kz-cos-use">' + (on ? 'Ablegen' : 'Benutzen') + '</button>' : '<button class="ghost kz-cos-buy">Kaufen – ' + (+c.price_money > 0 ? eur(c.price_money) : c.price_caps + ' Kronkorken') + '</button>') + '</div><div class="kz-cos-msg"></div></div>'; }).join('') + '</div>';
   body.appendChild(box);
   box.querySelectorAll('.kz-cos-c').forEach(c => {
     const b = c.querySelector('.kz-cos-buy'), u = c.querySelector('.kz-cos-use'), m = c.querySelector('.kz-cos-msg'), again = () => setTimeout(() => { box.remove(); drawCosmetics(); applyFrame(); }, 1500);
@@ -3232,9 +3234,11 @@ async function craftLocks() {
   cards.forEach(card => {
     const it = OWN.cat?.[card.dataset.id], btn = card.querySelector('.craft-go'); if (!it || !btn) return;
     if (!btn.dataset.orig) btn.dataset.orig = btn.textContent;
-    const lock = lvl < (it.required_level || 1);
-    if (lock) { btn.disabled = true; btn.dataset.kzlock = '1'; setLabel(btn, '🔒 ab Level ' + it.required_level); }
-    else if (btn.dataset.kzlock) { delete btn.dataset.kzlock; setLabel(btn, btn.dataset.orig); }
+    const lock = lvl < (it.required_level || 1), have = (OWN.combat?.owned || []).includes(it.id);
+    // schon gebastelt? Jedes Stück gibt es nur einmal (Durchspiel-Test: 8× „Das hast du schon“)
+    if (have) { btn.disabled = true; btn.dataset.kzlock = '1'; setLabel(btn, 'Schon hergestellt'); }
+    else if (lock) { btn.disabled = true; btn.dataset.kzlock = '1'; setLabel(btn, '🔒 ab Level ' + it.required_level); }
+    else if (btn.dataset.kzlock) { delete btn.dataset.kzlock; btn.disabled = false; setLabel(btn, btn.dataset.orig); }
     if (card.classList.contains('kz-locked') !== lock) card.classList.toggle('kz-locked', lock);
   });
 }
@@ -3505,10 +3509,14 @@ function crimeLocks() {
   const st = document.createElement('style'); st.textContent = 'html body:not(#kz1):not(#kz2) .kiez-quickbar{padding-right:var(--kz-qb-pad,0px) !important;box-sizing:border-box}'; document.head.appendChild(st);
   const fixQB = () => { document.querySelectorAll('.kiez-quickbar').forEach(bar => {
     const slip = document.querySelector('.player-slip'); if (!slip || !slip.offsetParent || !bar.offsetParent) return;
-    bar.style.setProperty('--kz-qb-pad', '0px'); const s = slip.getBoundingClientRect(), b = bar.getBoundingClientRect();
+    // Innenabstand ändert die Außenmaße nicht → ohne Zurücksetzen messen (sonst kurzes Flackern unter den Kasten)
+    const s = slip.getBoundingClientRect(), b = bar.getBoundingClientRect();
     const overlapY = b.top < s.bottom + 4 && b.bottom > s.top, pad = overlapY && b.right > s.left - 8 ? Math.ceil(b.right - s.left + 12) : 0;
-    if (pad > 0 && pad < b.width - 200) bar.style.setProperty('--kz-qb-pad', pad + 'px'); }); };
-  addEventListener('resize', fixQB); setInterval(fixQB, 2000); const prev = window.kiezShowView; window.kiezShowView = (...a) => { const r = prev?.(...a); setTimeout(fixQB, 60); setTimeout(fixQB, 500); return r; }; setTimeout(fixQB, 800);
+    const want = pad > 0 && pad < b.width - 200 ? pad + 'px' : '0px'; if (bar.style.getPropertyValue('--kz-qb-pad') !== want) bar.style.setProperty('--kz-qb-pad', want); }); };
+  new MutationObserver(() => requestAnimationFrame(fixQB)).observe(document.body, { attributes: true, attributeFilter: ['class'], subtree: false });
+  // auch beim Reiterwechsel innerhalb einer Seite (Tagesauftrag › Belohnungsserie lag kurz unter dem Kasten)
+  document.addEventListener('click', e => { if (e.target.closest('.section-tools, .kiez-quickbar, .kz-nav, .kz-drop')) { requestAnimationFrame(fixQB); setTimeout(fixQB, 300); } }, true);
+  addEventListener('resize', fixQB); setInterval(fixQB, 2000); const prev = window.kiezShowView; window.kiezShowView = (...a) => { const r = prev?.(...a); fixQB(); requestAnimationFrame(fixQB); setTimeout(fixQB, 500); return r; }; setTimeout(fixQB, 800);
 }
 
 // Übersicht › Haustier: war leer, seit die Tierliste wieder auf der Begleiter-Seite steht (ROADMAP 158) → Karte des aktiven Begleiters
@@ -3596,7 +3604,10 @@ document.addEventListener('click', async e => {
     const score = await timingGame(card, { title: 'Schloss knacken', hint: 'Drück, wenn der Zeiger im grünen Bereich ist – je genauer, desto kleiner das Risiko.', zone: Math.max(0.1, 0.3 - risk / 400), speed: 900 + risk * 4, btn: 'Knacken!' });
     let box = card.querySelector(':scope > .kz-crime-msg'); if (!box) { box = document.createElement('div'); box.className = 'kz-crime-msg'; card.appendChild(box); }
     try { const r = await rpc('commit_crime', { crime_id: Number(b.dataset.id), pick_score: score }); window.kiezRenderProfile?.(r.profile);
-      say(box, r.caught ? 'Erwischt bei „' + esc(r.name) + '“! Kaution: ' + eur(r.bail) + '.' + hintFor('knast') : '„' + esc(r.name) + '“ geklappt! +' + eur(r.reward) + '.', !r.caught);
+      const t = r.caught ? 'Erwischt bei „' + esc(r.name) + '“! Kaution: ' + eur(r.bail) + ' – oder den Wärter mit Kronkorken bestechen.' : '„' + esc(r.name) + '“ geklappt! +' + eur(r.reward) + '.';
+      say(box, t, !r.caught);
+      // Erwischt: die Seite schaltet auf die Knast-Ansicht, die Karte verschwindet → Meldung oben im Reiter (Durchspiel-Test)
+      if (r.caught) { const cc = document.querySelector('#pfand .crime-card'); if (cc) { let top = cc.querySelector(':scope > .kz-crime-top'); if (!top) { top = document.createElement('div'); top.className = 'kz-crime-top'; cc.prepend(top); } say(top, t + hintFor('knast'), false); } } else document.querySelector('#pfand .crime-card > .kz-crime-top')?.remove();
     } catch (err) { say(box, esc(err.message) + hintFor(err.message), false); }
   } finally { delete b.dataset.kzbusy; b.disabled = false; crimeLocks(); }
 }, true);
@@ -3676,3 +3687,21 @@ document.addEventListener('click', async e => {
   setTimeout(() => w.remove(), 2500); delete b.dataset.kzbusy; b.disabled = false;
 }, true);
 { const st = document.createElement('style'); st.textContent = 'html body:not(#kz1):not(#kz2) .kz-bin-grid{display:grid;grid-template-columns:repeat(3,72px);gap:6px;margin-top:8px}html body:not(#kz1):not(#kz2) .kz-bin-cell{min-height:48px;font-size:15px !important;padding:0 !important}'; document.head.appendChild(st); }
+
+// Meldung nach dem Neuzeichnen JEDER Seite wieder einsetzen (vorher nur einige Seiten – Kiosk-Ausbau lief ohne Meldung durch)
+{ let q = false; const main = document.querySelector('.main') || document.body;
+  new MutationObserver(() => { if (!flash || Date.now() - flash.t > 8000 || q) return; q = true; requestAnimationFrame(() => { q = false; restoreFlash(); }); })
+    .observe(main, { childList: true, subtree: true }); }
+
+// Kredithai-Schläger sofort melden, nicht nur in der Kiezpost (Durchspiel-Test: „Gewonnen +1,83 €“, aber 300 € weg)
+{ let seen = 0, busy = false, last = 0;
+  const check = async () => { const p = window.kiezProfile; if (!p || busy || Date.now() - last < 20000) return; busy = true; last = Date.now();
+    try { const { data } = await sb.from('notifications').select('id,body,created_at').eq('user_id', p.id).eq('kind', 'kredit').order('created_at', { ascending: false }).limit(1);
+      const n = (data || [])[0]; if (!n) return; const t = new Date(n.created_at).getTime();
+      if (!seen) { seen = t; if (Date.now() - t > 120000) return; }
+      if (t > seen || (seen === t && !document.body.dataset.kzshark)) { seen = t; document.body.dataset.kzshark = '1';
+        const box = document.querySelector('section.panel.active-view > .inside') || document.querySelector('section.panel.active-view'); if (!box) return;
+        box.querySelector(':scope > .kz-shark')?.remove(); const d = document.createElement('div'); d.className = 'notice bad kz-shark'; d.innerHTML = esc(n.body) + ' <a href="#" class="kz-hint" data-v="kredithai">Zum Kredithai ›</a>'; box.prepend(d); }
+    } catch { } finally { busy = false; } };
+  const prev = window.kiezOnProfile; window.kiezOnProfile = p => { prev?.(p); check(); };
+}
