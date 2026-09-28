@@ -2402,6 +2402,7 @@ async function sortGame(card) {
 
 // ---------- 3: Ereignisse nach der Pfandtour ----------
 async function tourEvent() {
+  if (!window.kiezProfile) return;  // vor dem Login gibt es keine Tour (sonst 400 „Nicht angemeldet“ im Protokoll)
   let e; try { e = await rpc('tour_event'); } catch (x) { return; }
   const host = document.getElementById('kz-pfandsell'); if (!e || !host) return;
   let c = document.getElementById('kz-tourevent'); if (!c) { c = document.createElement('div'); c.id = 'kz-tourevent'; c.className = 'card kz-event'; document.getElementById('pfanduebersicht')?.after(c); }
