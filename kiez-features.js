@@ -22,17 +22,23 @@ let flash = null;
 // Pfandlager-Größe je Stufe (0038)
 const STORE_CAP = [250, 1000, 5000, 20000, 80000], STORE_PRICE = [15, 150, 1200, 8000];
 const fmtN = n => Number(n).toLocaleString('de-DE');
+function cardKey(el) {
+  const c = el?.closest('[data-t],[data-id],[data-k],[data-p],.card,.kf-box'); if (!c) return '';
+  const d = c.dataset; return d.t || d.id || d.k || d.p || (c.querySelector('b,h3,h4')?.textContent || '').trim().slice(0, 40);
+}
 function restoreFlash() {
   if (!flash || Date.now() - flash.t > 8000) return;
-  const el = document.querySelector('section.panel.active-view .' + flash.cls.split(' ')[0]);
+  // nur in die Karte, zu der der Knopf gehörte – nie in die erstbeste Karte mit gleichem Meldungsfeld (Nutzer: Friseur-Meldung stand beim Brunnen)
+  const els = [...document.querySelectorAll('section.panel.active-view .' + flash.cls.split(' ')[0])];
+  const el = flash.card ? els.find(e => cardKey(e) === flash.card) : els.length === 1 ? els[0] : null;
   if (el && !el.innerHTML) say(el, flash.text, flash.good);
 }
 let gangNote = null, gangMsg = null;  // Meldung für die neu gezeichnete Bandenseite
 function act(btn, box, fn) {
   btn.onclick = async () => {
     btn.disabled = true; flash = null; if (box && !box.contains(btn) && box.children.length && [...box.children].every(k => k.classList.contains('notice'))) box.innerHTML = '';  // gleiche Meldung soll beim zweiten Klick sichtbar neu erscheinen; alte Meldung nicht nach dem Neuzeichnen wieder hervorholen (Nutzer: „Gekauft“ tauchte beim Einstellen auf)
-    try { const t = await fn(); if (t) { say(box, t, true); if (box?.className) flash = { cls: box.className, text: t, good: true, t: Date.now() }; } }
-    catch (e) { const t = esc(e.message) + hintFor(e.message); say(box, t, false); if (box?.className) flash = { cls: box.className, text: t, good: false, t: Date.now() }; }
+    try { const t = await fn(); if (t) { say(box, t, true); if (box?.className) flash = { cls: box.className, card: cardKey(box), text: t, good: true, t: Date.now() }; } }
+    catch (e) { const t = esc(e.message) + hintFor(e.message); say(box, t, false); if (box?.className) flash = { cls: box.className, card: cardKey(box), text: t, good: false, t: Date.now() }; }
     btn.disabled = false;
   };
 }
@@ -3293,6 +3299,7 @@ loaders.waschhaus = async () => {
     if (need > lvl) btn = need === lvl + 1 ? '<button class="ghost kz-wh-buy">' + WASH_GEAR[need][0] + ' kaufen – ' + eur(WASH_GEAR[need][1]) + '</button>' : '<button class="ghost" disabled>erst ' + WASH_GEAR[lvl + 1][0] + ' kaufen</button>';
     else if (id === 'brunnen' && fountainMin > 0) btn = '<button class="ghost" disabled>wieder in ' + fountainMin + ' Min.</button>';
     else if (id !== 'friseur' && c >= 100) btn = '<button class="ghost" disabled>Schon blitzsauber</button>';
+    else if (id === 'friseur' && c >= 100 && b.barber_until && new Date(b.barber_until) > now) btn = '<button class="ghost" disabled>Frisiert bis ' + until(b.barber_until) + '</button>';
     else btn = '<button class="big kz-wh-go">' + (price ? 'Waschen – ' + eur(price) : 'Waschen – gratis') + '</button>';
     return '<div class="card kz-wash" data-t="' + id + '"><b>' + name + '</b><p>' + desc + '</p><p class="kz-wash-fx">' + (gain >= 100 ? 'auf 100 %' : '+' + gain + ' %') + ' Sauberkeit' + (id === 'friseur' ? ' · 24 Std. halber Dreck' : '') + '</p>'
       + '<div class="kf-row">' + btn + '</div><div class="kz-wash-msg"></div></div>';

@@ -81,7 +81,9 @@ async function click(label, sel, { within, pick = 'first', fill, wait = 5000, qu
     if (!els.length) return null;
     let el = els[0]; if (pick === 'last') el = els[els.length - 1];
     else if (pick !== 'first') { const f = eval(pick); el = els.map(e => [f(e), e]).filter(x => x[0] != null && !isNaN(x[0])).sort((a, b) => b[0] - a[0])[0]?.[1]; if (!el) return null; }
-    el.scrollIntoView({ block: 'center' }); const txt = el.textContent.replace(/\s+/g, ' ').trim(); const y = scrollY; el.click(); return [txt, y];
+    el.scrollIntoView({ block: 'center' }); const txt = el.textContent.replace(/\s+/g, ' ').trim(); const y = scrollY;
+    const cd = el.closest('.card'); window.__kzCard = cd ? (cd.dataset.t || cd.dataset.id || (cd.querySelector('b,h3,h4')?.textContent || '').trim()) : null;
+    el.click(); return [txt, y];
   }, [sel, within || null, pick, DANGER.source]);
   if (r == null) { if (!quiet) log({ v: visit, typ: 'KEIN-KNOPF', label }); return null; }
   y0 = r[1]; const knopf = r[0];
@@ -99,6 +101,13 @@ async function click(label, sel, { within, pick = 'first', fill, wait = 5000, qu
       if ([...c.children].some(k => k !== n && k.offsetParent && k.getBoundingClientRect().bottom < top + 2)) out.push('Meldung verdrängt Karteninhalt: ' + (c.querySelector('h3,b')?.textContent || '').trim()); });
     if (Math.abs(scrollY - y0) > 250) out.push('Seite springt um ' + Math.round(scrollY - y0) + ' px'); return out; }, y0);
   lay.forEach(m => log({ v: visit, typ: 'LAYOUT', label, msg: m }));
+  // Meldung in einer fremden Karte? (Nutzer-Screenshot 28.09.: Friseur-Meldung stand beim Brunnen)
+  if (neu.length) { const wrong = await pg.evaluate(MSEL => { const k = window.__kzCard; if (!k) return null;
+      const key = c => c.dataset.t || c.dataset.id || (c.querySelector('b,h3,h4')?.textContent || '').trim();
+      const ns = [...document.querySelectorAll(MSEL)].filter(n => n.offsetParent && n.dataset.kzseen !== n.innerText.replace(/\s+/g, ' ').trim() && n.closest('.card'));
+      if (!ns.length || ns.some(n => key(n.closest('.card')) === k)) return null;
+      return 'Meldung in Karte „' + key(ns[0].closest('.card')) + '“ statt „' + k + '“'; }, MSEL).catch(() => null);
+    if (wrong) log({ v: visit, typ: 'FALSCHE-KARTE', label, msg: wrong }); }
   await popups(label);
   const msg = neu.join(' | ').slice(0, 300);
   // Widerspruch: Meldung sagt Gewinn, aber Tasche + Schließfach sind weniger geworden (Lehre: Rubbellos „Gewonnen 5 €“ bei 10 € Einsatz)
