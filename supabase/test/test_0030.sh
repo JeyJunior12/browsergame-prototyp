@@ -23,6 +23,7 @@ has "Rennen ausgetragen" "$(as_user $C "select races_overview()")" '"resolved": 
 # Diebstahl
 Q "update profiles set pickpocket_skill=40 where id='$C'" >/dev/null
 has "Klauversuch" "$(as_user $C "select steal_vehicle('$B')")" '"stolen"'
+Q "update profiles set jail_until=null where id='$C'" >/dev/null   # misslungener Klau = Knast (Zufall) – für die nächste Prüfung frei
 has "Nicht zweimal am Tag (oder schon weg)" "$(as_user $C "select steal_vehicle('$B')")" "heute schon\|kein Motorfahrzeug"
 has "Schutz kaufen" "$(as_user $A "select buy_car_protection('garage')")" "garage"
 # Transporter

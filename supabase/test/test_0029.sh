@@ -32,6 +32,7 @@ has "Motor tunen" "$(as_user $A "select tune_vehicle('motor')")" "motor"
 ok  "Bonus 45+10" "$(as_user $A "select (garage_overview())->>'bonus'")" "55"
 has "Lackieren" "$(as_user $A "select tune_vehicle('lack','#123456')")" "lack"
 has "Reparatur" "$(as_user $A "select vehicle_service('repair')")" '"price"'
+Q "update user_vehicles set tuev_until=now()+interval '2 days' where user_id='$A'" >/dev/null   # 0047: verlängern nur in der letzten Woche
 has "TÜV" "$(as_user $A "select vehicle_service('tuev')")" '"price"'
 # Schrottplatz
 has "Ausschlachten" "$(as_user $A "select scrapyard_dig()")" "nails"
