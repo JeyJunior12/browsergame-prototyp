@@ -4,7 +4,7 @@
 const sb = window.kiezSupabase;
 const $ = s => document.querySelector(s);
 const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const eur = n => Number(n || 0).toFixed(2).replace('.', ',') + ' €';
+const eur = n => Number(n || 0).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';  // mit Tausenderpunkt (15.000,00 €)
 const when = d => new Date(d).toLocaleString('de-DE', { dateStyle: 'short', timeStyle: 'short' });
 const say = (el, text, good) => { if (el) el.innerHTML = '<div class="notice ' + (good ? 'good' : 'bad') + '">' + text + '</div>'; };
 const ROLE = { owner: 'Chef', co: 'Vize', officer: 'Offizier', member: 'Mitglied' };
@@ -2402,6 +2402,7 @@ async function sortGame(card) {
 
 // ---------- 3: Ereignisse nach der Pfandtour ----------
 async function tourEvent() {
+  if (!window.kiezProfile) return;  // vor dem Login gibt es keine Tour (sonst 400 „Nicht angemeldet“ im Protokoll)
   let e; try { e = await rpc('tour_event'); } catch (x) { return; }
   const host = document.getElementById('kz-pfandsell'); if (!e || !host) return;
   let c = document.getElementById('kz-tourevent'); if (!c) { c = document.createElement('div'); c.id = 'kz-tourevent'; c.className = 'card kz-event'; document.getElementById('pfanduebersicht')?.after(c); }
@@ -3091,11 +3092,11 @@ loaders.garage = async () => {
       + '<div class="kz-veh-msg"></div></div>').join('') + '</div></div>'
     // Werkstatt
     + '<div data-rtab="Werkstatt"><div class="kf-box"><h3>Werkstatt: ' + esc(act_.name) + '</h3>' + (act_.id === 'wagen' ? '<p class="kf-muted">Der Einkaufswagen braucht keine Werkstatt.</p>' :
-      '<p>Zustand ' + uv.condition + ' % – schlechter Zustand macht Pannen wahrscheinlicher.</p><div class="kf-row"><button class="ghost kz-svc" data-k="repair"' + (uv.condition >= 100 ? ' disabled' : '') + '>Reparieren – ' + eur((100 - uv.condition) * 0.2) + '</button>' + (motor ? '<button class="ghost kz-svc" data-k="tuev">TÜV – 20 € (30 Tage)</button>' : '') + '</div>'
+      '<p>Zustand ' + uv.condition + ' % – schlechter Zustand macht Pannen wahrscheinlicher.</p><div class="kf-row"><button class="ghost kz-svc" data-k="repair"' + (uv.condition >= 100 ? ' disabled' : '') + '>' + (uv.condition >= 100 ? 'Kein Schaden' : 'Reparieren – ' + eur((100 - uv.condition) * 0.2)) + '</button>' + (motor ? '<button class="ghost kz-svc" data-k="tuev">TÜV – 20 € (30 Tage)</button>' : '') + '</div>'
       + '<h3>Tuning aus Material</h3><div class="kf-grid">' + [['reifen', 'Neue Reifen', '5 % schneller', '5 Nägel, 5 Holz'], ['anhaenger', 'Großer Anhänger', '+10 % Flaschen', '10 Nägel, 20 Holz'], ['motor', 'Motor frisiert', '+10 % Flaschen', '15 Nägel, 5 Scherben'], ['hupe', 'Laute Hupe', 'seltener Polizeikontrollen', '3 Scherben']].filter(x => x[0] !== 'motor' || motor)
         .map(x => '<div class="card"><b>' + x[1] + '</b><p>' + x[2] + '</p><p class="kf-muted">' + x[3] + '</p><div class="kf-row"><button class="ghost kz-tune" data-p="' + x[0] + '"' + ((uv.tuning || {})[x[0]] ? ' disabled' : '') + '>' + ((uv.tuning || {})[x[0]] ? 'Eingebaut' : 'Einbauen') + '</button></div><div class="kz-tune-msg"></div></div>').join('')
         + '<div class="card"><b>Lackierung</b><p>Farbe im Profil und auf dem Stadtplan</p><p class="kf-muted">10 Textil</p><div class="kf-row"><input type="color" class="kz-paint" value="' + esc(uv.paint || '#9b3c1f') + '"><button class="ghost kz-tune" data-p="lack">Lackieren</button></div><div class="kz-tune-msg"></div></div></div>'
-      + '<h3>Diebstahlschutz</h3><div class="kf-row"><button class="ghost kz-prot" data-k="kralle">Lenkradkralle – 15 €</button><button class="ghost kz-prot" data-k="garage">Garage – 100 €</button></div><p class="kf-muted">Ein Begleiter im Auto schreckt Diebe zusätzlich ab.</p>') + '<div class="kz-svc-msg"></div></div></div>'
+      + '<h3>Diebstahlschutz</h3><div class="kf-row"><button class="ghost kz-prot" data-k="kralle"' + (uv.kralle ? ' disabled>Lenkradkralle ist dran' : '>Lenkradkralle – 15 €') + '</button><button class="ghost kz-prot" data-k="garage"' + (uv.garage ? ' disabled>Steht in der Garage' : '>Garage – 100 €') + '</button></div><p class="kf-muted">Beides gilt dauerhaft für dieses Fahrzeug.</p><p class="kf-muted">Ein Begleiter im Auto schreckt Diebe zusätzlich ab.</p>') + '<div class="kz-svc-msg"></div></div></div>'
     // Schrottplatz
     + '<div data-rtab="Schrottplatz"><div class="kf-box"><h3>Schrottplatz</h3><p>Alte Autos ausschlachten: Nägel, Holz, Scherben, Textil – alle 30 Minuten (5 Energie). Überzähliges Material kannst du hier verkaufen.</p><div class="kf-row"><button class="big kz-scrap"' + (g.scrap_ready_at ? ' disabled' : '') + '>' + (g.scrap_ready_at ? 'Wieder ab ' + new Date(g.scrap_ready_at).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) : 'Ausschlachten') + '</button></div>'
     + '<div class="kf-row"><select class="kz-mat"><option value="nails">Nägel (0,05 €)</option><option value="wood">Holz (0,04 €)</option><option value="shards">Scherben (0,15 €)</option><option value="textile">Textil (0,08 €)</option></select><input type="number" class="kz-mat-n" min="1" value="10" style="width:90px"><button class="ghost kz-mat-go">Verkaufen</button></div><div class="kz-scrap-msg"></div></div></div>'
@@ -3118,7 +3119,7 @@ loaders.garage = async () => {
   const sm = garBody.querySelector('.kz-svc-msg');
   garBody.querySelectorAll('.kz-svc').forEach(b => { if (!b.disabled) act(b, sm, async () => { const r = await rpc('vehicle_service', { kind: b.dataset.k }); window.kiezRenderProfile?.(r.profile); again(); return (b.dataset.k === 'tuev' ? 'TÜV für 30 Tage' : 'Repariert') + ' – ' + eur(r.price) + '.'; }); });
   garBody.querySelectorAll('.kz-tune').forEach(b => { if (!b.disabled) act(b, b.closest('.card').querySelector('.kz-tune-msg'), async () => { const r = await rpc('tune_vehicle', { part: b.dataset.p, color: b.dataset.p === 'lack' ? garBody.querySelector('.kz-paint').value : null }); window.kiezRenderProfile?.(r.profile); again(); return 'Erledigt.'; }); });
-  garBody.querySelectorAll('.kz-prot').forEach(b => act(b, sm, async () => { const r = await rpc('buy_car_protection', { kind: b.dataset.k }); window.kiezRenderProfile?.(r.profile); return (b.dataset.k === 'kralle' ? 'Lenkradkralle' : 'Garage') + ' für ' + eur(r.price) + '.'; }));
+  garBody.querySelectorAll('.kz-prot:not([disabled])').forEach(b => act(b, sm, async () => { const r = await rpc('buy_car_protection', { kind: b.dataset.k }); window.kiezRenderProfile?.(r.profile); again(); return (b.dataset.k === 'kralle' ? 'Lenkradkralle' : 'Garage') + ' für ' + eur(r.price) + '.'; }));
   const scm = garBody.querySelector('.kz-scrap-msg');
   const sc = garBody.querySelector('.kz-scrap'); if (!sc.disabled) act(sc, scm, async () => { const r = await rpc('scrapyard_dig'); window.kiezRenderProfile?.(r.profile); again(); return 'Ausgeschlachtet: ' + r.nails + ' Nägel, ' + r.wood + ' Holz, ' + r.shards + ' Scherben, ' + r.textile + ' Textil.'; });
   act(garBody.querySelector('.kz-mat-go'), scm, async () => { const r = await rpc('sell_material', { kind: garBody.querySelector('.kz-mat').value, qty: Number(garBody.querySelector('.kz-mat-n').value) }); window.kiezRenderProfile?.(r.profile); return 'Verkauft für ' + eur(r.paid) + '.'; });

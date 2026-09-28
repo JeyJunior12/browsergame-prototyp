@@ -352,3 +352,7 @@ Nutzerwunsch: Ganz am Ende, wenn alles andere gebaut ist, noch einmal alles durc
 198. ✅ Laden: „benötigt Level ⏎ 1“ brach um
 199. ✅ Verbrechen lohnten sich ab Level ~50 nicht mehr → 0045: Beute und Kaution × (1 + Level/50)
 200. ✅ Nebenjobs spät: geprüft – ab Level 55/70 gibt es Umzugsfahrer/Sperrmüll (120–180 €, mit Fahrzeug); kein Fehler
+201. ✅ Diebstahlschutz (Lenkradkralle/Garage) ließ sich beliebig oft bezahlen, obwohl er dauerhaft gilt → 0046: zweiter Kauf abgelehnt, Knopf zeigt „ist dran“
+202. ✅ Garage: Kopf „Unterwegs mit“ zeigte Einkaufswagen, Werkstatt einen Spaten → Foto des aktiven Fahrzeugs
+203. ✅ Euro-Beträge mit Tausenderpunkt (15.000,00 € statt 15000,00 €)
+204. Fahrzeugfotos (Fahrrad, Lastenrad, Mofa, Kombi, Transporter, Wohnmobil, Werkstatt) auf dem PC erzeugen – bis dahin doppelte Ersatzbilder (Aufträge in bilder2.py)
