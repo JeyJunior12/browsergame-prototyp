@@ -22,24 +22,30 @@ let flash = null;
 // Pfandlager-Größe je Stufe (0038)
 const STORE_CAP = [250, 1000, 5000, 20000, 80000], STORE_PRICE = [15, 150, 1200, 8000];
 const fmtN = n => Number(n).toLocaleString('de-DE');
+function cardKey(el) {
+  const c = el?.closest('[data-t],[data-id],[data-k],[data-p],.card,.kf-box'); if (!c) return '';
+  const d = c.dataset; return d.t || d.id || d.k || d.p || (c.querySelector('b,h3,h4')?.textContent || '').trim().slice(0, 40);
+}
 function restoreFlash() {
   if (!flash || Date.now() - flash.t > 8000) return;
-  const el = document.querySelector('section.panel.active-view .' + flash.cls.split(' ')[0]);
+  // nur in die Karte, zu der der Knopf gehörte – nie in die erstbeste Karte mit gleichem Meldungsfeld (Nutzer: Friseur-Meldung stand beim Brunnen)
+  const els = [...document.querySelectorAll('section.panel.active-view .' + flash.cls.split(' ')[0])];
+  const el = flash.card ? els.find(e => cardKey(e) === flash.card) : els.length === 1 ? els[0] : null;
   if (el && !el.innerHTML) say(el, flash.text, flash.good);
 }
-let gangNote = null;  // Meldung für die neu gezeichnete Bandenseite
+let gangNote = null, gangMsg = null;  // Meldung für die neu gezeichnete Bandenseite
 function act(btn, box, fn) {
   btn.onclick = async () => {
-    btn.disabled = true; flash = null;  // alte Meldung nicht nach dem Neuzeichnen wieder hervorholen (Nutzer: „Gekauft“ tauchte beim Einstellen auf)
-    try { const t = await fn(); if (t) { say(box, t, true); if (box?.className) flash = { cls: box.className, text: t, good: true, t: Date.now() }; } }
-    catch (e) { say(box, esc(e.message) + hintFor(e.message), false); }
+    btn.disabled = true; flash = null; if (box && !box.contains(btn) && box.children.length && [...box.children].every(k => k.classList.contains('notice'))) box.innerHTML = '';  // gleiche Meldung soll beim zweiten Klick sichtbar neu erscheinen; alte Meldung nicht nach dem Neuzeichnen wieder hervorholen (Nutzer: „Gekauft“ tauchte beim Einstellen auf)
+    try { const t = await fn(); if (t) { say(box, t, true); if (box?.className) flash = { cls: box.className, card: cardKey(box), text: t, good: true, t: Date.now() }; } }
+    catch (e) { const t = esc(e.message) + hintFor(e.message); say(box, t, false); if (box?.className) flash = { cls: box.className, card: cardKey(box), text: t, good: false, t: Date.now() }; }
     btn.disabled = false;
   };
 }
 // Fehlermeldung → passender Weg (Durchspiel-Test 169: „Wasch dich erst“ ohne Hinweis, wohin)
 function hintFor(m) {
   const H = [[/wasch dich|sauberkeit/i, 'waschhaus', '', 'Zum Waschhaus'], [/energie/i, 'kronkorken', '', 'Energydrink für Kronkorken'],
-    [/kohle|geld|€ in der tasche|so viel hast du nicht/i, 'pfand', 'Pfand sammeln', 'Pfand sammeln'], [/knast/i, 'pfand', 'Verbrechen', 'Zur Kaution'], [/hunger|essen/i, 'store', 'Verbrauchbares', 'Zum Supermarkt']];
+    [/kohle|geld|€ in der tasche|so viel hast du nicht/i, 'pfand', 'Pfand sammeln', 'Pfand sammeln'], [/knast/i, 'pfand', 'Verbrechen', 'Zur Kaution'], [/kombi|fahrzeug|mofa|fahrrad|führerschein/i, 'garage', '', 'Zur Garage'], [/hunger|essen/i, 'store', 'Verbrauchbares', 'Zum Supermarkt']];
   const h = H.find(x => x[0].test(m || '')); return h ? ' <a href="#" class="kz-hint" data-v="' + h[1] + '" data-t="' + h[2] + '">' + h[3] + ' ›</a>' : '';
 }
 document.addEventListener('click', e => { const a = e.target.closest('a.kz-hint'); if (!a) return; e.preventDefault(); go(a.dataset.v, a.dataset.t || undefined); });
@@ -204,10 +210,12 @@ loaders.freunde = async () => {
     + '<div class="fmsg"></div>';
   const box = friendBody.querySelector('.fmsg');
   const search = async () => {
-    const q = friendBody.querySelector('.fq').value.trim(); if (q.length < 2) return;
+    const q = friendBody.querySelector('.fq').value.trim(); if (q.length < 2) { say(box, 'Gib mindestens 2 Buchstaben ein.'); return; }
     const { data } = await sb.from('profiles').select('id,username,level').ilike('username', '%' + q.replace(/[%_]/g, '') + '%').neq('id', me).limit(15);
     friendBody.querySelector('.fres').innerHTML = (data || []).map(p => '<li>' + playerLink(p.id, p.username) + ' <span class="kf-muted">Level ' + p.level + '</span></li>').join('') || '<li class="kf-muted">Niemand gefunden.</li>';
+    say(box, (data || []).length ? (data.length + ' gefunden – tipp auf einen Namen, um das Profil zu öffnen und eine Anfrage zu schicken.') : 'Niemand mit „' + esc(q) + '“ gefunden.', !!(data || []).length);
   };
+  friendBody.querySelector('.fq').onkeydown = e => { if (e.key === 'Enter') search(); };
   friendBody.querySelector('.fsearch').onclick = search;
   friendBody.querySelector('.fq').onkeydown = e => { if (e.key === 'Enter') search(); };
   friendBody.querySelectorAll('.facc').forEach(b => act(b, box, async () => { await rpc('friend_respond', { requester_id: b.dataset.id, accept: true }); loaders.freunde(); }));
@@ -333,6 +341,7 @@ setInterval(() => {
   if (!sel || !price || !document.getElementById('basar')?.classList.contains('active-view')) return;
   if ([...sel.options].some(o => o.value === pre.id)) sel.value = pre.id;
   price.value = pre.price; price.scrollIntoView({ block: 'center' }); price.focus();
+  const row = price.closest('.kf-row'); if (row) { let n = row.parentElement.querySelector(':scope > .kz-pre-note'); if (!n) { n = document.createElement('div'); n.className = 'kz-pre-note'; row.after(n); } say(n, 'Preisvorschlag eingetragen – Menge prüfen und „Einstellen“ drücken.', true); }
   window.kiezBasarPrefill = null;
 }, 400);
 // Öffnen-Moment für die Kronkorken-Plunderkiste (119)
@@ -511,19 +520,21 @@ async function renderMyGang(el, me, mine, t) {
     + '<div class="kf-box"><h3>💬 Bandenchat</h3><div class="kf-row"><input class="gchat" maxlength="500" placeholder="Nachricht an die Bande" style="flex:1"><button class="ghost gchatb">Senden</button></div><ul class="kf-list kf-chat">' + ((chat.data || []).map(c => '<li><b>' + esc(nm[c.user_id]) + ':</b> ' + esc(c.body) + ' <span class="kf-muted">' + when(c.created_at) + '</span></li>').join('') || '<li class="kf-muted">Noch still hier.</li>') + '</ul></div>'
     + '<div class="kf-box"><h3>📜 Protokoll</h3><ul class="kf-list">' + (log.data || []).map(l => '<li class="kf-muted">' + when(l.created_at) + ' · ' + esc(nm[l.user_id] || 'Kiez') + ' ' + esc(l.info) + (Number(l.amount) ? ' (' + eur(l.amount) + ')' : '') + '</li>').join('') + '</ul></div>';
   const box = el.querySelector('.gmsg'), reload = () => setTimeout(window.kiezLoadGang, 400), q = s => el.querySelector(s);
+  if (box && gangMsg && Date.now() - gangMsg.t < 15000) { say(box, gangMsg.txt, true); gangMsg = null; }
+  const keep = t => { gangMsg = { txt: t, t: Date.now() }; return t; };
   act(q('.gdonb'), box, async () => { const r = await rpc('donate_to_gang', { amount: Number(q('.gdon').value) }); await refreshProfile(); reload(); return eur(r.donated) + ' eingezahlt.'; });
   el.querySelectorAll('.gup').forEach(b => act(b, box, async () => { await rpc('upgrade_gang', { kind: b.dataset.k }); reload(); return 'Ausgebaut – der Bonus gilt sofort.'; }));
   act(q('.gleave'), box, async () => { if (!confirm('Bande wirklich verlassen?')) return; await rpc('leave_gang'); reload(); return 'Du hast die Bande verlassen.'; });
   if (q('.wdecl')) act(q('.wdecl'), box, async () => { await rpc('declare_gang_war', { target_gang: q('.wtarget').value, stake: Number(q('.wstake').value) }); reload(); return 'Krieg erklärt!'; });
   el.querySelectorAll('.grole').forEach(s => s.onchange = async () => { if (s.value === 'owner' && !confirm('Chefrolle wirklich übergeben?')) return reload(); try { await rpc('set_gang_role', { target_id: s.dataset.id, new_role: s.value }); reload(); } catch (e) { say(box, esc(e.message)); } });
-  el.querySelectorAll('.gkick').forEach(b => act(b, box, async () => { if (!confirm('Wirklich rauswerfen?')) return; await rpc('kick_gang_member', { target_id: b.dataset.id }); reload(); }));
+  el.querySelectorAll('.gkick').forEach(b => act(b, box, async () => { if (!confirm('Wirklich rauswerfen?')) return; await rpc('kick_gang_member', { target_id: b.dataset.id }); reload(); return keep('Rausgeworfen.'); }));
   if (q('.ginv')) act(q('.ginv'), box, async () => {
     const n = q('.ginvname').value.trim(); const { data } = await sb.from('profiles').select('id').ilike('username', n.replace(/[%_]/g, '')).maybeSingle();
-    if (!data) throw new Error('Spieler nicht gefunden'); const r = await rpc('gang_invite', { target_id: data.id }); reload(); return r.status === 'joined' ? 'Aufgenommen.' : 'Einladung verschickt.';
+    if (!data) throw new Error('Spieler nicht gefunden'); const r = await rpc('gang_invite', { target_id: data.id }); reload(); return keep(r.status === 'joined' ? 'Aufgenommen.' : 'Einladung verschickt.');
   });
-  el.querySelectorAll('.gappok').forEach(b => act(b, box, async () => { await rpc('gang_invite', { target_id: b.dataset.id }); reload(); }));
-  el.querySelectorAll('.gappno').forEach(b => act(b, box, async () => { await rpc('gang_request_delete', { wanted_gang: gid, target_id: b.dataset.id }); reload(); }));
-  if (q('.gsave')) act(q('.gsave'), box, async () => { await rpc('update_gang_profile', { new_description: q('.gdesc').value, open_for_all: q('.gopen').checked }); reload(); return 'Gespeichert.'; });
+  el.querySelectorAll('.gappok').forEach(b => act(b, box, async () => { await rpc('gang_invite', { target_id: b.dataset.id }); reload(); return keep('Aufgenommen.'); }));
+  el.querySelectorAll('.gappno').forEach(b => act(b, box, async () => { await rpc('gang_request_delete', { wanted_gang: gid, target_id: b.dataset.id }); reload(); return keep('Anfrage abgelehnt.'); }));
+  if (q('.gsave')) act(q('.gsave'), box, async () => { await rpc('update_gang_profile', { new_description: q('.gdesc').value, open_for_all: q('.gopen').checked }); reload(); return keep('Gespeichert.'); });
   const sendChat = async () => { try { await rpc('post_gang_message', { message_body: q('.gchat').value }); reload(); } catch (e) { say(box, esc(e.message)); } };
   q('.gchatb').onclick = sendChat; q('.gchat').onkeydown = e => { if (e.key === 'Enter') sendChat(); };
 }
@@ -744,8 +755,8 @@ async function updateReferral(p) {
   if (!row || !p) return;
   if (!row.classList.contains('kf-ref')) {
     row.classList.add('kf-ref');
-    row.innerHTML = '<h3>📣 Freunde in den Kiez einladen</h3><p>Wer sich über deinen Link anmeldet und Level 5 erreicht, bringt dir <b>25 Kronkorken + 100 Punkte</b> (und ihm selbst 10 Kronkorken).</p><div class="kf-row"><input class="rlink" readonly style="flex:1;min-width:180px"><button class="ghost rcopy">Kopieren</button></div><p class="kf-muted rcount"></p>';
-    row.querySelector('.rcopy').onclick = () => { const i = row.querySelector('.rlink'); i.select(); navigator.clipboard?.writeText(i.value); row.querySelector('.rcount').textContent = 'Link kopiert.'; };
+    row.innerHTML = '<h3>📣 Freunde in den Kiez einladen</h3><p>Wer sich über deinen Link anmeldet und Level 5 erreicht, bringt dir <b>25 Kronkorken + 100 Punkte</b> (und ihm selbst 10 Kronkorken).</p><div class="kf-row"><input class="rlink" readonly style="flex:1;min-width:180px"><button class="ghost rcopy">Kopieren</button></div><div class="rmsg"></div><p class="kf-muted rcount"></p>';
+    row.querySelector('.rcopy').onclick = () => { const i = row.querySelector('.rlink'); i.select(); navigator.clipboard?.writeText(i.value); say(row.querySelector('.rmsg'), 'Link kopiert – schick ihn deinen Leuten.', true); };
   }
   row.querySelector('.rlink').value = location.origin + '/?ref=' + encodeURIComponent(p.username);
   if (Date.now() - refChecked < 60000) return; refChecked = Date.now();
@@ -1088,11 +1099,11 @@ const DIST_TINT = { bahnhof: 'rgba(96,90,84,.22)', altstadt: 'rgba(160,92,52,.18
 const DIST_LABEL = { bahnhof: [180, 24], altstadt: [540, 24], villen: [880, 24], stadtpark: [180, 286], markt: [500, 286], hafen: [880, 286] };
 const PLACES = [
   ['Pfandannahme', 'pfand', '', 'szene-pfand', 90, 138], ['Schnorrplätze', 'income', 'Schnorrplätze', 'stadt-schnorrplaetze', 250, 188],
-  ['Kiezladen', 'store', 'Zubehör', 'stadt-zubehoer', 400, 128], ['Waffenladen', 'store', 'Waffen', 'stadt-waffenladen', 610, 128], ['Volkshochschule', 'training', 'Fähigkeiten', 'szene-training', 505, 212],
-  ['Schließfach', 'schliessfach', '', 'laden-geldversteck', 770, 132], ['Apotheke', 'apotheke', '', 'stadt-apotheke', 915, 200],
-  ['Tierhandlung', 'pets', 'Tierhandlung', 'stadt-tierhandlung', 90, 370], ['Hinterhof', 'pvp', '', 'szene-pruegelei', 240, 440], ['Waschhaus', 'waschhaus', '', 'stadt-waschhaus', 110, 540],
-  ['Supermarkt', 'store', 'Verbrauchbares', 'stadt-supermarkt', 420, 370], ['Plunder-Basar', 'basar', '', 'lager-inventar', 580, 370], ['Musikladen', 'income', 'Instrumente', 'stadt-musikladen', 430, 530],
-  ['Zockerbude', 'zockerbude', '', 'stadt-gluecksspiel', 570, 520],
+  ['Kiezladen', 'store', 'Zubehör', 'stadt-zubehoer', 400, 128], ['Waffenladen', 'store', 'Waffen', 'stadt-waffenladen', 660, 135], ['Volkshochschule', 'training', 'Fähigkeiten', 'szene-training', 530, 215],
+  ['Schließfach', 'schliessfach', '', 'laden-geldversteck', 792, 140], ['Apotheke', 'apotheke', '', 'stadt-apotheke', 928, 215],
+  ['Tierhandlung', 'pets', 'Tierhandlung', 'stadt-tierhandlung', 90, 395], ['Hinterhof', 'pvp', '', 'szene-pruegelei', 245, 470], ['Waschhaus', 'waschhaus', '', 'stadt-waschhaus', 110, 540],
+  ['Supermarkt', 'store', 'Verbrauchbares', 'stadt-supermarkt', 410, 398], ['Plunder-Basar', 'basar', '', 'lager-inventar', 590, 398], ['Musikladen', 'income', 'Instrumente', 'stadt-musikladen', 430, 545],
+  ['Zockerbude', 'zockerbude', '', 'stadt-gluecksspiel', 575, 540],
   ['Eigenheime', 'gear', '', 'stadt-eigenheime', 720, 400], ['Bandenversteck', 'gangs', '', 'szene-bande', 890, 425], ['Lottobude', 'missions', 'Glücksspiel', 'rubbellose', 735, 535]
 ];
 async function buildCityMap() {
@@ -1693,7 +1704,7 @@ async function drawQueue(msg) {
   if (q('.kz-q-cancel')) act(q('.kz-q-cancel'), m, async () => { if (!confirm('Weiterbildung abbrechen? Du bekommst die Hälfte des Preises zurück.')) return ''; const r = await rpc('cancel_training'); window.kiezRenderProfile?.(r.profile); setTimeout(() => drawQueue('Abgebrochen, ' + eur(r.refund) + ' zurück.'), 50); return 'Abgebrochen.'; });
   if (q('.kz-q-done')) act(q('.kz-q-done'), m, async () => { setTimeout(drawQueue, 50); return ''; });
   clearTimeout(queueTimer);
-  if (cur && document.getElementById('training')?.classList.contains('active-view')) queueTimer = setTimeout(() => drawQueue(), left > 0 ? Math.min(left * 1000 + 800, 30000) : 30000);
+  if (cur && document.getElementById('training')?.classList.contains('active-view')) queueTimer = setTimeout(() => { if (document.getElementById('training')?.classList.contains('active-view')) drawQueue(); }, left > 0 ? Math.min(left * 1000 + 800, 30000) : 30000);
 }
 { const prev = loaders.training; loaders.training = async () => { await prev?.(); drawQueue(); }; }
 if (document.getElementById('training')?.classList.contains('active-view')) drawQueue();
@@ -2926,7 +2937,8 @@ async function drawFriendsExtra() {
     + '<div class="kf-box"><h3>Mentor</h3>' + (ms.mentor ? '<p>Dein Mentor: ' + playerLink(ms.mentor.id, ms.mentor.name) + ' (Level ' + ms.mentor.level + ')</p>' : '')
     + (ms.mentees.length ? '<p>Deine Schützlinge: ' + ms.mentees.map(m => playerLink(m.id, m.name) + ' (' + m.level + ')').join(', ') + '</p>' : '')
     + (ms.can_choose ? '<p class="kf-muted">Such dir einen erfahrenen Spieler (ab Level 30). Bei deinen Levels 5, 10, 15 und 20 bekommt ihr beide Kronkorken, dein Mentor zusätzlich Geld.</p>' + (ms.candidates.length ? '<div class="kf-row"><select class="kz-m-sel">' + ms.candidates.map(c => '<option value="' + c.id + '">' + esc(c.name) + ' (Level ' + c.level + ')</option>').join('') + '</select><button class="ghost kz-m-go">Als Mentor wählen</button></div>' : '<p class="kf-muted">Gerade ist niemand ab Level 30 aktiv.</p>')
-      : !ms.mentor && !ms.can_mentor ? '<p class="kf-muted">Mentor werden kannst du ab Level 30.</p>' : '') + '<div class="kz-m-msg"></div></div></div>';
+      : !ms.mentor && !ms.can_mentor ? '<p class="kf-muted">Mentor werden kannst du ab Level 30.</p>'
+      : ms.can_mentor && !ms.mentees.length ? '<p class="kf-muted">Du kannst jetzt Mentor sein: Neue Spieler unter Level 20 können dich hier auswählen. Bei ihren Levels 5, 10, 15 und 20 bekommst du Kronkorken und Geld.</p>' : '') + '<div class="kz-m-msg"></div></div></div>';
   body.appendChild(box);
   const q = s => box.querySelector(s);
   if (q('.kz-duo')) act(q('.kz-duo'), q('.kz-duo-msg'), async () => { const r = await rpc('duo_invite', { friend: q('.kz-fx-friend').value }); return r.status === 'active' ? 'Ihr seid zu zweit unterwegs – 3 Stunden +15 %!' : 'Eingeladen – dein Freund muss hier auch auf „Einladen / annehmen“ drücken.'; });
@@ -3287,6 +3299,7 @@ loaders.waschhaus = async () => {
     if (need > lvl) btn = need === lvl + 1 ? '<button class="ghost kz-wh-buy">' + WASH_GEAR[need][0] + ' kaufen – ' + eur(WASH_GEAR[need][1]) + '</button>' : '<button class="ghost" disabled>erst ' + WASH_GEAR[lvl + 1][0] + ' kaufen</button>';
     else if (id === 'brunnen' && fountainMin > 0) btn = '<button class="ghost" disabled>wieder in ' + fountainMin + ' Min.</button>';
     else if (id !== 'friseur' && c >= 100) btn = '<button class="ghost" disabled>Schon blitzsauber</button>';
+    else if (id === 'friseur' && c >= 100 && b.barber_until && new Date(b.barber_until) > now) btn = '<button class="ghost" disabled>Frisiert bis ' + until(b.barber_until) + '</button>';
     else btn = '<button class="big kz-wh-go">' + (price ? 'Waschen – ' + eur(price) : 'Waschen – gratis') + '</button>';
     return '<div class="card kz-wash" data-t="' + id + '"><b>' + name + '</b><p>' + desc + '</p><p class="kz-wash-fx">' + (gain >= 100 ? 'auf 100 %' : '+' + gain + ' %') + ' Sauberkeit' + (id === 'friseur' ? ' · 24 Std. halber Dreck' : '') + '</p>'
       + '<div class="kf-row">' + btn + '</div><div class="kz-wash-msg"></div></div>';
