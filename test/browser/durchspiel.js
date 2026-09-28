@@ -61,6 +61,12 @@ async function look(view, tab) {
         leaves.forEach(e => { if (bt.contains(e) || e.contains(bt)) return; const r = e.getBoundingClientRect(); if (q.left < r.right - 3 && r.left < q.right - 3 && q.top < r.bottom - 3 && r.top < q.bottom - 3) out.push('Knopf über Text: „' + bt.textContent.trim().slice(0, 20) + '“ über „' + e.textContent.trim().slice(0, 30) + '“ (' + (c.querySelector('b,h3')?.textContent || '').trim().slice(0, 20) + ')'); }); }); });
     // leere Kästen (nur Überschrift, kein Inhalt) – Nutzer: Übersicht › Haustier
     s.querySelectorAll('.card, .kf-box, .lead-card, .profile-wide-row').forEach(c => { if (c.offsetParent && c.getBoundingClientRect().height > 30 && c.innerText.trim().length < 25 && !c.querySelector('img,button,input,select,.generated-item-thumb')) out.push('Leerer Kasten: ' + (c.innerText.trim() || '(ohne Text)')); });
+    // Knöpfe einer Kartenreihe nicht auf einer Linie (Nutzer-Screenshot Waschhaus: Brunnen-Knopf höher als die anderen)
+    const rows = new Map(); s.querySelectorAll('.card').forEach(c => { if (!c.offsetParent || c.querySelector('.notice')) return; const r = c.getBoundingClientRect();
+      const bt = [...c.querySelectorAll(':scope > .kf-row button, :scope > button, :scope > div > button')].filter(x => x.offsetParent).pop(); if (!bt) return;
+      const k = c.parentElement && Math.round(r.top / 6) + '|' + Math.round(r.height / 6); (rows.get(c.parentElement) || rows.set(c.parentElement, new Map()).get(c.parentElement)).set(c, [k, bt.getBoundingClientRect().bottom - r.bottom]); });
+    rows.forEach(m => { const by = {}; m.forEach(([k, d], c) => (by[k] = by[k] || []).push([d, c])); Object.values(by).forEach(l => { if (l.length < 2) return; const ds = l.map(x => x[0]);
+      if (Math.max(...ds) - Math.min(...ds) > 14) out.push('Knöpfe nicht auf einer Linie: ' + l.map(x => (x[1].querySelector('b,h3')?.textContent || '').trim().slice(0, 14)).join(' / ')); }); });
     return [...new Set(out)].slice(0, 12); });
   r.forEach(m => log({ v: visit, typ: 'AUSSEHEN', wo: key, msg: m }));
   const w = Math.floor(visit / 50); if (!shot.has(w + key)) { shot.add(w + key); fs.mkdirSync(OUT + '/bilder', { recursive: true });
