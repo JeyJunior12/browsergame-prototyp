@@ -853,7 +853,7 @@ function addCrimeSystem(){
  const card=document.createElement('div');
  card.className='card crime-card';
  card.style.gridColumn='1/-1';
- const rows=crimes.map((c,i)=>'<div class="card crime-item"><b>'+c.name+'</b><p>Risiko erwischt zu werden: <b>'+c.risk+' %</b></p><p>Beute: '+c.rewardmin+'–'+c.rewardmax+' € · Kaution bei Erwischen: '+c.bail+' €</p><button class="ghost crime-pick" data-id="'+(i+1)+'">Verbrechen begehen</button></div>').join('');
+ const cf=Math.round((1+Math.max(1,(window.kiezProfile?.level||(typeof currentProfile!=='undefined'&&currentProfile?.level)||1))/50)*100)/100,cr=x=>Math.round(x*cf);const rows=crimes.map((c,i)=>'<div class="card crime-item"><b>'+c.name+'</b><p>Risiko erwischt zu werden: <b>'+c.risk+' %</b></p><p class="crime-loot" data-a="'+c.rewardmin+'" data-b="'+c.rewardmax+'" data-c="'+c.bail+'">Beute: '+cr(c.rewardmin)+'–'+cr(c.rewardmax)+' € · Kaution bei Erwischen: '+cr(c.bail)+' €</p><button class="ghost crime-pick" data-id="'+(i+1)+'">Verbrechen begehen</button></div>').join('');
  card.innerHTML='<b>Ein Verbrechen begehen</b><p>Es ist nicht immer leicht, legal sein Leben zu bestreiten. Überlege dir gut, welche Straftat du dir zutraust – die Kaution ist nicht gerade billig und das Risiko geschnappt zu werden ist real.</p><div class="crime-jail hide"><p class="crime-jail-status"></p><strong class="crime-jail-timer">00:00</strong> <button class="ghost crime-paybail">Kaution zahlen</button></div><div class="crime-list cards">'+rows+'</div><div id="crimemsg"></div>';
  anchor.insertAdjacentElement('afterend',card);
  card.querySelectorAll('.crime-pick').forEach(b=>b.onclick=()=>{document.getElementById('crimeid').value=b.dataset.id;document.getElementById('docrime').click()});

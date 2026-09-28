@@ -350,5 +350,5 @@ Nutzerwunsch: Ganz am Ende, wenn alles andere gebaut ist, noch einmal alles durc
 196. ✅ Rückmeldungen: Link kopieren, Spielersuche, Bande, Basar-Preisvorschlag; gleiche Meldung erscheint beim zweiten Klick sichtbar neu
 197. ✅ Mentor-Kasten ab Level 30 leer; Hinweis-Link zur Garage bei „brauchst Rostiger Kombi“
 198. ✅ Laden: „benötigt Level ⏎ 1“ brach um
-199. Verbrechen lohnen sich ab Level ~50 nicht mehr (Bankraub max. 900 € bei 9.000 € in der Tasche) → späte Verbrechen oder Beute mit dem Level wachsen lassen
-200. Nebenjobs lohnen sich spät nicht (Flyer 1,20 € auf Level 87) → Lohn mit dem Level
+199. ✅ Verbrechen lohnten sich ab Level ~50 nicht mehr → 0045: Beute und Kaution × (1 + Level/50)
+200. ✅ Nebenjobs spät: geprüft – ab Level 55/70 gibt es Umzugsfahrer/Sperrmüll (120–180 €, mit Fahrzeug); kein Fehler
