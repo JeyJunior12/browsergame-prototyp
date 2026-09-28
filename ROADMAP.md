@@ -340,3 +340,15 @@ Nutzerwunsch: Ganz am Ende, wenn alles andere gebaut ist, noch einmal alles durc
 188. ✅ Kampf: kurzer Reaktionsmoment („Ausweichen!“) gibt Bonus
 189. ✅ Mülltonne: 3 von 9 Feldern aufdecken
 190. ✅ Straßenmusik: Takt-Tippen für den Hut-Bonus
+
+### Aus dem Durchspiel-Test, Teil 2 (Level 68–93, 28.09.2026)
+191. ✅ Waschhaus: Friseur-Meldung stand beim Brunnen (Nutzer-Screenshot) → Meldungen nach Neuzeichnen nur noch in der eigenen Karte, überall
+192. ✅ Friseur lässt sich nicht nochmal bezahlen, solange man frisiert ist
+193. ✅ Knöpfe einer Kartenreihe unten auf einer Linie (Waschhaus, Laden, Tierhandlung, Nebenjobs, Basteln, Stadtteile) + Bot-Prüfung
+194. ✅ Lernwarteschlange zog Geld auf fremden Seiten ohne Meldung ab → startet nur noch auf der Trainingsseite
+195. ✅ Stadtplan: Orte stießen an Viertel-Schilder (Desktop + Handy)
+196. ✅ Rückmeldungen: Link kopieren, Spielersuche, Bande, Basar-Preisvorschlag; gleiche Meldung erscheint beim zweiten Klick sichtbar neu
+197. ✅ Mentor-Kasten ab Level 30 leer; Hinweis-Link zur Garage bei „brauchst Rostiger Kombi“
+198. ✅ Laden: „benötigt Level ⏎ 1“ brach um
+199. ✅ Verbrechen lohnten sich ab Level ~50 nicht mehr → 0045: Beute und Kaution × (1 + Level/50)
+200. ✅ Nebenjobs spät: geprüft – ab Level 55/70 gibt es Umzugsfahrer/Sperrmüll (120–180 €, mit Fahrzeug); kein Fehler

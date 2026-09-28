@@ -3462,6 +3462,9 @@ document.addEventListener('click', e => {
 const CRIME_LVL = { 1: 1, 2: 4, 3: 10, 4: 20, 5: 35, 6: 55, 7: 1 };
 function crimeLocks() {
   const lvl = window.kiezProfile?.level || 1, btns = [...document.querySelectorAll('#pfand .crime-pick')]; if (!btns.length) return;
+  // Beute und Kaution wachsen mit dem Level (0045: Faktor 1 + Level/50)
+  const cf = Math.round((1 + Math.max(1, lvl) / 50) * 100) / 100, cr = x => Math.round(+x * cf);
+  document.querySelectorAll('#pfand .crime-loot').forEach(p => { p.textContent = 'Beute: ' + cr(p.dataset.a) + '–' + cr(p.dataset.b) + ' € · Kaution bei Erwischen: ' + cr(p.dataset.c) + ' €'; });
   const cards = btns.map(b => ({ b, card: b.closest('.card') || b.parentElement, need: CRIME_LVL[b.dataset.id] || 1, risk: +((b.closest('.card') || b.parentElement).textContent.match(/(\d+)\s*%/) || [0, 0])[1] }));
   cards.forEach(({ b, card, need }) => {
     if (lvl < need) { b.disabled = true; b.dataset.kzlock = '1'; setLabel(b, '🔒 ab Level ' + need); card.classList.add('kz-locked'); }
