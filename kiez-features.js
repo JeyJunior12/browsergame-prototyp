@@ -3692,3 +3692,16 @@ document.addEventListener('click', async e => {
 { let q = false; const main = document.querySelector('.main') || document.body;
   new MutationObserver(() => { if (!flash || Date.now() - flash.t > 8000 || q) return; q = true; requestAnimationFrame(() => { q = false; restoreFlash(); }); })
     .observe(main, { childList: true, subtree: true }); }
+
+// Kredithai-Schläger sofort melden, nicht nur in der Kiezpost (Durchspiel-Test: „Gewonnen +1,83 €“, aber 300 € weg)
+{ let seen = 0, busy = false, last = 0;
+  const check = async () => { const p = window.kiezProfile; if (!p || busy || Date.now() - last < 20000) return; busy = true; last = Date.now();
+    try { const { data } = await sb.from('notifications').select('id,body,created_at').eq('user_id', p.id).eq('kind', 'kredit').order('created_at', { ascending: false }).limit(1);
+      const n = (data || [])[0]; if (!n) return; const t = new Date(n.created_at).getTime();
+      if (!seen) { seen = t; if (Date.now() - t > 120000) return; }
+      if (t > seen || (seen === t && !document.body.dataset.kzshark)) { seen = t; document.body.dataset.kzshark = '1';
+        const box = document.querySelector('section.panel.active-view > .inside') || document.querySelector('section.panel.active-view'); if (!box) return;
+        box.querySelector(':scope > .kz-shark')?.remove(); const d = document.createElement('div'); d.className = 'notice bad kz-shark'; d.innerHTML = esc(n.body) + ' <a href="#" class="kz-hint" data-v="kredithai">Zum Kredithai ›</a>'; box.prepend(d); }
+    } catch { } finally { busy = false; } };
+  const prev = window.kiezOnProfile; window.kiezOnProfile = p => { prev?.(p); check(); };
+}
