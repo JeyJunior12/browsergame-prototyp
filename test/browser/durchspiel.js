@@ -9,7 +9,7 @@ const BESUCHE = +(process.env.BESUCHE || 50); const START = +(process.env.START 
 const log = (o) => fs.appendFileSync(OUT + '/aktionen.jsonl', JSON.stringify(o) + '\n');
 const snap = (o) => fs.appendFileSync(OUT + '/verlauf.jsonl', JSON.stringify(o) + '\n');
 const SUSPECT = /fehler|error|exception|undefined|null\b|NaN|\+0,00 €|permission|violates|function .* does not exist|\[object/i;
-const DANGER = /abmelden|löschen|entfernen|auflösen|verlassen|kündigen|melden|rauswerfen|austreten|kapitulieren|passwort|bewerben/i;
+const DANGER = /abmelden|löschen|entfernen|auflösen|verlassen|kündigen|melden|rauswerfen|austreten|kapitulieren|passwort|bewerben|leihen/i;
 // beim Erkunden unbekannter Seiten zusätzlich nichts gegen andere Spieler auslösen
 const DANGER_X = new RegExp(DANGER.source + '|überfall|klauen|angreifen|herausfordern|ausrauben|stehlen|zuschlagen|krieg', 'i');
 let visit = START, pg, b, errs = [];
@@ -245,8 +245,9 @@ async function extras(k) {
   if (k === 5) { await go('kronkorken'); await click('Plunderkiste', '.kkbuy[data-id="plunderkiste"]', { quiet: true }); await go('plunder', 'Meine Stücke'); await click('Doppelte verkaufen', '.kz-p-dups', { quiet: true }); await click('Plunder anlegen', 'button', { pick: `e=>/anlegen/i.test(e.textContent)?1:null`, quiet: true }); await go('plunder', 'Basteln'); await click('Basteln', '.craft-go', { pick: priceFn(p.money, 0.3), quiet: true }); }
   if (k === 6) { await go('gangs'); if (!(await pg.evaluate(() => /Bandenkasse|Mitglieder/.test(document.getElementById('gangs')?.innerText || ''))) && p.money > 120) await click('Bande gründen', '.gcreate', { fill: [['section.panel.active-view .gname', 'Testbande Durchspiel'], ['section.panel.active-view .gtag', 'TDS']] }); else await explore('gangs', p.money); await go('bandenhaus'); await explore('bandenhaus', p.money); }
   if (k === 7) { await go('basar'); await explore('basar', p.money); await go('auktion'); await explore('auktion', p.money); }
-  if (k === 8) { await go('kredithai'); if (p.level > 5 && visit % 24 === 8) await click('Kredit', '.kz-l-take', { fill: [['section.panel.active-view .kz-l-amt', 50]] }); else await explore('kredithai', p.money); await go('apotheke'); await explore('apotheke', p.money); }
-  if (k === 9) { await go('chat'); await click('Chat', '.csend', { fill: [['section.panel.active-view textarea, section.panel.active-view input[type=text]', 'Testkonto spielt durch (Besuch ' + visit + ')']] }); await go('stadtteile'); await click('Revier', '.dpick', { quiet: true }); for (const t of ['Übersicht', 'Haustier', 'Aktionen', 'Inventar', 'Plunder', 'Kronkorken', 'Profil ansehen']) await go('overview', t); for (const v of ['saison', 'statistik', 'career', 'leaderboard', 'kampfprotokoll', 'profil', 'wettbewerb', 'citymap']) await go(v); }
+  if (k === 8) { await go('kredithai'); await click('Kredit zurückzahlen', '.kz-l-pay', { quiet: true });
+    if (p.level > 5 && visit % 50 === 0) await click('Kredit', '.kz-l-take', { fill: [['section.panel.active-view .kz-l-amt', 50]] }); await go('apotheke'); await explore('apotheke', p.money); }
+  if (k === 9) { await go('chat'); await click('Chat', '.csend', { fill: [['section.panel.active-view .cin', 'Testkonto spielt durch (Besuch ' + visit + ')']] }); await go('stadtteile'); await click('Revier', '.dpick', { quiet: true }); for (const t of ['Übersicht', 'Haustier', 'Aktionen', 'Inventar', 'Plunder', 'Kronkorken', 'Profil ansehen']) await go('overview', t); for (const v of ['saison', 'statistik', 'career', 'leaderboard', 'kampfprotokoll', 'profil', 'wettbewerb', 'citymap']) await go(v); }
   if (k === 10) { await go('messages', 'Posteingang'); await explore('messages', p.money); await go('freunde'); await click('Spieler suchen', '.fsearch', { fill: [['section.panel.active-view input', PARTNER]] }); }
   if (k === 11) { await go('store', 'Verteidigung'); await click('Verteidigung kaufen', '.buydefense', { pick: priceFn(p.money, 0.2), quiet: true }); await go('overview'); await explore('overview', p.money); }
 }
