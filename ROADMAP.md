@@ -358,3 +358,4 @@ Nutzerwunsch: Ganz am Ende, wenn alles andere gebaut ist, noch einmal alles durc
 204. Fahrzeugfotos (Fahrrad, Lastenrad, Mofa, Kombi, Transporter, Wohnmobil, Werkstatt) auf dem PC erzeugen – bis dahin doppelte Ersatzbilder (Aufträge in bilder2.py)
 205. ✅ TÜV ließ sich beliebig oft verlängern (Testkonto: TÜV bis 2028) → 0047: nur in der letzten Woche, Knopf zeigt „TÜV bis …“
 206. ✅ Verteidigung „bis zum nächsten Angriff“ ließ sich unbegrenzt stapeln (Testkonto: 232 Fallen → unangreifbar) → 0048: jeder Gegenstand nur einmal aktiv, Doppelte entfernt, Laden zeigt „Aktiv“
+207. ✅ Verteidigungs-Katalog unstimmig (Sand 1.000 € für +1, Wegweiser 10 € für +12, Bier 2.400 € für 5 Min., „Geschick“-Stücke zählten als Verteidigung) → 0049: Preis nach Punkten und Dauer
