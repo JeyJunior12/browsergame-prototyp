@@ -357,3 +357,4 @@ Nutzerwunsch: Ganz am Ende, wenn alles andere gebaut ist, noch einmal alles durc
 203. ✅ Euro-Beträge mit Tausenderpunkt (15.000,00 € statt 15000,00 €)
 204. Fahrzeugfotos (Fahrrad, Lastenrad, Mofa, Kombi, Transporter, Wohnmobil, Werkstatt) auf dem PC erzeugen – bis dahin doppelte Ersatzbilder (Aufträge in bilder2.py)
 205. ✅ TÜV ließ sich beliebig oft verlängern (Testkonto: TÜV bis 2028) → 0047: nur in der letzten Woche, Knopf zeigt „TÜV bis …“
+206. ✅ Verteidigung „bis zum nächsten Angriff“ ließ sich unbegrenzt stapeln (Testkonto: 232 Fallen → unangreifbar) → 0048: jeder Gegenstand nur einmal aktiv, Doppelte entfernt, Laden zeigt „Aktiv“

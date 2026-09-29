@@ -281,14 +281,14 @@ window.kiezRenderDefenseShop=async()=>{
  const box=document.getElementById('defenseshop');
  if(!box)return;
  box.innerHTML='<p>Lädt…</p>';
- const {data,error}=await statusClient.from('defense_items').select('*').order('sort_order');
+ const [{data,error},{data:act}]=await Promise.all([statusClient.from('defense_items').select('*').order('sort_order'),statusClient.from('user_active_defenses').select('item_id,expires_at')]);const on={};(act||[]).forEach(a=>{if(!a.expires_at||new Date(a.expires_at)>new Date())on[a.item_id]=a.expires_at||'x'});
  if(error||!data){box.innerHTML='<p>Verteidigung gerade nicht verfügbar.</p>';return}
  const dur=it=>it.duration_type==='until_attack'?'bis zum nächsten Angriff':(it.duration_minutes>=60?(Math.round(it.duration_minutes/6)/10)+' Std.':it.duration_minutes+' Min.');
- box.innerHTML=data.map(it=>'<div class="card"><b>'+it.name+'</b><p>'+(it.kind==='defense'?'🛡 +'+it.amount+' Verteidigung':'🎭 +'+it.amount+' Geschick')+' · '+dur(it)+'</p><button class="ghost buydefense" data-id="'+it.id+'">Kaufen – '+Number(it.price).toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})+' €</button></div>').join('')+'<div class="defensemsg" style="grid-column:1/-1"></div>';
+ box.innerHTML=data.map(it=>'<div class="card"><b>'+it.name+'</b><p>'+(it.kind==='defense'?'🛡 +'+it.amount+' Verteidigung':'🎭 +'+it.amount+' Geschick')+' · '+dur(it)+'</p>'+(on[it.id]?'<button class="ghost" disabled>Aktiv'+(on[it.id]!=='x'?' bis '+new Date(on[it.id]).toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'}):' bis zum nächsten Angriff')+'</button>':'<button class="ghost buydefense" data-id="'+it.id+'">Kaufen – '+Number(it.price).toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})+' €</button>')+'</div>').join('')+'<div class="defensemsg" style="grid-column:1/-1"></div>';
  box.querySelectorAll('.buydefense').forEach(b=>b.onclick=async()=>{
   b.disabled=true;
   const {data:res,error:err}=await statusClient.rpc('buy_defense_item',{wanted_item:b.dataset.id});
-  const dm=box.querySelector('.defensemsg');if(err){if(dm)dm.innerHTML='<div class="notice bad">'+esc(err.message)+'</div>'}else{if(res?.profile)window.kiezRenderProfile(res.profile);if(dm)dm.innerHTML='<div class="notice good">'+esc(res.item)+' gekauft – wirkt sofort bei Angriffen auf dich.</div>'}
+  const dm=box.querySelector('.defensemsg');if(err){if(dm)dm.innerHTML='<div class="notice bad">'+esc(err.message)+'</div>'}else{if(res?.profile)window.kiezRenderProfile(res.profile);const t=esc(res.item)+' gekauft – wirkt sofort bei Angriffen auf dich.';await window.kiezRenderDefenseShop();const dm2=box.querySelector('.defensemsg');if(dm2)dm2.innerHTML='<div class="notice good">'+t+'</div>';return}
   b.disabled=false;
  });
 };
