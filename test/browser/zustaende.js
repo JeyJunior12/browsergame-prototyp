@@ -26,7 +26,8 @@ const ok = (c, l, x) => { if (!c) fails++; console.log(c ? '✓' : '✗', l, x ?
       ok(!f.length, label + ' · ' + v + ' › ' + t, f.slice(0, 4).join(' | '));
     }
     // echten Zustand wiederherstellen (kein Neuladen nötig)
-    await pg.evaluate(async () => { const r = await window.kiezSupabase.rpc('refresh_my_profile'); if (r.data) window.kiezRenderProfile(r.data); }); await pg.waitForTimeout(2000);
+    // lädt die Seite dabei neu (Level-Wechsel), einfach abwarten und weiter
+    await pg.evaluate(async () => { const r = await window.kiezSupabase.rpc('refresh_my_profile'); if (r.data) window.kiezRenderProfile(r.data); }).catch(async () => { await pg.waitForLoadState('load').catch(() => {}); await pg.waitForFunction(() => window.kiezGoTab, null, { timeout: 30000 }).catch(() => {}); }); await pg.waitForTimeout(2000);
   }
   ok(!errs.length, 'JS-Fehler', errs.join(' | ') || 'keine');
   console.log(fails ? 'FEHLER: ' + fails : 'ALLES OK'); await b.close();
