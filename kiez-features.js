@@ -1747,7 +1747,7 @@ const HEAD_LINKS = [
   ['#money', 'schliessfach', null, '#schliessfach .card, #schliessfach h2'],
   ['.alcohol-stat', 'store', 'Verbrauchbares', '#store .supermarket-inline'],
   ['.top-training-stat', 'training', 'Lernwarteschlange', '#training .kz-queue'],
-  ['.price-stat', 'pfand', null, '.pfand-pricehistory-card'],
+  ['.price-stat', 'pfand', 'Pfand sammeln', '#pfand details.kz-hist, .pfand-pricehistory-card'],
   ['#bottles', 'pfand', null, '#kz-pfandsell'],
   ['.clean-stat', 'waschhaus', null, '#waschhaus .kz-wh-state'],
   ['#energy', 'pfand', null, '#pfand .section-tools'],
@@ -1789,6 +1789,7 @@ function jumpTo(view, tab, sel) {
   const find = () => {
     const el = sel.split(',').map(x => [...document.querySelectorAll(x)].find(isShown)).find(Boolean); // Reihenfolge = Vorrang
     if (!el) { if (++n < 25) setTimeout(find, 120); return; }
+    if (el.tagName === 'DETAILS') el.open = true;  // zugeklappter Kasten (z. B. Pfandkurs-Verlauf) → aufklappen
     const card = el.matches('input,button,select,label') ? (el.closest('.card,.kf-box') || el) : el;
     const toCard = smooth => window.scrollTo({ top: Math.max(0, card.getBoundingClientRect().top + window.scrollY - 16), behavior: smooth ? 'smooth' : 'auto' });
     toCard(true);

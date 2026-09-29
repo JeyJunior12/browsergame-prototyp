@@ -201,7 +201,7 @@
       ['Konzentrieren', 'training-konzentrieren'], ['Parallele Entwicklung', 'training-parallel'], ['Steigende Anforderungen', 'training-anforderungen'],
       ['Nachricht schreiben', 'post-schreiben'], ['Postfach', 'post-fach'], ['Heute im Kiez', 'mission-heute'], ['Rubbellose', 'rubbellose'],
       ['Nächster Aufstieg', 'uebersicht-aufstieg']
-    ].map(([n, f]) => ['body', new RegExp('^' + n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$'), f]),
+    ].map(x => x.length === 3 ? x : ['body', new RegExp('^' + x[0].replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$'), x[1]]),  // fertige Regeln (S18-Listen oben) nicht noch einmal umwandeln – sonst gingen deren Ersatzbilder verloren
     ['#income', /^Instrument$/, 'musik-instrument'],
     ['#pfand', /^Übersicht$/, 'pfand-uebersicht'],
     ['#pfand', /^Pfandkurs-Verlauf$/, 'pfand-kurs'],
@@ -257,7 +257,7 @@
       ok[file] = null;
       const i = new Image();
       i.onload = () => { ok[file] = true; later(); };
-      i.onerror = () => { ok[file] = false; };
+      i.onerror = () => { ok[file] = false; later(); };  // fehlt das neue Foto, sofort mit dem Ersatzbild weitermachen
       i.src = '/bilder/' + file + '.webp';
     }
     return ok[file] === true;
@@ -306,6 +306,9 @@
     let res = null, done = true;
     // Garage: Kopf „Unterwegs mit: X“ / „Werkstatt: X“ zeigt das Foto des aktiven Fahrzeugs X (vorher Einkaufswagen bzw. Spaten)
     const vm = ids.has('#garage') && tx.match(/^(?:Unterwegs mit|Werkstatt): (.+)$/); if (vm) tx = vm[1];
+    // Besitzlisten zeigen „Name ×2“ → Zähler weg; Platz-Karten (Angelegt: Waffe/Kleidung/Zubehör) zeigen das Foto des angelegten Stücks
+    tx = tx.replace(/\s*×\s*\d+$/, '');
+    if (card.classList.contains('kz-slot')) { const n = (card.querySelector('p')?.firstChild?.textContent || '').trim(); if (n && !/^(nichts|keine?)/i.test(n)) tx = n; }
     for (const [scope, re, file] of R) {
       if (scope[0] === '=') continue;
       if (scope !== 'body' && !(SIMPLE.test(scope) ? ids.has(scope) : card.closest(scope))) continue;
