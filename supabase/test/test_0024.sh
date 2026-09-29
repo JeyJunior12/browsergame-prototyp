@@ -56,7 +56,7 @@ has "Zu spät" "$(as_user $A "select chance_claim((select max(id) from chances w
 # Sortierspiel
 G=$(as_user $A "select sort_game_start()")
 GID=$(echo "$G" | python3 -c "import sys,json;print(json.load(sys.stdin)['id'])"); IT=$(echo "$G" | python3 -c "import sys,json;print(json.load(sys.stdin)['items'])")
-ok  "Sortieren: alle richtig = 20 Flaschen" "$(as_user $A "select (sort_game_finish($GID,'$IT'))->>'bottles'")" "20"
+ok  "Sortieren: alle richtig = 20 × (1 + Level/10) Flaschen (0050)" "$(as_user $A "select (sort_game_finish($GID,'$IT'))->>'bottles'")" "$($P -tAc "select ceil(20*(1+level/10.0))::int from profiles where id='$A'")"
 has "Sortieranlage alle 20 Min." "$(as_user $A "select sort_game_start()")" "belegt"
 G2=$(Q "insert into sort_games(user_id,items,started_at) values('$A','gggggggggggggggggggg',now()-interval '1 minute') returning id")
 has "Zu langsam zählt nicht" "$(as_user $A "select sort_game_finish($G2,'gggggggggggggggggggg')")" "Zeit abgelaufen"
