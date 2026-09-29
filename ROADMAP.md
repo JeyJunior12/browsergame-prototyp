@@ -360,3 +360,4 @@ Nutzerwunsch: Ganz am Ende, wenn alles andere gebaut ist, noch einmal alles durc
 206. ✅ Verteidigung „bis zum nächsten Angriff“ ließ sich unbegrenzt stapeln (Testkonto: 232 Fallen → unangreifbar) → 0048: jeder Gegenstand nur einmal aktiv, Doppelte entfernt, Laden zeigt „Aktiv“
 207. ✅ Verteidigungs-Katalog unstimmig (Sand 1.000 € für +1, Wegweiser 10 € für +12, Bier 2.400 € für 5 Min., „Geschick“-Stücke zählten als Verteidigung) → 0049: Preis nach Punkten und Dauer
 208. ✅ Sortierspiel/Mülltonne spät bedeutungslos (Level 114: +20 Flaschen ≈ 3 €) → 0050: Belohnung × (1 + Level/10)
+209. ✅ Höchstlevel 100 (Nutzerentscheidung) → 0051: Level, Weiterbildungen und Kiez-Legende bei 100; Freischaltungen über 45 auf 46–100 verteilt, Preise steigen bis +50 %

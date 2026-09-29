@@ -9,7 +9,7 @@ $P -tAc "update profiles set money=500, cash_capacity=100000 where id in ('$A','
 # Punkte / Level
 ok  "Level aus Punkten (Kurve 0016: 15×(L−1)²)" "$(as_user $A "update profiles set xp=760 where id=auth.uid() returning level")" "8"
 ok  "Level sinkt nie" "$(as_user $A "update profiles set xp=10 where id=auth.uid() returning level")" "8"
-ok  "Level max 150" "$(as_user $A "update profiles set xp=999999 where id=auth.uid() returning level")" "150"
+ok  "Level max 100 (0051)" "$(as_user $A "update profiles set xp=999999 where id=auth.uid() returning level")" "100"
 $P -tAc "update profiles set xp=0, level=1 where id='$A'"
 as_user $A "select start_training('defense')" >/dev/null
 $P -tAc "update profiles set training_ends_at=now()-interval '1 second' where id='$A'"

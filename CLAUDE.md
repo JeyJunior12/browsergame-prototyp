@@ -31,7 +31,7 @@ Deutsches Browsergame im Stil von Pennergame (Pfand sammeln, Schnorren, Training
 ## Stand
 - Gesamtplan mit allen Pennergame-Funktionen: `ROADMAP.md` (Etappen 1–7).
 - Etappe 1+2 erledigt (Migration 0001 live). XSS-Schutz in `index.html` liegt im Branch, **noch nicht in `main`** (braucht PR + Merge durch Nutzer).
-- Etappe 3 (Balancing, Migration 0002): `xp` = **Punkte** (UI sagt „Punkte“), Level = `kiez_level(xp)` = 1+√(xp/15) (max. 150, **seit 0016**: Punkte für Level L = 15×(L−1)², Pennergame-artig: schneller Einstieg, Level 150 aktiv ~1,5 Jahre; vorher 1+xp/250), per Trigger `profile_sync_level`, nie herabgestuft. Weiterbildung gibt 10+2×neue Stufe Punkte. Kampf nur Level 80–150 %, 3 Std. Sperre pro Gegner. Versicherung 1 €/Tag → Apotheke halb, halber Verlust. Konzentration: −10 % Trainingszeit, blockiert Tour/Kampf/Verbrechen/Kiezaktionen/Schnorren. Schnorren: nur `beg_at_spot` (6 Plätze nach Sammelgebiet), `beg_for_money` = Platz „strasse“.
+- Etappe 3 (Balancing, Migration 0002): `xp` = **Punkte** (UI sagt „Punkte“), Level = `kiez_level(xp)` = 1+√(xp/15) (max. **100** seit 0051 = `kiez_max_level()`, Weiterbildungen ebenfalls max. 100; Anhebung später zusammen mit neuem Inhalt; **seit 0016**: Punkte für Level L = 15×(L−1)², Pennergame-artig: schneller Einstieg, Level 150 aktiv ~1,5 Jahre; vorher 1+xp/250), per Trigger `profile_sync_level`, nie herabgestuft. Weiterbildung gibt 10+2×neue Stufe Punkte. Kampf nur Level 80–150 %, 3 Std. Sperre pro Gegner. Versicherung 1 €/Tag → Apotheke halb, halber Verlust. Konzentration: −10 % Trainingszeit, blockiert Tour/Kampf/Verbrechen/Kiezaktionen/Schnorren. Schnorren: nur `beg_at_spot` (6 Plätze nach Sammelgebiet), `beg_for_money` = Platz „strasse“.
 - Helfer für neue Funktionen: `kiez_actor()` (Profil sperren, Bann prüfen, Energie auffüllen), `kiez_assert_free(p)` (Knast/Konzentration). Geldgewinne immer bis `cash_capacity` deckeln.
 - Admin: Nutzer hat nur einen Account; `is_admin` muss er per SQL setzen (`update profiles set is_admin = true;`) – noch offen.
 
@@ -106,3 +106,9 @@ Testkonten wurden nach Runde 3 gelöscht (0014) – bei Bedarf neu anlegen. Neue
 - Muster für Funktionsänderungen per Textersetzung: `pg_temp.patch` (0040) bzw. `pg_temp.resign` (0041, neue Parameter → alte Signatur löschen, Grants neu setzen).
 - **Vorfall 28.09.2026 ~05:50–06:30:** Live-Datenbank überlastet (Zeitüberschreitungen, dann 503), weil `tester_skip_time` (0039) bei jedem Sprung alle Zeitspalten ALLER Zeilen des Testkontos verschob – auch Protokolle (`profile_audit` wächst bei jeder Profiländerung). Fix 0044: Spaltenliste in `tester_skip_cols`, Protokoll-Tabellen ausgenommen, nur Zeitpunkte der letzten 3 Tage. Bot pausiert 5 Min., wenn ein Sprung > 3 s dauert. Regel: Test-Hilfen nie über ganze Tabellen laufen lassen, immer begrenzen.
 - 0043 `tester_money_log(n)`: Testkonten lesen ihr Geldprotokoll (Fehlersuche). Befund: „verschwundenes“ Geld = Lernwarteschlange bucht erst beim Start.
+
+## Höchstlevel 100 (0051, 29.09.2026, Nutzerentscheidung)
+- `kiez_max_level()` = 100 für Spieler-Level, Weiterbildungen (außer Sozial 45/Musik 9), Kiez-Legende, Banden-Mindestlevel. Punkte zählen weiter.
+- Freischaltungen über Level 45 wurden auf 46–100 zusammengeschoben (neu = 45 + (alt−45)×55/105), Preisaufschlag steigt bis +50 % bei Level 100.
+- Tempo aus dem Durchspiel-Test (Besuch alle 4 Std.): Level 45 ≈ 3 Wochen, 60 ≈ 6 Wochen, 80 ≈ 2,5 Monate, 100 ≈ 4,5 Monate.
+- Anheben: `kiez_max_level()` ändern + neue Inhalte 101+ (Tests `test_0016/0032/0033/0028` rechnen mit 100).

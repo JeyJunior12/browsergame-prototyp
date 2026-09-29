@@ -2217,7 +2217,7 @@ loaders.bandenhaus = async () => {
     + '<div data-htab="Einstellungen"><div class="kf-box"><h3>Bandenprofil</h3>' + (lead ? '<div class="kz-look"><label>Motto <input class="kz-motto-in" maxlength="80" value="' + esc(pub.motto || '') + '"></label>'
       + '<label>Wappen <select class="kz-crest-in">' + Object.keys(CREST_SVG).map(c => '<option value="' + c + '"' + (c === pub.crest ? ' selected' : '') + '>' + ({ flasche: 'Flasche', faust: 'Faust', krone: 'Krone', taube: 'Taube', anker: 'Anker', stern: 'Stern', ratte: 'Ratte', schluessel: 'Schlüssel' })[c] + '</option>').join('') + '</select></label>'
       + '<label>Farbe <input class="kz-color-in" type="color" value="' + esc(pub.color) + '"></label>'
-      + '<label>Mindestlevel <input class="kz-minlvl-in" type="number" min="1" max="150" value="' + pub.min_level + '"></label>'
+      + '<label>Mindestlevel <input class="kz-minlvl-in" type="number" min="1" max="100" value="' + pub.min_level + '"></label>'
       + '<label>Wochenbeitrag € <input class="kz-dues-in" type="number" min="0" max="1000" step="0.5" value="' + Number(mem.dues) + '"></label>'
       + '<label class="kz-check"><input class="kz-open-in" type="checkbox"' + (pub.is_open ? ' checked' : '') + '> Jeder darf beitreten</label>'
       + '<div class="kz-preview">' + crest(pub, 56) + '</div></div><div class="kf-row"><button class="big kz-look-save">Speichern</button></div><div class="kz-look-msg"></div>' : '<p class="kf-muted">Das Profil ändern Chef und Vize.</p>') + '</div>'
@@ -3018,8 +3018,8 @@ loaders.saison = async () => {
 function drawLegend() {
   const ins = document.querySelector('#career > .inside'), p = window.kiezProfile; if (!ins || !p || ins.querySelector('.kz-legend')) return;
   const box = document.createElement('div'); box.className = 'kf-box kz-legend';
-  box.innerHTML = '<h3>Kiez-Legende' + (p.legend ? ' (' + p.legend + '×)' : '') + '</h3><p>Wer Level 150 erreicht, kann als Kiez-Legende von vorn anfangen: Level, Punkte und Weiterbildungen gehen zurück auf Anfang, Geld bis auf 50 € weg. Dafür bleibt für immer: +3 Angriff, +3 Verteidigung und +5 % Pfand – je Legenden-Stufe.</p>'
-    + (p.level >= 150 ? '<div class="kf-row"><button class="big kz-leg-go">Kiez-Legende werden</button></div>' : '<p class="kf-muted">Noch ' + (150 - p.level) + ' Level bis dahin.</p>') + '<div class="kz-leg-msg"></div>';
+  box.innerHTML = '<h3>Kiez-Legende' + (p.legend ? ' (' + p.legend + '×)' : '') + '</h3><p>Wer Level 100 erreicht, kann als Kiez-Legende von vorn anfangen: Level, Punkte und Weiterbildungen gehen zurück auf Anfang, Geld bis auf 50 € weg. Dafür bleibt für immer: +3 Angriff, +3 Verteidigung und +5 % Pfand – je Legenden-Stufe.</p>'
+    + (p.level >= 100 ? '<div class="kf-row"><button class="big kz-leg-go">Kiez-Legende werden</button></div>' : '<p class="kf-muted">Noch ' + (100 - p.level) + ' Level bis dahin.</p>') + '<div class="kz-leg-msg"></div>';
   ins.appendChild(box);
   const b = box.querySelector('.kz-leg-go'); if (b) act(b, box.querySelector('.kz-leg-msg'), async () => { if (!confirm('Wirklich von vorn anfangen? Level und Weiterbildungen werden zurückgesetzt.')) return 'Nicht jetzt.'; const r = await rpc('become_legend'); window.kiezRenderProfile?.(r.profile); return 'Du bist Kiez-Legende Nr. ' + r.legend + '!'; });
 }

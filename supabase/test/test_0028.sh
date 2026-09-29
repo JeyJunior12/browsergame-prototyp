@@ -18,9 +18,9 @@ ok  "Ostern 2027" "$(Q "select kiez_easter(2027)")" "2027-03-28"
 ok  "Feiertage erkannt" "$(Q "select kiez_holiday('2026-12-10')||'/'||kiez_holiday('2026-10-31')||'/'||kiez_holiday('2027-01-01')")" "advent/halloween/silvester"
 ok  "Feiertagsstück nie außerhalb" "$(Q "select count(*) from generate_series(1,300) where kiez_random_plunder() in ('kuerbislaterne','schokohase','lebkuchenherz','wunderkerze') and kiez_holiday() is null")" "0"
 # Legende
-has "Erst ab Level 150" "$(as_user $A "select become_legend()")" "Level 150"
+has "Erst ab Level 100 (0051)" "$(as_user $A "select become_legend()")" "Level 100"
 Q "update profiles set xp=333015, attack_skill=50 where id='$A'" >/dev/null
-ok  "Level 150" "$(Q "select level from profiles where id='$A'")" "150"
+ok  "Level 100" "$(Q "select level from profiles where id='$A'")" "100"
 D0=$(as_user $A "select (combat_overview())->'attack'->>'base'")
 ok  "Legende: zurück auf Level 1" "$(as_user $A "select (become_legend())->'profile'->>'level'")" "1"
 ok  "Legenden-Zähler" "$(Q "select legend from profiles where id='$A'")" "1"
