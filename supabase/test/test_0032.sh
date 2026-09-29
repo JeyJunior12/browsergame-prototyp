@@ -15,11 +15,11 @@ ok "Kein Stück schwächer als sein Vorgänger" "$(Q "$LADDER select string_agg(
 ok "Kampfwert passt zum Level" "$(Q "select string_agg(name,', ') from shop_items where category in ('waffen','kleidung','zubehoer','craft') and required_level>=5
   and ((attack+defense)::numeric/required_level > 2.6 or (attack+defense)::numeric/required_level < 0.4)")" ""
 ok "Bastelsachen nicht mehr ab Level 1 überstark" "$(Q "select count(*) from shop_items where category='craft' and required_level<5 and attack+defense>10")" "0"
-# Lücken: bis Level 150 gibt es in jeder Kategorie spätestens alle 16 Level etwas Neues
+# Lücken: bis Level 100 (0051) gibt es in jeder Kategorie spätestens alle 10 Level etwas Neues
 ok "Keine Lücke > 16 Level" "$(Q "select string_agg(category||' '||required_level,', ') from (select category,required_level,
-  lead(required_level) over (partition by category order by required_level) nx from shop_items where category in ('waffen','kleidung','zubehoer')) x where nx-required_level>16")" ""
-ok "Jede Kategorie reicht bis Level 150" "$(Q "select count(distinct category) from shop_items where category in ('waffen','kleidung','zubehoer') and required_level=150")" "3"
-ok "Begleiter reichen bis Level 150" "$(Q "select max(required_level) from pet_catalog")" "150"
+  lead(required_level) over (partition by category order by required_level) nx from shop_items where category in ('waffen','kleidung','zubehoer')) x where nx-required_level>10")" ""
+ok "Jede Kategorie reicht bis Level 100" "$(Q "select count(distinct category) from shop_items where category in ('waffen','kleidung','zubehoer') and required_level=100")" "3"
+ok "Begleiter reichen bis Level 100" "$(Q "select max(required_level) from pet_catalog")" "100"
 # (health = Mitleid-Bonus, niedrige Werte bei Kampftieren sind gewollt – siehe 0033)
 ok "Begleiter-Leiter: teurer = stärker (Kampf + halbes Mitleid, grob)" "$(Q "select string_agg(name,', ') from (select name,attack+defense+health/2 v, max(attack+defense+health/2) over (order by price rows between unbounded preceding and 1 preceding) prevmax from pet_catalog where price>=100) x where v < prevmax*0.5")" ""
 # Herstellen prüft das Level
