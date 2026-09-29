@@ -362,3 +362,4 @@ Nutzerwunsch: Ganz am Ende, wenn alles andere gebaut ist, noch einmal alles durc
 208. ✅ Sortierspiel/Mülltonne spät bedeutungslos (Level 114: +20 Flaschen ≈ 3 €) → 0050: Belohnung × (1 + Level/10)
 209. ✅ Höchstlevel 100 (Nutzerentscheidung) → 0051: Level, Weiterbildungen und Kiez-Legende bei 100; Freischaltungen über 45 auf 46–100 verteilt, Preise steigen bis +50 %
 210. ✅ Durchspiel-Test abgeschlossen (KiezTester Level 100) → 0052: Test-Werkzeuge entfernt, Testkonten und Daten bleiben
+211. ✅ Bis Level 100 regelmäßig Neues (Nutzerwunsch) → 0053: späte Stücke und Begleiter abwechselnd verteilt, höchstens 1 Level ohne Neues; Test prüft Lücken 1–100
